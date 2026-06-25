@@ -258,7 +258,7 @@ export function generatePriorityOptions(
   addOption(options, {
     id: 'health-scenario-separation',
     label: 'Separate health-risk scenarios from roster-value scenarios',
-    detail: 'Keep medical uncertainty from disguising fundamentally different basketball decisions.',
+    detail: 'Keep medical uncertainty from disguising fundamentally different football decisions.',
     type: 'roster',
     timeline: 'this_season',
     source: 'team_context',

@@ -44,11 +44,11 @@ export const useStore = create<RootStore>()(
       ...createToastsSlice(...a),
     }),
     {
-      name: 'gambit-ui-state-gsw-v3',
-      // Bumped after Saved became Projects. Mismatched versions
+      name: 'gambit-nfl-demo-state-nyg-v1',
+      // Bumped for the NFL demo identity/default POV. Mismatched versions
       // migrate through this narrow persisted surface instead of dropping the
       // app into Zustand's no-migrate warning path.
-      version: 14,
+      version: 15,
       migrate: (persisted) => {
         const s = persisted as Partial<RootStore>;
         const storedNav = s.activeNav as string | undefined;
@@ -59,7 +59,7 @@ export const useStore = create<RootStore>()(
           activeSessionId: null,
           activeBriefId: null,
           activeNav,
-          databaseTeamId: 'GSW',
+          databaseTeamId: 'NYG',
           databasePlayerId: null,
           databaseCapRowId: null,
           databaseStatKey: null,

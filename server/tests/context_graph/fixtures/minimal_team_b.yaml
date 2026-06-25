@@ -1,11 +1,11 @@
-team_id: BOS
+team_id: ARI
 as_of_date: "2026-05-02"
 last_updated: "2026-05-02"
 
 identity:
-  name: Boston Celtics
-  conference: Eastern
-  division: Atlantic
+  name: Arizona Cardinals
+  conference: NFC
+  division: NFC West
   market_tier: tier_1
   market_tier_rationale: Test fixture market rationale.
 
@@ -62,7 +62,7 @@ strategic_posture:
   last_reviewed: "2026-05-02"
 
 cap_situation:
-  current_status: above_first_apron
+  current_status: near_cap
   current_payroll_estimate: 150000000
   hard_capped: no
   hard_cap_reason: none
@@ -80,7 +80,7 @@ trade_dna:
     - Test deals.
   recent_significant_trades:
     - date: "2026-02-01"
-      summary: Boston acquired Player Alpha from Atlanta Hawks in a pick deal.
+      summary: Arizona acquired Player Alpha from Atlanta Falcons in a pick deal.
   confidence: high
 
 cultural_signals:
@@ -104,16 +104,16 @@ roster:
   - player_id: player_beta
     name: Player Beta
     age: 26
-    position_listed: SG
+    position_listed: WR
     contract_type: standard
     availability_status: healthy
     archetype:
-      physical_position: combo_guard
+      physical_position: receiver
       offensive_role:
-        primary: secondary_creator
-        secondary: [spacer]
-      defensive_role: wing_stopper
-      shooting_profile: elite
+        primary: primary_receiver
+        secondary: [field_stretcher]
+      defensive_role: not_applicable
+      shooting_profile: not_applicable
       special_traits: [playoff_riser]
     tier: starter
     trajectory: peak
@@ -126,7 +126,7 @@ roster:
       trade_kicker: none
       player_option: none
       team_option: none
-      bird_rights: full
+      bird_rights: extension_eligible
       contract_through: "2027"
       source: https://example.com/player-beta-contract
     movement_constraints:
@@ -184,7 +184,7 @@ team_team_relationships:
       detail: Test connection.
 
 g_league_and_stash:
-  affiliate_team: Maine Celtics
+  affiliate_team: Arizona practice squad
   notable_affiliate_players: []
   international_stash: []
 

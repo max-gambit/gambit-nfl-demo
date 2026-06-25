@@ -2,6 +2,7 @@ import { useState, type CSSProperties } from 'react';
 import { Icon } from '../ds/Icon';
 import { useToasts } from '../store';
 import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
+import { ContextGraphSettings } from './ContextGraphSettings';
 
 type SourceStatus = 'connected' | 'not_connected';
 type SourceAction = 'connect' | 'configure';
@@ -19,14 +20,14 @@ interface SourceConfig {
 const SOURCES: SourceConfig[] = [
   { id: 'google-sheets', name: 'Google Sheets', category: 'Workspace', status: 'connected', freshness: '12m ago', cadence: 'Hourly', icon: 'grid' },
   { id: 'google-docs', name: 'Google Docs', category: 'Workspace', status: 'connected', freshness: '22m ago', cadence: 'Hourly', icon: 'doc' },
-  { id: 'realgm', name: 'RealGM', category: 'League data', status: 'not_connected', freshness: 'Not connected', cadence: 'Daily', icon: 'search' },
+  { id: 'pff', name: 'PFF', category: 'League data', status: 'not_connected', freshness: 'Not connected', cadence: 'Daily', icon: 'search' },
   { id: 'teamworks', name: 'Teamworks', category: 'Team operations', status: 'not_connected', freshness: 'Not connected', cadence: 'Near real time', icon: 'shield' },
-  { id: 'warriorsdb', name: 'WarriorsDB', category: 'Internal system', status: 'not_connected', freshness: 'Not connected', cadence: 'On demand', icon: 'clipboard' },
-  { id: 'second-spectrum', name: 'Second Spectrum', category: 'Tracking and video', status: 'not_connected', freshness: 'Not connected', cadence: 'Game day', icon: 'pulse' },
-  { id: 'synergy', name: 'Synergy', category: 'Scouting and video', status: 'not_connected', freshness: 'Not connected', cadence: 'Game day', icon: 'play' },
-  { id: 'spotrac', name: 'Spotrac / Cap Sheets', category: 'Cap and contracts', status: 'connected', freshness: '35m ago', cadence: 'Daily', icon: 'clipboard' },
-  { id: 'nba-official', name: 'NBA Official Stats / Rosters', category: 'League data', status: 'connected', freshness: '1h ago', cadence: 'Daily', icon: 'check' },
-  { id: 'basketball-reference', name: 'Basketball Reference / Stathead', category: 'Historical stats', status: 'not_connected', freshness: 'Not connected', cadence: 'Weekly', icon: 'search' },
+  { id: 'club-os', name: 'Club football ops DB', category: 'Internal system', status: 'not_connected', freshness: 'Not connected', cadence: 'On demand', icon: 'clipboard' },
+  { id: 'zebra', name: 'Zebra tracking', category: 'Tracking and player data', status: 'not_connected', freshness: 'Not connected', cadence: 'Game day', icon: 'pulse' },
+  { id: 'sports-info-solutions', name: 'Sports Info Solutions', category: 'Scouting and charting', status: 'not_connected', freshness: 'Not connected', cadence: 'Game day', icon: 'play' },
+  { id: 'overthecap', name: 'Over The Cap / contracts', category: 'Cap and contracts', status: 'connected', freshness: '35m ago', cadence: 'Daily', icon: 'clipboard' },
+  { id: 'nfl-official', name: 'NFL official rosters / transactions', category: 'League data', status: 'connected', freshness: '1h ago', cadence: 'Daily', icon: 'check' },
+  { id: 'pro-football-reference', name: 'Pro Football Reference / Stathead', category: 'Historical stats', status: 'not_connected', freshness: 'Not connected', cadence: 'Weekly', icon: 'search' },
   { id: 'hudl-sportscode', name: 'Hudl / Sportscode', category: 'Video workflow', status: 'not_connected', freshness: 'Not connected', cadence: 'Game day', icon: 'deck' },
   { id: 'catapult', name: 'Catapult', category: 'Performance', status: 'not_connected', freshness: 'Not connected', cadence: 'Daily', icon: 'pulse' },
   { id: 'slack-email', name: 'Slack / Email', category: 'Communications', status: 'not_connected', freshness: 'Not connected', cadence: 'On demand', icon: 'link' },
@@ -57,47 +58,63 @@ export function SettingsView() {
       <header style={headerStyle}>
         <div>
           <div style={eyebrowStyle}>Settings</div>
-          <h1 style={titleStyle}>Sources</h1>
+          <h1 style={titleStyle}>Profile and sources</h1>
         </div>
       </header>
 
       <main style={contentStyle}>
-        <div style={tableStyle}>
-          <div style={tableHeaderStyle}>
-            <div>Source</div>
-            <div>Status</div>
-            <div>Sync</div>
-            <div>Updated</div>
-            <div />
+        <section style={sectionStyle}>
+          <div style={sectionHeaderStyle}>
+            <div style={eyebrowStyle}>Profile</div>
+            <h2 style={sectionTitleStyle}>Team preferences</h2>
           </div>
-          {SOURCES.map((source, index) => {
-            const status = STATUS_COPY[source.status];
-            const recent = recentAction[source.id];
-            const action = actionForSource(source);
-            const isLast = index === SOURCES.length - 1;
-            return (
-              <div key={source.id} style={isLast ? lastRowStyle : rowStyle}>
-                <div style={sourceCellStyle}>
-                  <div style={sourceIconStyle}>
-                    <Icon name={source.icon} size={16} />
+          <div style={profilePanelStyle}>
+            <ContextGraphSettings initialTeamId="NYG" embedded />
+          </div>
+        </section>
+
+        <section style={sectionStyle}>
+          <div style={sectionHeaderStyle}>
+            <div style={eyebrowStyle}>Sources</div>
+            <h2 style={sectionTitleStyle}>Connections</h2>
+          </div>
+          <div style={tableStyle}>
+            <div style={tableHeaderStyle}>
+              <div>Source</div>
+              <div>Status</div>
+              <div>Sync</div>
+              <div>Updated</div>
+              <div />
+            </div>
+            {SOURCES.map((source, index) => {
+              const status = STATUS_COPY[source.status];
+              const recent = recentAction[source.id];
+              const action = actionForSource(source);
+              const isLast = index === SOURCES.length - 1;
+              return (
+                <div key={source.id} style={isLast ? lastRowStyle : rowStyle}>
+                  <div style={sourceCellStyle}>
+                    <div style={sourceIconStyle}>
+                      <Icon name={source.icon} size={16} />
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={sourceNameStyle}>{source.name}</div>
+                      <div style={sourceCategoryStyle}>{source.category}</div>
+                    </div>
                   </div>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={sourceNameStyle}>{source.name}</div>
-                    <div style={sourceCategoryStyle}>{source.category}</div>
+                  <div><StatusIndicator label={status.label} connected={status.connected} /></div>
+                  <div style={plainCellStyle}>{source.cadence}</div>
+                  <div style={plainCellStyle}>{recent ? recentCopy(recent) : source.freshness}</div>
+                  <div style={actionCellStyle}>
+                    <button type="button" onClick={() => onAction(source)} style={actionButtonStyle}>
+                      {actionLabel(action)}
+                    </button>
                   </div>
                 </div>
-                <div><StatusIndicator label={status.label} connected={status.connected} /></div>
-                <div style={plainCellStyle}>{source.cadence}</div>
-                <div style={plainCellStyle}>{recent ? recentCopy(recent) : source.freshness}</div>
-                <div style={actionCellStyle}>
-                  <button type="button" onClick={() => onAction(source)} style={actionButtonStyle}>
-                    {actionLabel(action)}
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        </section>
       </main>
     </section>
   );
@@ -172,6 +189,35 @@ const contentStyle: CSSProperties = {
   minHeight: 0,
   overflow: 'auto',
   padding: `${SPACE.xl}px ${SPACE['3xl']}px ${SPACE['4xl']}px`,
+};
+
+const sectionStyle: CSSProperties = {
+  display: 'grid',
+  gap: SPACE.md,
+  marginBottom: SPACE['2xl'],
+};
+
+const sectionHeaderStyle: CSSProperties = {
+  display: 'grid',
+  gap: SPACE.xs,
+};
+
+const sectionTitleStyle: CSSProperties = {
+  margin: 0,
+  fontFamily: 'var(--font-display)',
+  fontSize: TYPE.display.sm,
+  fontWeight: 650,
+  color: F.ink,
+  letterSpacing: TRACKING.body,
+};
+
+const profilePanelStyle: CSSProperties = {
+  minHeight: 520,
+  background: F.surface,
+  border: `1px solid ${F.border}`,
+  borderRadius: RADIUS.md,
+  overflow: 'hidden',
+  boxShadow: F.shadowSoft,
 };
 
 const tableStyle: CSSProperties = {

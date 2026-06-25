@@ -29,7 +29,6 @@ import {
   buildCurrentNbaEvidence,
   currentNbaEvidenceScopeForQuestion,
   currentNbaEvidenceTeamIds as resolveCurrentNbaEvidenceTeamIds,
-  defaultNbaEvidenceTeamId,
   reserveGeneratedSourceRefs,
 } from '../claude/nba_evidence.js';
 import {
@@ -1144,7 +1143,7 @@ function normalizeBriefMode(mode: unknown): BriefMode | null {
 }
 
 export function defaultBriefTeamId(): string | null {
-  return defaultNbaEvidenceTeamId();
+  return null;
 }
 
 export function currentNbaEvidenceTeamIds(question: string, defaultTeamId = defaultBriefTeamId()): string[] {

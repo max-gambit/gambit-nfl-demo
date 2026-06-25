@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
 import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
-import { getCbaArticle, listCba, searchCbaArticles, streamCbaChat } from '../api/cba';
+import { getNflRuleArticle, listNflRules, searchNflRules, streamNflRulesChat } from '../api/nflRules';
 import { fire } from '../lib/events';
 import { useUi } from '../store';
 import type {
@@ -28,11 +28,11 @@ type CbaLinkState = {
 };
 
 const RELATED_CONCEPTS = [
-  { label: 'Second apron', query: 'second apron' },
-  { label: 'Hard cap', query: 'hard cap' },
-  { label: 'Trade aggregation', query: 'trade aggregation' },
-  { label: 'Bird rights', query: 'Bird rights' },
-  { label: 'Sign-and-trade', query: 'sign and trade' },
+  { label: 'Restructure', query: 'restructure' },
+  { label: 'Post-June 1', query: 'post June 1' },
+  { label: 'Franchise tag', query: 'franchise tag' },
+  { label: 'Dead money', query: 'dead money' },
+  { label: 'Comp picks', query: 'compensatory picks' },
 ];
 
 export function CbaWorkbench() {
@@ -57,13 +57,13 @@ export function CbaWorkbench() {
     options: { updateUrl?: boolean } = {},
   ) => {
     try {
-      const next = await getCbaArticle(id);
+      const next = await getNflRuleArticle(id);
       setSelected(next);
       setSelectedChunkId(chunkId);
       setHighlightedChunkId(chunkId);
       if (options.updateUrl !== false) writeCbaLinkState(id, chunkId);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'CBA section unavailable.');
+      setError(err instanceof Error ? err.message : 'NFL rule unavailable.');
     }
   }, []);
 
@@ -77,7 +77,7 @@ export function CbaWorkbench() {
 
   useEffect(() => {
     let cancelled = false;
-    listCba()
+    listNflRules()
       .then(async (res) => {
         if (cancelled) return;
         setDocument(res.document);
@@ -90,7 +90,7 @@ export function CbaWorkbench() {
         if (target) await selectArticle(target.id, initialSection ? initial.chunkId : null);
       })
       .catch((err) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'CBA corpus unavailable.');
+        if (!cancelled) setError(err instanceof Error ? err.message : 'NFL rules corpus unavailable.');
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -118,12 +118,12 @@ export function CbaWorkbench() {
     }
     let cancelled = false;
     const timer = window.setTimeout(() => {
-      searchCbaArticles(q)
+      searchNflRules(q)
         .then((res) => {
           if (!cancelled) setSearchSections(res.sections);
         })
         .catch((err) => {
-          if (!cancelled) setError(err instanceof Error ? err.message : 'CBA search failed.');
+          if (!cancelled) setError(err instanceof Error ? err.message : 'NFL rules search failed.');
         });
     }, 180);
     return () => {
@@ -177,8 +177,8 @@ export function CbaWorkbench() {
         onContexts={setRelatedContexts}
         onOpenAnalyze={(question) => {
           const prompt = question
-            ? `Analyze this live/team-specific question with current cap data, then cite the relevant CBA rule: ${question}`
-            : 'Analyze this live/team-specific question with current cap data, then cite the relevant CBA rule.';
+            ? `Analyze this live/team-specific NFL question with current cap data, then cite the relevant NFL rule family: ${question}`
+            : 'Analyze this live/team-specific NFL question with current cap data, then cite the relevant NFL rule family.';
           openAnalyzeWithDraft(prompt);
         }}
       />
@@ -221,7 +221,7 @@ function CbaIndexPanel({
           letterSpacing: TRACKING.micro,
           color: F.fgMuted,
           textTransform: 'uppercase',
-        }}>CBA reference</div>
+        }}>NFL Rules reference</div>
         <div style={{
           marginTop: SPACE.xs,
           fontFamily: 'var(--font-sans)',
@@ -229,13 +229,13 @@ function CbaIndexPanel({
           fontWeight: 600,
           color: F.ink,
           lineHeight: 1.25,
-        }}>{document?.season_label ?? '2023 CBA'}</div>
+        }}>{document?.season_label ?? 'NFL Rules'}</div>
         <div style={{
           marginTop: SPACE.xs,
           fontFamily: 'var(--font-mono)',
           fontSize: TYPE.meta.md,
           color: F.fgMuted,
-        }}>{document ? `${document.page_count} PDF pages` : 'Loading'}</div>
+        }}>{document ? `${document.page_count} rule families` : 'Loading'}</div>
       </div>
       <div style={{ padding: SPACE.md, borderBottom: `1px solid ${F.border}` }}>
         <input
@@ -278,7 +278,7 @@ function CbaIndexPanel({
         </div>
       </div>
       <div className="gd-scroll" style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: `${SPACE.sm}px 0` }}>
-        {loading && <PanelNote>Loading CBA corpus...</PanelNote>}
+        {loading && <PanelNote>Loading NFL rules corpus...</PanelNote>}
         {!loading && error && <PanelNote>{error}</PanelNote>}
         {!loading && !error && sections.length === 0 && <PanelNote>No matching sections.</PanelNote>}
         {sections.map((section) => {
@@ -351,7 +351,7 @@ function CbaReader({
   if (!selected) {
     return (
       <main style={{ minHeight: 0, overflow: 'auto', padding: SPACE.xl }}>
-        <PanelNote>Select a CBA section.</PanelNote>
+        <PanelNote>Select an NFL rule family.</PanelNote>
       </main>
     );
   }
@@ -536,7 +536,7 @@ function CbaChatRail({
     ]);
 
     try {
-      for await (const streamEvent of streamCbaChat({
+      for await (const streamEvent of streamNflRulesChat({
         message: text,
         activeArticleId: selected?.section.id ?? null,
         selectedChunkId,
@@ -574,7 +574,7 @@ function CbaChatRail({
     } catch (err) {
       setMessages((current) => current.map((entry) => (
         entry.id === assistantId
-          ? { ...entry, content: err instanceof Error ? err.message : 'CBA chat failed.' }
+          ? { ...entry, content: err instanceof Error ? err.message : 'NFL Rules chat failed.' }
           : entry
       )));
     } finally {
@@ -596,7 +596,7 @@ function CbaChatRail({
           fontSize: TYPE.body.lg,
           fontWeight: 600,
           color: F.ink,
-        }}>CBA Navigator</div>
+        }}>NFL Rules Navigator</div>
         <div style={{
           marginTop: SPACE.xs,
           fontFamily: 'var(--font-mono)',
@@ -645,7 +645,7 @@ function CbaChatRail({
               color: F.ink,
               lineHeight: 1.5,
               whiteSpace: 'pre-wrap',
-            }}>{message.content || (streaming && message.role === 'assistant' ? 'Searching CBA...' : '')}</div>
+            }}>{message.content || (streaming && message.role === 'assistant' ? 'Searching NFL rules...' : '')}</div>
             {message.citations.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: SPACE.xs, marginTop: SPACE.sm }}>
                 {message.citations.map((citation) => (
@@ -716,7 +716,7 @@ function CbaChatRail({
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           disabled={streaming}
-          placeholder="Ask the CBA"
+          placeholder="Ask NFL Rules"
           rows={2}
           style={{
             flex: 1,
@@ -972,7 +972,7 @@ function buildAnalyzeRulePrompt(section: CbaSection, chunk?: CbaChunk): string {
   const quote = chunk ? ` Quote: "${clipWords(chunk.body, 42)}"` : '';
   const page = pageLabel(chunk ?? section);
   const cite = page ? `${section.label} (${page})` : section.label;
-  return `Explain this CBA rule in Analyze against current team/cap context. CBA citation: ${cite}.${quote}`;
+  return `Explain this NFL rule family in Analyze against current team/cap context. NFL Rules citation: ${cite}.${quote}`;
 }
 
 function uniqueRelatedContexts(
@@ -993,7 +993,7 @@ function uniqueRelatedContexts(
 function copyText(text: string): void {
   if (!text) return;
   navigator.clipboard?.writeText(text).catch((err) => {
-    console.warn('[cba] copy failed', err);
+    console.warn('[nfl-rules] copy failed', err);
   });
 }
 

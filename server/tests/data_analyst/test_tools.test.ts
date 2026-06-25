@@ -8,6 +8,7 @@ import {
   dataAnalystTools,
   dataAnalystTracesToBriefSources,
   dataAnalystTracesToToolCalls,
+  handleDataAnalystToolUse,
   isSubmitDataAnalysisInput,
   recommendationBriefCbaCitationSources,
   resolveDataAnalystTeamIds,
@@ -25,14 +26,24 @@ test('brief mode parsing honors explicit data command and conservative heuristic
   assert.equal(inferBriefModeFromQuestion('Which Wizards players have the highest usage?'), 'data_analyst');
   assert.equal(inferBriefModeFromQuestion('Rank the Wizards by true shooting'), 'data_analyst');
   assert.equal(inferBriefModeFromQuestion('Should Washington trade for a veteran guard?'), 'brief');
+  assert.equal(
+    inferBriefModeFromQuestion('We are the Giants. Should we cut, restructure, extend, or tag a veteran contract to open cap room?'),
+    'data_analyst',
+  );
+  assert.equal(inferBriefModeFromQuestion('Should we trade for a veteran edge rusher?'), 'brief');
 });
 
 test('data analyst tool catalog exposes read-only app data tools and structured output', () => {
   assert.deepEqual(dataAnalystTools.map((tool) => tool.name), [
     'list_available_datasets',
+    'query_nfl_data',
     'query_nba_data',
     'query_brief_workspace',
   ]);
+  const nflSchema = dataAnalystTools.find((tool) => tool.name === 'query_nfl_data')?.input_schema as {
+    properties?: { datasets?: { items?: { enum?: string[] } } };
+  };
+  assert.ok(nflSchema.properties?.datasets?.items?.enum?.includes('rules'));
   const querySchema = dataAnalystTools.find((tool) => tool.name === 'query_nba_data')?.input_schema as {
     properties?: { datasets?: { items?: { enum?: string[] } } };
   };
@@ -54,6 +65,54 @@ test('data analyst tool catalog exposes read-only app data tools and structured 
     'followups',
   ]);
   assert.ok(schema.properties?.sources?.items?.properties?.kind?.enum?.includes('CBA'));
+});
+
+test('data analyst dataset catalog advertises NFL demo data instead of legacy NBA snapshots', async () => {
+  const result = await handleDataAnalystToolUse('list_available_datasets', {});
+  const datasetIds = result.datasets.map((dataset) => dataset.dataset_id);
+
+  assert.equal(result.ok, true);
+  assert.ok(datasetIds.includes('nfl_demo_static'));
+  assert.ok(datasetIds.includes('nfl_rosters_current'));
+  assert.ok(datasetIds.includes('nfl_cap_sheets_current'));
+  assert.ok(datasetIds.includes('nfl_player_metrics_current'));
+  assert.ok(datasetIds.includes('nfl_context_graph'));
+  assert.ok(datasetIds.includes('nfl_rules_static'));
+  assert.equal(datasetIds.some((datasetId) => datasetId.startsWith('nba_')), false);
+});
+
+test('data analyst NFL tool defaults omitted team scope to Giants and returns cap rules evidence', async () => {
+  const result = await handleDataAnalystToolUse('query_nfl_data', {
+    datasets: ['cap_sheets', 'rules'],
+    player_names: ['Andrew Thomas'],
+    limit: 8,
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.datasets.some((dataset) => dataset.dataset_id === 'nfl_cap_sheets_current'), true);
+  assert.equal(result.datasets.some((dataset) => dataset.dataset_id === 'nfl_rules_static'), true);
+  assert.deepEqual(result.datasets.find((dataset) => dataset.dataset_id === 'nfl_cap_sheets_current')?.team_ids, ['NYG']);
+  const capRows = (result.data.cap_sheets as { rows: Array<{ player_name: string; restructure_savings_estimate_2026: number | null }> }).rows;
+  assert.equal(capRows[0]?.player_name, 'Andrew Thomas');
+  assert.equal(typeof capRows[0]?.restructure_savings_estimate_2026, 'number');
+  const rules = (result.data.rules as { rows: Array<{ rule_family: string }> }).rows;
+  assert.equal(rules.some((row) => row.rule_family === 'restructure_conversion'), true);
+});
+
+test('data analyst NFL tool supports Giants cut restructure tag prompt evidence shape', async () => {
+  const result = await handleDataAnalystToolUse('query_nfl_data', {
+    datasets: ['cap_sheets', 'rosters', 'player_metrics', 'context_graph', 'rules'],
+    limit: 12,
+  });
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.datasets.find((dataset) => dataset.dataset_id === 'nfl_cap_sheets_current')?.team_ids, ['NYG']);
+  const capRows = (result.data.cap_sheets as { rows: Array<{ player_name: string; restructure_savings_estimate_2026: number | null; tag_eligible_2027: boolean }> }).rows;
+  assert.ok(capRows.some((row) => row.player_name === 'Andrew Thomas' && typeof row.restructure_savings_estimate_2026 === 'number'));
+  assert.ok(capRows.some((row) => row.tag_eligible_2027));
+  const rules = (result.data.rules as { rows: Array<{ rule_family: string; summary: string }> }).rows;
+  assert.ok(rules.some((row) => row.rule_family === 'post_june_1_accounting'));
+  assert.ok(rules.some((row) => row.rule_family === 'franchise_transition_tag'));
 });
 
 test('data analyst NBA tool defaults omitted team scope to Warriors POV', () => {
@@ -162,6 +221,50 @@ test('data analysis CBA citation sources select matching article cards', () => {
 test('data analysis CBA citation matcher does not add rule cards for non-CBA analysis', () => {
   assert.deepEqual(selectCbaArticlesForText(cbaArticles(), 'Rank Washington guards by true shooting.'), []);
   assert.deepEqual(selectCbaArticlesForText(cbaArticles(), 'Compare Larry Bird and Magic Johnson career playoff production.'), []);
+});
+
+test('data analysis CBA citation sources skip NBA cards when NFL data evidence is present', () => {
+  const payload: SubmitDataAnalysisInput = {
+    answer: 'For the Giants, prioritize restructure paths before tag decisions.',
+    key_findings: [],
+    tables: [],
+    calculations: [],
+    sources: [{
+      ref_index: 1,
+      kind: 'ANALYST_DATA',
+      source: 'GAMBIT_APP_DATA',
+      title: 'App data - NFL rules static snippets',
+      updated_at: '2026-06-25',
+      data: {
+        rows: [{ k: 'Dataset', v: 'nfl_rules_static' }],
+        data_analyst_trace: {
+          tool_use_id: 'trace_1',
+          tool_name: 'query_nfl_data',
+          datasets: [{
+            dataset_id: 'nfl_rules_static',
+            label: 'NFL rules static snippets',
+            as_of_date: '2026-06-25',
+            source_name: 'NFL rules corpus',
+            team_ids: ['NYG'],
+            row_count: 3,
+          }],
+          errors: [],
+        },
+      },
+    }],
+    caveats: [],
+    followups: [],
+  };
+
+  const sources = dataAnalysisCbaCitationSources(
+    'We are the Giants. Should we restructure or tag a veteran contract?',
+    payload,
+    cbaArticles(),
+    2,
+    payload.sources,
+  );
+
+  assert.deepEqual(sources, []);
 });
 
 test('data analysis CBA citation matcher handles above-cap re-signing phrasing', () => {

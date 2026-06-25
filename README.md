@@ -1,17 +1,17 @@
-# Gambit UI Remix
+# gambit-nfl-demo
 
-Gambit UI Remix is the working product prototype for Gambit's NBA front-office operating system. It combines an AI decision-brief workspace, current NBA reference data, and source-backed Intel so basketball operators can ask roster, cap, trade, and team-strategy questions with visible evidence instead of generic chat output.
+`gambit-nfl-demo` is an internal NFL demo fork of Gambit's front-office operating-system prototype. Milestone 1 is graph-first: the visible profile and Intel preference surfaces default to the New York Giants / `NYG`, while the app preserves the existing three-panel shell and avoids claiming the legacy Analyze/cap/rules surfaces are NFL-complete.
 
-The app is intentionally product-shaped rather than demo-slide-shaped: the first screen is the usable Analyze workspace, with supporting Dashboard, War Room, Database, and Settings surfaces.
+The app is intentionally product-shaped rather than demo-slide-shaped: the first screen remains the usable three-panel workspace, with supporting Dashboard, Database, and Settings surfaces. Settings is available for profile/preferences even when first-run onboarding is skipped.
 
 ## What It Includes
 
-- **Analyze workspace**: channel-style decision briefs, follow-up chat, right-panel brief threads, source cards, artifacts, and compare flows.
-- **AI brief generation**: Anthropic-backed recommendation briefs, follow-up chat, agent outputs, context-graph tool use, and data-analyst mode.
-- **NBA data layer**: seeded roster, cap-sheet, and player-stat snapshots exposed through the app database and `/nba/*` server routes.
-- **NBA Intel**: one YAML source file per NBA team, generated relationship artifacts, validation/reporting tools, Settings overrides, and AI lookup adapters.
-- **Intel onboarding**: first-run team-context capture that stores user-provided priorities, working style, and trust boundaries as local Intel overrides.
-- **War Room**: a team-specific executive-demo surface built on the generic Intel read model.
+- **Three-panel workspace**: channel-style decision briefs, follow-up chat, right-panel brief threads, source cards, artifacts, and compare flows.
+- **AI brief generation**: Anthropic-backed recommendation briefs, follow-up chat, agent outputs, context-graph tool use, and data-analyst mode. This path still contains legacy NBA assumptions and should not be treated as an NFL Analyze claim.
+- **Legacy NBA data layer**: seeded roster, cap-sheet, and player-stat snapshots exposed through the app database and `/nba/*` server routes. Milestone 1 does not modify this data layer.
+- **NFL Intel slice**: NFL context-graph source files, generated relationship artifacts, validation/reporting tools, Settings overrides, and AI lookup adapters.
+- **Intel onboarding**: optional team-context capture that stores user-provided priorities, working style, and trust boundaries as local Intel overrides. The first-run gate is disabled by default in this fork.
+- **Settings profile/preferences**: profile and source-connection surfaces tuned for the NFL internal demo.
 - **QA harness**: optional Playwright + Claude exploratory QA that walks canonical flows and writes a findings report.
 
 ## Tech Stack
@@ -21,7 +21,7 @@ The app is intentionally product-shaped rather than demo-slide-shaped: the first
 - Hono server on Node
 - Supabase local database and storage
 - Anthropic SDK for chat, briefs, agents, and QA harness flows
-- Git-tracked NBA data and Intel artifacts
+- Git-tracked NFL/NBA demo data and Intel artifacts
 
 ## Repository Layout
 
@@ -29,9 +29,9 @@ The app is intentionally product-shaped rather than demo-slide-shaped: the first
 .
   src/                         React app
     fenway/                    Core Analyze shell and brief UI
-    onboarding/                Intel onboarding flow
-    war-room/                  Team-specific executive demo surface
-    database/                  NBA roster/cap/stat database UI
+    onboarding/                Optional Intel onboarding flow
+    war-room/                  Legacy team-specific executive demo surface
+    database/                  Legacy NBA roster/cap/stat database UI
     settings/                  Intel settings UI
     api/                       Browser API clients
     store/                     Zustand slices
@@ -39,11 +39,12 @@ The app is intentionally product-shaped rather than demo-slide-shaped: the first
     src/routes/                Hono route modules
     src/claude/                Anthropic prompts, tools, and adapters
     src/context_graph/         Intel parser, validator, routes, AI adapter helpers
-    src/nba_*                  NBA roster/cap/stat seed and route helpers
+    src/nba_*                  Legacy NBA roster/cap/stat seed and route helpers
     tests/                     Node test suites
   shared/                      Shared TypeScript contracts
   data/
-    nba-context-graph/         Team YAML sources, derived graph JSON, validation report
+    nfl-context-graph/         NFL team YAML sources, derived graph JSON, validation report
+    nba-context-graph/         Legacy NBA team YAML sources and derived artifacts
     nba-rosters/               Reviewed roster seed snapshot
     nba-cap-sheets/            Reviewed cap-sheet seed snapshot
     nba-player-stats/          Reviewed player-stat seed snapshot
@@ -101,12 +102,12 @@ VITE_SUPABASE_ANON_KEY=<local anon key from `supabase status`>
 Optional Intel onboarding flags:
 
 ```text
-VITE_ONBOARDING_TEAM_ID=GSW
+VITE_ONBOARDING_TEAM_ID=NYG
 VITE_DISABLE_ONBOARDING_GATE=true
 VITE_FORCE_ANALYZE_START=true
 ```
 
-Use those flags when you want the prototype to skip first-run onboarding and open directly on Analyze.
+The onboarding gate is disabled by default. Set `VITE_DISABLE_ONBOARDING_GATE=false` only when you explicitly want to exercise the first-run onboarding flow.
 
 ## Run Locally
 
@@ -154,7 +155,7 @@ npm run qa                   # Optional exploratory QA harness
 
 ## Intel Workflow
 
-The Intel source lives under `data/nba-context-graph/teams`, with one YAML file per NBA team. Derived artifacts live under `data/nba-context-graph/derived`.
+The NFL Intel source lives under `data/nfl-context-graph/teams`, with one YAML file per NFL team. Derived artifacts live under `data/nfl-context-graph/derived`.
 
 Common commands:
 
@@ -167,9 +168,9 @@ npm --prefix server run context-graph:repair:safe -- --dry-run
 npm --prefix server run context-graph:repair:source-backed -- --dry-run
 ```
 
-Runtime preference and onboarding edits are stored in gitignored local override files under `data/nba-context-graph/overrides/*.local.json`. The tracked YAML and derived JSON remain the reviewable source layer.
+Runtime preference and onboarding edits are stored in gitignored local override files under the context-graph overrides directory. The tracked YAML and derived JSON remain the reviewable source layer.
 
-See `data/nba-context-graph/README.md` for the deeper schema, validation, repair, and AI-tooling contract.
+See the context-graph README in the relevant data directory for the deeper schema, validation, repair, and AI-tooling contract.
 
 ## Key Server Routes
 
@@ -219,17 +220,17 @@ Reports are written under `qa-harness/runs/<timestamp>/`.
 
 - Local `.env`, `.env.local`, and `data/nba-context-graph/overrides/*.local.json` files are gitignored.
 - Do not commit real API keys, private connector tokens, raw transcripts, private emails, or production credentials.
-- Intel onboarding stores concise team-provided context, not raw conversations.
+- Intel onboarding, when explicitly enabled, stores concise team-provided context, not raw conversations.
 - Export bundles under `exports/` may include local onboarding/preferences context. Review them before sending outside Gambit.
 
 ## Current Demo Defaults
 
-- The default Intel team is `GSW`.
-- The War Room is tuned for the Golden State Warriors front-office demo thread.
-- To skip onboarding and force Analyze on startup, run the client with:
+- The default Intel/profile team is `NYG`.
+- The header/profile surface is tuned for the New York Giants internal demo thread.
+- First-run onboarding is skipped by default. To force Analyze on startup, run the client with:
 
 ```sh
-VITE_ONBOARDING_TEAM_ID=GSW VITE_DISABLE_ONBOARDING_GATE=true VITE_FORCE_ANALYZE_START=true npm run dev
+VITE_ONBOARDING_TEAM_ID=NYG VITE_FORCE_ANALYZE_START=true npm run dev
 ```
 
 ## Project Status

@@ -1,0 +1,3158 @@
+{
+  "pickOwnership": [
+    {
+      "type": "pick_ownership",
+      "owning_team": "ARI",
+      "owed_team": "ARI",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "ARI.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "ARI",
+      "owed_team": "ARI",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "ARI.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "ATL",
+      "owed_team": "ATL",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "ATL.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "ATL",
+      "owed_team": "ATL",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "ATL.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "BAL",
+      "owed_team": "BAL",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "BAL.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "BAL",
+      "owed_team": "BAL",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "BAL.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "BUF",
+      "owed_team": "BUF",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "BUF.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "BUF",
+      "owed_team": "BUF",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "BUF.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "CAR",
+      "owed_team": "CAR",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "CAR.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "CAR",
+      "owed_team": "CAR",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "CAR.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "CHI",
+      "owed_team": "CHI",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "CHI.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "CHI",
+      "owed_team": "CHI",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "CHI.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "CIN",
+      "owed_team": "CIN",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "CIN.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "CIN",
+      "owed_team": "CIN",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "CIN.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "CLE",
+      "owed_team": "CLE",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "CLE.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "CLE",
+      "owed_team": "CLE",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "CLE.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "DAL",
+      "owed_team": "DAL",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "DAL.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "DAL",
+      "owed_team": "DAL",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "DAL.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "DEN",
+      "owed_team": "DEN",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "DEN.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "DEN",
+      "owed_team": "DEN",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "DEN.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "DET",
+      "owed_team": "DET",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "DET.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "DET",
+      "owed_team": "DET",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "DET.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "GB",
+      "owed_team": "GB",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "GB.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "GB",
+      "owed_team": "GB",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "GB.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "HOU",
+      "owed_team": "HOU",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "HOU.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "HOU",
+      "owed_team": "HOU",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "HOU.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "IND",
+      "owed_team": "IND",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "IND.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "IND",
+      "owed_team": "IND",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "IND.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "JAX",
+      "owed_team": "JAX",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "JAX.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "JAX",
+      "owed_team": "JAX",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "JAX.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "KC",
+      "owed_team": "KC",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "KC.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "KC",
+      "owed_team": "KC",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "KC.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "LAC",
+      "owed_team": "LAC",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "LAC.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "LAC",
+      "owed_team": "LAC",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "LAC.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "LAR",
+      "owed_team": "LAR",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "LAR.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "LAR",
+      "owed_team": "LAR",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "LAR.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "LV",
+      "owed_team": "LV",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "LV.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "LV",
+      "owed_team": "LV",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "LV.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "MIA",
+      "owed_team": "MIA",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "MIA.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "MIA",
+      "owed_team": "MIA",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "MIA.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "MIN",
+      "owed_team": "MIN",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "MIN.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "MIN",
+      "owed_team": "MIN",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "MIN.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "NE",
+      "owed_team": "NE",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "NE.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "NE",
+      "owed_team": "NE",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "NE.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "NO",
+      "owed_team": "NO",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "NO.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "NO",
+      "owed_team": "NO",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "NO.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "NYG",
+      "owed_team": "NYG",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "NYG.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "NYG",
+      "owed_team": "NYG",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "NYG.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "NYJ",
+      "owed_team": "NYJ",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "NYJ.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "NYJ",
+      "owed_team": "NYJ",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "NYJ.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "PHI",
+      "owed_team": "PHI",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "PHI.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "PHI",
+      "owed_team": "PHI",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "PHI.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "PIT",
+      "owed_team": "PIT",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "PIT.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "PIT",
+      "owed_team": "PIT",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "PIT.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "SEA",
+      "owed_team": "SEA",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "SEA.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "SEA",
+      "owed_team": "SEA",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "SEA.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "SF",
+      "owed_team": "SF",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "SF.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "SF",
+      "owed_team": "SF",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "SF.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "TB",
+      "owed_team": "TB",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "TB.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "TB",
+      "owed_team": "TB",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "TB.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "TEN",
+      "owed_team": "TEN",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "TEN.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "TEN",
+      "owed_team": "TEN",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "TEN.key_assets.draft_picks_owned[1]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "WAS",
+      "owed_team": "WAS",
+      "year": 2027,
+      "round": 1,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "WAS.key_assets.draft_picks_owned[0]"
+    },
+    {
+      "type": "pick_ownership",
+      "owning_team": "WAS",
+      "owed_team": "WAS",
+      "year": 2027,
+      "round": 2,
+      "protections": "own pick",
+      "condition": null,
+      "conditional": false,
+      "source_path": "WAS.key_assets.draft_picks_owned[1]"
+    }
+  ],
+  "tradePartners": [
+    {
+      "type": "trade_partner",
+      "team_a": "ARI",
+      "team_b": "LAR",
+      "trade_count_recent": 1,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "ARI.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "ATL",
+      "team_b": "CAR",
+      "trade_count_recent": 1,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "CAR.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "ATL",
+      "team_b": "NO",
+      "trade_count_recent": 1,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "NO.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "ATL",
+      "team_b": "TB",
+      "trade_count_recent": 2,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "ATL.trade_dna.frequent_partners",
+        "TB.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "BAL",
+      "team_b": "CIN",
+      "trade_count_recent": 1,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "CIN.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "BAL",
+      "team_b": "PIT",
+      "trade_count_recent": 2,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "BAL.trade_dna.frequent_partners",
+        "PIT.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "BUF",
+      "team_b": "MIA",
+      "trade_count_recent": 2,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "BUF.trade_dna.frequent_partners",
+        "MIA.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "CHI",
+      "team_b": "GB",
+      "trade_count_recent": 2,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "CHI.trade_dna.frequent_partners",
+        "GB.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "CLE",
+      "team_b": "PIT",
+      "trade_count_recent": 1,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "CLE.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "DAL",
+      "team_b": "PHI",
+      "trade_count_recent": 2,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "DAL.trade_dna.frequent_partners",
+        "PHI.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "DEN",
+      "team_b": "KC",
+      "trade_count_recent": 2,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "DEN.trade_dna.frequent_partners",
+        "KC.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "DET",
+      "team_b": "GB",
+      "trade_count_recent": 1,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "DET.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "DET",
+      "team_b": "MIN",
+      "trade_count_recent": 1,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "MIN.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "HOU",
+      "team_b": "IND",
+      "trade_count_recent": 2,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "HOU.trade_dna.frequent_partners",
+        "IND.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "JAX",
+      "team_b": "TEN",
+      "trade_count_recent": 2,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "JAX.trade_dna.frequent_partners",
+        "TEN.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "KC",
+      "team_b": "LAC",
+      "trade_count_recent": 1,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "LAC.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "KC",
+      "team_b": "LV",
+      "trade_count_recent": 1,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "LV.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "LAR",
+      "team_b": "SF",
+      "trade_count_recent": 2,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "LAR.trade_dna.frequent_partners",
+        "SF.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "NE",
+      "team_b": "NYJ",
+      "trade_count_recent": 2,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "NE.trade_dna.frequent_partners",
+        "NYJ.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "NYG",
+      "team_b": "PHI",
+      "trade_count_recent": 1,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "NYG.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "NYG",
+      "team_b": "WAS",
+      "trade_count_recent": 1,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "WAS.trade_dna.frequent_partners"
+      ]
+    },
+    {
+      "type": "trade_partner",
+      "team_a": "SEA",
+      "team_b": "SF",
+      "trade_count_recent": 1,
+      "last_trade_date": "2026-03",
+      "source_paths": [
+        "SEA.trade_dna.frequent_partners"
+      ]
+    }
+  ],
+  "rivalries": [
+    {
+      "type": "rivalry",
+      "team_a": "ARI",
+      "team_b": "LAR",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "ARI.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "ATL",
+      "team_b": "TB",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "ATL.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "BAL",
+      "team_b": "PIT",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "BAL.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "BUF",
+      "team_b": "MIA",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "BUF.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "CAR",
+      "team_b": "ATL",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "CAR.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "CHI",
+      "team_b": "GB",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "CHI.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "CIN",
+      "team_b": "BAL",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "CIN.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "CLE",
+      "team_b": "PIT",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "CLE.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "DAL",
+      "team_b": "PHI",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "DAL.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "DEN",
+      "team_b": "KC",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "DEN.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "DET",
+      "team_b": "GB",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "DET.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "GB",
+      "team_b": "CHI",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "GB.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "HOU",
+      "team_b": "IND",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "HOU.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "IND",
+      "team_b": "HOU",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "IND.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "JAX",
+      "team_b": "TEN",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "JAX.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "KC",
+      "team_b": "DEN",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "KC.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "LAC",
+      "team_b": "KC",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "LAC.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "LAR",
+      "team_b": "SF",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "LAR.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "LV",
+      "team_b": "KC",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "LV.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "MIA",
+      "team_b": "BUF",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "MIA.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "MIN",
+      "team_b": "DET",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "MIN.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "NE",
+      "team_b": "NYJ",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "NE.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "NO",
+      "team_b": "ATL",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "NO.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "NYG",
+      "team_b": "PHI",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "NYG.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "NYJ",
+      "team_b": "NE",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "NYJ.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "PHI",
+      "team_b": "DAL",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "PHI.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "PIT",
+      "team_b": "BAL",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "PIT.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "SEA",
+      "team_b": "SF",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "SEA.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "SF",
+      "team_b": "LAR",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "SF.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "TB",
+      "team_b": "ATL",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "TB.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "TEN",
+      "team_b": "JAX",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "TEN.team_team_relationships.rivalries[0]"
+    },
+    {
+      "type": "rivalry",
+      "team_a": "WAS",
+      "team_b": "NYG",
+      "rivalry_type": "competitive_historical",
+      "basis": "Division and recurring roster-building comparison point.",
+      "requires_reciprocal": false,
+      "source_path": "WAS.team_team_relationships.rivalries[0]"
+    }
+  ],
+  "personnelConnections": [
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "ARI",
+      "person_name": "Jonathan Gannon",
+      "connected_team": "LAR",
+      "connection_type": "division_comparison",
+      "source_path": "ARI.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "ATL",
+      "person_name": "Raheem Morris",
+      "connected_team": "TB",
+      "connection_type": "division_comparison",
+      "source_path": "ATL.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "BAL",
+      "person_name": "John Harbaugh",
+      "connected_team": "PIT",
+      "connection_type": "division_comparison",
+      "source_path": "BAL.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "BUF",
+      "person_name": "Sean McDermott",
+      "connected_team": "MIA",
+      "connection_type": "division_comparison",
+      "source_path": "BUF.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "CAR",
+      "person_name": "Dave Canales",
+      "connected_team": "ATL",
+      "connection_type": "division_comparison",
+      "source_path": "CAR.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "CHI",
+      "person_name": "Ben Johnson",
+      "connected_team": "GB",
+      "connection_type": "division_comparison",
+      "source_path": "CHI.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "CIN",
+      "person_name": "Zac Taylor",
+      "connected_team": "BAL",
+      "connection_type": "division_comparison",
+      "source_path": "CIN.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "CLE",
+      "person_name": "Kevin Stefanski",
+      "connected_team": "PIT",
+      "connection_type": "division_comparison",
+      "source_path": "CLE.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "DAL",
+      "person_name": "Brian Schottenheimer",
+      "connected_team": "PHI",
+      "connection_type": "division_comparison",
+      "source_path": "DAL.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "DEN",
+      "person_name": "Sean Payton",
+      "connected_team": "KC",
+      "connection_type": "division_comparison",
+      "source_path": "DEN.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "DET",
+      "person_name": "Dan Campbell",
+      "connected_team": "GB",
+      "connection_type": "division_comparison",
+      "source_path": "DET.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "GB",
+      "person_name": "Matt LaFleur",
+      "connected_team": "CHI",
+      "connection_type": "division_comparison",
+      "source_path": "GB.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "HOU",
+      "person_name": "DeMeco Ryans",
+      "connected_team": "IND",
+      "connection_type": "division_comparison",
+      "source_path": "HOU.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "IND",
+      "person_name": "Shane Steichen",
+      "connected_team": "HOU",
+      "connection_type": "division_comparison",
+      "source_path": "IND.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "JAX",
+      "person_name": "Liam Coen",
+      "connected_team": "TEN",
+      "connection_type": "division_comparison",
+      "source_path": "JAX.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "KC",
+      "person_name": "Andy Reid",
+      "connected_team": "DEN",
+      "connection_type": "division_comparison",
+      "source_path": "KC.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "LAC",
+      "person_name": "Jim Harbaugh",
+      "connected_team": "KC",
+      "connection_type": "division_comparison",
+      "source_path": "LAC.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "LAR",
+      "person_name": "Sean McVay",
+      "connected_team": "SF",
+      "connection_type": "division_comparison",
+      "source_path": "LAR.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "LV",
+      "person_name": "Pete Carroll",
+      "connected_team": "KC",
+      "connection_type": "division_comparison",
+      "source_path": "LV.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "MIA",
+      "person_name": "Mike McDaniel",
+      "connected_team": "BUF",
+      "connection_type": "division_comparison",
+      "source_path": "MIA.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "MIN",
+      "person_name": "Kevin OConnell",
+      "connected_team": "DET",
+      "connection_type": "division_comparison",
+      "source_path": "MIN.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "NE",
+      "person_name": "Mike Vrabel",
+      "connected_team": "NYJ",
+      "connection_type": "division_comparison",
+      "source_path": "NE.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "NO",
+      "person_name": "Kellen Moore",
+      "connected_team": "ATL",
+      "connection_type": "division_comparison",
+      "source_path": "NO.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "NYG",
+      "person_name": "Brian Daboll",
+      "connected_team": "PHI",
+      "connection_type": "division_comparison",
+      "source_path": "NYG.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "NYJ",
+      "person_name": "Aaron Glenn",
+      "connected_team": "NE",
+      "connection_type": "division_comparison",
+      "source_path": "NYJ.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "PHI",
+      "person_name": "Nick Sirianni",
+      "connected_team": "DAL",
+      "connection_type": "division_comparison",
+      "source_path": "PHI.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "PIT",
+      "person_name": "Mike Tomlin",
+      "connected_team": "BAL",
+      "connection_type": "division_comparison",
+      "source_path": "PIT.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "SEA",
+      "person_name": "Mike Macdonald",
+      "connected_team": "SF",
+      "connection_type": "division_comparison",
+      "source_path": "SEA.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "SF",
+      "person_name": "Kyle Shanahan",
+      "connected_team": "LAR",
+      "connection_type": "division_comparison",
+      "source_path": "SF.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "TB",
+      "person_name": "Todd Bowles",
+      "connected_team": "ATL",
+      "connection_type": "division_comparison",
+      "source_path": "TB.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "TEN",
+      "person_name": "Brian Callahan",
+      "connected_team": "JAX",
+      "connection_type": "division_comparison",
+      "source_path": "TEN.team_team_relationships.notable_personnel_connections[0]"
+    },
+    {
+      "type": "personnel_connection",
+      "team_with_entry": "WAS",
+      "person_name": "Dan Quinn",
+      "connected_team": "NYG",
+      "connection_type": "division_comparison",
+      "source_path": "WAS.team_team_relationships.notable_personnel_connections[0]"
+    }
+  ],
+  "playerTeams": [
+    {
+      "type": "player_team",
+      "player_id": "kyler_murray",
+      "team_id": "ARI",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "ARI.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "marvin_harrison_jr",
+      "team_id": "ARI",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "ARI.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "paris_johnson_jr",
+      "team_id": "ARI",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "ARI.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "budda_baker",
+      "team_id": "ARI",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "ARI.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "michael_penix_jr",
+      "team_id": "ATL",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "ATL.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "bijan_robinson",
+      "team_id": "ATL",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "ATL.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "drake_london",
+      "team_id": "ATL",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "ATL.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "aj_terrell",
+      "team_id": "ATL",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "ATL.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "lamar_jackson",
+      "team_id": "BAL",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "BAL.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "derrick_henry",
+      "team_id": "BAL",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "BAL.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "zay_flowers",
+      "team_id": "BAL",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "BAL.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "roquan_smith",
+      "team_id": "BAL",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "BAL.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "josh_allen",
+      "team_id": "BUF",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "BUF.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "james_cook",
+      "team_id": "BUF",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "BUF.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "dawson_knox",
+      "team_id": "BUF",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "BUF.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "greg_rousseau",
+      "team_id": "BUF",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "BUF.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "bryce_young",
+      "team_id": "CAR",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "CAR.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "chuba_hubbard",
+      "team_id": "CAR",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "CAR.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "xavier_legette",
+      "team_id": "CAR",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "CAR.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "derrick_brown",
+      "team_id": "CAR",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "CAR.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "caleb_williams",
+      "team_id": "CHI",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "CHI.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "dj_moore",
+      "team_id": "CHI",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "CHI.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "rome_odunze",
+      "team_id": "CHI",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "CHI.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "montez_sweat",
+      "team_id": "CHI",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "CHI.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "joe_burrow",
+      "team_id": "CIN",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "CIN.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "jamarr_chase",
+      "team_id": "CIN",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "CIN.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "tee_higgins",
+      "team_id": "CIN",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "CIN.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "trey_hendrickson",
+      "team_id": "CIN",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "CIN.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "myles_garrett",
+      "team_id": "CLE",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "CLE.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "david_njoku",
+      "team_id": "CLE",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "CLE.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "denzel_ward",
+      "team_id": "CLE",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "CLE.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "jerome_ford",
+      "team_id": "CLE",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "CLE.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "dak_prescott",
+      "team_id": "DAL",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "DAL.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "ceedee_lamb",
+      "team_id": "DAL",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "DAL.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "micah_parsons",
+      "team_id": "DAL",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "DAL.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "tyler_smith",
+      "team_id": "DAL",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "DAL.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "bo_nix",
+      "team_id": "DEN",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "DEN.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "courtland_sutton",
+      "team_id": "DEN",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "DEN.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "patrick_surtain_ii",
+      "team_id": "DEN",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "DEN.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "quinn_meinerz",
+      "team_id": "DEN",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "DEN.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "jared_goff",
+      "team_id": "DET",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "DET.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "amonra_st_brown",
+      "team_id": "DET",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "DET.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "penei_sewell",
+      "team_id": "DET",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "DET.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "aidan_hutchinson",
+      "team_id": "DET",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "DET.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "jordan_love",
+      "team_id": "GB",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "GB.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "josh_jacobs",
+      "team_id": "GB",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "GB.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "jayden_reed",
+      "team_id": "GB",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "GB.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "rashan_gary",
+      "team_id": "GB",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "GB.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "cj_stroud",
+      "team_id": "HOU",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "HOU.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "nico_collins",
+      "team_id": "HOU",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "HOU.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "will_anderson_jr",
+      "team_id": "HOU",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "HOU.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "derek_stingley_jr",
+      "team_id": "HOU",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "HOU.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "anthony_richardson",
+      "team_id": "IND",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "IND.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "jonathan_taylor",
+      "team_id": "IND",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "IND.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "michael_pittman_jr",
+      "team_id": "IND",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "IND.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "deforest_buckner",
+      "team_id": "IND",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "IND.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "trevor_lawrence",
+      "team_id": "JAX",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "JAX.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "brian_thomas_jr",
+      "team_id": "JAX",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "JAX.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "josh_hinesallen",
+      "team_id": "JAX",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "JAX.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "travon_walker",
+      "team_id": "JAX",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "JAX.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "patrick_mahomes",
+      "team_id": "KC",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "KC.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "travis_kelce",
+      "team_id": "KC",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "KC.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "chris_jones",
+      "team_id": "KC",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "KC.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "trent_mcduffie",
+      "team_id": "KC",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "KC.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "justin_herbert",
+      "team_id": "LAC",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "LAC.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "ladd_mcconkey",
+      "team_id": "LAC",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "LAC.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "rashawn_slater",
+      "team_id": "LAC",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "LAC.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "derwin_james",
+      "team_id": "LAC",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "LAC.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "matthew_stafford",
+      "team_id": "LAR",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "LAR.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "puka_nacua",
+      "team_id": "LAR",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "LAR.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "kyren_williams",
+      "team_id": "LAR",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "LAR.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "kobie_turner",
+      "team_id": "LAR",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "LAR.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "brock_bowers",
+      "team_id": "LV",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "LV.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "maxx_crosby",
+      "team_id": "LV",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "LV.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "kolton_miller",
+      "team_id": "LV",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "LV.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "jakobi_meyers",
+      "team_id": "LV",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "LV.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "tua_tagovailoa",
+      "team_id": "MIA",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "MIA.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "tyreek_hill",
+      "team_id": "MIA",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "MIA.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "jaylen_waddle",
+      "team_id": "MIA",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "MIA.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "jalen_ramsey",
+      "team_id": "MIA",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "MIA.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "jj_mccarthy",
+      "team_id": "MIN",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "MIN.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "justin_jefferson",
+      "team_id": "MIN",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "MIN.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "christian_darrisaw",
+      "team_id": "MIN",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "MIN.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "andrew_van_ginkel",
+      "team_id": "MIN",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "MIN.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "drake_maye",
+      "team_id": "NE",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "NE.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "stefon_diggs",
+      "team_id": "NE",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "NE.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "christian_gonzalez",
+      "team_id": "NE",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "NE.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "christian_barmore",
+      "team_id": "NE",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "NE.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "chris_olave",
+      "team_id": "NO",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "NO.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "alvin_kamara",
+      "team_id": "NO",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "NO.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "cameron_jordan",
+      "team_id": "NO",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "NO.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "trevor_penning",
+      "team_id": "NO",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "NO.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "malik_nabers",
+      "team_id": "NYG",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 3,
+      "source_path": "NYG.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "andrew_thomas",
+      "team_id": "NYG",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 5,
+      "source_path": "NYG.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "dexter_lawrence",
+      "team_id": "NYG",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 3,
+      "source_path": "NYG.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "brian_burns",
+      "team_id": "NYG",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 1,
+      "source_path": "NYG.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "garrett_wilson",
+      "team_id": "NYJ",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "NYJ.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "sauce_gardner",
+      "team_id": "NYJ",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "NYJ.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "quinnen_williams",
+      "team_id": "NYJ",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "NYJ.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "breece_hall",
+      "team_id": "NYJ",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "NYJ.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "jalen_hurts",
+      "team_id": "PHI",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "PHI.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "saquon_barkley",
+      "team_id": "PHI",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "PHI.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "aj_brown",
+      "team_id": "PHI",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "PHI.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "jalen_carter",
+      "team_id": "PHI",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "PHI.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "tj_watt",
+      "team_id": "PIT",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "PIT.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "minkah_fitzpatrick",
+      "team_id": "PIT",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "PIT.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "george_pickens",
+      "team_id": "PIT",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "PIT.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "broderick_jones",
+      "team_id": "PIT",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "PIT.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "jaxon_smithnjigba",
+      "team_id": "SEA",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "SEA.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "devon_witherspoon",
+      "team_id": "SEA",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "SEA.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "kenneth_walker_iii",
+      "team_id": "SEA",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "SEA.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "leonard_williams",
+      "team_id": "SEA",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "SEA.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "brock_purdy",
+      "team_id": "SF",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "SF.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "christian_mccaffrey",
+      "team_id": "SF",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "SF.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "george_kittle",
+      "team_id": "SF",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "SF.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "nick_bosa",
+      "team_id": "SF",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "SF.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "baker_mayfield",
+      "team_id": "TB",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "TB.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "mike_evans",
+      "team_id": "TB",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "TB.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "tristan_wirfs",
+      "team_id": "TB",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "TB.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "antoine_winfield_jr",
+      "team_id": "TB",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "TB.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "cam_ward",
+      "team_id": "TEN",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "TEN.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "calvin_ridley",
+      "team_id": "TEN",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "TEN.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "jeffery_simmons",
+      "team_id": "TEN",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "TEN.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "jc_latham",
+      "team_id": "TEN",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "TEN.roster[3]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "jayden_daniels",
+      "team_id": "WAS",
+      "contract_type": "standard",
+      "tier": "elite",
+      "years_remaining": 4,
+      "source_path": "WAS.roster[0]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "terry_mclaurin",
+      "team_id": "WAS",
+      "contract_type": "standard",
+      "tier": "core_starter",
+      "years_remaining": 3,
+      "source_path": "WAS.roster[1]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "daron_payne",
+      "team_id": "WAS",
+      "contract_type": "standard",
+      "tier": "starter",
+      "years_remaining": 2,
+      "source_path": "WAS.roster[2]"
+    },
+    {
+      "type": "player_team",
+      "player_id": "marshon_lattimore",
+      "team_id": "WAS",
+      "contract_type": "standard",
+      "tier": "rotation",
+      "years_remaining": 1,
+      "source_path": "WAS.roster[3]"
+    }
+  ],
+  "pendingFreeAgents": [
+    {
+      "type": "pending_free_agent",
+      "player_id": "budda_baker",
+      "team_id": "ARI",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "ARI.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "aj_terrell",
+      "team_id": "ATL",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "ATL.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "roquan_smith",
+      "team_id": "BAL",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "BAL.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "greg_rousseau",
+      "team_id": "BUF",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "BUF.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "derrick_brown",
+      "team_id": "CAR",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "CAR.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "montez_sweat",
+      "team_id": "CHI",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "CHI.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "trey_hendrickson",
+      "team_id": "CIN",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "CIN.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "jerome_ford",
+      "team_id": "CLE",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "CLE.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "tyler_smith",
+      "team_id": "DAL",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "DAL.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "quinn_meinerz",
+      "team_id": "DEN",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "DEN.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "aidan_hutchinson",
+      "team_id": "DET",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "DET.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "rashan_gary",
+      "team_id": "GB",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "GB.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "derek_stingley_jr",
+      "team_id": "HOU",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "HOU.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "deforest_buckner",
+      "team_id": "IND",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "IND.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "travon_walker",
+      "team_id": "JAX",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "JAX.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "trent_mcduffie",
+      "team_id": "KC",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "KC.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "derwin_james",
+      "team_id": "LAC",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "LAC.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "kobie_turner",
+      "team_id": "LAR",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "LAR.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "jakobi_meyers",
+      "team_id": "LV",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "LV.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "jalen_ramsey",
+      "team_id": "MIA",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "MIA.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "andrew_van_ginkel",
+      "team_id": "MIN",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "MIN.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "christian_barmore",
+      "team_id": "NE",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "NE.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "trevor_penning",
+      "team_id": "NO",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "NO.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "brian_burns",
+      "team_id": "NYG",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "NYG.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "breece_hall",
+      "team_id": "NYJ",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "NYJ.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "jalen_carter",
+      "team_id": "PHI",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "PHI.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "broderick_jones",
+      "team_id": "PIT",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "PIT.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "leonard_williams",
+      "team_id": "SEA",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "SEA.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "nick_bosa",
+      "team_id": "SF",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "SF.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "antoine_winfield_jr",
+      "team_id": "TB",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "TB.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "jc_latham",
+      "team_id": "TEN",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "TEN.pending_free_agents[0]"
+    },
+    {
+      "type": "pending_free_agent",
+      "player_id": "marshon_lattimore",
+      "team_id": "WAS",
+      "free_agent_type": "UFA",
+      "expected_market": "uncertain",
+      "source_path": "WAS.pending_free_agents[0]"
+    }
+  ],
+  "historicalPursuits": [
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "ARI",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "ARI.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "ATL",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "ATL.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "BAL",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "BAL.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "BUF",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "BUF.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "CAR",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "CAR.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "CHI",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "CHI.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "CIN",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "CIN.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "CLE",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "CLE.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "DAL",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "DAL.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "DEN",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "DEN.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "DET",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "DET.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "GB",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "GB.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "HOU",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "HOU.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "IND",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "IND.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "JAX",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "JAX.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "KC",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "KC.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "LAC",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "LAC.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "LAR",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "LAR.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "LV",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "LV.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "MIA",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "MIA.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "MIN",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "MIN.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "NE",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "NE.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "NO",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "NO.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "NYG",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "NYG.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "NYJ",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "NYJ.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "PHI",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "PHI.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "PIT",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "PIT.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "SEA",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "SEA.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "SF",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "SF.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "TB",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "TB.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "TEN",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "TEN.known_target_history[0]"
+    },
+    {
+      "type": "historical_pursuit",
+      "pursuer_team": "WAS",
+      "target_name": "Premium offensive line depth",
+      "year": 2026,
+      "outcome": "pursued_no_deal",
+      "source_path": "WAS.known_target_history[0]"
+    }
+  ]
+}

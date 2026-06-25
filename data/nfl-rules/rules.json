@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "document_id": "nfl-rules-demo-2026-offseason",
+  "title": "NFL Rules Demo Corpus",
+  "season": "2026 offseason",
+  "as_of_date": "2026-06-25",
+  "source_name": "NFL CBA / public transaction-rule references",
+  "source_url": "https://nflpa.com/active-players/2020-cba",
+  "retrieved_at": "2026-06-25T00:00:00.000Z",
+  "notes": [
+    "Static internal-demo rule corpus for bounded NFL Analyze retrieval.",
+    "Summaries are operator prompts, not legal advice or a complete CBA parser.",
+    "Use source URLs and live club/NFL/NFLPA guidance before external decisions."
+  ],
+  "rules": [
+    {
+      "rule_family": "restructure_conversion",
+      "title": "Salary-to-signing-bonus restructure",
+      "summary": "NFL base salary can be converted into signing bonus for cap purposes; the converted amount is prorated over the remaining contract years, creating current-year room and future cap charges.",
+      "analysis_use": "Use for current-year cap-room questions where a veteran contract has enough remaining years and cash to convert.",
+      "source_url": "https://nflpa.com/active-players/2020-cba",
+      "source_note": "NFL CBA public reference; verify article/section and club-specific contract terms before external use."
+    },
+    {
+      "rule_family": "post_june_1_accounting",
+      "title": "Post-June 1 release or trade accounting",
+      "summary": "Post-June 1 treatment generally keeps current-year bonus proration in the current season and pushes remaining acceleration into the following league year.",
+      "analysis_use": "Use for cut/trade timing comparisons where dead money and immediate room differ by transaction date.",
+      "source_url": "https://nflpa.com/active-players/2020-cba",
+      "source_note": "NFL CBA public reference; verify designation limits and player-specific bonus schedules."
+    },
+    {
+      "rule_family": "franchise_transition_tag",
+      "title": "Franchise and transition tenders",
+      "summary": "A club may use one franchise or transition tag in the tag window; the tender creates a cap charge and player-specific negotiation leverage.",
+      "analysis_use": "Use for pending free agents where the club is weighing tag, extension, or walk-away paths.",
+      "source_url": "https://nflpa.com/active-players/2020-cba",
+      "source_note": "NFL CBA public reference; tag windows and tender amounts require current league-year confirmation."
+    },
+    {
+      "rule_family": "rookie_contract_options",
+      "title": "Rookie deals and fifth-year options",
+      "summary": "Drafted rookie contracts and fifth-year-option decisions shape extension timing, tag leverage, and cap planning for core players.",
+      "analysis_use": "Use for first-round rookie planning, extension timing, and tag-leverage questions.",
+      "source_url": "https://nflpa.com/active-players/2020-cba",
+      "source_note": "NFL CBA public reference; option tiers and deadlines require current league-year confirmation."
+    },
+    {
+      "rule_family": "practice_squad_roster_management",
+      "title": "Practice squad and roster churn",
+      "summary": "Practice-squad rules create a lower-cost development and emergency-depth lane, but active-roster elevation and signing limits constrain repeated use.",
+      "analysis_use": "Use for fringe roster construction and short-term injury-depth planning.",
+      "source_url": "https://operations.nfl.com/updates/the-rules/nfl-practice-squad-rules/",
+      "source_note": "NFL football operations public explainer; verify current league-year roster limits."
+    },
+    {
+      "rule_family": "injury_lists",
+      "title": "IR, PUP, and NFI availability lists",
+      "summary": "Injury and availability lists affect roster spots, activation timing, and cap/contract planning but do not replace player-specific medical and contract review.",
+      "analysis_use": "Use for availability caveats when roster and cap plans depend on injured players.",
+      "source_url": "https://operations.nfl.com/the-rules/nfl-rulebook/",
+      "source_note": "NFL public rulebook/operations reference; verify CBA and league memo details."
+    },
+    {
+      "rule_family": "waivers",
+      "title": "Waiver claims and vested veterans",
+      "summary": "Waiver status affects whether a released player can be claimed before becoming a free agent, which changes cut, stash, and re-sign planning.",
+      "analysis_use": "Use for young/depth-player release and reacquisition scenarios.",
+      "source_url": "https://operations.nfl.com/the-rules/nfl-rulebook/",
+      "source_note": "NFL public rulebook/operations reference; verify current waiver calendar and player service time."
+    },
+    {
+      "rule_family": "compensatory_picks",
+      "title": "Compensatory pick formula posture",
+      "summary": "Compensatory pick outcomes depend on qualifying free-agent losses and gains, contract value, playing time, and postseason honors, so team posture should be treated as directional until awards are official.",
+      "analysis_use": "Use for free-agent walk/sign tradeoff caveats.",
+      "source_url": "https://operations.nfl.com/updates/the-rules/2020-resolution-jc-2a/",
+      "source_note": "NFL operations public reference; formula details are not fully public."
+    },
+    {
+      "rule_family": "trades",
+      "title": "NFL player and pick trades",
+      "summary": "NFL trades require league approval and carry cap-accounting consequences for bonus acceleration, acquiring-team salary obligations, roster limits, and draft-pick ownership.",
+      "analysis_use": "Use for veteran contract movement and draft-capital planning.",
+      "source_url": "https://operations.nfl.com/the-rules/nfl-rulebook/",
+      "source_note": "NFL public rulebook/operations reference plus CBA cap-accounting concepts."
+    },
+    {
+      "rule_family": "salary_cap_accounting",
+      "title": "Team salary cap accounting",
+      "summary": "NFL cap planning combines salary, prorated bonuses, dead money, incentives, rollover, top-51/offseason treatment, and transaction timing.",
+      "analysis_use": "Use as the umbrella caveat for cap-room, cut, restructure, tag, and extension analysis.",
+      "source_url": "https://nflpa.com/active-players/2020-cba",
+      "source_note": "NFL CBA public reference; club cap sheets remain the row-level source of truth."
+    },
+    {
+      "rule_family": "extensions",
+      "title": "Contract extensions",
+      "summary": "Extensions can lower or raise current-year cap through new money, signing bonus proration, guarantees, option bonuses, void years, and future cash commitments.",
+      "analysis_use": "Use for extend-versus-restructure questions and core-player timing decisions.",
+      "source_url": "https://nflpa.com/active-players/2020-cba",
+      "source_note": "NFL CBA public reference; player-specific deal terms are required for exact modeling."
+    }
+  ]
+}

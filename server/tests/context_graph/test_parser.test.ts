@@ -20,12 +20,11 @@ test('loadTeamFile parses YAML and preserves line lookups', async () => {
 test('discoverTeamFiles only loads standard team-code YAML files', async () => {
   const dir = await mkdtemp(path.join(tmpdir(), 'context-graph-parser-'));
   await copyFile(path.join(fixturesDir, 'minimal_team_a.yaml'), path.join(dir, 'atl.yaml'));
-  await copyFile(path.join(fixturesDir, 'minimal_team_b.yaml'), path.join(dir, 'bos.yaml'));
+  await copyFile(path.join(fixturesDir, 'minimal_team_b.yaml'), path.join(dir, 'ari.yaml'));
   await copyFile(path.join(fixturesDir, '_ignored.yaml'), path.join(dir, '_ignored.yaml'));
   await copyFile(path.join(fixturesDir, 'invalid_vocab.yaml'), path.join(dir, 'invalid_vocab.yaml'));
 
   const files = await discoverTeamFiles(dir);
 
-  assert.deepEqual(files.map((file) => path.basename(file)), ['atl.yaml', 'bos.yaml']);
+  assert.deepEqual(files.map((file) => path.basename(file)), ['ari.yaml', 'atl.yaml']);
 });
-

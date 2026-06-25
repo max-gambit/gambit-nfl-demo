@@ -1,5 +1,5 @@
 {
-  "name": "gambit-ui-remix-server",
+  "name": "gambit-nfl-demo-server",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -15,8 +15,9 @@
     "refresh:nba-cap-sheets": "node --import tsx src/nba_cap_sheets/refresh.ts",
     "build:nba-player-stats": "node --import tsx src/nba_player_stats/build_reviewed_snapshot.ts",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/context_graph/*.test.ts tests/nba_rosters/*.test.ts tests/nba_cap_sheets/*.test.ts tests/nba_player_stats/*.test.ts tests/data_analyst/*.test.ts",
+    "test": "tsx --test tests/context_graph/*.test.ts tests/nfl_data/*.test.ts tests/nfl_rules/*.test.ts tests/nba_rosters/*.test.ts tests/nba_cap_sheets/*.test.ts tests/nba_player_stats/*.test.ts tests/data_analyst/*.test.ts",
     "test:cba": "tsx --test tests/data_analyst/test_cba_workbench.test.ts tests/data_analyst/test_cba_retrieval_eval.test.ts",
+    "acceptance:nfl-analyze": "tsx src/claude/nfl_analyze_preview.ts",
     "context-graph:validate": "tsx src/context_graph/cli.ts validate",
     "context-graph:build": "tsx src/context_graph/cli.ts build",
     "context-graph:report": "tsx src/context_graph/cli.ts report",

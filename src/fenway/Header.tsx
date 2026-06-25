@@ -9,10 +9,10 @@ interface HeaderProps {
   trayBetween?: ReactNode;
 }
 
-const TEAM_NAME = 'Golden State Warriors';
-const TEAM_LOGO = '/assets/warriors-logo.png';
-const USER_NAME = 'Golden State Warriors Front Office';
-const USER_INITIALS = 'GSW';
+const TEAM_NAME = 'New York Giants';
+const TEAM_LOGO = '/assets/gambit-mark.svg';
+const USER_NAME = 'New York Giants Football Operations';
+const USER_INITIALS = 'NYG';
 
 export function Header({ trayBetween }: HeaderProps) {
   const [avatarOpen, setAvatarOpen] = useState(false);
@@ -25,7 +25,7 @@ export function Header({ trayBetween }: HeaderProps) {
     { id: 'analyze', label: 'Analyze' },
     { id: 'projects', label: 'Projects' },
     { id: 'database', label: 'Database' },
-    { id: 'cba', label: 'CBA' },
+    { id: 'cba', label: 'NFL Rules' },
   ];
   // Close the avatar popover on outside click.
   useEffect(() => {

@@ -73,7 +73,7 @@ export interface ContextGraphLookupToolResult {
 export const contextGraphLookupTool: Anthropic.Tool = {
   name: CONTEXT_GRAPH_LOOKUP_TOOL_NAME,
   description:
-    'Lookup effective NBA Intel data for one or more teams by standard three-letter NBA team_id. Use this before making claims about team preferences, posture, trade DNA, culture, priorities, relationships, or Settings-editable context.',
+    'Lookup effective NFL Intel data for one or more teams by standard NFL team_id. Use this before making claims about team preferences, posture, transaction DNA, culture, priorities, relationships, or Settings-editable context.',
   input_schema: {
     type: 'object',
     properties: {
@@ -85,7 +85,7 @@ export const contextGraphLookupTool: Anthropic.Tool = {
           type: 'string',
           enum: NBA_TEAM_IDS,
         },
-        description: 'Standard NBA three-letter team ids, e.g. GSW, BOS, LAL.',
+        description: 'Standard NFL team ids, e.g. NYG, KC, PHI.',
       },
     },
     required: ['team_ids'],
@@ -105,8 +105,8 @@ export async function buildContextGraphSystemBlock(
   options: ContextGraphAiOptions = {},
 ): Promise<string> {
   const lines: string[] = [
-    '=== NBA CONTEXT GRAPH TOOLING ===',
-    'NBA Intel is available for all 30 teams through the lookup_context_graph_teams tool.',
+    '=== NFL CONTEXT GRAPH TOOLING ===',
+    'NFL Intel is available for all 32 teams through the lookup_context_graph_teams tool.',
     'The index below is only for discovery. It is not enough evidence for substantive claims.',
     'Before making claims about team preferences, strategic posture, spending posture, trade DNA, cultural signals, near-term priorities, relationships, or Settings-editable context, call lookup_context_graph_teams for the relevant team_id values.',
     'Tool results return effective context: source graph data layered with Settings JSON overrides and first-party onboarding_profile context captured from the user. Source YAML and derived graph artifacts are not user-editable; Settings/onboarding overrides are user-editable.',

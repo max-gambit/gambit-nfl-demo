@@ -80,9 +80,9 @@ test('reset removes a team override and restores source preferences', async () =
 
 test('effective team context includes overrides, metadata, summaries, and immutable source data', async () => {
   const options = await buildFixtureGraph();
-  await patchTeamContextPreferences('BOS', { cultural_signals: { risk_tolerance: { value: 'moderate' } } }, options);
+  await patchTeamContextPreferences('ARI', { cultural_signals: { risk_tolerance: { value: 'moderate' } } }, options);
 
-  const effective = await getEffectiveTeamContext('BOS', options);
+  const effective = await getEffectiveTeamContext('ARI', options);
 
   assert.equal(effective.preferences.cultural_signals.risk_tolerance.value, 'moderate');
   assert.equal(effective.source_preferences.cultural_signals.risk_tolerance.value, 'aggressive');
@@ -91,8 +91,8 @@ test('effective team context includes overrides, metadata, summaries, and immuta
   assert.equal(effective.relationship_summary.trade_partners[0]?.team_id, 'ATL');
 
   effective.source_team.identity = {};
-  const fresh = await getEffectiveTeamContext('BOS', options);
-  assert.equal((fresh.source_team.identity as Record<string, unknown>).name, 'Boston Celtics');
+  const fresh = await getEffectiveTeamContext('ARI', options);
+  assert.equal((fresh.source_team.identity as Record<string, unknown>).name, 'Arizona Cardinals');
 });
 
 test('context graph preference routes support get, patch, and reset', async () => {
@@ -136,12 +136,12 @@ test('war-room read model returns subject, counterparties, map, and overrides', 
   assert.equal(warRoom.subject.has_overrides, true);
   assert.equal(warRoom.subject.preferences.ownership.spending_posture, 'conservative');
   assert.equal(warRoom.executive_summary.headline.length > 0, true);
-  assert.equal(warRoom.executive_summary.top_calls[0]?.team_id, 'BOS');
+  assert.equal(warRoom.executive_summary.top_calls[0]?.team_id, 'ARI');
   assert.equal(warRoom.executive_summary.confidence.has_overrides, true);
   assert.equal(warRoom.executive_summary.confidence.validation_status, 'pass');
   assert.equal(warRoom.executive_summary.decision_cards.length, 3);
   assert.equal(warRoom.executive_summary.caveats.some((caveat) => caveat.includes('Settings overrides')), true);
-  assert.equal(warRoom.counterparties[0]?.team_id, 'BOS');
+  assert.equal(warRoom.counterparties[0]?.team_id, 'ARI');
   assert.equal(warRoom.counterparties[0]?.tier, 'hot');
   assert.equal(warRoom.counterparties[0]?.relationship_types.includes('trade_partner'), true);
   assert.equal(warRoom.counterparties[0]?.dossier.call_priority, 'First-wave call');
@@ -149,7 +149,7 @@ test('war-room read model returns subject, counterparties, map, and overrides', 
   assert.equal(warRoom.strategic_tensions.length > 0, true);
   assert.equal(warRoom.scenario_lenses.length, 3);
   assert.equal(warRoom.graph.nodes.some((node) => node.team_id === 'ATL' && node.kind === 'subject'), true);
-  assert.equal(warRoom.graph.edges.some((edge) => edge.to_team_id === 'BOS'), true);
+  assert.equal(warRoom.graph.edges.some((edge) => edge.to_team_id === 'ARI'), true);
   assert.equal(warRoom.demo_prompts.length, 3);
 });
 
@@ -181,7 +181,7 @@ async function buildFixtureGraph(): Promise<Required<Pick<TeamPreferenceStoreOpt
   const derivedDir = await mkdtemp(path.join(tmpdir(), 'context-graph-pref-derived-'));
   const overridesDir = await mkdtemp(path.join(tmpdir(), 'context-graph-pref-overrides-'));
   await copyFile(path.join(fixturesDir, 'minimal_team_a.yaml'), path.join(teamsDir, 'atl.yaml'));
-  await copyFile(path.join(fixturesDir, 'minimal_team_b.yaml'), path.join(teamsDir, 'bos.yaml'));
+  await copyFile(path.join(fixturesDir, 'minimal_team_b.yaml'), path.join(teamsDir, 'ari.yaml'));
   await buildContextGraph({ teamsDir, outputDir: derivedDir });
   return {
     derivedDir,

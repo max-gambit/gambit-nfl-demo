@@ -27,8 +27,8 @@ test('onboarding derives role defaults, deterministic priorities, and required s
   const view = deriveOnboardingViewModel(team);
 
   assert.equal(view.profile.status, 'not_started');
-  assert.equal(view.profile.team_snapshot.cap_posture, 'below_apron');
-  assert.equal(view.inferred_cap_context.current_status, 'below_apron');
+  assert.equal(view.profile.team_snapshot.cap_posture, 'cap_room');
+  assert.equal(view.inferred_cap_context.current_status, 'cap_room');
   assert.equal(view.defaults.recommendation_style, 'adaptive');
   assert.equal(view.sections.find((section) => section.id === 'identity_role')?.complete, false);
   assert.equal(view.generated_priority_options.some((option) => option.id === 'wizards-acceleration-trigger'), true);
@@ -118,7 +118,7 @@ test('onboarding routes save partial graph context, complete, reset, and reject 
   assert.deepEqual(teamAfterPatch.preferences.onboarding_profile.team_snapshot.secondary_lifecycles, ['playoff_hopeful']);
   assert.equal(teamAfterPatch.preferences.onboarding_profile.team_snapshot.rookie_scale_extension_players, 'Bilal Coulibaly');
   assert.equal(teamAfterPatch.preferences.onboarding_profile.data_trust.off_limits_people, 'Kyle Kuzma, Jordan Poole');
-  assert.equal(teamAfterPatch.preferences.onboarding_profile.team_snapshot.cap_posture, 'below_apron');
+  assert.equal(teamAfterPatch.preferences.onboarding_profile.team_snapshot.cap_posture, 'cap_room');
   assert.equal(teamAfterPatch.preferences.strategic_posture.timeframe, 'rebuild');
   assert.equal(teamAfterPatch.preferences.strategic_posture.constraints.some((constraint) => constraint.reason_code === 'onboarding_cap_posture'), false);
   assert.equal(teamAfterPatch.preferences.near_term_priorities.some((priority) => priority.detail.includes('Onboarding capture:')), true);
@@ -154,10 +154,10 @@ async function buildWizardsFixtureGraph(): Promise<Required<Pick<TeamPreferenceS
   const atl = await readFile(path.join(fixturesDir, 'minimal_team_a.yaml'), 'utf8');
   const was = atl
     .replaceAll('ATL', 'WAS')
-    .replaceAll('Atlanta Hawks', 'Washington Wizards')
+    .replaceAll('Atlanta Falcons', 'Washington Wizards')
     .replaceAll('Atlanta', 'Washington');
   await writeFile(path.join(teamsDir, 'was.yaml'), was, 'utf8');
-  await copyFile(path.join(fixturesDir, 'minimal_team_b.yaml'), path.join(teamsDir, 'bos.yaml'));
+  await copyFile(path.join(fixturesDir, 'minimal_team_b.yaml'), path.join(teamsDir, 'ari.yaml'));
   await buildContextGraph({ teamsDir, outputDir: derivedDir });
   return {
     derivedDir,

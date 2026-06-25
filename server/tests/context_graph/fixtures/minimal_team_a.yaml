@@ -3,9 +3,9 @@ as_of_date: "2026-05-02"
 last_updated: "2026-05-02"
 
 identity:
-  name: Atlanta Hawks
-  conference: Eastern
-  division: Southeast
+  name: Atlanta Falcons
+  conference: NFC
+  division: NFC South
   market_tier: tier_2
   market_tier_rationale: Test fixture market rationale.
 
@@ -62,7 +62,7 @@ strategic_posture:
   last_reviewed: "2026-05-02"
 
 cap_situation:
-  current_status: below_apron
+  current_status: cap_room
   current_payroll_estimate: 100000000
   hard_capped: no
   hard_cap_reason: none
@@ -75,12 +75,12 @@ cap_situation:
   confidence: high
 
 trade_dna:
-  frequent_partners: [BOS]
+  frequent_partners: [ARI]
   preferred_deal_archetypes:
     - Test deals.
   recent_significant_trades:
     - date: "2026-02-01"
-      summary: Atlanta traded Player Alpha to Boston Celtics for a future pick.
+      summary: Atlanta traded Player Alpha to Arizona Cardinals for a future pick.
   confidence: high
 
 cultural_signals:
@@ -104,17 +104,17 @@ roster:
   - player_id: player_alpha
     name: Player Alpha
     age: 25
-    position_listed: PG
+    position_listed: QB
     contract_type: standard
     availability_status: healthy
     archetype:
-      physical_position: lead_guard
+      physical_position: quarterback
       offensive_role:
-        primary: primary_initiator
-        secondary: [connector]
-      defensive_role: point_of_attack
-      shooting_profile: good
-      special_traits: [elite_passer]
+        primary: franchise_quarterback
+        secondary: [depth_piece]
+      defensive_role: not_applicable
+      shooting_profile: not_applicable
+      special_traits: [elite_arm]
     tier: starter
     trajectory: peak
     contract:
@@ -126,7 +126,7 @@ roster:
       trade_kicker: none
       player_option: none
       team_option: none
-      bird_rights: full
+      bird_rights: extension_eligible
       contract_through: "2026"
       source: https://example.com/player-alpha-contract
     movement_constraints:
@@ -150,7 +150,7 @@ pending_free_agents:
   - player_id: player_alpha
     name: Player Alpha
     type: UFA
-    bird_rights_status: full
+    bird_rights_status: tag_eligible
     cap_hold_amount: 1000000
     expected_market: retain
     expected_market_detail: Test market.
@@ -175,7 +175,7 @@ key_assets:
   draft_picks_owned:
     - year: 2027
       round: 1
-      from_team: BOS
+      from_team: ARI
       protections: none
       source: https://example.com/pick-a
   draft_picks_owed: []
@@ -183,12 +183,12 @@ key_assets:
 
 team_team_relationships:
   rivalries:
-    - team_id: BOS
+    - team_id: ARI
       type: competitive_recent
       basis: Test rivalry.
   notable_personnel_connections:
     - person: Coach Link
-      connected_team: BOS
+      connected_team: ARI
       connection_type: former_coach
       detail: Test connection.
 

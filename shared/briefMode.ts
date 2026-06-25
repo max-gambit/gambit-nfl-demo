@@ -17,6 +17,13 @@ const ANALYTIC_PATTERNS = [
   /\bcompare\b/i,
 ];
 
+const NFL_DATA_ACTION_PATTERNS = [
+  /\b(restructure|restructure candidate|convert salary|signing bonus)\b/i,
+  /\b(cut|release|post[-\s]?june 1|dead money|cut savings)\b/i,
+  /\b(franchise tag|transition tag|tag eligible|tender)\b/i,
+  /\b(cap room|cap space|cap sheet|contract lever|guarantees?)\b/i,
+];
+
 const ACTION_PATTERNS = [
   /\bshould\b/i,
   /\brecommend\b/i,
@@ -41,6 +48,7 @@ export function inferBriefModeFromQuestion(question: string): BriefMode {
   if (parsed.mode) return parsed.mode;
   const q = parsed.question.trim();
   if (!q) return 'brief';
+  if (NFL_DATA_ACTION_PATTERNS.some((re) => re.test(q))) return 'data_analyst';
   if (ACTION_PATTERNS.some((re) => re.test(q))) return 'brief';
   return ANALYTIC_PATTERNS.some((re) => re.test(q)) ? 'data_analyst' : 'brief';
 }
