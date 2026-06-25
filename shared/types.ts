@@ -701,43 +701,45 @@ export interface AcknowledgeMonitorAlertsResponse {
   monitors: Monitor[];
 }
 
-// ── NBA context graph preferences ────────────────────────────────────────────
+// ── NFL context graph preferences ────────────────────────────────────────────
 export type ContextGraphTeamId =
+  | 'ARI'
   | 'ATL'
-  | 'BOS'
-  | 'BKN'
-  | 'CHA'
+  | 'BAL'
+  | 'BUF'
+  | 'CAR'
   | 'CHI'
+  | 'CIN'
   | 'CLE'
   | 'DAL'
   | 'DEN'
   | 'DET'
-  | 'GSW'
+  | 'GB'
   | 'HOU'
   | 'IND'
+  | 'JAX'
+  | 'KC'
   | 'LAC'
-  | 'LAL'
-  | 'MEM'
+  | 'LAR'
+  | 'LV'
   | 'MIA'
-  | 'MIL'
   | 'MIN'
-  | 'NOP'
-  | 'NYK'
-  | 'OKC'
-  | 'ORL'
+  | 'NE'
+  | 'NO'
+  | 'NYG'
+  | 'NYJ'
   | 'PHI'
-  | 'PHX'
-  | 'POR'
-  | 'SAC'
-  | 'SAS'
-  | 'TOR'
-  | 'UTA'
+  | 'PIT'
+  | 'SEA'
+  | 'SF'
+  | 'TB'
+  | 'TEN'
   | 'WAS';
 
 export type ContextGraphConfidence = 'high' | 'medium' | 'low';
 export type ContextGraphSpendingPosture = 'aggressive_spender' | 'moderate' | 'conservative' | 'unknown';
 export type ContextGraphTimeframe = 'contend_now' | 'contend_soon' | 'retool' | 'rebuild' | 'tank' | 'purgatory';
-export type ContextGraphPriorityType = 'extension' | 'free_agency' | 'trade' | 'coaching_decision' | 'draft' | 'structural' | 'roster';
+export type ContextGraphPriorityType = 'extension' | 'free_agency' | 'trade' | 'coaching_decision' | 'draft' | 'structural' | 'roster' | 'scheme' | 'cap_management';
 export type ContextGraphPriorityTimeline = 'next_30_days' | 'this_offseason' | 'by_trade_deadline' | 'this_season' | 'next_season';
 export type ContextGraphStability = 'high' | 'medium' | 'low';
 export type ContextGraphPlayerFriendly = 'yes' | 'mixed' | 'no';
@@ -1238,7 +1240,7 @@ export interface DataAnalystTraceDataset {
 
 export interface DataAnalystTrace {
   tool_use_id: string;
-  tool_name: 'list_available_datasets' | 'query_nba_data' | 'query_brief_workspace';
+  tool_name: 'list_available_datasets' | 'query_nba_data' | 'query_nfl_data' | 'query_brief_workspace';
   datasets: DataAnalystTraceDataset[];
   errors: { scope: string; error: string }[];
 }
@@ -1680,6 +1682,117 @@ export interface ListCurrentNbaCapSheetsResponse {
 export interface GetCurrentNbaCapSheetResponse {
   snapshot: NbaCapSheetSnapshot | null;
   cap_sheet: NbaCapSheet | null;
+}
+
+// ── NFL static demo database ─────────────────────────────────────────────────
+export interface NflDemoSnapshot {
+  season: string;
+  as_of_date: string;
+  source_name: string;
+  source_url: string;
+  retrieved_at: string;
+  notes: string[];
+}
+
+export interface NflDemoTeam {
+  team_id: string;
+  abbreviation: string;
+  full_name: string;
+  conference: string | null;
+  division: string | null;
+  source_url: string | null;
+}
+
+export interface NflRosterEntry {
+  team_id: string;
+  player_id: string;
+  player_name: string;
+  position: string | null;
+  age: number | null;
+  roster_status: string;
+  contract_status: string;
+  source_order: number;
+  source_url: string | null;
+  source_note: string;
+}
+
+export interface NflCapRow {
+  team_id: string;
+  player_id: string | null;
+  player_name: string;
+  position: string | null;
+  cap_number_2026: number | null;
+  cash_due_2026: number | null;
+  total_value_remaining: number | null;
+  years_remaining: number | null;
+  guaranteed_remaining: number | null;
+  dead_money_if_cut_2026: number | null;
+  cut_savings_2026: number | null;
+  restructure_savings_estimate_2026: number | null;
+  tag_eligible_2027: boolean;
+  contract_lever: string;
+  source_url: string | null;
+  source_status: string;
+}
+
+export interface NflPlayerMetricRow {
+  team_id: string;
+  player_id: string;
+  player_name: string;
+  position: string | null;
+  snaps_2025: number | null;
+  games_2025: number | null;
+  availability_risk: string;
+  role: string;
+  value_tier: string;
+  metric_note: string;
+  source_url: string | null;
+}
+
+export interface NflSourceRef {
+  id: string;
+  name: string;
+  url: string;
+}
+
+export interface NflDemoTotals {
+  season: string;
+  as_of_date: string;
+  team_count: number;
+  roster_row_count: number;
+  cap_row_count: number;
+  player_metric_row_count: number;
+}
+
+export interface NflTeamListRow extends NflDemoTeam {
+  roster_count: number;
+  cap_row_count: number;
+  player_metric_row_count: number;
+}
+
+export interface ListCurrentNflDemoResponse {
+  snapshot: NflDemoSnapshot;
+  teams: NflTeamListRow[];
+  totals: NflDemoTotals;
+  rows: NflRosterEntry[] | NflCapRow[] | NflPlayerMetricRow[];
+}
+
+export interface GetCurrentNflTeamResponse {
+  snapshot: NflDemoSnapshot;
+  team: NflDemoTeam;
+  roster_entries: NflRosterEntry[];
+  cap_rows: NflCapRow[];
+  player_metrics: NflPlayerMetricRow[];
+  source_refs: NflSourceRef[];
+  notes: string[];
+}
+
+export interface GetCurrentNflPlayerMetricsTeamResponse {
+  snapshot: NflDemoSnapshot;
+  team: NflDemoTeam;
+  rows: NflPlayerMetricRow[];
+  source_refs: NflSourceRef[];
+  notes: string[];
 }
 
 // ── CBA reference corpus ────────────────────────────────────────────────────

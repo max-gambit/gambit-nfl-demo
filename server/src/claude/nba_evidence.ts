@@ -3,7 +3,6 @@ import {
   getEffectiveTeamContext,
   type TeamPreferenceStoreOptions,
 } from '../context_graph/preferences.js';
-import { NBA_TEAM_IDS, TEAM_ALIASES, isNbaTeamId, normalizeTeamAlias } from '../context_graph/schema.js';
 import { db } from '../db/client.js';
 import type {
   CurrentCapSheetPlayerRowRecord,
@@ -22,6 +21,49 @@ const ROSTER_NBA_EVIDENCE_RE =
   /\b(roster|current players?|current .{0,40} players?|still have|do we have|who do we have|on our team|team members?|player-team membership|guards?|wings?|bigs?|centers?|depth chart|lineups?|starting lineup|rotation|starters?|backups?|two-way|two way|active roster)\b/i;
 
 export const DEFAULT_NBA_EVIDENCE_TEAM_ID = 'GSW';
+
+const NBA_EVIDENCE_TEAM_IDS = [
+  'ATL', 'BOS', 'BKN', 'CHA', 'CHI', 'CLE', 'DAL', 'DEN', 'DET', 'GSW',
+  'HOU', 'IND', 'LAC', 'LAL', 'MEM', 'MIA', 'MIL', 'MIN', 'NOP', 'NYK',
+  'OKC', 'ORL', 'PHI', 'PHX', 'POR', 'SAC', 'SAS', 'TOR', 'UTA', 'WAS',
+] as const;
+
+type NbaEvidenceTeamId = typeof NBA_EVIDENCE_TEAM_IDS[number];
+
+const NBA_EVIDENCE_TEAM_ID_SET = new Set<string>(NBA_EVIDENCE_TEAM_IDS);
+
+const NBA_EVIDENCE_TEAM_ALIASES: Record<string, NbaEvidenceTeamId> = {
+  ATL: 'ATL', HAWKS: 'ATL', ATLANTA: 'ATL', 'ATLANTA HAWKS': 'ATL',
+  BOS: 'BOS', CELTICS: 'BOS', BOSTON: 'BOS', 'BOSTON CELTICS': 'BOS',
+  BKN: 'BKN', NETS: 'BKN', BROOKLYN: 'BKN', 'BROOKLYN NETS': 'BKN',
+  CHA: 'CHA', HORNETS: 'CHA', CHARLOTTE: 'CHA', 'CHARLOTTE HORNETS': 'CHA',
+  CHI: 'CHI', BULLS: 'CHI', CHICAGO: 'CHI', 'CHICAGO BULLS': 'CHI',
+  CLE: 'CLE', CAVALIERS: 'CLE', CAVS: 'CLE', CLEVELAND: 'CLE', 'CLEVELAND CAVALIERS': 'CLE',
+  DAL: 'DAL', MAVERICKS: 'DAL', MAVS: 'DAL', DALLAS: 'DAL', 'DALLAS MAVERICKS': 'DAL',
+  DEN: 'DEN', NUGGETS: 'DEN', DENVER: 'DEN', 'DENVER NUGGETS': 'DEN',
+  DET: 'DET', PISTONS: 'DET', DETROIT: 'DET', 'DETROIT PISTONS': 'DET',
+  GSW: 'GSW', WARRIORS: 'GSW', 'GOLDEN STATE': 'GSW', 'GOLDEN STATE WARRIORS': 'GSW',
+  HOU: 'HOU', ROCKETS: 'HOU', HOUSTON: 'HOU', 'HOUSTON ROCKETS': 'HOU',
+  IND: 'IND', PACERS: 'IND', INDIANA: 'IND', 'INDIANA PACERS': 'IND',
+  LAC: 'LAC', CLIPPERS: 'LAC', 'LA CLIPPERS': 'LAC', 'LOS ANGELES CLIPPERS': 'LAC',
+  LAL: 'LAL', LAKERS: 'LAL', 'LOS ANGELES LAKERS': 'LAL',
+  MEM: 'MEM', GRIZZLIES: 'MEM', MEMPHIS: 'MEM', 'MEMPHIS GRIZZLIES': 'MEM',
+  MIA: 'MIA', HEAT: 'MIA', MIAMI: 'MIA', 'MIAMI HEAT': 'MIA',
+  MIL: 'MIL', BUCKS: 'MIL', MILWAUKEE: 'MIL', 'MILWAUKEE BUCKS': 'MIL',
+  MIN: 'MIN', TIMBERWOLVES: 'MIN', WOLVES: 'MIN', MINNESOTA: 'MIN', 'MINNESOTA TIMBERWOLVES': 'MIN',
+  NOP: 'NOP', PELICANS: 'NOP', 'NEW ORLEANS': 'NOP', 'NEW ORLEANS PELICANS': 'NOP',
+  NYK: 'NYK', KNICKS: 'NYK', 'NEW YORK KNICKS': 'NYK',
+  OKC: 'OKC', THUNDER: 'OKC', OKLAHOMA: 'OKC', 'OKLAHOMA CITY': 'OKC', 'OKLAHOMA CITY THUNDER': 'OKC',
+  ORL: 'ORL', MAGIC: 'ORL', ORLANDO: 'ORL', 'ORLANDO MAGIC': 'ORL',
+  PHI: 'PHI', SIXERS: 'PHI', '76ERS': 'PHI', PHILADELPHIA: 'PHI', 'PHILADELPHIA 76ERS': 'PHI',
+  PHX: 'PHX', SUNS: 'PHX', PHOENIX: 'PHX', 'PHOENIX SUNS': 'PHX',
+  POR: 'POR', BLAZERS: 'POR', PORTLAND: 'POR', 'PORTLAND TRAIL BLAZERS': 'POR', 'TRAIL BLAZERS': 'POR',
+  SAC: 'SAC', KINGS: 'SAC', SACRAMENTO: 'SAC', 'SACRAMENTO KINGS': 'SAC',
+  SAS: 'SAS', SPURS: 'SAS', 'SAN ANTONIO': 'SAS', 'SAN ANTONIO SPURS': 'SAS',
+  TOR: 'TOR', RAPTORS: 'TOR', TORONTO: 'TOR', 'TORONTO RAPTORS': 'TOR',
+  UTA: 'UTA', JAZZ: 'UTA', UTAH: 'UTA', 'UTAH JAZZ': 'UTA',
+  WAS: 'WAS', WIZARDS: 'WAS', WASHINGTON: 'WAS', 'WASHINGTON WIZARDS': 'WAS',
+};
 
 export class AppDataRequiredError extends Error {
   readonly code = 'app_data_required';
@@ -125,10 +167,10 @@ export function isFirstPersonTeamQuestion(question: string): boolean {
 
 export function extractNbaTeamIds(question: string): string[] {
   const hits = new Map<string, number>();
-  const aliases = Object.keys(TEAM_ALIASES).sort((a, b) => b.length - a.length);
+  const aliases = Object.keys(NBA_EVIDENCE_TEAM_ALIASES).sort((a, b) => b.length - a.length);
 
   for (const alias of aliases) {
-    const teamId = normalizeTeamAlias(alias);
+    const teamId = normalizeNbaEvidenceTeamAlias(alias);
     if (!teamId) continue;
     const pattern = new RegExp(`(^|[^A-Za-z0-9])(${escapeRegExp(alias)})(?=$|[^A-Za-z0-9])`, 'gi');
     let match: RegExpExecArray | null;
@@ -548,7 +590,7 @@ function normalizeEvidenceTeamIds(teamIds: string[]): string[] {
   const out: string[] = [];
   for (const raw of teamIds) {
     const teamId = String(raw).trim().toUpperCase();
-    if (isNbaTeamId(teamId) && !out.includes(teamId)) out.push(teamId);
+    if (isNbaEvidenceTeamId(teamId) && !out.includes(teamId)) out.push(teamId);
   }
   return out;
 }
@@ -608,7 +650,15 @@ function normalizeName(value: string): string {
 }
 
 function teamSortIndex(teamId: string): number {
-  return NBA_TEAM_IDS.indexOf(teamId as (typeof NBA_TEAM_IDS)[number]);
+  return NBA_EVIDENCE_TEAM_IDS.indexOf(teamId as NbaEvidenceTeamId);
+}
+
+function isNbaEvidenceTeamId(teamId: string): teamId is NbaEvidenceTeamId {
+  return NBA_EVIDENCE_TEAM_ID_SET.has(teamId);
+}
+
+function normalizeNbaEvidenceTeamAlias(alias: string): NbaEvidenceTeamId | null {
+  return NBA_EVIDENCE_TEAM_ALIASES[alias.trim().toUpperCase()] ?? null;
 }
 
 function escapeRegExp(value: string): string {

@@ -46,7 +46,7 @@ function auditMessage(section: AuditMessage['section'], message: ValidationMessa
 
 function renderAudit(messages: AuditMessage[], passed: boolean): string {
   const lines: string[] = [
-    '# Gambit NBA Intel Validation Audit',
+    '# Gambit NFL Intel Validation Audit',
     '',
     `- Status: ${passed ? 'PASS' : 'FAIL'}`,
     `- Total findings: ${messages.length}`,

@@ -38,7 +38,7 @@ interface ContextGraphSettingsProps {
   embedded?: boolean;
 }
 
-export function ContextGraphSettings({ initialTeamId = 'GSW', teamId, embedded = false }: ContextGraphSettingsProps) {
+export function ContextGraphSettings({ initialTeamId = 'NYG', teamId, embedded = false }: ContextGraphSettingsProps) {
   const requestedTeamId = (teamId ?? initialTeamId).toUpperCase();
   const [data, setData] = useState<ListContextGraphPreferencesResponse | null>(null);
   const [selectedTeamId, setSelectedTeamId] = useState<string>(requestedTeamId);

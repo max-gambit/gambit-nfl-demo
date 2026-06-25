@@ -13,6 +13,7 @@ test-results/
 
 # Runtime context graph preference overrides
 data/nba-context-graph/overrides/*.local.json
+data/nfl-context-graph/overrides/*.local.json
 
 # Supabase CLI scratch
 supabase/.temp

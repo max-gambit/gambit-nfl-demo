@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import type {
-  GetCurrentNbaCapSheetResponse,
-  ListCurrentNbaCapSheetsResponse,
-  ListCurrentNbaPlayerStatsResponse,
+  ListContextGraphPreferencesResponse,
   NbaCapSheet,
   NbaCapSheetMetric,
   NbaCapSheetPlayerRow,
@@ -10,8 +8,13 @@ import type {
   NbaPlayerStatRow,
   NbaRosterEntry,
   NbaRosterTeam,
+  GetCurrentNflTeamResponse,
+  NflCapRow,
+  NflPlayerMetricRow,
+  NflRosterEntry,
 } from '@shared/types';
-import { getCurrentNbaCapSheet, getCurrentNbaCapSheets, getCurrentNbaPlayerStats } from '../api/nba';
+import { getCurrentNflCapSheet } from '../api/nfl';
+import { listContextGraphPreferences } from '../api/contextGraph';
 import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
 import { useUi } from '../store';
 import { ContextGraphSettings } from '../settings/ContextGraphSettings';
@@ -39,28 +42,23 @@ const NBA_2025_26_THRESHOLDS = {
 
 const CAP_SHEET_PLAYER_COLUMN_WIDTH = 220;
 
-type SummaryLoadState =
-  | { status: 'loading'; data: null; error: null }
-  | { status: 'ready'; data: ListCurrentNbaCapSheetsResponse; error: null }
-  | { status: 'error'; data: null; error: string };
-
 type DetailLoadState =
   | { status: 'idle'; data: null; error: null }
   | { status: 'loading'; data: null; error: null }
-  | { status: 'ready'; data: GetCurrentNbaCapSheetResponse; error: null }
+  | { status: 'ready'; data: GetCurrentNflTeamResponse; error: null }
   | { status: 'error'; data: null; error: string };
 
-type StatsSummaryLoadState =
+type ContextGraphTeamsLoadState =
   | { status: 'loading'; data: null; error: null }
-  | { status: 'ready'; data: ListCurrentNbaPlayerStatsResponse; error: null }
+  | { status: 'ready'; data: ListContextGraphPreferencesResponse; error: null }
   | { status: 'error'; data: null; error: string };
 
-function useCapSheetSummaries(): SummaryLoadState {
-  const [state, setState] = useState<SummaryLoadState>({ status: 'loading', data: null, error: null });
+function useContextGraphTeams(): ContextGraphTeamsLoadState {
+  const [state, setState] = useState<ContextGraphTeamsLoadState>({ status: 'loading', data: null, error: null });
 
   useEffect(() => {
     let cancelled = false;
-    getCurrentNbaCapSheets()
+    listContextGraphPreferences()
       .then((data) => {
         if (!cancelled) setState({ status: 'ready', data, error: null });
       })
@@ -73,7 +71,7 @@ function useCapSheetSummaries(): SummaryLoadState {
   return state;
 }
 
-function useCapSheetDetail(teamId: string | null): DetailLoadState {
+function useNflTeamDetail(teamId: string | null): DetailLoadState {
   const [state, setState] = useState<DetailLoadState>({ status: 'idle', data: null, error: null });
 
   useEffect(() => {
@@ -83,7 +81,7 @@ function useCapSheetDetail(teamId: string | null): DetailLoadState {
     }
     let cancelled = false;
     setState({ status: 'loading', data: null, error: null });
-    getCurrentNbaCapSheet(teamId)
+    getCurrentNflCapSheet(teamId)
       .then((data) => {
         if (!cancelled) setState({ status: 'ready', data, error: null });
       })
@@ -96,40 +94,23 @@ function useCapSheetDetail(teamId: string | null): DetailLoadState {
   return state;
 }
 
-function usePlayerStatsSummaries(): StatsSummaryLoadState {
-  const [state, setState] = useState<StatsSummaryLoadState>({ status: 'loading', data: null, error: null });
-
-  useEffect(() => {
-    let cancelled = false;
-    getCurrentNbaPlayerStats()
-      .then((data) => {
-        if (!cancelled) setState({ status: 'ready', data, error: null });
-      })
-      .catch((err) => {
-        if (!cancelled) setState({ status: 'error', data: null, error: err instanceof Error ? err.message : String(err) });
-      });
-    return () => { cancelled = true; };
-  }, []);
-
-  return state;
-}
-
 export function NbaRosterLeftPanel() {
-  const summaries = useCapSheetSummaries();
+  const graphTeams = useContextGraphTeams();
   const {
     databaseTeamId,
     setDatabaseTeamId,
   } = useUi();
-  const summaryData = summaries.status === 'ready' ? summaries.data : null;
-  const selectedTeamId = summaryData?.teams.find((team) => team.team.team_id === databaseTeamId)?.team.team_id
-    ?? summaryData?.teams[0]?.team.team_id
+  const summaryData = graphTeams.status === 'ready' ? graphTeams.data : null;
+  const selectedTeamId = summaryData?.teams.find((team) => team.team_id === databaseTeamId)?.team_id
+    ?? summaryData?.teams.find((team) => team.team_id === 'NYG')?.team_id
+    ?? summaryData?.teams[0]?.team_id
     ?? null;
 
-  if (summaries.status === 'loading') {
+  if (graphTeams.status === 'loading') {
     return <LeftPanelShell><MutedBlock>Loading teams...</MutedBlock></LeftPanelShell>;
   }
-  if (summaries.status === 'error') {
-    return <LeftPanelShell><MutedBlock>{summaries.error}</MutedBlock></LeftPanelShell>;
+  if (graphTeams.status === 'error') {
+    return <LeftPanelShell><MutedBlock>{graphTeams.error}</MutedBlock></LeftPanelShell>;
   }
 
   const teams = summaryData?.teams ?? [];
@@ -143,14 +124,14 @@ export function NbaRosterLeftPanel() {
         padding: `${SPACE.md}px ${SPACE.md}px`,
       }}>
         {teams.map((team, index) => {
-          const active = selectedTeamId === team.team.team_id;
+          const active = selectedTeamId === team.team_id;
           const isLast = index === teams.length - 1;
-          const freshness = mockFreshnessStatus(team.team.team_id);
+          const freshness = team.validation.status === 'pass' ? 'fresh' : 'stale';
           return (
             <button
-              key={team.team.team_id}
+              key={team.team_id}
               onClick={() => {
-                setDatabaseTeamId(team.team.team_id);
+                setDatabaseTeamId(team.team_id);
               }}
               style={{
                 width: '100%',
@@ -174,7 +155,7 @@ export function NbaRosterLeftPanel() {
                 fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.md, fontWeight: 700,
                 color: active ? F.fenway : F.fg,
                 letterSpacing: TRACKING.caps,
-              }}>{team.team.abbreviation}</span>
+              }}>{team.team_id}</span>
               <span style={{ minWidth: 0 }}>
                 <span style={{
                   display: 'block',
@@ -183,7 +164,7 @@ export function NbaRosterLeftPanel() {
                   whiteSpace: 'nowrap',
                   fontFamily: 'var(--font-sans)', fontSize: TYPE.body.sm, fontWeight: active ? 600 : 500,
                   color: F.ink,
-                }}>{team.team.full_name}</span>
+                }}>{team.name}</span>
               </span>
               <span style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <FreshnessDot status={freshness} />
@@ -197,23 +178,26 @@ export function NbaRosterLeftPanel() {
 }
 
 export function NbaRosterDatabase() {
-  const summaries = useCapSheetSummaries();
+  const graphTeams = useContextGraphTeams();
   const {
     databaseTeamId, databaseCapRowId, databaseStatKey, databasePlayerId,
     setDatabaseTeamId, setDatabaseCapRowId, setDatabasePlayerId, setDatabaseStatKey,
   } = useUi();
   const [view, setView] = useState<DatabaseView>('context');
 
-  const teams = summaries.status === 'ready' ? summaries.data.teams : [];
+  const teams = graphTeams.status === 'ready' ? graphTeams.data.teams : [];
   const selectedSummary = useMemo(
-    () => teams.find((team) => team.team.team_id === databaseTeamId) ?? teams[0] ?? null,
+    () => teams.find((team) => team.team_id === databaseTeamId)
+      ?? teams.find((team) => team.team_id === 'NYG')
+      ?? teams[0]
+      ?? null,
     [teams, databaseTeamId],
   );
-  const detail = useCapSheetDetail(selectedSummary?.team.team_id ?? null);
+  const detail = useNflTeamDetail(selectedSummary?.team_id ?? null);
 
   useEffect(() => {
-    if (selectedSummary && selectedSummary.team.team_id !== databaseTeamId) {
-      setDatabaseTeamId(selectedSummary.team.team_id);
+    if (selectedSummary && selectedSummary.team_id !== databaseTeamId) {
+      setDatabaseTeamId(selectedSummary.team_id);
     }
   }, [selectedSummary, databaseTeamId, setDatabaseTeamId]);
 
@@ -221,48 +205,32 @@ export function NbaRosterDatabase() {
     setView('context');
   }, [databaseTeamId]);
 
-  const sheet = detail.status === 'ready' ? detail.data.cap_sheet : null;
+  const nflDetail = detail.status === 'ready' ? detail.data : null;
   const snapshot = detail.status === 'ready' ? detail.data.snapshot : null;
-  const selectedRow = detail.status === 'ready'
-    ? selectedCapRow(
-      detail.data.cap_sheet?.player_rows ?? [],
-      detail.data.cap_sheet?.player_stats ?? [],
-      databaseCapRowId,
-      databaseStatKey,
-      databasePlayerId,
-    )
+  const selectedRow = nflDetail
+    ? selectedNflCapRow(nflDetail.cap_rows, databaseCapRowId, databasePlayerId)
     : null;
-  const selectedStats = detail.status === 'ready'
-    ? selectedStatRow(detail.data.cap_sheet?.player_stats ?? [], databaseStatKey, selectedRow, databasePlayerId)
+  const selectedStats = nflDetail
+    ? selectedNflMetricRow(nflDetail.player_metrics, databaseStatKey, selectedRow, databasePlayerId)
     : null;
 
   useEffect(() => {
-    const firstRow = detail.status === 'ready' ? detail.data.cap_sheet?.player_rows[0] ?? null : null;
+    const firstRow = detail.status === 'ready' ? firstPlayerCapRow(detail.data.cap_rows) : null;
     if (!databaseCapRowId && !databaseStatKey && databasePlayerId === null && firstRow) {
-      setDatabaseCapRowId(firstRow.id);
-      setDatabasePlayerId(firstRow.nba_player_id);
+      setDatabaseCapRowId(nflCapRowId(firstRow));
+      setDatabasePlayerId(null);
     }
   }, [detail, databaseCapRowId, databaseStatKey, databasePlayerId, setDatabaseCapRowId, setDatabasePlayerId]);
 
-  if (summaries.status === 'loading') {
-    return <MainShell><EmptyState>Loading NBA cap sheet database...</EmptyState></MainShell>;
+  if (graphTeams.status === 'loading') {
+    return <MainShell><EmptyState>Loading NFL Intel database...</EmptyState></MainShell>;
   }
-  if (summaries.status === 'error') {
-    return <MainShell><EmptyState>{summaries.error}</EmptyState></MainShell>;
+  if (graphTeams.status === 'error') {
+    return <MainShell><EmptyState>{graphTeams.error}</EmptyState></MainShell>;
   }
   if (!selectedSummary) {
-    return <MainShell><EmptyState>No cap-sheet snapshot has been seeded yet.</EmptyState></MainShell>;
+    return <MainShell><EmptyState>No NFL Intel snapshot has been seeded yet.</EmptyState></MainShell>;
   }
-  if (view !== 'context' && (detail.status === 'loading' || detail.status === 'idle')) {
-    return <MainShell><EmptyState>Loading {selectedSummary.team.full_name}...</EmptyState></MainShell>;
-  }
-  if (view !== 'context' && detail.status === 'error') {
-    return <MainShell><EmptyState>{detail.error}</EmptyState></MainShell>;
-  }
-  if (view !== 'context' && !sheet) {
-    return <MainShell><EmptyState>No current cap sheet exists for {selectedSummary.team.full_name}.</EmptyState></MainShell>;
-  }
-
   return (
     <MainShell>
       <div style={{
@@ -281,25 +249,25 @@ export function NbaRosterDatabase() {
             fontFamily: 'var(--font-display)', fontSize: TYPE.display.lg, fontWeight: 600,
             color: F.ink, lineHeight: 1.15, letterSpacing: TRACKING.body,
           }}>
-            {selectedSummary.team.full_name}
+            {selectedSummary.name}
           </div>
           <div style={{
             marginTop: SPACE.xs,
             fontFamily: 'var(--font-sans)', fontSize: TYPE.body.sm, color: F.fgMuted,
           }}>
-            {selectedSummary.team.conference} · {selectedSummary.team.division} · {selectedSummary.official_roster_count} official roster rows
+            {selectedSummary.conference} · {selectedSummary.division} · {selectedSummary.roster_summary.roster_count} Intel roster rows
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: SPACE.sm, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           <SourceChip label="Snapshot" value={snapshot?.as_of_date ?? selectedSummary.as_of_date ?? 'None'} />
-          <SourceChip label="Season" value={snapshot?.season ?? selectedSummary.season ?? '-'} />
-          <SourceChip label="Source" value={snapshot?.source_name ?? selectedSummary.source_name ?? '-'} />
-          <SourceChip label="Missing" value={String(sheet?.summary.missing_section_count ?? selectedSummary.missing_section_count)} />
+          <SourceChip label="Validation" value={selectedSummary.validation.status.toUpperCase()} />
+          <SourceChip label="Overrides" value={selectedSummary.has_overrides ? 'On' : 'Off'} />
+          <SourceChip label="Unknowns" value={String(selectedSummary.validation.error_count + selectedSummary.validation.warning_count)} />
         </div>
       </div>
 
-      {sheet && (
-        <FinancialSummaryStrip sheet={sheet} />
+      {nflDetail && (
+        <NflFinancialSummaryStrip detail={nflDetail} />
       )}
 
       <div style={{
@@ -311,63 +279,61 @@ export function NbaRosterDatabase() {
       }}>
         <SegmentButton active={view === 'context'} onClick={() => setView('context')}>Intel</SegmentButton>
         <SegmentButton active={view === 'cap'} onClick={() => setView('cap')}>Cap sheet</SegmentButton>
-        <SegmentButton active={view === 'stats'} onClick={() => setView('stats')}>Advanced stats</SegmentButton>
-        <SegmentButton active={view === 'roster'} onClick={() => setView('roster')}>Official roster</SegmentButton>
+        <SegmentButton active={view === 'stats'} onClick={() => setView('stats')}>Player metrics</SegmentButton>
+        <SegmentButton active={view === 'roster'} onClick={() => setView('roster')}>Offseason roster</SegmentButton>
       </div>
 
       <div className="gd-scroll" style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
         {view === 'context' ? (
-          <ContextGraphSettings key={selectedSummary.team.team_id} teamId={selectedSummary.team.team_id} embedded />
-        ) : sheet && view === 'cap' ? (
-          <CapSheetView
-            playerRows={sheet.player_rows}
-            sections={sheet.sections}
-            selectedRowId={selectedRow?.id ?? null}
+          <ContextGraphSettings key={selectedSummary.team_id} teamId={selectedSummary.team_id} embedded />
+        ) : nflDetail && view === 'cap' ? (
+          <NflCapSheetView
+            rows={nflDetail.cap_rows}
+            selectedRowId={selectedRow ? nflCapRowId(selectedRow) : null}
             onSelectRow={(row) => {
-              setDatabaseCapRowId(row.id);
-              setDatabasePlayerId(row.nba_player_id);
+              setDatabaseCapRowId(nflCapRowId(row));
+              setDatabasePlayerId(null);
             }}
           />
-        ) : sheet && view === 'stats' ? (
-          <StatsTable
-            rows={sheet.player_stats}
-            selectedStatKey={selectedStats ? statKey(selectedStats) : databaseStatKey}
+        ) : nflDetail && view === 'stats' ? (
+          <NflMetricsTable
+            rows={nflDetail.player_metrics}
+            selectedStatKey={selectedStats ? nflMetricKey(selectedStats) : databaseStatKey}
             onSelectRow={(row) => {
-              setDatabaseStatKey(statKey(row));
-              setDatabasePlayerId(row.nba_player_id);
+              setDatabaseStatKey(nflMetricKey(row));
+              setDatabasePlayerId(null);
             }}
           />
-        ) : sheet?.roster ? (
-          <RosterTable
-            team={sheet.roster}
+        ) : nflDetail && view === 'roster' ? (
+          <NflRosterTable
+            rows={nflDetail.roster_entries}
             onSelectEntry={(entry) => {
-              const capMatch = sheet.player_rows.find((row) => row.nba_player_id === entry.nba_player_id) ?? null;
-              setDatabasePlayerId(entry.nba_player_id);
-              if (entry.stats) {
-                setDatabaseStatKey(statKey(entry.stats));
-              } else if (capMatch) {
-                setDatabaseCapRowId(capMatch.id);
-              } else {
+              const capMatch = nflDetail.cap_rows.find((row) => row.player_id === entry.player_id) ?? null;
+              if (capMatch) {
+                setDatabaseCapRowId(nflCapRowId(capMatch));
                 setDatabaseStatKey(null);
+              } else {
+                setDatabaseCapRowId(null);
+                setDatabaseStatKey(entry.player_id);
               }
             }}
           />
         ) : (
-          <EmptyState>Official roster rows are not available for this team.</EmptyState>
+          <MilestoneTwoPlaceholder view={view} teamName={selectedSummary.name} />
         )}
       </div>
 
-      {sheet && view !== 'context' && (
+      {nflDetail && view !== 'context' && (
         <div style={{
           padding: `${SPACE.sm}px ${SPACE.xl}px`,
           borderTop: `1px solid ${F.border}`,
           fontFamily: 'var(--font-sans)', fontSize: TYPE.body.sm,
           color: F.fgMuted, lineHeight: 1.45,
         }}>
-          {sheet.source_refs.slice(0, 3).map((source, index) => (
-            <span key={`${source.name}-${index}`}>
+          {nflDetail.source_refs.slice(0, 3).map((source, index) => (
+            <span key={`${source.id}-${index}`}>
               {index > 0 ? ' · ' : null}
-              {source.url && source.url.startsWith('http') ? (
+              {source.url.startsWith('http') ? (
                 <a href={source.url} target="_blank" rel="noreferrer" style={{ color: F.fenway, textDecoration: 'none', fontWeight: 600 }}>
                   {source.name}
                 </a>
@@ -384,9 +350,258 @@ export function NbaRosterDatabase() {
 
 function databaseViewKicker(view: DatabaseView): string {
   if (view === 'context') return 'Database / Intel';
-  if (view === 'stats') return 'Database / advanced stats';
-  if (view === 'roster') return 'Database / official roster';
+  if (view === 'stats') return 'Database / player metrics';
+  if (view === 'roster') return 'Database / offseason roster';
   return 'Database / cap sheet';
+}
+
+function MilestoneTwoPlaceholder({ view, teamName }: { view: DatabaseView; teamName: string }) {
+  const label = view === 'cap'
+    ? 'NFL cap sheets'
+    : view === 'stats'
+      ? 'NFL player metrics'
+      : 'NFL offseason roster';
+  return (
+    <EmptyState>
+      {label} for {teamName} land in Milestone 2. The current Database slice is intentionally limited to NFL Intel.
+    </EmptyState>
+  );
+}
+
+function NflCapSheetView({
+  rows,
+  selectedRowId,
+  onSelectRow,
+}: {
+  rows: NflCapRow[];
+  selectedRowId: string | null;
+  onSelectRow: (row: NflCapRow) => void;
+}) {
+  const playerRows = rows.filter((row) => row.player_id);
+  const postureRows = rows.filter((row) => !row.player_id);
+  return (
+    <div>
+      <table style={{
+        width: '100%',
+        borderCollapse: 'collapse',
+        fontFamily: 'var(--font-sans)',
+        fontSize: TYPE.body.sm,
+        color: F.ink,
+        minWidth: 1180,
+      }}>
+        <thead>
+          <tr>
+            {['Player', 'Pos', 'Cap 2026', 'Cash 2026', 'Total left', 'Years', 'Guarantees', 'Dead cut', 'Cut room', 'Restructure', 'Tag', 'Lever', 'Source'].map((head) => (
+              <th key={head} style={{
+                position: 'sticky', top: 0, zIndex: 1,
+                padding: `${SPACE.sm}px ${SPACE.md}px`,
+                background: F.paper,
+                borderBottom: `1px solid ${F.borderStrong}`,
+                fontFamily: 'var(--font-mono)',
+                fontSize: TYPE.meta.sm,
+                color: F.fgMuted,
+                textAlign: ['Player', 'Lever', 'Source'].includes(head) ? 'left' : 'right',
+                letterSpacing: TRACKING.micro,
+                textTransform: 'uppercase',
+                whiteSpace: 'nowrap',
+                width: head === 'Player' ? CAP_SHEET_PLAYER_COLUMN_WIDTH : undefined,
+                minWidth: head === 'Player' ? CAP_SHEET_PLAYER_COLUMN_WIDTH : undefined,
+              }}>{head}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {playerRows.map((row) => {
+            const selected = nflCapRowId(row) === selectedRowId;
+            return (
+              <tr
+                key={nflCapRowId(row)}
+                onClick={() => onSelectRow(row)}
+                style={{ background: selected ? F.fenwaySoft : 'transparent', cursor: 'pointer' }}
+              >
+                <td style={capSheetPlayerCellStyle()}>
+                  <span style={{ display: 'block' }}>{row.player_name}</span>
+                  <SmallStatus>{formatMetricValue(row.contract_lever)}</SmallStatus>
+                </td>
+                <td style={cellStyle('right')}>{row.position ?? '-'}</td>
+                <td style={cellStyle('right', Boolean(row.cap_number_2026))}>{formatMoney(row.cap_number_2026)}</td>
+                <td style={cellStyle('right')}>{formatMoney(row.cash_due_2026)}</td>
+                <td style={cellStyle('right')}>{formatMoney(row.total_value_remaining)}</td>
+                <td style={cellStyle('right')}>{row.years_remaining ?? '-'}</td>
+                <td style={cellStyle('right')}>{formatMoney(row.guaranteed_remaining)}</td>
+                <td style={cellStyle('right')}>{formatMoney(row.dead_money_if_cut_2026)}</td>
+                <td style={cellStyle('right', (row.cut_savings_2026 ?? 0) > 0)}>{formatMoney(row.cut_savings_2026)}</td>
+                <td style={cellStyle('right', (row.restructure_savings_estimate_2026 ?? 0) > 0)}>{formatMoney(row.restructure_savings_estimate_2026)}</td>
+                <td style={cellStyle('right')}>{row.tag_eligible_2027 ? '2027' : '-'}</td>
+                <td style={cellStyle('left')}>{formatMetricValue(row.contract_lever)}</td>
+                <td style={cellStyle('left')}>
+                  {row.source_url?.startsWith('http') ? (
+                    <a href={row.source_url} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()} style={{ color: F.fenway, textDecoration: 'none', fontWeight: 600 }}>
+                      {formatMetricValue(row.source_status)}
+                    </a>
+                  ) : formatMetricValue(row.source_status)}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      {postureRows.length > 0 && (
+        <div style={{
+          padding: `${SPACE.lg}px ${SPACE.xl}px ${SPACE.xl}px`,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: SPACE.md,
+        }}>
+          {postureRows.map((row) => (
+            <section key={nflCapRowId(row)} style={{
+              minWidth: 0,
+              padding: SPACE.md,
+              border: `1px solid ${F.border}`,
+              borderRadius: RADIUS.md,
+              background: F.surface,
+            }}>
+              <FinancialLabel>Team Cap Posture</FinancialLabel>
+              <div style={{ marginTop: SPACE.xs, fontFamily: 'var(--font-sans)', fontSize: TYPE.body.lg, fontWeight: 750, color: F.ink }}>
+                {formatCompactMoney(row.cap_number_2026)}
+              </div>
+              <div style={{ marginTop: SPACE.xs, color: F.fgMuted, fontFamily: 'var(--font-sans)', fontSize: TYPE.body.sm, lineHeight: 1.4 }}>
+                Estimated restructure room: {formatCompactMoney(row.restructure_savings_estimate_2026)}. Static demo cap posture; verify against live league cap sheets before external use.
+              </div>
+            </section>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NflMetricsTable({
+  rows,
+  selectedStatKey,
+  onSelectRow,
+}: {
+  rows: NflPlayerMetricRow[];
+  selectedStatKey: string | null;
+  onSelectRow: (row: NflPlayerMetricRow) => void;
+}) {
+  return (
+    <table style={{
+      width: '100%',
+      borderCollapse: 'collapse',
+      fontFamily: 'var(--font-sans)',
+      fontSize: TYPE.body.sm,
+      color: F.ink,
+      minWidth: 900,
+    }}>
+      <thead>
+        <tr>
+          {['Player', 'Pos', 'Snaps', 'Games', 'Availability', 'Role', 'Tier', 'Metric note', 'Source'].map((head) => (
+            <th key={head} style={{
+              position: 'sticky', top: 0, zIndex: 1,
+              padding: `${SPACE.sm}px ${SPACE.md}px`,
+              background: F.paper,
+              borderBottom: `1px solid ${F.borderStrong}`,
+              fontFamily: 'var(--font-mono)',
+              fontSize: TYPE.meta.sm,
+              color: F.fgMuted,
+              textAlign: ['Player', 'Availability', 'Role', 'Tier', 'Metric note', 'Source'].includes(head) ? 'left' : 'right',
+              letterSpacing: TRACKING.micro,
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+            }}>{head}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row) => {
+          const selected = selectedStatKey === nflMetricKey(row);
+          return (
+            <tr
+              key={nflMetricKey(row)}
+              onClick={() => onSelectRow(row)}
+              style={{ background: selected ? F.fenwaySoft : 'transparent', cursor: 'pointer' }}
+            >
+              <td style={cellStyle('left', true)}>{row.player_name}</td>
+              <td style={cellStyle('right')}>{row.position ?? '-'}</td>
+              <td style={cellStyle('right', true)}>{formatNumber(row.snaps_2025, 0)}</td>
+              <td style={cellStyle('right')}>{formatNumber(row.games_2025, 0)}</td>
+              <td style={cellStyle('left')}>{formatMetricValue(row.availability_risk)}</td>
+              <td style={cellStyle('left')}>{formatMetricValue(row.role)}</td>
+              <td style={cellStyle('left')}>{formatMetricValue(row.value_tier)}</td>
+              <td style={cellStyle('left')}>{row.metric_note}</td>
+              <td style={cellStyle('left')}>
+                {row.source_url?.startsWith('http') ? (
+                  <a href={row.source_url} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()} style={{ color: F.fenway, textDecoration: 'none', fontWeight: 600 }}>
+                    Roster source
+                  </a>
+                ) : 'Static snapshot'}
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+}
+
+function NflRosterTable({
+  rows,
+  onSelectEntry,
+}: {
+  rows: NflRosterEntry[];
+  onSelectEntry?: (entry: NflRosterEntry) => void;
+}) {
+  return (
+    <table style={{
+      width: '100%',
+      borderCollapse: 'collapse',
+      fontFamily: 'var(--font-sans)',
+      fontSize: TYPE.body.sm,
+      color: F.ink,
+      minWidth: 860,
+    }}>
+      <thead>
+        <tr>
+          {['Player', 'Pos', 'Age', 'Roster', 'Contract', 'Order', 'Source note', 'Source'].map((head) => (
+            <th key={head} style={{
+              position: 'sticky', top: 0, zIndex: 1,
+              padding: `${SPACE.sm}px ${SPACE.md}px`,
+              background: F.paper,
+              borderBottom: `1px solid ${F.borderStrong}`,
+              fontFamily: 'var(--font-mono)',
+              fontSize: TYPE.meta.sm,
+              color: F.fgMuted,
+              textAlign: ['Player', 'Roster', 'Contract', 'Source note', 'Source'].includes(head) ? 'left' : 'right',
+              letterSpacing: TRACKING.micro,
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+            }}>{head}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((entry) => (
+          <tr key={entry.player_id} onClick={() => onSelectEntry?.(entry)} style={{ cursor: onSelectEntry ? 'pointer' : 'default' }}>
+            <td style={cellStyle('left', true)}>{entry.player_name}</td>
+            <td style={cellStyle('right')}>{entry.position ?? '-'}</td>
+            <td style={cellStyle('right')}>{entry.age ?? '-'}</td>
+            <td style={cellStyle('left')}>{formatMetricValue(entry.roster_status)}</td>
+            <td style={cellStyle('left')}>{formatMetricValue(entry.contract_status)}</td>
+            <td style={cellStyle('right')}>{entry.source_order}</td>
+            <td style={cellStyle('left')}>{entry.source_note}</td>
+            <td style={cellStyle('left')}>
+              {entry.source_url?.startsWith('http') ? (
+                <a href={entry.source_url} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()} style={{ color: F.fenway, textDecoration: 'none', fontWeight: 600 }}>
+                  Roster page
+                </a>
+              ) : 'Static snapshot'}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
 }
 
 function CapSheetView({
@@ -836,6 +1051,66 @@ function FinancialSummaryStrip({ sheet }: { sheet: NbaCapSheet }) {
           <FinancialGridItem label="Luxury tax" value={formatCompactMoney(summary.luxuryTax)} />
           <FinancialGridItem label="First apron" value={formatCompactMoney(summary.firstApron)} />
           <FinancialGridItem label="Second apron" value={formatCompactMoney(summary.secondApron)} />
+        </FinancialDetailGrid>
+      </FinancialPanel>
+    </div>
+  );
+}
+
+function NflFinancialSummaryStrip({ detail }: { detail: GetCurrentNflTeamResponse }) {
+  const posture = detail.cap_rows.find((row) => !row.player_id) ?? null;
+  const playerRows = detail.cap_rows.filter((row) => row.player_id);
+  const totalCap = sumNumbers(playerRows.map((row) => row.cap_number_2026));
+  const restructureRoom = sumNumbers(playerRows.map((row) => row.restructure_savings_estimate_2026));
+  const cutRoom = sumNumbers(playerRows.map((row) => row.cut_savings_2026));
+  const tagCandidates = playerRows.filter((row) => row.tag_eligible_2027).length;
+  const primaryLever = playerRows
+    .slice()
+    .sort((a, b) => (b.restructure_savings_estimate_2026 ?? 0) - (a.restructure_savings_estimate_2026 ?? 0))[0] ?? null;
+
+  return (
+    <div data-testid="database-financial-summary" style={{
+      padding: `${SPACE.md}px ${SPACE.xl}px ${SPACE.lg}px`,
+      borderBottom: `1px solid ${F.border}`,
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: SPACE.sm,
+      alignItems: 'stretch',
+    }}>
+      <FinancialPanel>
+        <FinancialHeader label="Team cap posture" badge={detail.snapshot.season} />
+        <FinancialHero
+          value={formatCompactMoney(posture?.cap_number_2026 ?? totalCap)}
+          subhead={`${detail.team.abbreviation} static cap snapshot as of ${detail.snapshot.as_of_date}.`}
+        />
+        <FinancialDetailGrid>
+          <FinancialGridItem label="Roster rows" value={String(detail.roster_entries.length)} />
+          <FinancialGridItem label="Cap rows" value={String(playerRows.length)} />
+        </FinancialDetailGrid>
+      </FinancialPanel>
+
+      <FinancialPanel>
+        <FinancialHeader label="Flexible room" badge="Contracts" />
+        <FinancialHero
+          value={formatCompactMoney(restructureRoom)}
+          subhead={primaryLever ? `Largest restructure lever: ${primaryLever.player_name}.` : 'No player restructure estimates in snapshot.'}
+          tone={restructureRoom > 0 ? F.fenway : F.ink}
+        />
+        <FinancialDetailGrid>
+          <FinancialGridItem label="Cut savings" value={formatCompactMoney(cutRoom)} />
+          <FinancialGridItem label="Tag candidates" value={String(tagCandidates)} />
+        </FinancialDetailGrid>
+      </FinancialPanel>
+
+      <FinancialPanel>
+        <FinancialHeader label="Data trust" badge="Static" />
+        <FinancialHero
+          value={detail.snapshot.as_of_date}
+          subhead="Internal demo fixture; source links and row statuses show what must be verified before external use."
+        />
+        <FinancialDetailGrid>
+          <FinancialGridItem label="Sources" value={String(detail.source_refs.length)} />
+          <FinancialGridItem label="Metrics" value={String(detail.player_metrics.length)} />
         </FinancialDetailGrid>
       </FinancialPanel>
     </div>
@@ -1318,6 +1593,46 @@ function capSheetTableMinWidth(seasonCount: number): number {
     + 92
     + 220
     + 140;
+}
+
+function firstPlayerCapRow(rows: NflCapRow[]): NflCapRow | null {
+  return rows.find((row) => row.player_id) ?? rows[0] ?? null;
+}
+
+function selectedNflCapRow(
+  rows: NflCapRow[],
+  selectedRowId: string | null,
+  selectedPlayerId: number | null,
+): NflCapRow | null {
+  if (selectedRowId) return rows.find((row) => nflCapRowId(row) === selectedRowId) ?? null;
+  if (selectedPlayerId !== null) return null;
+  return firstPlayerCapRow(rows);
+}
+
+function selectedNflMetricRow(
+  rows: NflPlayerMetricRow[],
+  selectedKey: string | null,
+  capRow: NflCapRow | null,
+  selectedPlayerId: number | null,
+): NflPlayerMetricRow | null {
+  if (selectedKey) return rows.find((row) => nflMetricKey(row) === selectedKey) ?? null;
+  if (capRow?.player_id) return rows.find((row) => row.player_id === capRow.player_id) ?? null;
+  if (selectedPlayerId !== null) return null;
+  return rows[0] ?? null;
+}
+
+function nflCapRowId(row: NflCapRow): string {
+  return `${row.team_id}:${row.player_id ?? 'team'}:${row.contract_lever}`;
+}
+
+function nflMetricKey(row: NflPlayerMetricRow): string {
+  return `${row.team_id}:${row.player_id}`;
+}
+
+function sumNumbers(values: Array<number | null | undefined>): number {
+  return values.reduce<number>((total, value) => (
+    typeof value === 'number' && Number.isFinite(value) ? total + value : total
+  ), 0);
 }
 
 function selectedCapRow(

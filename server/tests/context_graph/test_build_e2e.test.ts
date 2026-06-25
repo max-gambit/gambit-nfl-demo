@@ -13,7 +13,7 @@ test('build pipeline writes JSON artifacts and markdown report for tiny fixture 
   const teamsDir = await mkdtemp(path.join(tmpdir(), 'context-graph-teams-'));
   const outputDir = await mkdtemp(path.join(tmpdir(), 'context-graph-derived-'));
   await copyFile(path.join(fixturesDir, 'minimal_team_a.yaml'), path.join(teamsDir, 'atl.yaml'));
-  await copyFile(path.join(fixturesDir, 'minimal_team_b.yaml'), path.join(teamsDir, 'bos.yaml'));
+  await copyFile(path.join(fixturesDir, 'minimal_team_b.yaml'), path.join(teamsDir, 'ari.yaml'));
 
   const result = await buildContextGraph({ teamsDir, outputDir });
   const artifacts = await loadDerivedArtifacts(outputDir);

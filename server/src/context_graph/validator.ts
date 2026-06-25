@@ -137,7 +137,7 @@ export function createValidationReport(schemaErrors: ValidationMessage[], crossT
 
 export function renderValidationReport(report: ValidationReport): string {
   const lines: string[] = [
-    '# Gambit NBA Intel Validation Report',
+    '# Gambit NFL Intel Validation Report',
     '',
     '## Summary',
     '',
@@ -445,7 +445,7 @@ class TeamSchemaValidator {
 
   private validatePick(base: string, owed: boolean): void {
     this.requiredNumber(`${base}.year`);
-    this.enumValue(`${base}.round`, [1, 2], false);
+    this.enumValue(`${base}.round`, [1, 2, 3, 4, 5, 6, 7], false);
     this.requiredString(`${base}.protections`);
     this.requiredUrlOrUnknown(`${base}.source`);
     if (!owed) return;

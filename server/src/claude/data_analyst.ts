@@ -16,6 +16,8 @@ import type { CurrentCapSheetViewRow } from '../nba_cap_sheets/seed.js';
 import type { CurrentPlayerStatViewRow } from '../nba_player_stats/seed.js';
 import type { CurrentRosterViewRow } from '../nba_rosters/seed.js';
 import { defaultNbaEvidenceTeamId } from './nba_evidence.js';
+import { loadNflDemoSeed, nflTeamDetail, type NflDemoSeed } from '../nfl_data/seed.js';
+import { loadNflRulesCorpus } from '../nfl_rules/seed.js';
 
 const MAX_TOOL_ROUNDS = 6;
 const DEFAULT_LIMIT = 40;
@@ -23,11 +25,11 @@ const MAX_LIMIT = 100;
 const CBA_SOURCE_NAME = 'CBA REFERENCE';
 const CBA_SOURCE_FRESHNESS = '2024 CBA';
 
-export const DATA_ANALYST_SYSTEM = `You are the Gambit Data Analyst - an evidence-first analyst for NBA front-office data.
+export const DATA_ANALYST_SYSTEM = `You are the Gambit Data Analyst - an evidence-first analyst for NFL front-office data in the New York Giants demo.
 
 The user asked a data-backed question. You must answer using only app-available data retrieved through tools. Before submitting the final answer, call at least one data tool. Do not invent numbers, rows, sources, freshness, or calculations.
 
-This local setup is the Golden State Warriors POV. Treat first-person phrases like "we", "our", and "us" as the GSW front office unless the user explicitly names a different subject team. If you call query_nba_data without team_ids, the server scopes the lookup to GSW.
+This local setup is now the New York Giants NFL demo POV. Treat first-person phrases like "we", "our", and "us" as the NYG front office for NFL questions unless the user explicitly names a different subject team. If you call query_nfl_data without team_ids, the server scopes the lookup to NYG. Legacy NBA app data remains available only through query_nba_data for old NBA tests and demos.
 
 Output requirements:
 - Lead with the direct answer.
@@ -35,16 +37,17 @@ Output requirements:
 - Use tables when the answer compares players, teams, salaries, or stats.
 - Cite source refs in findings, tables, and calculations.
 - State missing/stale data plainly. Current app datasets are snapshots, not live feeds.
-- When the question or answer involves CBA mechanics, name the specific rule family (for example: Second Apron Restrictions, Mid-Level Exception, Bird Rights & Qualifying Offers). CBA reference cards are attached from the app corpus when those concepts appear.
+- When the question or answer involves NFL rules mechanics, name the specific rule family. Prefer the loaded NFL rule rows returned by query_nfl_data and caveat missing full-corpus coverage.
 - Keep the tone tight, expert, and data-driven.
 - Submit the final analysis by calling submit_data_analysis exactly once.`;
 
 export const DATA_ANALYST_CHAT_SYSTEM = `You are the Gambit Data Analyst answering follow-up questions inside an existing analyst thread.
 
-Use read-only app data tools whenever the user asks for fresh numbers, rankings, comparisons, tables, or source-backed checks. This local setup is the Golden State Warriors POV; omitted team scope defaults to GSW. Do not write SQL. Do not invent data. Lead with the answer, then show the relevant evidence and caveats in concise prose.`;
+Use read-only app data tools whenever the user asks for fresh numbers, rankings, comparisons, tables, or source-backed checks. This local setup is the New York Giants NFL demo POV for NFL questions; omitted NFL team scope defaults to NYG. Do not write SQL. Do not invent data. Lead with the answer, then show the relevant evidence and caveats in concise prose.`;
 
 type NbaDatasetKey = 'rosters' | 'cap_sheets' | 'player_stats' | 'context_graph' | 'cba_articles';
-type DataAnalystToolName = 'list_available_datasets' | 'query_nba_data' | 'query_brief_workspace';
+type NflDatasetKey = 'rosters' | 'cap_sheets' | 'player_metrics' | 'context_graph' | 'rules';
+type DataAnalystToolName = 'list_available_datasets' | 'query_nba_data' | 'query_nfl_data' | 'query_brief_workspace';
 
 interface DataAnalystToolResult {
   ok: boolean;
@@ -102,6 +105,41 @@ export const queryNbaDataTool: Anthropic.Tool = {
   },
 };
 
+export const queryNflDataTool: Anthropic.Tool = {
+  name: 'query_nfl_data',
+  description:
+    'Read bounded NFL demo app datasets for team/player cap, roster, metrics, Intel, and rules analysis. Use standard NFL team_ids such as NYG, DAL, PHI. If team_ids are omitted, this local setup defaults to NYG.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      team_ids: {
+        type: 'array',
+        description: 'Optional standard NFL team ids. If omitted, this local setup returns NYG rows as the Giants POV default.',
+        items: { type: 'string' },
+        maxItems: 32,
+      },
+      player_names: {
+        type: 'array',
+        description: 'Optional case-insensitive player-name filters.',
+        items: { type: 'string' },
+        maxItems: 20,
+      },
+      datasets: {
+        type: 'array',
+        description: 'Datasets to query. Defaults to roster/cap/metric/context/rules data.',
+        items: { type: 'string', enum: ['rosters', 'cap_sheets', 'player_metrics', 'context_graph', 'rules'] },
+        maxItems: 5,
+      },
+      limit: {
+        type: 'integer',
+        minimum: 1,
+        maximum: MAX_LIMIT,
+        description: 'Maximum rows per dataset returned to the model.',
+      },
+    },
+  },
+};
+
 export const queryBriefWorkspaceTool: Anthropic.Tool = {
   name: 'query_brief_workspace',
   description:
@@ -123,6 +161,7 @@ export const queryBriefWorkspaceTool: Anthropic.Tool = {
 
 export const dataAnalystTools: Anthropic.Tool[] = [
   listAvailableDatasetsTool,
+  queryNflDataTool,
   queryNbaDataTool,
   queryBriefWorkspaceTool,
 ];
@@ -325,6 +364,8 @@ export async function handleDataAnalystToolUse(
       return listAvailableDatasetsResult();
     case 'query_nba_data':
       return queryNbaDataResult(input);
+    case 'query_nfl_data':
+      return queryNflDataResult(input);
     case 'query_brief_workspace':
       return queryBriefWorkspaceResult(input);
     default:
@@ -372,7 +413,7 @@ export function dataAnalystTracesToBriefSources(
       ],
       data_analyst_trace: {
         tool_use_id: 'brief_data_analyst_sources',
-        tool_name: 'query_nba_data',
+        tool_name: dataset.dataset_id.startsWith('nfl_') ? 'query_nfl_data' : 'query_nba_data',
         datasets: [dataset],
         errors,
       } satisfies DataAnalystTrace,
@@ -402,6 +443,8 @@ export function dataAnalysisCbaCitationSources(
   startRefIndex: number,
   existingSources: Omit<BriefSource, 'id' | 'brief_id'>[] = [],
 ): Omit<BriefSource, 'id' | 'brief_id'>[] {
+  if (hasNflDataAnalystEvidence([...input.sources, ...existingSources])) return [];
+
   const text = dataAnalysisCbaMatchText(question, input);
   const selected = selectCbaArticlesForText(articles, text);
   if (selected.length === 0) return [];
@@ -413,6 +456,24 @@ export function dataAnalysisCbaCitationSources(
       return keys.every((key) => !existingKeys.has(key));
     })
     .map((article, index) => cbaArticleToBriefSource(article, startRefIndex + index));
+}
+
+function hasNflDataAnalystEvidence(sources: Omit<BriefSource, 'id' | 'brief_id'>[]): boolean {
+  return sources.some((source) => {
+    if (source.kind === 'NFL_RULE' || source.source === 'NFL_RULES') return true;
+    const data = source.data;
+    if (!data) return false;
+    const trace = data.data_analyst_trace as DataAnalystTrace | undefined;
+    if (trace?.tool_name === 'query_nfl_data') return true;
+    if (trace?.datasets.some((dataset) => dataset.dataset_id.startsWith('nfl_'))) return true;
+    const rows = data.rows;
+    if (!Array.isArray(rows)) return false;
+    return rows.some((row) => {
+      if (!row || typeof row !== 'object') return false;
+      const value = 'v' in row ? String((row as { v?: unknown }).v ?? '') : '';
+      return value.startsWith('nfl_');
+    });
+  });
 }
 
 export function recommendationBriefCbaCitationSources(
@@ -514,6 +575,7 @@ function appendToolResultMessages(
 export function isDataAnalystToolUse(block: Anthropic.ContentBlock): block is Anthropic.ToolUseBlock {
   return block.type === 'tool_use' && (
     block.name === 'list_available_datasets' ||
+    block.name === 'query_nfl_data' ||
     block.name === 'query_nba_data' ||
     block.name === 'query_brief_workspace'
   );
@@ -521,14 +583,13 @@ export function isDataAnalystToolUse(block: Anthropic.ContentBlock): block is An
 
 async function listAvailableDatasetsResult(): Promise<DataAnalystToolResult> {
   const result = emptyResult('list_available_datasets');
-  const [rosters, capSheets, playerStats, contextGraph, cbaArticles] = await Promise.all([
-    latestSnapshot('nba_roster_snapshots', 'NBA current rosters', 'player_count'),
-    latestSnapshot('nba_cap_sheet_snapshots', 'NBA current cap sheets', 'team_count'),
-    latestSnapshot('nba_player_stat_snapshots', 'NBA current player stats', 'row_count'),
+  const [nflDemo, nflStaticDatasets, contextGraph, nflRules] = await Promise.all([
+    nflDemoCatalogEntry(),
+    nflStaticCatalogEntries(),
     contextGraphCatalogEntry(),
-    cbaCorpusCatalogEntry(),
+    nflRulesCatalogEntry(),
   ]);
-  for (const item of [rosters, capSheets, playerStats, contextGraph, cbaArticles]) {
+  for (const item of [nflDemo, ...nflStaticDatasets, contextGraph, nflRules]) {
     if ('error' in item) {
       addError(result, item.scope, item.error);
     } else {
@@ -536,6 +597,77 @@ async function listAvailableDatasetsResult(): Promise<DataAnalystToolResult> {
     }
   }
   result.data.datasets = result.datasets;
+  return result;
+}
+
+async function nflStaticCatalogEntries(): Promise<Array<DataAnalystTraceDataset | { scope: string; error: string }>> {
+  try {
+    const seed = await loadNflDemoSeed();
+    const teamIds = seed.teams.map((team) => team.team_id);
+    return [
+      nflDatasetTrace('nfl_rosters_current', 'NFL offseason rosters', seed, teamIds, seed.roster_entries.length),
+      nflDatasetTrace('nfl_cap_sheets_current', 'NFL cap and contract rows', seed, teamIds, seed.cap_rows.length),
+      nflDatasetTrace('nfl_player_metrics_current', 'NFL player metrics', seed, teamIds, seed.player_metrics.length),
+    ];
+  } catch (error) {
+    return [{ scope: 'nfl_static_catalog', error: error instanceof Error ? error.message : String(error) }];
+  }
+}
+
+async function queryNflDataResult(input: unknown): Promise<DataAnalystToolResult> {
+  const result = emptyResult('query_nfl_data');
+  const body = objectInput(input);
+  const seed = await loadNflDemoSeed();
+  const requestedDatasets = parseNflDatasets(body.datasets);
+  const limit = clampLimit(numberInput(body.limit) ?? DEFAULT_LIMIT);
+  const teamIds = resolveNflTeamIds(body.team_ids, seed, result);
+  const playerNames = stringArrayInput(body.player_names).map((name) => name.toLowerCase());
+
+  if (requestedDatasets.includes('rosters')) {
+    const rows = filterNflPlayers(seed.roster_entries.filter((row) => teamIds.includes(row.team_id)), playerNames).slice(0, limit);
+    result.data.rosters = { rows };
+    result.datasets.push(nflDatasetTrace('nfl_rosters_current', 'NFL offseason rosters', seed, teamIds, rows.length));
+  }
+  if (requestedDatasets.includes('cap_sheets')) {
+    const rows = filterNflPlayers(seed.cap_rows.filter((row) => teamIds.includes(row.team_id)), playerNames).slice(0, limit);
+    result.data.cap_sheets = { rows };
+    result.datasets.push(nflDatasetTrace('nfl_cap_sheets_current', 'NFL cap and contract rows', seed, teamIds, rows.length));
+  }
+  if (requestedDatasets.includes('player_metrics')) {
+    const rows = filterNflPlayers(seed.player_metrics.filter((row) => teamIds.includes(row.team_id)), playerNames).slice(0, limit);
+    result.data.player_metrics = { rows };
+    result.datasets.push(nflDatasetTrace('nfl_player_metrics_current', 'NFL player metrics', seed, teamIds, rows.length));
+  }
+  if (requestedDatasets.includes('context_graph')) {
+    const teams = [];
+    for (const teamId of teamIds) {
+      const team = await getEffectiveTeamContextForAI(teamId);
+      teams.push(team);
+    }
+    result.data.context_graph = { teams };
+    result.datasets.push({
+      dataset_id: 'nfl_context_graph',
+      label: 'NFL Intel',
+      source_name: 'Gambit Intel',
+      as_of_date: firstString(teams.map((team) => team.metadata.source_as_of_date)),
+      team_ids: teams.map((team) => team.team_id),
+      row_count: teams.length,
+    });
+  }
+  if (requestedDatasets.includes('rules')) {
+    const rulesCorpus = await loadNflRulesCorpus();
+    const rules = rulesCorpus.rules;
+    result.data.rules = { rows: rules };
+    result.datasets.push({
+      dataset_id: 'nfl_rules_static',
+      label: 'NFL rules static snippets',
+      source_name: rulesCorpus.source_name,
+      as_of_date: rulesCorpus.as_of_date,
+      team_ids: teamIds,
+      row_count: rules.length,
+    });
+  }
+
   return result;
 }
 
@@ -573,8 +705,8 @@ async function queryNbaDataResult(input: unknown): Promise<DataAnalystToolResult
     const contextRows = await queryContextGraphRows(teamIds, limit, result);
     result.data.context_graph = { teams: contextRows };
     result.datasets.push({
-      dataset_id: 'nba_context_graph',
-      label: 'NBA Intel',
+      dataset_id: 'nfl_context_graph',
+      label: 'NFL Intel',
       source_name: 'Gambit Intel',
       as_of_date: firstString(contextRows.map((row) => row.metadata.source_as_of_date)),
       team_ids: contextRows.map((row) => row.team_id),
@@ -691,15 +823,47 @@ async function contextGraphCatalogEntry(): Promise<DataAnalystTraceDataset | { s
   try {
     const teams = await listContextGraphTeams();
     return {
-      dataset_id: 'nba_context_graph',
-      label: 'NBA Intel',
+      dataset_id: 'nfl_context_graph',
+      label: 'NFL Intel',
       source_name: 'Gambit Intel',
       as_of_date: firstString(teams.map((team) => team.source_as_of_date)),
       team_ids: teams.map((team) => team.team_id),
       row_count: teams.length,
     };
   } catch (error) {
-    return { scope: 'nba_context_graph', error: error instanceof Error ? error.message : String(error) };
+    return { scope: 'nfl_context_graph', error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+async function nflDemoCatalogEntry(): Promise<DataAnalystTraceDataset | { scope: string; error: string }> {
+  try {
+    const seed = await loadNflDemoSeed();
+    return {
+      dataset_id: 'nfl_demo_static',
+      label: 'NFL static demo data',
+      source_name: seed.source_name,
+      as_of_date: seed.as_of_date,
+      team_ids: seed.teams.map((team) => team.team_id),
+      row_count: seed.roster_entries.length + seed.cap_rows.length + seed.player_metrics.length,
+    };
+  } catch (error) {
+    return { scope: 'nfl_demo_static', error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+async function nflRulesCatalogEntry(): Promise<DataAnalystTraceDataset | { scope: string; error: string }> {
+  try {
+    const corpus = await loadNflRulesCorpus();
+    return {
+      dataset_id: 'nfl_rules_static',
+      label: 'NFL rules static snippets',
+      source_name: corpus.source_name,
+      as_of_date: corpus.as_of_date,
+      team_ids: [],
+      row_count: corpus.rules.length,
+    };
+  } catch (error) {
+    return { scope: 'nfl_rules_static', error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -817,7 +981,15 @@ function parseNbaDatasets(value: unknown): NbaDatasetKey[] {
   const parsed = Array.isArray(value)
     ? value.filter((item): item is NbaDatasetKey => typeof item === 'string' && allowed.has(item as NbaDatasetKey))
     : [];
-  return parsed.length ? parsed : ['rosters', 'cap_sheets', 'player_stats', 'context_graph'];
+  return parsed.length ? parsed : ['rosters', 'cap_sheets', 'player_stats'];
+}
+
+function parseNflDatasets(value: unknown): NflDatasetKey[] {
+  const allowed = new Set<NflDatasetKey>(['rosters', 'cap_sheets', 'player_metrics', 'context_graph', 'rules']);
+  const parsed = Array.isArray(value)
+    ? value.filter((item): item is NflDatasetKey => typeof item === 'string' && allowed.has(item as NflDatasetKey))
+    : [];
+  return parsed.length ? parsed : ['rosters', 'cap_sheets', 'player_metrics', 'context_graph', 'rules'];
 }
 
 function parseWorkspaceIncludes(value: unknown): ('sources' | 'options' | 'chat_turns')[] {
@@ -870,6 +1042,26 @@ function filterByPlayerNames(rows: CurrentPlayerStatViewRow[], playerNames: stri
 function filterRosterByPlayerNames(rows: CurrentRosterViewRow[], playerNames: string[]) {
   if (playerNames.length === 0) return rows;
   return rows.filter((row) => playerNames.some((name) => row.player_full_name.toLowerCase().includes(name)));
+}
+
+function filterNflPlayers<T extends { player_name: string }>(rows: T[], playerNames: string[]): T[] {
+  if (playerNames.length === 0) return rows;
+  return rows.filter((row) => playerNames.some((name) => row.player_name.toLowerCase().includes(name)));
+}
+
+function resolveNflTeamIds(value: unknown, seed: NflDemoSeed, result?: DataAnalystToolResult): string[] {
+  const allowed = new Set(seed.teams.map((team) => team.team_id));
+  const ids = stringArrayInput(value).map((id) => id.toUpperCase());
+  if (ids.length === 0) return ['NYG'];
+  const valid: string[] = [];
+  for (const id of ids) {
+    if (!allowed.has(id)) {
+      if (result) addError(result, `team_id:${id}`, 'unknown_nfl_team_id');
+    } else {
+      valid.push(id);
+    }
+  }
+  return [...new Set(valid)];
 }
 
 function sortPlayerRows(rows: CurrentPlayerStatViewRow[], sortBy: string) {
@@ -962,6 +1154,23 @@ function cbaDatasetTrace(rowCount: number): DataAnalystTraceDataset {
     source_name: CBA_SOURCE_NAME,
     as_of_date: CBA_SOURCE_FRESHNESS,
     team_ids: [],
+    row_count: rowCount,
+  };
+}
+
+function nflDatasetTrace(
+  datasetId: string,
+  label: string,
+  seed: NflDemoSeed,
+  teamIds: string[],
+  rowCount: number,
+): DataAnalystTraceDataset {
+  return {
+    dataset_id: datasetId,
+    label,
+    source_name: seed.source_name,
+    as_of_date: seed.as_of_date,
+    team_ids: teamIds,
     row_count: rowCount,
   };
 }

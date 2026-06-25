@@ -28,7 +28,7 @@ const NOW = new Date('2026-05-06T12:00:00.000Z');
 test('team memory storage saves structured reviewed context without raw transcript text', async () => {
   const options = await buildFixtureGraph();
   const rawIntake = 'DO_NOT_STORE_FULL_TRANSCRIPT Anthony Gill is locker-room glue and a giver, but this exact sentence should not be persisted.';
-  const intake = await buildTeamMemoryIntake('ATL', 'Atlanta Hawks', rawIntake, {
+  const intake = await buildTeamMemoryIntake('ATL', 'Atlanta Falcons', rawIntake, {
     ...options,
     now: () => NOW,
     extractor: async () => fixtureExtraction(),
@@ -53,7 +53,7 @@ test('team memory rejects unknown teams and normalizes edited profiles', async (
   const options = await buildFixtureGraph();
   await assert.rejects(() => getTeamMemoryProfile('NOPE', options), /Unknown Intel team_id NOPE/);
 
-  const profile = normalizeTeamMemoryProfile('BOS', 'Boston Celtics', {
+  const profile = normalizeTeamMemoryProfile('ARI', 'Arizona Cardinals', {
     summary: 'Private staff view of the roster.',
     cards: [{
       kind: 'coach_gut_hypothesis',
@@ -67,7 +67,7 @@ test('team memory rejects unknown teams and normalizes edited profiles', async (
     }],
   }, { now: () => NOW });
 
-  const saved = await saveTeamMemoryProfile('BOS', { ...profile, summary: 'Edited summary.' }, { ...options, now: () => NOW });
+  const saved = await saveTeamMemoryProfile('ARI', { ...profile, summary: 'Edited summary.' }, { ...options, now: () => NOW });
   assert.equal(saved.profile.summary, 'Edited summary.');
   assert.equal(saved.profile.cards[0]?.source_type, 'private_intake');
 });
@@ -212,10 +212,10 @@ test('team memory option route validates requests and does not persist raw optio
 
 test('context graph AI adapter exposes private memory as separate brief source', async () => {
   const options = await buildFixtureGraph();
-  const profile = normalizeTeamMemoryProfile('BOS', 'Boston Celtics', fixtureExtraction(), { now: () => NOW });
-  await saveTeamMemoryProfile('BOS', profile, { ...options, now: () => NOW });
+  const profile = normalizeTeamMemoryProfile('ARI', 'Arizona Cardinals', fixtureExtraction(), { now: () => NOW });
+  await saveTeamMemoryProfile('ARI', profile, { ...options, now: () => NOW });
 
-  const result = await handleContextGraphToolUse({ team_ids: ['BOS'] }, options);
+  const result = await handleContextGraphToolUse({ team_ids: ['ARI'] }, options);
   assert.equal(result.ok, true);
   assert.equal(result.teams[0]?.private_memory?.card_count, 3);
   assert.equal(result.teams[0]?.private_memory?.summary.includes('private soft context'), true);
@@ -234,7 +234,7 @@ async function buildFixtureGraph(): Promise<Required<Pick<TeamPreferenceStoreOpt
   const derivedDir = await mkdtemp(path.join(tmpdir(), 'context-graph-memory-derived-'));
   const overridesDir = await mkdtemp(path.join(tmpdir(), 'context-graph-memory-overrides-'));
   await copyFile(path.join(fixturesDir, 'minimal_team_a.yaml'), path.join(teamsDir, 'atl.yaml'));
-  await copyFile(path.join(fixturesDir, 'minimal_team_b.yaml'), path.join(teamsDir, 'bos.yaml'));
+  await copyFile(path.join(fixturesDir, 'minimal_team_b.yaml'), path.join(teamsDir, 'ari.yaml'));
   await buildContextGraph({ teamsDir, outputDir: derivedDir });
   return {
     derivedDir,

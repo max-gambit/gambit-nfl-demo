@@ -18,7 +18,6 @@ import {
   currentNbaEvidenceScopeForQuestion,
   currentNbaEvidenceTeamIds,
   currentNbaEvidenceToDataAnalystTrace,
-  defaultNbaEvidenceTeamId,
 } from '../claude/nba_evidence.js';
 import { db } from '../db/client.js';
 import type {
@@ -291,7 +290,7 @@ async function preloadCurrentNbaEvidenceForChat(
   baseSystemBlocks: Anthropic.TextBlockParam[],
   userTurnId: string,
 ): Promise<{ systemBlocks: Anthropic.TextBlockParam[]; trace: DataAnalystTrace | null }> {
-  const teamIds = currentNbaEvidenceTeamIds(message, defaultNbaEvidenceTeamId());
+  const teamIds = currentNbaEvidenceTeamIds(message, null);
   if (teamIds.length === 0) return { systemBlocks: baseSystemBlocks, trace: null };
   const scope = currentNbaEvidenceScopeForQuestion(message);
   if (!scope) return { systemBlocks: baseSystemBlocks, trace: null };

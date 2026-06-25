@@ -3,7 +3,7 @@ as_of_date: "2026-05-02"
 last_updated: "2026-05-02"
 
 identity:
-  name: Atlanta Hawks
+  name: Atlanta Falcons
   conference: Eastern
   division: Southeast
   market_tier: tier_2
@@ -75,12 +75,12 @@ cap_situation:
   confidence: high
 
 trade_dna:
-  frequent_partners: [BOS]
+  frequent_partners: [ARI]
   preferred_deal_archetypes:
     - Test deals.
   recent_significant_trades:
     - date: "2026-02-01"
-      summary: Atlanta traded Player Alpha to Boston Celtics for a future pick.
+      summary: Atlanta traded Player Alpha to Arizona Cardinals for a future pick.
   confidence: high
 
 cultural_signals:
@@ -178,7 +178,7 @@ key_assets:
 
 team_team_relationships:
   rivalries:
-    - team_id: BOS
+    - team_id: ARI
       type: competitive_recent
       basis: Test rivalry.
   notable_personnel_connections: []

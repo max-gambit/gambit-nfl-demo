@@ -21,7 +21,7 @@ import { submitBriefTool } from '../../src/claude/tools.js';
 
 const fixturesDir = path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures');
 
-test('context graph AI adapter exposes all NBA team ids and compact league index guidance', async () => {
+test('context graph AI adapter exposes all NFL team ids and compact league index guidance', async () => {
   const options = await buildFixtureGraph();
   const inputSchema = contextGraphLookupTool.input_schema as {
     properties?: { team_ids?: { items?: { enum?: string[] } } };
@@ -31,14 +31,14 @@ test('context graph AI adapter exposes all NBA team ids and compact league index
   };
 
   assert.equal(contextGraphLookupTool.name, 'lookup_context_graph_teams');
-  assert.equal(teamIdsSchema.items?.enum?.length, 30);
-  assert.equal(teamIdsSchema.items?.enum?.includes('GSW'), true);
+  assert.equal(teamIdsSchema.items?.enum?.length, 32);
+  assert.equal(teamIdsSchema.items?.enum?.includes('NYG'), true);
 
   const systemBlock = await buildContextGraphSystemBlock(options);
-  assert.match(systemBlock, /NBA Intel is available for all 30 teams/);
+  assert.match(systemBlock, /NFL Intel is available for all 32 teams/);
   assert.match(systemBlock, /lookup_context_graph_teams/);
-  assert.match(systemBlock, /ATL: Atlanta Hawks/);
-  assert.match(systemBlock, /BOS: Boston Celtics/);
+  assert.match(systemBlock, /ATL: Atlanta Falcons/);
+  assert.match(systemBlock, /ARI: Arizona Cardinals/);
 });
 
 test('context graph lookup returns compact effective context with overrides applied', async () => {
@@ -76,21 +76,21 @@ test('context graph traces preserve validation, freshness, and override metadata
 
 test('context graph traces become persisted tool calls and brief source rows', async () => {
   const options = await buildFixtureGraph();
-  const result = await handleContextGraphToolUse({ team_ids: ['BOS'] }, options);
+  const result = await handleContextGraphToolUse({ team_ids: ['ARI'] }, options);
   const trace = contextGraphTraceFromLookupResult('toolu_bos', result);
 
   const toolCalls = contextGraphTracesToToolCalls([trace]);
   assert.equal(toolCalls[0].name, 'lookup_context_graph_teams');
-  assert.equal(toolCalls[0].context_graph_trace?.teams[0].team_id, 'BOS');
+  assert.equal(toolCalls[0].context_graph_trace?.teams[0].team_id, 'ARI');
 
   const sources = contextGraphTracesToBriefSources([trace], 6);
   assert.equal(sources[0].ref_index, 6);
   assert.equal(sources[0].kind, 'CONTEXT_GRAPH');
   assert.equal(sources[0].source, 'GAMBIT_CONTEXT_GRAPH');
-  assert.match(sources[0].title, /BOS/);
+  assert.match(sources[0].title, /ARI/);
   assert.deepEqual((sources[0].data as { rows: { k: string; v: string }[] }).rows[0], {
     k: 'Team',
-    v: 'BOS · Boston Celtics',
+    v: 'ARI · Arizona Cardinals',
   });
 });
 
@@ -101,7 +101,7 @@ test('context graph brief source rows preserve lookup errors', async () => {
 
   const sources = contextGraphTracesToBriefSources([trace], 9);
   assert.equal(sources.length, 2);
-  assert.equal(sources[0].title, 'Intel · ATL · Atlanta Hawks');
+  assert.equal(sources[0].title, 'Intel · ATL · Atlanta Falcons');
   assert.equal(sources[1].title, 'Intel · lookup errors');
   assert.deepEqual((sources[1].data as { rows: { k: string; v: string }[] }).rows[0], {
     k: 'NOPE',
@@ -129,10 +129,10 @@ test('context graph lookup returns controlled errors for invalid or missing team
 
 test('AI-facing context does not mutate derived source artifacts', async () => {
   const options = await buildFixtureGraph();
-  const first = await getEffectiveTeamContextForAI('BOS', options);
+  const first = await getEffectiveTeamContextForAI('ARI', options);
   first.preferences.ownership.spending_posture = 'conservative';
 
-  const fresh = await getEffectiveTeamContextForAI('BOS', options);
+  const fresh = await getEffectiveTeamContextForAI('ARI', options);
   assert.equal(fresh.preferences.ownership.spending_posture, 'aggressive_spender');
 });
 
@@ -177,7 +177,7 @@ async function buildFixtureGraph(): Promise<Required<Pick<TeamPreferenceStoreOpt
   const derivedDir = await mkdtemp(path.join(tmpdir(), 'context-graph-ai-derived-'));
   const overridesDir = await mkdtemp(path.join(tmpdir(), 'context-graph-ai-overrides-'));
   await copyFile(path.join(fixturesDir, 'minimal_team_a.yaml'), path.join(teamsDir, 'atl.yaml'));
-  await copyFile(path.join(fixturesDir, 'minimal_team_b.yaml'), path.join(teamsDir, 'bos.yaml'));
+  await copyFile(path.join(fixturesDir, 'minimal_team_b.yaml'), path.join(teamsDir, 'ari.yaml'));
   await buildContextGraph({ teamsDir, outputDir: derivedDir });
   return {
     derivedDir,

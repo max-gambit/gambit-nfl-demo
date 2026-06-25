@@ -15,9 +15,9 @@ export interface UiSlice {
   railCollapsed: boolean;
   /** Phase 7b — which top-level surface is active. Header writes; FenwayApp reads. */
   activeNav: NavTab;
-  /** Database tab: selected NBA roster team. */
+  /** Database tab: selected roster team. */
   databaseTeamId: string;
-  /** Database tab: selected NBA player from the active roster team. */
+  /** Database tab: selected player from the active roster team. */
   databasePlayerId: number | null;
   /** Database tab: selected cap-sheet salary row. */
   databaseCapRowId: string | null;
@@ -80,7 +80,7 @@ export const createUiSlice: StateCreator<UiSlice, [], [], UiSlice> = (set) => ({
   sessionsExpanded: false,
   railCollapsed: false,
   activeNav: 'analyze',
-  databaseTeamId: 'GSW',
+  databaseTeamId: 'NYG',
   databasePlayerId: null,
   databaseCapRowId: null,
   databaseStatKey: null,

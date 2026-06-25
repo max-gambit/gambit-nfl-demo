@@ -333,7 +333,7 @@ async function generateTeamMemoryOptionsWithClaude(request: {
   return parseJsonObject(text);
 }
 
-const TEAM_MEMORY_EXTRACTION_SYSTEM = `You extract private NBA team memory from a front-office user's natural-language roster download.
+const TEAM_MEMORY_EXTRACTION_SYSTEM = `You extract private NFL team memory from a front-office user's natural-language roster download.
 
 Return ONLY valid JSON. No markdown, no comments, no surrounding prose.
 
@@ -373,7 +373,7 @@ Rules:
 - Include roster-decision context only when the intake mentions locked spots, open spots, cuts, camp, draft, or evaluation windows.
 - Do not store the full raw transcript. Evidence snippets must be short.`;
 
-const TEAM_MEMORY_OPTIONS_SYSTEM = `You generate selectable private-memory hypotheses for an NBA front-office onboarding prototype.
+const TEAM_MEMORY_OPTIONS_SYSTEM = `You generate selectable private-memory hypotheses for an NFL front-office onboarding prototype.
 
 Return ONLY valid JSON. No markdown, no comments, no prose.
 

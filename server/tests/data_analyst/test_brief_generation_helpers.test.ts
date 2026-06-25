@@ -26,6 +26,10 @@ test('first-person roster questions inherit the active demo team for app evidenc
   assert.match(buildBriefUserPrompt(question, 'CHA'), /3-5 options/);
 });
 
+test('NFL branch does not preload legacy NBA evidence for first-person NFL brief prompts', () => {
+  assert.deepEqual(currentNbaEvidenceTeamIds('Should we trade for a veteran edge rusher?'), []);
+});
+
 test('explicit team names win over the active demo team for app evidence', () => {
   const question = 'Should the Wizards shop a wing contract or preserve cap flexibility?';
 

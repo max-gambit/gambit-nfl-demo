@@ -349,7 +349,7 @@ export function SessionFeed() {
             onValueChange={setDraftQuestion}
             onSlashCommand={dispatchFromChannel}
             disabled={submitting}
-            placeholder="Ask anything about cap, contracts, trades, or the CBA…"
+            placeholder="Ask about Giants cap, contracts, tags, trades, or NFL rules..."
             focusBinding="main"
             autoFocus
           />
@@ -411,7 +411,7 @@ export function SessionFeed() {
               onValueChange={setDraftQuestion}
               onSlashCommand={dispatchFromChannel}
               disabled={submitting}
-              placeholder={`Ask a new question in #${session.label}…`}
+              placeholder={`Ask a Giants/NFL question in #${session.label}...`}
               focusBinding="main"
               autoFocus={channelBriefs.length === 0}
             />

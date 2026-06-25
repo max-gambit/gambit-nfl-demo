@@ -61,7 +61,7 @@ function parseArgs(args: string[]): CliOptions {
 }
 
 function usage(): void {
-  process.stdout.write(`Gambit NBA Intel CLI\n\n`);
+  process.stdout.write(`Gambit NFL Intel CLI\n\n`);
   process.stdout.write(`Usage:\n`);
   process.stdout.write(`  tsx src/context_graph/cli.ts validate [--teams-dir <dir>]\n`);
   process.stdout.write(`  tsx src/context_graph/cli.ts build [--teams-dir <dir>] [--output-dir <dir>]\n`);

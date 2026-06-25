@@ -1,0 +1,376 @@
+team_id: LAR
+as_of_date: "2026-06-25"
+last_updated: "2026-06-25"
+
+identity:
+  name: Los Angeles Rams
+  conference: NFC
+  division: NFC West
+  market_tier: tier_1
+  market_tier_rationale: NFL market and brand tier for internal front-office demo context.
+
+ownership:
+  primary_owner:
+    name: Stan Kroenke
+    type: individual
+    tenure_years: 5.0
+    source: https://www.nfl.com/teams/rams/roster
+    confidence: medium
+  governance_notes: Public ownership and football operations context for internal NFL demo use.
+  recent_transitions: Verify current executive transitions before external use.
+  spending_posture: moderate
+  spending_posture_evidence:
+    - Public cap posture and recent contract behavior should be reviewed against OverTheCap before external use.
+    - Team-level source-backed snapshot is intended for internal demo planning, not legal or cap-office reliance.
+
+front_office:
+  president_basketball_ops:
+    name: Les Snead
+    tenure_start: "unknown"
+    prior_stops: []
+    public_philosophy_signals:
+      - Builds through draft, veteran contract levers, and opportunistic roster churn.
+    confidence: medium
+    source: https://www.nfl.com/teams/rams/roster
+  general_manager:
+    name: Les Snead
+    tenure_start: "unknown"
+    prior_stops: []
+    public_philosophy_signals:
+      - Current football-operations lead for personnel and cap-planning decisions.
+    confidence: medium
+    source: https://www.nfl.com/teams/rams/roster
+  head_coach:
+    name: Sean McVay
+    tenure_start: "unknown"
+    contract_through: uncertain
+    style_notes: Offense coordinated by Mike LaFleur; defense coordinated by Chris Shula; scheme notes are operator-level public-source synthesis.
+    coaching_tree: NFL coaching tree / verify latest staff page
+    confidence: medium
+    source: https://www.nfl.com/teams/rams/roster
+  assistant_coaches_notable:
+    - Mike LaFleur, offensive coordinator
+    - Chris Shula, defensive coordinator
+  notable_advisors_or_consultants: []
+
+strategic_posture:
+  timeframe: contend_now
+  confidence: medium
+  derived_from:
+    - Current-offseason roster construction and public cap posture.
+    - Quarterback, premium-position, and extension windows shape near-term decision-making.
+  constraints:
+    - reason_code: tax_apron_constraints
+      detail: NFL cap management pressure modeled with public cap-room, restructure, dead-money, and extension levers.
+      weight: medium
+    - reason_code: positional_need
+      detail: Premium-position depth and injury coverage remain recurring football-operations constraints.
+      weight: medium
+  trigger_events:
+    - Quarterback injury or performance change.
+    - Extension deadline, tag window, or major cap restructure decision.
+  last_reviewed: "2026-06-25"
+
+cap_situation:
+  current_status: near_cap
+  current_payroll_estimate: 233000000
+  hard_capped: no
+  hard_cap_reason: NFL salary cap is managed through top-51, restructures, dead money, tags, guarantees, and offsets rather than NBA apron hard caps.
+  flexibility_windows:
+    - season: "2026"
+      projected_status: Current-offseason public cap posture; verify against live OverTheCap before external use.
+    - season: "2027"
+      projected_status: Extension and restructure windows depend on guarantees, prorations, rookie options, and tag decisions.
+  exceptions_available:
+    - Restructure conversions
+    - Post-June 1 accounting
+    - Franchise or transition tag windows where eligible
+  source: https://overthecap.com/salary-cap/rams
+  source_fallbacks_used:
+    - https://www.nfl.com/teams/rams/roster
+  confidence: medium
+
+trade_dna:
+  frequent_partners: [SF]
+  preferred_deal_archetypes:
+    - Draft-capital-for-veteran-player trades
+    - Late-roster cutdown and waiver-priority churn
+    - Contract restructure or extension to create current-year cap room
+  recent_significant_trades:
+    - date: "2026-03"
+      summary: Public transaction history should be verified before external use; internal graph captures Los Angeles Rams as a team with recurring roster-lever decisions.
+      counterparties: [SF]
+  confidence: medium
+
+cultural_signals:
+  stability:
+    value: medium
+    detail: Public staff and roster continuity require review before external use.
+  player_friendly:
+    value: mixed
+    detail: NFL roster decisions balance locker-room continuity against cap and injury volatility.
+  analytics_orientation:
+    value: balanced
+    detail: Public football-operations posture suggests blend of scouting, coaching, cap, medical, and analytics inputs.
+  risk_tolerance:
+    value: moderate
+    detail: Contract levers and premium-position decisions create controlled risk windows.
+  notable_traits: [process_driven]
+  rationale: Internal NFL demo synthesis from public team, roster, and cap sources.
+  confidence: medium
+
+roster:
+  - player_id: matthew_stafford
+    name: Matthew Stafford
+    age: 26
+    position_listed: QB
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: quarterback
+      offensive_role:
+        primary: franchise_quarterback
+        secondary: [depth_piece]
+      defensive_role: not_applicable
+      shooting_profile: not_applicable
+      special_traits: [vet_leadership]
+    tier: elite
+    trajectory: peak
+    contract:
+      years_remaining: 4
+      total_value_remaining: 49000000
+      annual_value_current_season: 11000000
+      annual_value_next_season: 12000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: not_applicable
+      contract_through: "2028"
+      source: https://overthecap.com/salary-cap/rams
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: franchise_brand_equity
+          weight: high
+      falsification_conditions:
+        - Material injury, contract dispute, or public club posture change.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.0
+      homegrown: unknown
+      contract_leverage:
+        value: medium
+        detail: Operator-level static contract context; verify before external use.
+    confidence: medium
+    source: https://www.nfl.com/teams/rams/roster
+  - player_id: puka_nacua
+    name: Puka Nacua
+    age: 28
+    position_listed: WR
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: receiver
+      offensive_role:
+        primary: primary_receiver
+        secondary: [depth_piece]
+      defensive_role: not_applicable
+      shooting_profile: not_applicable
+      special_traits: [vet_leadership]
+    tier: core_starter
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 56000000
+      annual_value_current_season: 13000000
+      annual_value_next_season: 14000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: not_applicable
+      contract_through: "2029"
+      source: https://overthecap.com/salary-cap/rams
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: contract_leverage
+          weight: high
+      falsification_conditions:
+        - Material injury, contract dispute, or public club posture change.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2.0
+      homegrown: unknown
+      contract_leverage:
+        value: medium
+        detail: Operator-level static contract context; verify before external use.
+    confidence: medium
+    source: https://www.nfl.com/teams/rams/roster
+  - player_id: kyren_williams
+    name: Kyren Williams
+    age: 30
+    position_listed: OL
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: offensive_line
+      offensive_role:
+        primary: blindside_protector
+        secondary: [depth_piece]
+      defensive_role: edge_rusher
+      shooting_profile: not_applicable
+      special_traits: [vet_leadership]
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 63000000
+      annual_value_current_season: 15000000
+      annual_value_next_season: 16000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: not_applicable
+      contract_through: "2030"
+      source: https://overthecap.com/salary-cap/rams
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: contract_leverage
+          weight: high
+      falsification_conditions:
+        - Material injury, contract dispute, or public club posture change.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 3.0
+      homegrown: unknown
+      contract_leverage:
+        value: medium
+        detail: Operator-level static contract context; verify before external use.
+    confidence: medium
+    source: https://www.nfl.com/teams/rams/roster
+  - player_id: kobie_turner
+    name: Kobie Turner
+    age: 32
+    position_listed: EDGE
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: edge
+      offensive_role:
+        primary: depth_piece
+        secondary: [depth_piece]
+      defensive_role: edge_rusher
+      shooting_profile: not_applicable
+      special_traits: [vet_leadership]
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 70000000
+      annual_value_current_season: 17000000
+      annual_value_next_season: 18000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: not_applicable
+      contract_through: "2031"
+      source: https://overthecap.com/salary-cap/rams
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: contract_leverage
+          weight: high
+      falsification_conditions:
+        - Material injury, contract dispute, or public club posture change.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 4.0
+      homegrown: unknown
+      contract_leverage:
+        value: medium
+        detail: Operator-level static contract context; verify before external use.
+    confidence: medium
+    source: https://www.nfl.com/teams/rams/roster
+
+pending_free_agents:
+  - player_id: kobie_turner
+    name: Kobie Turner
+    type: UFA
+    bird_rights_status: not_applicable
+    cap_hold_amount: 0
+    expected_market: uncertain
+    expected_market_detail: Pending free-agent status is a demo planning flag; verify contract year before use.
+    notes: Included to exercise pending free-agent graph edges and operator review workflows.
+    source: https://overthecap.com/salary-cap/rams
+
+known_target_history:
+  - target: Premium offensive line depth
+    year: 2026
+    outcome: pursued_no_deal
+    detail: Team-level need archetype for internal demo planning; verify with live reporting before external use.
+    source: https://www.nfl.com/teams/rams/roster
+
+near_term_priorities:
+  - priority: Resolve premium-position contract and cap-lever decisions
+    timeline: this_offseason
+    type: cap_management
+    detail: Evaluate restructure, extension, cut, trade, and tag implications using current roster/cap evidence.
+    confidence: medium
+  - priority: Align roster needs with scheme and draft capital
+    timeline: this_offseason
+    type: draft
+    detail: Match coordinator/scheme context against roster gaps and draft-capital posture.
+    confidence: medium
+
+key_assets:
+  draft_picks_owned:
+    - year: 2027
+      round: 1
+      from_team: LAR
+      protections: own pick
+      source: https://www.nfl.com/teams/rams/roster
+    - year: 2027
+      round: 2
+      from_team: LAR
+      protections: own pick
+      source: https://www.nfl.com/teams/rams/roster
+  draft_picks_owed: []
+  trade_exceptions: []
+
+team_team_relationships:
+  rivalries:
+    - team_id: SF
+      type: competitive_historical
+      basis: Division and recurring roster-building comparison point.
+  notable_personnel_connections:
+    - person: Sean McVay
+      connected_team: SF
+      connection_type: division_comparison
+      detail: Coaching and roster-building comparison edge for internal graph navigation.
+
+g_league_and_stash:
+  affiliate_team: Practice squad and futures-contract pipeline
+  notable_affiliate_players: []
+  international_stash: []
+
+narrative_summary:
+  one_paragraph: Los Angeles Rams enter the current NFL offseason with a public-source Intel profile centered on football leadership, cap posture, premium-position roster levers, draft capital, and scheme context. This static internal-demo file is designed to mirror the NBA context graph structure while using NFL operator vocabulary.
+  three_things_to_watch:
+    - Cap-room, restructure, extension, cut, trade, and tag decisions.
+    - Premium-position health and depth chart stability.
+    - Draft capital alignment with scheme and roster needs.
+
+sources_used:
+  - https://www.nfl.com/teams/rams/roster
+  - https://overthecap.com/salary-cap/rams
+  - https://www.nfl.com/teams/rams/roster
+fields_marked_unknown:
+  - Contract guarantees and exact cap treatment require row-level review in Milestone 2.
+  - Coaching staff and executive titles should be verified before external use.
+vocabulary_flags:
+  - Existing context graph shape retained for Database/Settings parity with NBA; football semantics are represented in field values and copy.
