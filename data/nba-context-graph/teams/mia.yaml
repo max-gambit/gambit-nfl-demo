@@ -1,0 +1,740 @@
+team_id: MIA
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Miami Heat
+  conference: Eastern
+  division: Southeast
+  market_tier: tier_1
+  market_tier_rationale: Major metro with strong franchise equity; consistent playoff presence and cultural significance despite recent competitive decline.
+ownership:
+  primary_owner:
+    name: Micky Arison
+    type: individual
+    tenure_years: 31
+    source: https://www.nba.com/heat/bio/micky-arison
+    confidence: high
+  governance_notes: Nick Arison (son) serves as CEO and manages daily operations since 2011; Pat Riley remains team president but organizational decision-making authority has broadened to include CEO and GM Andy Elisburg.
+  recent_transitions: none
+  spending_posture: moderate
+  spending_posture_evidence:
+    - Current payroll $186.4M against $123.6M cap reflects willingness to pay, but $29.5M below luxury tax line suggests measured approach
+    - Seeking to clear $80M+ in cap space for 2026 free agency targeting star acquisitions
+    - No major free-agent overpays in past two years; focus on trade acquisitions and development
+front_office:
+  president_basketball_ops:
+    name: Pat Riley
+    tenure_start: 1995-06
+    prior_stops:
+      - New York Knicks (General Manager, Executive Vice President)
+      - Los Angeles Lakers (Executive Vice President, General Manager)
+    public_philosophy_signals:
+      - "\"We're going to be aggressive as hell to make the team better\" (2026 exit presser, cbssports.com)"
+      - '"I want to build this around Bam" – declares Adebayo untouchable; prioritizes availability and consistency'
+      - Opposes tanking; committed to contention window despite recent struggles
+    confidence: high
+    source: https://www.cbssports.com/nba/news/pat-riley-heat-tanking-bam-adebayo-tyler-herro/
+  general_manager:
+    name: Andy Elisburg
+    tenure_start: 2013-09
+    prior_stops:
+      - Miami Heat (cap analyst, salary cap expert role pre-2013)
+    public_philosophy_signals:
+      - 35+ year tenure with Heat signals continuity and institutional knowledge prioritization
+      - Focus on development and roster flexibility over aggressive draft trading
+      - Cap-first approach emphasizing flexibility windows and exception management
+    confidence: high
+    source: https://www.espn.com/nba/story/_/id/39275735/sources-heat-extend-erik-spoelstra-record-8-year-120m-deal
+  head_coach:
+    name: Erik Spoelstra
+    tenure_start: 2008-04
+    contract_through: 2032
+    style_notes: Defensive-first identity with zone defense emphasis (leads NBA 3+ straight years in zone possessions); moderate pace; functional offensive system built around versatile bigs and role-player efficiency.
+    coaching_tree: Popovich tree (mentored under Popovich during assistant role)
+    confidence: high
+    source: https://www.espn.com/nba/story/_/id/39275735/sources-heat-extend-erik-spoelstra-record-8-year-120m-deal
+  assistant_coaches_notable:
+    - Shane Battier (VP Basketball Development & Analytics)
+    - Chet Kammerer (VP Basketball Operations, 24+ years tenure)
+  notable_advisors_or_consultants:
+    - Shane Battier (Analytics infrastructure and player development)
+strategic_posture:
+  timeframe: contend_now
+  confidence: medium
+  derived_from:
+    - Riley declares contention mandate; will not tank and states "I'm not going to retire"
+    - Bam Adebayo declared untouchable (franchise cornerstone); core locked through 2027
+    - Recent playoff disappointment (play-in exit 2026) after Finals run in 2023 signals urgency
+    - 43-39 record and 10th seed in weak East indicates roster plateau, not rebuild
+    - Explicit plan to clear $80M+ in 2026 cap space for star acquisition signal aggressive retooling
+  constraints:
+    - reason_code: max_contract_lockup
+      detail: Adebayo ($49.5M 2026-27), Herro ($33M 2026-27), Wiggins (~$28-30M 2025-26 with PO decision pending) consume bulk of payroll.
+      weight: high
+    - reason_code: tax_apron_constraints
+      detail: Operating $1.1M below second apron; cannot execute most trades without shedding salary; limits mid-season adjustment ability.
+      weight: high
+    - reason_code: aging_core
+      detail: Wiggins (31yo), Powell (32yo) are veteran role players; core youth (Herro 26, Adebayo 28) needs star creation support.
+      weight: medium
+  trigger_events:
+    - Acquisition of franchise star via trade (e.g., All-NBA wing) would shift to aggressive contention
+    - Major injury to Adebayo or Herro would force rebuild evaluation
+    - Play-in miss for two consecutive years would trigger rebuild conversation
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: between_aprons
+  current_payroll_estimate: 186447146
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Projected $29.5M below luxury tax, $35.5M below first apron if prior signings honored. Trade exceptions ($16.8M, $5.6M) available through July-August 2026.
+  exceptions_available:
+    - value: 16800000
+      expires: 2026-07-07
+      source: unknown
+    - value: 5600000
+      expires: 2026-08-15
+      source: unknown
+    - value: 15100000
+      expires: unknown
+      source: unknown
+  source: https://www.spotrac.com/nba/miami-heat/cap/
+  source_fallbacks_used:
+    - https://www.si.com/nba/heat/onsi/miami-heat-2026-salary-cap-tracker-how-much-room-flexibility-do-they-have-this-offseason-01kpxnynf35d
+    - https://www.salaryswish.com/teams/heat
+  confidence: high
+trade_dna:
+  frequent_partners:
+    - GSW
+    - UTA
+    - TOR
+    - CLE
+  preferred_deal_archetypes:
+    - Role player + draft pick for star or near-star (e.g., Butler to Warriors, Rozier from Charlotte)
+    - Salary dump + minor asset for cap relief and exception creation
+    - Young wing or guard with defensive versatility and developmental upside
+  recent_significant_trades:
+    - date: 2025-02-06
+      summary: "Five-team trade: Heat send Jimmy Butler to Golden State, receive Andrew Wiggins, Davion Mitchell, Kyle Anderson, protected 1st; also send Josh Richardson to Utah, cash to Toronto."
+      counterparties:
+        - GSW
+        - TOR
+        - UTA
+    - date: 2023-07
+      summary: Heat acquire Terry Rozier from Charlotte in exchange for Kyle Lowry and conditional 2027 1st-rounder.
+      counterparties:
+        - CHA
+    - date: 2024-02
+      summary: Heat trade Victor Oladipo to Oklahoma City for cash; trade Max Strus to Cleveland in three-team deal.
+      counterparties:
+        - CLE
+        - OKC
+  confidence: high
+cultural_signals:
+  stability:
+    value: high
+    detail: Spoelstra 18 years; Riley 31 years; Elisburg 13 years as GM (35+ tenure overall); beat reporter consensus notes 'nobody leaves Heat FO.'
+  player_friendly:
+    value: mixed
+    detail: Defensive grind culture and discipline-focused system; favorable player development reputation but limited star-chasing history pre-2023 Finals run. Butler trade reflects org willingness to move on from frustrated star.
+  analytics_orientation:
+    value: balanced
+    detail: Shane Battier leads advanced analytics infrastructure; cap management highly sophisticated; but draft philosophy remains archetype-based development over pure analytics targeting.
+  risk_tolerance:
+    value: aggressive
+    detail: Five-team trade for Butler to Warriors; willingness to clear $80M+ cap space for unknown 2026 free-agent target; maintains contention despite recent lottery proximity.
+  notable_traits:
+    - process_driven
+    - defensive_identity
+    - developmental_org
+    - homegrown_priority
+    - veteran_friendly
+  rationale: Miami's 31-year ownership stability, strong internal continuity, and defensive-first philosophy define organizational identity. Zone defense and player development are core, yet recent trade aggression (Butler deal) and explicit $80M+ cap-clearing plan signal evolution toward star-chasing. Culture remains disciplinary and defensive-first, resistant to tanking.
+  confidence: high
+roster:
+  - player_id: bam_adebayo
+    name: Bam Adebayo
+    age: 28
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: post_hub
+        secondary:
+          - connector
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: functional
+      special_traits:
+        - elite_rebounder
+        - switchable
+        - vet_leadership
+    tier: star
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 49500000
+      annual_value_current_season: 49500000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/23609/bam-adebayo
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: high
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Career-threatening injury or sudden decline in defensive mobility
+        - Riley departs organization
+        - Explicit request for trade from Adebayo himself
+      signal_strength: confirmed_shopped
+    team_relationship:
+      tenure_with_team: 8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Team controls through 2027; no opt-outs or trade clause.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/23609/bam-adebayo
+  - player_id: tyler_herro
+    name: Tyler Herro
+    age: 26
+    position_listed: SG
+    contract_type: standard
+    availability_status: injured_short_term
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - iso_creator
+    tier: star
+    trajectory: declining_peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 33000000
+      annual_value_current_season: 33000000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/25247/tyler-herro
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: extension_decline
+          weight: medium
+      falsification_conditions:
+        - Heat fails to re-sign or extend Herro by July 2026 deadline
+        - Persistent injury issues reduce trade value further
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 5.5
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Eligible for extension but Riley publicly noncommittal; appeared in only 33 games in 2025-26 due to injuries.
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/_/id/25247/tyler-herro
+  - player_id: andrew_wiggins
+    name: Andrew Wiggins
+    age: 31
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - finisher
+          - connector
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+    tier: starter
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 28223215
+      annual_value_current_season: 28223215
+      annual_value_next_season: 30000000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: 2027
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.salaryswish.com/players/andrew-wiggins
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: aging_core
+          weight: medium
+        - reason_code: contract_expiring
+          weight: medium
+      falsification_conditions:
+        - Wiggins opts in and Heat re-sign him to extension
+        - Heat prioritize wing retention over cap flexibility
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.3
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Player option in 2027; Heat made it known wants Wiggins back but flexibility needs may force exploration.
+    confidence: high
+    source: https://www.si.com/nba/heat/onsi/andrew-wiggins-30m-decision-could-shape-the-miami-heat-s-offseason-01kpbh6cgf3v
+  - player_id: norman_powell
+    name: Norman Powell
+    age: 32
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - finisher
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+    tier: starter
+    trajectory: declining
+    contract:
+      years_remaining: 0
+      total_value_remaining: 0
+      annual_value_current_season: 20480000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://ca.sports.yahoo.com/news/heat-make-conclusive-decisions-bam-adebayo-222800810.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: aging_core
+          weight: high
+      falsification_conditions:
+        - Heat extends Powell to 4yr/$120M+ deal before June 30 deadline
+        - Powell accepts lesser multi-year deal to stay
+      signal_strength: widely_reported
+    team_relationship:
+      tenure_with_team: 2
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Unrestricted free agent in summer 2026; expected to command $25M+ annually; Heat uncertain on extension given injury history and decline post-All-Star.
+    confidence: high
+    source: https://clutchpoints.com/nba/miami-heat/heat-news-norman-powell-gets-real-on-miamis-potential-contract-extension-with-miami-after-play-in-exit
+  - player_id: jaime_jaquez_jr
+    name: Jaime Jaquez Jr.
+    age: 24
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - finisher
+          - connector
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - playoff_riser
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: 5900000
+      annual_value_current_season: 3900000
+      annual_value_next_season: 5900000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2027
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/82323/jaime-jaquez-jr
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: recent_extension_poison_pill
+          weight: medium
+      falsification_conditions:
+        - Heat receives star-level return in multi-player deal
+        - Team enters full rebuild phase
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2.5
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Team controls through 2027 via team option; entering restricted free agency in 2027.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/82323/jaime-jaquez-jr
+  - player_id: kel_el_ware
+    name: Kel'el Ware
+    age: 21
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - finisher
+          - connector
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+        - offensive_rebound_specialist
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2027
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.nba.com/player/1642276/kelel-ware
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Ware's development stalls or regression evident
+        - Heat trades for established star center
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2.5
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie scale contract; team controls through 2027.
+    confidence: high
+    source: https://www.nba.com/player/1642276/kelel-ware
+  - player_id: davion_mitchell
+    name: Davion Mitchell
+    age: 25
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: connector
+        secondary:
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2027
+      source: https://www.nba.com/heat/news/heat-acquire-wiggins-anderson-and-mitchell
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: positional_redundancy
+          weight: medium
+      falsification_conditions:
+        - Heat acquires star guard and Mitchell becomes backup
+        - Mitchell's development accelerates
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.3
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Non-bird rights; acquired in 2025 Butler trade.
+    confidence: medium
+    source: https://www.nba.com/heat/news/heat-acquire-wiggins-anderson-and-mitchell
+  - player_id: nikola_jovic
+    name: Nikola Jovic
+    age: 22
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: spacer
+        secondary:
+          - screen_setter
+          - connector
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.nba.com/player/1631107/nikola-jovic
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: medium
+      falsification_conditions:
+        - Heat enters full rebuild
+        - Jovic's 3-point shooting further regresses
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 3.5
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Drafted 2021; part of homegrown development core.
+    confidence: medium
+    source: https://www.nba.com/player/1631107/nikola-jovic
+pending_free_agents:
+  - player_id: norman_powell
+    name: Norman Powell
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: unknown
+    expected_market: bidding_war
+    expected_market_detail: All-Star selection Feb 2026; expected to command $25M+ annually despite post-All-Star decline and age 32.
+    notes: Unrestricted free agent; Heat has extension window through June 30, 2026.
+    source: https://clutchpoints.com/nba/miami-heat/heat-news-norman-powell-gets-real-on-miamis-potential-contract-extension-with-miami-after-play-in-exit
+known_target_history:
+  - target: Jimmy Butler
+    year: 2025
+    outcome: acquired
+    detail: Traded to Golden State Warriors in 5-team deal Feb 6, 2025; Heat acquired Wiggins, Mitchell, Anderson, 1st-rounder.
+    source: https://www.nba.com/news/jimmy-butler-heading-to-warriors-in-multi-player-deal-with-heat
+  - target: Terry Rozier
+    year: 2023
+    outcome: acquired
+    detail: Acquired from Charlotte for Kyle Lowry + conditional 2027 1st; later waived in 2026 as part of gambling investigation fallout.
+    source: https://hothothoops.com/2026/03/09/miami-heat-receive-2026-second-round-pick-amid-terry-rozier-dispute-hornets/
+  - target: Victor Oladipo
+    year: 2024
+    outcome: declined
+    detail: Heat traded Oladipo out to Oklahoma City for cash; limited fit in defensive scheme.
+    source: https://basketball.realgm.com/nba/teams/Miami-Heat/15/Rosters/Current/2026
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "Miami Heat hold No. 13, No. 41 from GSW in the official post-lottery order. Mock-source layer: No. 13: Labaron Philon Jr.; treat prospect names as low-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: low
+  - priority: Star wing/guard acquisition
+    timeline: this_offseason
+    type: free_agency
+    detail: Heat intends to clear $80M+ cap space targeting elite scoring/creation talent (Jokic, Morant, Leonard mentioned); LeBron/Giannis tier if available.
+    confidence: high
+  - priority: Extension negotiations with Jaime Jaquez Jr.
+    timeline: by_trade_deadline
+    type: extension
+    detail: Expected ~$90M extension by summer 2026; window closes mid-October before season.
+    confidence: high
+  - priority: Evaluate Norman Powell future
+    timeline: next_30_days
+    type: free_agency
+    detail: Extension window closes June 30; if not extended, likely walks to higher bidder.
+    confidence: high
+  - priority: Roster depth/wing shooting
+    timeline: this_offseason
+    type: roster
+    detail: Riley explicit on adding 'shooting, ball-handling, and overall length'; fill bench gaps if star acquired.
+    confidence: high
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 13 overall; own pick.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 2
+      protections: 2026 No. 41 overall; from GSW via CHA, NYK, OKC, and ATL.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: GSW
+    - year: 2028
+      round: 1
+      protections: owned if 2027 conveyed to Charlotte
+      source: https://allucanheat.com/full-list-of-heat-draft-picks-ahead-of-next-superstar-pursuit
+    - year: 2029
+      round: 1
+      protections: owned
+      source: https://allucanheat.com/full-list-of-heat-draft-picks-ahead-of-next-superstar-pursuit
+    - year: 2030
+      round: 1
+      protections: owned
+      source: https://allucanheat.com/full-list-of-heat-draft-picks-ahead-of-next-superstar-pursuit
+    - year: 2031
+      round: 1
+      protections: owned
+      source: https://allucanheat.com/full-list-of-heat-draft-picks-ahead-of-next-superstar-pursuit
+  draft_picks_owed:
+    - year: 2026
+      round: 2
+      to_team: SAS
+      protections: 2026 No. 44 overall; from MIA via IND.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2027
+      round: 1
+      to_team: CHA
+      protections: lottery protected (1-14); Heat keep if 15+
+      source: https://allucanheat.com/full-list-of-heat-draft-picks-ahead-of-next-superstar-pursuit
+  trade_exceptions:
+    - value: 16800000
+      expires: 2026-07-07
+      source: unknown
+      confidence: high
+    - value: 5600000
+      expires: 2026-08-15
+      source: unknown
+      confidence: high
+team_team_relationships:
+  rivalries:
+    - team_id: BOS
+      type: competitive_recent
+      basis: Matched in first round 2024 (Celtics won); prior Finals matchup 2023 ECF (Heat won).
+    - team_id: PHI
+      type: geographic
+      basis: Atlantic division rivals; frequent playoff contention overlap.
+  notable_personnel_connections:
+    - person: Pat Riley
+      connected_team: LAL
+      connection_type: former_GM
+      detail: Served as Lakers GM 1982-1991; won two titles; known for building Showtime Lakers culture.
+    - person: Erik Spoelstra
+      connected_team: unknown
+      connection_type: mentor
+      detail: Mentored under Gregg Popovich ethos; represents Popovich tree in NBA.
+    - person: Shane Battier
+      connected_team: MIA
+      connection_type: former_player
+      detail: Played for Heat 2014-2015; now VP Basketball Development & Analytics; embodies Heat player-to-FO pipeline.
+g_league_and_stash:
+  affiliate_team: Sioux Falls Skyforce
+  notable_affiliate_players:
+    - Jahmir Young (2026 G League Player of the Month Jan; 29.5 ppg, 9.7 apg avg)
+    - Dennis Smith Jr. (veteran guard signed to Skyforce)
+    - Keshad Johnson (Heat rotation player assigned for development)
+  international_stash:
+    - Kasparas Jakučionis (Lithuania guard, 2023 draft pick; in camp roster 2025-26)
+narrative_summary:
+  one_paragraph: The Miami Heat stand at a critical crossroads. After reaching the NBA Finals in 2023, they have declined to a 10th-seed play-in exit in 2026 (43-39 record), losing to Charlotte in OT. Pat Riley remains committed to contention, explicitly stating he will not retire or step aside and declaring Bam Adebayo (28, star, untouchable) the franchise centerpiece. The organization intends to clear $80M+ in cap space this offseason to pursue elite star talent (Jokic, Morant, Leonard tier), betting on their development system and defensive identity to retain competitiveness. Tyler Herro (26, injuries limiting 2025-26), Andrew Wiggins (31, player option pending), and emerging wing Jaime Jaquez Jr. (24, ascending) round out the core. However, payroll constraints (operating between aprons) and recent underperformance have created roster stagnation requiring aggressive external moves. The Heat's organizational stability (Spoelstra 18 years, Elisburg 13 as GM, Riley 31 as president) and defensive-first culture remain competitive advantages, but the window to recapture 2023-24 contention legitimacy narrows.
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 13, No. 41 from GSW; The Athletic mock-source layer lists No. 13: Labaron Philon Jr. as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - Will Miami successfully clear $80M+ cap space and land a star-tier free agent (Jokic, Morant), or will ownership/cap limitations force modest upgrades and gradual retool?
+    - How do Herro's injury recovery and availability impact his trade value and extension negotiations? Extension window closes July 2026.
+    - Does the homegrown youth core (Jaquez, Ware, Jovic) develop sufficiently to justify passing on higher draft picks, or does near-term competitive pressure force a midseason pivot?
+sources_used:
+  - https://www.basketball-reference.com/teams/MIA/2026.html
+  - https://www.cbssports.com/nba/teams/MIA/miami-heat/roster/
+  - https://www.nba.com/news/jimmy-butler-heading-to-warriors-in-multi-player-deal-with-heat
+  - https://www.cnn.com/2025/02/05/sport/jimmy-butler-traded-to-golden-state-warriors-spt
+  - https://www.spotrac.com/nba/miami-heat/cap/
+  - https://www.si.com/nba/heat/onsi/miami-heat-2026-salary-cap-tracker-how-much-room-flexibility-do-they-have-this-offseason-01kpxnynf35d
+  - https://www.cbssports.com/nba/news/pat-riley-heat-tanking-bam-adebayo-tyler-herro/
+  - https://www.nba.com/bio/micky-arison
+  - https://www.espn.com/nba/story/_/id/39275735/sources-heat-extend-erik-spoelstra-record-8-year-120m-deal
+  - https://www.spotrac.com/nba/player/_/id/23609/bam-adebayo
+  - https://www.spotrac.com/nba/player/_/id/25247/tyler-herro
+  - https://www.salaryswish.com/players/andrew-wiggins
+  - https://ca.sports.yahoo.com/news/heat-make-conclusive-decisions-bam-adebayo-222800810.html
+  - https://clutchpoints.com/nba/miami-heat/heat-news-norman-powell-gets-real-on-miamis-potential-contract-extension-with-miami-after-play-in-exit
+  - https://www.spotrac.com/nba/player/_/id/82323/jaime-jaquez-jr
+  - https://www.nba.com/player/1642276/kelel-ware
+  - https://www.nba.com/heat/news/heat-acquire-wiggins-anderson-and-mitchell
+  - https://www.nba.com/player/1631107/nikola-jovic
+  - https://hothothoops.com/2026/03/09/miami-heat-receive-2026-second-round-pick-amid-terry-rozier-dispute-hornets/
+  - https://allucanheat.com/full-list-of-heat-draft-picks-ahead-of-next-superstar-pursuit
+  - https://siouxfalls.gleague.nba.com/
+  - https://lastwordonsports.com/basketball/2026/04/28/pat-riley-end-of-season-press-conference-miami-heat/
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - front_office.general_manager.public_philosophy_signals.sources (general inference from cap and trade actions, no explicit statement)
+  - bam_adebayo.contract.trade_kicker (confirmed absent in recent contracts, likely "none")
+  - andrew_wiggins.contract.trade_kicker (confirmed absent, likely "none")
+  - kel_el_ware.contract.annual_value_current_season (rookie scale; exact amount not publicly disclosed)
+  - kel_el_ware.contract.annual_value_next_season (rookie scale, not disclosed)
+  - kel_el_ware.contract.total_value_remaining (rookie scale 2-year span, not fully disclosed)
+  - davion_mitchell.contract.annual_value_current_season (early-career, not widely disclosed)
+  - davion_mitchell.contract.annual_value_next_season (early-career, not widely disclosed)
+  - davion_mitchell.contract.total_value_remaining (early-career, not widely disclosed)
+  - nikola_jovic.contract.annual_value_current_season (rookies scale, not disclosed)
+  - nikola_jovic.contract.annual_value_next_season (rookie scale, not disclosed)
+  - nikola_jovic.contract.total_value_remaining (rookie scale, not disclosed)
+  - nikola_jovic.contract.team_option (likely held but not confirmed)
+  - pending_free_agents.norman_powell.cap_hold_amount (not disclosed; UFA cap hold formula applied)
+vocabulary_flags:
+  - "Coach tree: Spoelstra listed as 'Popovich tree'; verified via prior mentorship under San Antonio. Added to notable_traits per v2.2.1 expansion."
+  - Terry Rozier marked 'acquired' in known_target_history despite 2026 waiver (April); acquisition outcome 2023 is the operative signal.
+  - "Jimmy Butler trade: Heat received Wiggins, Mitchell, Kyle Anderson, 2025 1st-rounder; outcome 'acquired' reflects the reacquisition archetype, not retention."
+  - "Strategic posture: marked 'contend_now' despite 10th seed and play-in exit, grounded in Riley's explicit 2026 statements and $80M+ cap-clearing intent. Confidence medium due to roster stagnation vs. explicit organizational mandate."
+  - Andrew Wiggins availability status marked 'available' despite 'makes it known wants to be back' signals; available reflects trade-deadline exploration possibility, not trade demand.
+  - Norman Powell contract leverage marked 'high' (UFA) vs. 'medium'; revised based on Heat's stated uncertainty post-All-Star decline.
+  - "Sources: Spotrac and SalarySwish primary for contracts; Tier 2 fallback used throughout. Third Apron and SB Nation blogs cross-checked for consistency."

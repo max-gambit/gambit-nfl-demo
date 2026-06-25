@@ -1,0 +1,1168 @@
+team_id: ORL
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Orlando Magic
+  conference: Eastern
+  division: Southeast
+  market_tier: tier_2
+  market_tier_rationale: Metro area of 1.73M (Nielsen rank 16 US); mid-market franchise with strong regional presence but not NYC/LA/Chicago scale.
+ownership:
+  primary_owner:
+    name: Dan DeVos (Chair); DeVos Family collective ownership via RDV Sports, Inc.
+    type: group
+    tenure_years: 34.8
+    source: https://www.nba.com/magic/devos-family
+    confidence: high
+  governance_notes: Four DeVos siblings (Dan, Dick, Cheri, Doug) maintain collective ownership. Dan serves as public-facing chairman. Third-generation succession planning underway (e.g., Ryan, Cole DeVos involvement). No sale expected.
+  recent_transitions: none
+  spending_posture: moderate
+  spending_posture_evidence:
+    - 2025-26 payroll $188.6M, fourth-lowest in NBA; below first apron by $7.4M
+    - Recent max extensions to Banchero ($287M/5yr), Wagner ($224M/5yr), Suggs ($150.5M/5yr) reflect core commitment
+    - Selective acquisition via trade (Bane) rather than free-agent splashing; franchise prioritizes cap flexibility
+front_office:
+  president_basketball_ops:
+    name: Jeff Weltman
+    tenure_start: 2019-07
+    prior_stops:
+      - Orlando Magic (Assistant GM, 2012-2019)
+      - Denver Nuggets (Assistant GM)
+      - Memphis Grizzlies (Scout)
+    public_philosophy_signals:
+      - Emphasis on youth development and long-term core building (Banchero, Wagner, Suggs drafted and extended)
+      - Strategic trade discipline; willing to move pieces (Cole Anthony, KCP) for positional upgrades (Bane)
+      - Patient cap management to preserve flexibility below hard-cap thresholds
+    confidence: high
+    source: https://www.nba.com/magic/orlando-magic-executives
+  general_manager:
+    name: Anthony Parker
+    tenure_start: 2023-07
+    prior_stops:
+      - Orlando Magic (Assistant GM, prior)
+      - Sacramento Kings (Scout)
+    public_philosophy_signals:
+      - Collaborative with Weltman; focused on roster cohesion and fit optimization
+      - Executed Desmond Bane trade (June 2025) signaling mid-season aggressiveness for contention window
+    confidence: high
+    source: https://www.nba.com/news/anthony-parker-new-gm-orlando-magic
+  head_coach:
+    name: Jamahl Mosley
+    tenure_start: 2021-07
+    contract_through: 2028
+    style_notes: "Pace-and-space offense emphasizing three-point shooting (Bane/Wagner). Switching-heavy defense with rim protection (Carter Jr., Isaac). Playoff experience: led Magic to playoffs 2023-24, 2024-25, 2025-26."
+    coaching_tree: unknown
+    confidence: high
+    source: https://www.nba.com/magic/news/orlando-magic-head-coach-jamahl-mosley-agree-to-multi-year-contract-extension-20240312
+  assistant_coaches_notable:
+    - Joe Prunty (added 2025-26)
+    - God Shammgod (added 2025-26)
+  notable_advisors_or_consultants: []
+strategic_posture:
+  timeframe: contend_now
+  confidence: high
+  derived_from:
+    - "Core locked in: Banchero (5yr/$287M thru 2030), Wagner (5yr/$224M thru 2029), Suggs (5yr/$150.5M thru 2029), Bane (extension pending, 4yr/$75M+ range)"
+    - Healthy window 2025-30; all four stars age 23-28 by 2029
+    - 2025-26 offseason trade aggression (Bane acquisition) signals immediate contention rather than patience
+    - "Playoff progression: 2023-24 first round, 2024-25 first round (vs BOS), 2025-26 first round (beat CHA in play-in, competed vs DET Pistons)"
+    - "Recent health: Paolo returned from November groin injury by playoffs; Franz Wagner available full 2024-25"
+  constraints:
+    - reason_code: tax_apron_constraints
+      detail: Payroll $188.6M; $7.4M under first apron. Banchero extension will push into second apron by 2027. Hard-cap acceptance limits mid-season acquisitions.
+      weight: high
+    - reason_code: young_core_developing
+      detail: Banchero, Wagner, Suggs, Bane all age 23-27; trajectory still ascending. Peak window likely 2027-2030, not guaranteed immediate title.
+      weight: medium
+  trigger_events:
+    - Injury cascade (Banchero + Wagner both out >4 weeks) forces retool pivot
+    - Playoff exit <Conference Finals in consecutive years reopens rebuild debate
+    - Ownership directive to accelerate cap spending (unlikely given current posture)
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: below_apron
+  current_payroll_estimate: 188575322
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Banchero extension kicks in (~$41-49M); projected $210-215M payroll, entering first apron band
+    - season: 2027-28
+      projected_status: All four stars in full extension years; likely $225-235M, likely between aprons or at second apron
+  exceptions_available:
+    - Mid-level exception (NTMLE used for Tyus Jones in 2024-25; availability 2026 pending payroll)
+  source: https://sportsbusinessclassroom.com/nba-2025-26-apron-tracker/
+  source_fallbacks_used:
+    - https://www.thirdapron.com/p/salary-cap-minutia-why-the-magic
+  confidence: high
+trade_dna:
+  frequent_partners:
+    - MEM
+  preferred_deal_archetypes:
+    - "Win-now trades: give future picks for proven perimeter shot-makers (Bane model)"
+    - "Shed salary: expiring contracts (KCP, Cole) in exchange for young/controlled assets"
+    - "Interior defense: acquisitions of rim protectors (e.g., consideration of Goga extension)"
+  recent_significant_trades:
+    - date: 2025-06-15
+      summary: Memphis sends Desmond Bane to Orlando for KCP, Cole Anthony, 4 FRPs (2025, 2026, 2028, 2030) and pick swap
+      counterparties:
+        - MEM
+  confidence: medium
+cultural_signals:
+  stability:
+    value: high
+    detail: Weltman and Parker in roles 6.8 and 2.8 years respectively. Mosley in year 5 with extension to 2028. No recent coach/GM carousel.
+  player_friendly:
+    value: yes
+    detail: Max extensions offered to Banchero, Wagner, Suggs signal investment in player retention. Developed-player-centric (homegrown core)
+  analytics_orientation:
+    value: balanced
+    detail: Emphasis on three-point shooting and defensive efficiency metrics; not dogmatic. Scouting remains human-centered.
+  risk_tolerance:
+    value: moderate
+    detail: "Aggressive trade (Bane) to push contention window; conservative cap management below hard-cap thresholds; patient draft approach (Richardson #25 pick, Penda #32)"
+  notable_traits:
+    - homegrown_priority
+    - developmental_org
+    - process_driven
+  rationale: Orlando's FO explicitly developed Banchero, Wagner, Suggs in-house and locked them long-term, signaling homegrown loyalty. Organizational stability and draft investment in young players reflect process-driven culture. Recent trade aggression shows readiness to compete now with young core, but cap discipline prevents recklessness.
+  confidence: high
+roster:
+  - player_id: paolo_banchero
+    name: Paolo Banchero
+    age: 22
+    position_listed: SF/PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - tertiary_scorer
+          - connector
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits:
+        - iso_creator
+        - elite_passer
+        - elite_athlete
+    tier: superstar
+    trajectory: ascending
+    contract:
+      years_remaining: 5
+      total_value_remaining: 287000000
+      annual_value_current_season: 41000000
+      annual_value_next_season: 49000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: 2030
+      team_option: none
+      bird_rights: full
+      contract_through: 2030
+      source: https://www.nba.com/news/magic-paolo-banchero-extension
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: generational_talent
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: high
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Publicly stated intent to request trade
+        - Multiple injury setbacks (ACL/MCL) affecting long-term outlook
+      signal_strength: confirmed_shopped
+    team_relationship:
+      tenure_with_team: 3.1
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Player option in final year; franchise leverage minimal. Player-friendly max extension.
+    confidence: high
+    source: https://www.nba.com/news/magic-paolo-banchero-extension
+  - player_id: franz_wagner
+    name: Franz Wagner
+    age: 23
+    position_listed: SF/PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - playoff_riser
+        - elite_athlete
+    tier: star
+    trajectory: ascending
+    contract:
+      years_remaining: 4
+      total_value_remaining: 170000000
+      annual_value_current_season: 38661750
+      annual_value_next_season: 41000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://sports.yahoo.com/article/magic-paolo-banchero-239-million-205548490.html
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: high
+      falsification_conditions:
+        - Public trade request
+        - Sustained injury (>6 months recovery)
+      signal_strength: confirmed_shopped
+    team_relationship:
+      tenure_with_team: 3.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: No-trade options; max extension. Full bird rights.
+    confidence: high
+    source: https://sports.yahoo.com/article/magic-paolo-banchero-239-million-205548490.html
+  - player_id: desmond_bane
+    name: Desmond Bane
+    age: 26
+    position_listed: SG/SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+          - connector
+      defensive_role: wing_stopper
+      shooting_profile: elite
+      special_traits:
+        - playoff_riser
+    tier: star
+    trajectory: peak
+    contract:
+      years_remaining: 4
+      total_value_remaining: 113000000
+      annual_value_current_season: 28000000
+      annual_value_next_season: 28000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2029
+      source: https://www.nba.com/news/magic-grizzlies-trade-bane-caldwell-pope
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: recently_acquired
+          weight: medium
+      falsification_conditions:
+        - Fit issues emerge; traded in return for mid-tier assets
+        - Locker room concerns reported by beat writers
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Non-bird rights; no trade clause. Traded into premium role.
+    confidence: high
+    source: https://www.nba.com/news/magic-grizzlies-trade-bane-caldwell-pope
+  - player_id: jalen_suggs
+    name: Jalen Suggs
+    age: 23
+    position_listed: PG/SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - finisher
+          - connector
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - playoff_riser
+    tier: star
+    trajectory: ascending
+    contract:
+      years_remaining: 5
+      total_value_remaining: 150500000
+      annual_value_current_season: 35000000
+      annual_value_next_season: 37000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.foxsports.com/stories/nba/magic-jalen-suggs-agree-5-year-extension-worth-average-of-30-million-annually
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: high
+      falsification_conditions:
+        - Public trade request
+        - Locker room conflict reported by multiple beat writers
+      signal_strength: confirmed_shopped
+    team_relationship:
+      tenure_with_team: 3.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Max extension; full bird rights.
+    confidence: high
+    source: https://www.foxsports.com/stories/nba/magic-jalen-suggs-agree-5-year-extension-worth-average-of-30-million-annually
+  - player_id: wendell_carter_jr
+    name: Wendell Carter Jr.
+    age: 26
+    position_listed: C/PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: connector
+        secondary:
+          - screen_setter
+          - finisher
+      defensive_role: rim_protector
+      shooting_profile: good
+      special_traits:
+        - elite_rebounder
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 39600000
+      annual_value_current_season: 10800000
+      annual_value_next_season: 11400000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2029
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.nba.com/news/wendell-carter-orlando-magic-contract-extension
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: contract_expiring
+          weight: low
+      falsification_conditions:
+        - Multi-year extension signed
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2.5
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Team option in 2028-29; team retains control.
+    confidence: high
+    source: https://www.nba.com/news/wendell-carter-orlando-magic-contract-extension
+  - player_id: jonathan_isaac
+    name: Jonathan Isaac
+    age: 27
+    position_listed: SF/PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: connector
+        secondary:
+          - screen_setter
+      defensive_role: switchable
+      shooting_profile: non_shooter
+      special_traits:
+        - rim_protector
+        - elite_athlete
+    tier: rotation
+    trajectory: declining_peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 44500000
+      annual_value_current_season: 15000000
+      annual_value_next_season: 14500000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.spotrac.com/nba/teams/orlando-magic/cap
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: injury_recovery_uncertain
+          weight: medium
+      falsification_conditions:
+        - Full season without injury; reports of strong defensive impact
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 4.5
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: Non-expiring; team option absent. Veteran presence valued for playoff defense.
+    confidence: high
+    source: https://www.spotrac.com/nba/teams/orlando-magic/cap
+  - player_id: anthony_black
+    name: Anthony Black
+    age: 21
+    position_listed: PG/SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: 7500000
+      annual_value_current_season: 3500000
+      annual_value_next_season: 4000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2027
+      bird_rights: early
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/teams/orlando-magic/cap
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: behind_younger_player
+          weight: medium
+      falsification_conditions:
+        - Increased playoff rotation minutes; extension offered
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2.3
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie-scale contract; team option year 3.
+    confidence: medium
+    source: https://www.spotrac.com/nba/teams/orlando-magic/cap
+  - player_id: jase_richardson
+    name: Jase Richardson
+    age: 20
+    position_listed: SG/SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 10500000
+      annual_value_current_season: 2800000
+      annual_value_next_season: 3100000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.nba.com/magic/news/orlando-magic-add-a-great-player-and-even-better-person-by-selecting-jase-richardson-with-25th-overall-pick-in-2025-nba-draft-20250625
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: recently_acquired
+          weight: medium
+      falsification_conditions:
+        - Benched long-term; moved in deeper bench-building trade
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: First-round pick; team controls all years. No options.
+    confidence: medium
+    source: https://www.nba.com/magic/news/orlando-magic-add-a-great-player-and-even-better-person-by-selecting-jase-richardson-with-25th-overall-pick-in-2025-nba-draft-20250625
+  - player_id: goga_bitadze
+    name: Goga Bitadze
+    age: 26
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - connector
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: functional
+      special_traits:
+        - elite_rebounder
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 8300000
+      annual_value_current_season: 8300000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/teams/orlando-magic/cap
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: medium
+      falsification_conditions:
+        - Extension offer signed (2+ years)
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 3.2
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Expiring contract; unrestricted free agent after 2026.
+    confidence: high
+    source: https://www.spotrac.com/nba/teams/orlando-magic/cap
+  - player_id: tristan_da_silva
+    name: Tristan da Silva
+    age: 24
+    position_listed: SF/PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+          - connector
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 7800000
+      annual_value_current_season: 3809520
+      annual_value_next_season: 3909880
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2027
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/91759/tristanda-silva
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: positional_redundancy
+          weight: low
+      falsification_conditions:
+        - Increased role minutes in playoffs
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2.1
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Team option in 2027; team controls future.
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/_/id/91759/tristanda-silva
+  - player_id: moritz_wagner
+    name: Moritz Wagner
+    age: 27
+    position_listed: C/PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+          - screen_setter
+      defensive_role: helper
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: declining_peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 5000000
+      annual_value_current_season: 5000000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.thirdapron.com/p/orlando-magic-2025-offseason-priorities
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Multi-year extension offer accepted
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Short-term deal; free agent after 2026.
+    confidence: medium
+    source: https://www.thirdapron.com/p/orlando-magic-2025-offseason-priorities
+  - player_id: tyus_jones
+    name: Tyus Jones
+    age: 30
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_passer
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 0
+      total_value_remaining: 0
+      annual_value_current_season: null
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2025
+      source: https://www.hoopsrumors.com/2026/02/magic-jevon-carter-agree-to-rest-of-season-deal.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Re-signed to 2026-27 deal
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Traded away mid-season (Feb 2026) to CHA for cash. No longer with Magic.
+    confidence: high
+    source: https://www.hoopsrumors.com/2026/02/magic-jevon-carter-agree-to-rest-of-season-deal.html
+  - player_id: jevon_carter
+    name: Jevon Carter
+    age: 30
+    position_listed: PG/SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: finisher
+        secondary:
+          - connector
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - vet_leadership
+    tier: fringe
+    trajectory: declining
+    contract:
+      years_remaining: 0
+      total_value_remaining: 0
+      annual_value_current_season: 1168625
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.hoopsrumors.com/2026/02/magic-jevon-carter-agree-to-rest-of-season-deal.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Re-signed for 2026-27 season
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Signed mid-season (Feb 2026) on rest-of-season deal.
+    confidence: high
+    source: https://www.hoopsrumors.com/2026/02/magic-jevon-carter-agree-to-rest-of-season-deal.html
+  - player_id: jett_howard
+    name: Jett Howard
+    age: 22
+    position_listed: SG/SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: 5500000
+      annual_value_current_season: 5500000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2026
+      bird_rights: early
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/teams/orlando-magic/cap
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: medium
+      falsification_conditions:
+        - Team picks up team option; long-term development role
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2.3
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie-scale with team option year 3.
+    confidence: medium
+    source: https://www.spotrac.com/nba/teams/orlando-magic/cap
+  - player_id: noah_penda
+    name: Noah Penda
+    age: 21
+    position_listed: PF/C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits:
+        - elite_rebounder
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: 6800000
+      annual_value_current_season: 2900000
+      annual_value_next_season: 3900000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.si.com/nba/magic/onsi/news/orlando-magic-make-two-way-player-decisions-01kk05pravt8
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: recently_acquired
+          weight: medium
+      falsification_conditions:
+        - Waived; not re-signed
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: 2025 draft pick (No. 32); team controls all years.
+    confidence: medium
+    source: https://www.si.com/nba/magic/onsi/news/orlando-magic-make-two-way-player-decisions-01kk05pravt8
+  - player_id: jamal_cain
+    name: Jamal Cain
+    age: 27
+    position_listed: SF/PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: finisher
+        secondary:
+          - connector
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits: []
+    tier: fringe
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 1300000
+      annual_value_current_season: 328120
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2027
+      bird_rights: non
+      contract_through: 2027
+      source: https://www.hoopsrumors.com/2026/03/magic-converting-jamal-cain-to-standard-contract.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: medium
+      falsification_conditions:
+        - Long-term extension offer; increased role
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Converted from two-way to standard contract in March 2026. Team option year 3.
+    confidence: medium
+    source: https://www.hoopsrumors.com/2026/03/magic-converting-jamal-cain-to-standard-contract.html
+  - player_id: orlando_robinson
+    name: Orlando Robinson
+    age: 24
+    position_listed: C
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+        - elite_athlete
+    tier: two_way
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: 636435
+      annual_value_current_season: 636435
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.hoopsrumors.com/2025/07/magic-sign-orlando-robinson-to-two-way-contract.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Promoted to standard contract; extended
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Two-way contract; limited NBA time (50 games max).
+    confidence: medium
+    source: https://www.hoopsrumors.com/2025/07/magic-sign-orlando-robinson-to-two-way-contract.html
+  - player_id: alex_morales
+    name: Alex Morales
+    age: unknown
+    position_listed: SF
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: finisher
+        secondary:
+          - connector
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits: []
+    tier: two_way
+    trajectory: unknown
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://gleague.nba.com/news/orlando-magic-sign-free-agent-alex-morales-to-two-way-contract
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Promoted to standard contract
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Two-way contract acquired mid-season.
+    confidence: low
+    source: https://gleague.nba.com/news/orlando-magic-sign-free-agent-alex-morales-to-two-way-contract
+pending_free_agents:
+  - player_id: goga_bitadze
+    name: Goga Bitadze
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Restricted or unrestricted status depends on Magic's formal cap-hold decision post-2026. Likely re-signed or allowed to walk given depth at center (Carter Jr., Robinson).
+    notes: Contract expires 2026-06-30. Non-bird rights; team option absent.
+    source: https://www.spotrac.com/nba/teams/orlando-magic/cap
+  - player_id: moritz_wagner
+    name: Moritz Wagner
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Expiring one-year deal. Team may re-sign or allow market test. Fit in rotation not guaranteed with Banchero/Wagner/Bane core.
+    notes: Contract expires 2026-06-30. Non-bird; unrestricted free agent.
+    source: https://www.thirdapron.com/p/orlando-magic-2025-offseason-priorities
+  - player_id: jett_howard
+    name: Jett Howard
+    type: RFA
+    bird_rights_status: early
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Team option year 3 provides control. Team likely retains if developed favorably in 2025-26 playoffs.
+    notes: Team option 2026. RFA if declined.
+    source: https://www.spotrac.com/nba/teams/orlando-magic/cap
+known_target_history:
+  - target: Desmond Bane
+    year: 2025
+    outcome: acquired
+    detail: Traded KCP, Cole Anthony, 4 FRPs (2025, 2026, 2028, 2030) + swap to Memphis, June 15, 2025
+    source: https://www.nba.com/news/magic-grizzlies-trade-bane-caldwell-pope
+  - target: Paolo Banchero (extension)
+    year: 2025
+    outcome: acquired
+    detail: 5-year max extension, $287M, agreed July 2025, lock through 2030
+    source: https://www.nba.com/news/magic-paolo-banchero-extension
+  - target: Franz Wagner (extension)
+    year: 2024
+    outcome: acquired
+    detail: 5-year extension, $224M, signed in 2024 offseason
+    source: https://sports.yahoo.com/article/magic-paolo-banchero-239-million-205548490.html
+near_term_priorities:
+  - priority: 2026 second-round and undrafted pipeline
+    timeline: this_offseason
+    type: draft
+    detail: Orlando Magic do not own a 2026 first-round pick but hold No. 46. Use second-round mocks as low-confidence scouting leads rather than strategic posture anchors.
+    confidence: low
+  - priority: Maintain roster health through playoffs
+    timeline: this_season
+    type: roster
+    detail: Banchero returned from November groin injury; Franz Wagner healthy. Injury cascade (both out) would force retool.
+    confidence: high
+  - priority: Navigate first-round playoff series vs. Detroit Pistons
+    timeline: this_season
+    type: structural
+    detail: Magic lead 3–2 after Game 5 (121–109 Pistons win, May 1). Series pushed to Game 6+ as Detroit staged historic comeback from 24-point deficit in Game 6.
+    confidence: high
+  - priority: Resolve cap flexibility post-2026
+    timeline: next_season
+    type: structural
+    detail: Banchero extension kicks in 2026-27 (~$41-49M), pushing into first/second apron band. Trade deadline moves possible for relief or mid-tier additions.
+    confidence: high
+  - priority: Extend Anthony Black or trade for depth
+    timeline: by_trade_deadline
+    type: extension
+    detail: RFA eligible 2027 if team option declined. Decision point before 2026-27 offseason.
+    confidence: medium
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 2
+      protections: 2026 No. 46 overall; own pick.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2027
+      round: 1
+      protections: None (Unprotected)
+      source: https://www.nba.com/news/magic-grizzlies-trade-bane-caldwell-pope
+    - year: 2025
+      round: 1
+      from_team: DEN
+      protections: Owed to Orlando Magic (Aaron Gordon trade 2021)
+      source: https://fanspo.com/nba/teams/Nuggets/8/draft-picks
+    - year: 2027
+      round: 1
+      from_team: DEN
+      protections: Potentially owed; Stepien rule violations prevent clarity
+      source: https://nugglove.com/posts/denver-nuggets-draft-picks-updated-look-every-selection-2025-2026-beyond
+  draft_picks_owed:
+    - year: 2026
+      round: 1
+      to_team: CHA
+      protections: 2026 No. 18 overall; from ORL via PHX.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2028
+      round: 1
+      to_team: MEM
+      protections: None (Unprotected; traded to Memphis in Bane deal)
+      source: https://www.nba.com/news/magic-grizzlies-trade-bane-caldwell-pope
+    - year: 2030
+      round: 1
+      to_team: MEM
+      protections: None (Unprotected; traded to Memphis in Bane deal)
+      source: https://www.nba.com/news/magic-grizzlies-trade-bane-caldwell-pope
+    - year: 2029
+      round: 1
+      to_team: MEM
+      protections: Lightly protected pick swap (traded to Memphis in Bane deal)
+      source: https://www.nba.com/news/magic-grizzlies-trade-bane-caldwell-pope
+  trade_exceptions: []
+team_team_relationships:
+  rivalries:
+    - team_id: BOS
+      type: playoff_rematch
+      basis: Magic lost 2024-25 first-round series 1–4 to defending champion Celtics
+    - team_id: DET
+      type: competitive_recent
+      basis: 2025-26 first-round series, Magic vs. Pistons (1 seed). Intense playoff matchup with Game 6 comeback.
+    - team_id: MIA
+      type: geographic
+      basis: Both in Southeast division; regular season rivalry. Play-in tournament relevance (Charlotte vs. Orlando in 2026).
+  notable_personnel_connections:
+    - person: Jeff Weltman
+      connected_team: DEN
+      connection_type: former_assistant_gm
+      detail: Weltman worked in Denver FO before joining Orlando, familiar with Nuggets org dynamics
+    - person: Jamahl Mosley
+      connected_team: DEN
+      connection_type: former_assistant
+      detail: Mosley was assistant coach under Mike Malone in Denver before joining Magic
+g_league_and_stash:
+  affiliate_team: Lakeland Magic
+  notable_affiliate_players:
+    - Orlando Robinson (on two-way contract; splits between NBA and G League)
+    - Alex Morales (two-way contract holder)
+  international_stash: []
+narrative_summary:
+  one_paragraph: The Orlando Magic enter 2026 as a legitimate Eastern Conference contender following aggressive offseason moves and the health return of their young core. With Paolo Banchero, Franz Wagner, Jalen Suggs, and newly acquired Desmond Bane locked on long-term extensions through at least 2029–30, the franchise has bet decisively on contend-now positioning under steady front-office leadership (Weltman, Parker) and head coach Jamahl Mosley. The 2025-26 season saw the Magic finish 45–37, defeat Charlotte in the play-in tournament 121–90, and mount a first-round playoff battle against Detroit (3–2 lead in series). Payroll discipline ($188.6M, below first apron) has preserved mid-tier flexibility, though the Banchero extension will push future seasons into apron constraints by 2027–28. The franchise's homegrown development model—drafting and extending Banchero, Wagner, Suggs—combined with Weltman's strategic trades (e.g., Bane for future picks) signal a multi-year window (2025–2030) where youth and championship aspirations align before age and tax economics force retool conversations.
+  three_things_to_watch:
+    - "2026 second-round board: official assets No. 46; use mocked second-round names as low-confidence depth or rights leads, not rotation assumptions."
+    - Can the Pistons–Magic series outcome (or post-season trajectory) confirm Bane as a 'missing piece' or expose depth/fit vulnerabilities that require mid-season trade action in 2026–27?
+    - Will Banchero stay healthy through the contention window? Groin injuries early in 2025–26 and prior back concerns are tracked by FO; sustained availability is non-negotiable for window realization.
+    - When does ownership pressure mount to accelerate spending above the first apron? Current moderate posture ($188.6M) may prove insufficient if Celtics/Knicks/Heat consolidate East dominance; willingness to enter apron penalties by 2027 could reshape deadline strategy.
+sources_used:
+  - https://www.nba.com/magic/devos-family
+  - https://www.nba.com/magic/orlando-magic-executives
+  - https://www.nba.com/news/magic-paolo-banchero-extension
+  - https://www.nba.com/news/magic-grizzlies-trade-bane-caldwell-pope
+  - https://www.nba.com/magic/news/orlando-magic-head-coach-jamahl-mosley-agree-to-multi-year-contract-extension-20240312
+  - https://www.nba.com/magic/news/orlando-magic-add-a-great-player-and-even-better-person-by-selecting-jase-richardson-with-25th-overall-pick-in-2025-nba-draft-20250625
+  - https://www.nba.com/magic/news/orlando-magic-dominate-charlotte-hornets-in-play-in-will-take-on-detroit-pistons-in-first-round-of-playoffs-20260417
+  - https://www.nba.com/news/anthony-parker-new-gm-orlando-magic
+  - https://www.nba.com/news/wendell-carter-orlando-magic-contract-extension
+  - https://www.basketball-reference.com/teams/ORL/2026.html
+  - https://www.spotrac.com/nba/orlando-magic/cap
+  - https://www.spotrac.com/nba/teams/orlando-magic/overview/_/year/2024
+  - https://www.spotrac.com/nba/player/_/id/78110/paolo-banchero
+  - https://www.spotrac.com/nba/player/_/id/91759/tristanda-silva
+  - https://www.spotrac.com/nba/player/_/id/26998/jevon-carter
+  - https://sports.yahoo.com/article/magic-paolo-banchero-239-million-205548490.html
+  - https://www.foxsports.com/stories/nba/magic-jalen-suggs-agree-5-year-extension-worth-average-of-30-million-annually
+  - https://www.hoopsrumors.com/2025/07/magic-sign-orlando-robinson-to-two-way-contract.html
+  - https://www.hoopsrumors.com/2026/02/magic-jevon-carter-agree-to-rest-of-season-deal.html
+  - https://www.hoopsrumors.com/2026/03/magic-converting-jamal-cain-to-standard-contract.html
+  - https://gleague.nba.com/news/orlando-magic-sign-free-agent-alex-morales-to-two-way-contract
+  - https://www.thirdapron.com/p/orlando-magic-2025-offseason-priorities
+  - https://www.thirdapron.com/p/salary-cap-minutia-why-the-magic
+  - https://sportsbusinessclassroom.com/nba-2025-26-apron-tracker/
+  - https://www.espn.com/nba/story/_/id/45517668/sources-grizzlies-trade-desmond-bane-magic-blockbuster-deal
+  - https://www.si.com/nba/magic/onsi/news/orlando-magic-make-two-way-player-decisions-01kk05pravt8
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - orlando_robinson.age
+  - alex_morales.age
+  - alex_morales.annual_value_current_season
+  - alex_morales.total_value_remaining
+  - jamal_cain.annual_value_next_season
+  - notable_advisors_or_consultants (list empty; no public advisors identified)
+vocabulary_flags:
+  - No deviations from controlled vocab detected.
+  - "Source conflict: Tyus Jones contract end date: as_of_date 2026-05-02 is after Jones traded away (Feb 2026). Listed as free agent; no contract through 2026 now held."

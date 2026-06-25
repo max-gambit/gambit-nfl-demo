@@ -1,0 +1,40 @@
+{
+  "name": "gambit-ui-remix-server",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "seed": "tsx src/db/seed.ts",
+    "seed:cba": "tsx src/db/seed-cba.ts",
+    "seed:demo": "tsx src/db/seed-demo.ts",
+    "seed:nba-rosters": "tsx src/db/seed-nba-rosters.ts",
+    "refresh:nba-rosters": "tsx src/nba_rosters/refresh.ts",
+    "build:nba-cap-sheets": "node --import tsx src/nba_cap_sheets/build_reviewed_snapshot.ts",
+    "refresh:nba-cap-sheets": "node --import tsx src/nba_cap_sheets/refresh.ts",
+    "build:nba-player-stats": "node --import tsx src/nba_player_stats/build_reviewed_snapshot.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/context_graph/*.test.ts tests/nba_rosters/*.test.ts tests/nba_cap_sheets/*.test.ts tests/nba_player_stats/*.test.ts tests/data_analyst/*.test.ts",
+    "test:cba": "tsx --test tests/data_analyst/test_cba_workbench.test.ts tests/data_analyst/test_cba_retrieval_eval.test.ts",
+    "context-graph:validate": "tsx src/context_graph/cli.ts validate",
+    "context-graph:build": "tsx src/context_graph/cli.ts build",
+    "context-graph:report": "tsx src/context_graph/cli.ts report",
+    "context-graph:audit": "tsx src/context_graph/audit.ts",
+    "context-graph:repair:safe": "tsx src/context_graph/repair_safe.ts",
+    "context-graph:repair:source-backed": "tsx src/context_graph/repair_source_backed.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
+    "@hono/node-server": "^2.0.0",
+    "@supabase/supabase-js": "^2.45.4",
+    "dotenv": "^16.4.5",
+    "hono": "^4.12.15",
+    "yaml": "^2.8.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "tsx": "^4.21.0",
+    "typescript": "^5.6.3"
+  }
+}

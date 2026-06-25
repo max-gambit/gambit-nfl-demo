@@ -1,0 +1,929 @@
+team_id: WAS
+as_of_date: 2026-05-02
+last_updated: 2026-05-02
+identity:
+  name: Washington Wizards
+  conference: Eastern
+  division: Southeast
+  market_tier: tier_2
+  market_tier_rationale: Washington D.C. is the nation's capital (tier_1 media market) but Wizards underperformed relative to market size for past 15 years; rebuilding posture limits current revenue.
+ownership:
+  primary_owner:
+    name: Ted Leonsis
+    type: individual
+    tenure_years: 16
+    source: https://monumentalsports.com/people/ted-leonsis/
+    confidence: high
+  governance_notes: Leonsis majority owner since June 2010. Monumental Sports & Entertainment also owns Washington Mystics (WNBA) and Capital City Go-Go (G-League). Leonsis granted full authority to Michael Winger on basketball operations.
+  recent_transitions: none
+  spending_posture: moderate
+  spending_posture_evidence:
+    - Finished 2025-26 payroll at $189.9M; below second apron but above luxury tax ($187.9M).
+    - Willingness to add veteran talent mid-season (Young, Davis) suggests mid-rebuild reinvestment rather than hard tank.
+    - Leonsis stated rebuild could take five seasons; patience evident but not aggressive free-agent spender.
+front_office:
+  president_basketball_ops:
+    name: Michael Winger
+    tenure_start: 2023-05
+    prior_stops:
+      - Los Angeles Clippers (GM, 2017–2023)
+      - Oklahoma City Thunder (2010–2017)
+    public_philosophy_signals:
+      - Emphasis on youth development and asset accumulation; traded Jordan Poole for veteran CJ McCollum (2025 summer).
+      - Mid-season acquisition of Trae Young and Anthony Davis signals pivot from pure rebuild toward contention window if health allows.
+      - Directive to create modern position-less basketball with long bodies who can shoot and defend (per Leonsis statements).
+    confidence: high
+    source: https://www.washingtonpost.com/sports/2023/05/24/michael-winger-wizards-general-manager/
+  general_manager:
+    name: Will Dawkins
+    tenure_start: 2023-06
+    prior_stops:
+      - Unknown
+    public_philosophy_signals:
+      - Stated Wizards 'still early in their rebuild' (September 2025 post-draft).
+      - Announced intention to retain Brian Keefe post-season (April 2026) despite 17-65 record.
+      - Optimistic narrative around youth trajectory despite worst record in NBA.
+    confidence: high
+    source: https://www.washingtonpost.com/sports/2025/09/25/wizards-rebuild-will-dawkins/
+  head_coach:
+    name: Brian Keefe
+    tenure_start: 2024-05
+    contract_through: 2027
+    style_notes: Defensive-minded, pace-oriented coach. Emphasizes transition play and perimeter shooting. No known coaching tree affiliation documented.
+    coaching_tree: unknown
+    confidence: medium
+    source: https://sports.yahoo.com/nba/breaking-news/article/wizards-anticipate-return-of-brian-keefe-as-head-coach-after-last-place-finish-in-2025-26-season-171754827.html
+  assistant_coaches_notable:
+    - unknown
+  notable_advisors_or_consultants:
+    - unknown
+strategic_posture:
+  timeframe: rebuild
+  confidence: high
+  derived_from:
+    - 17-65 record (worst in NBA) confirms youth-first strategy with limited win-now pretense.
+    - Trae Young and Anthony Davis acquisitions January–February 2026 signal medium-term contention target (2026-27 onward).
+    - "Leonsis public statements: 'these are the years to not be competitive' given strength of next two drafts; expects rebuild completion in 5 years total (3 years elapsed, 2 remaining as of 2026)."
+    - Deep roster youth (Alex Sarr age 20, Bub Carrington age 20, Tre Johnson age 20, Bilal Coulibaly age 21) precludes immediate contention.
+  constraints:
+    - reason_code: young_core_developing
+      detail: Five first-year and second-year players in core rotation; chemistry and development cycle require 1–2 more seasons.
+      weight: high
+    - reason_code: multi_year_lottery
+      detail: Two consecutive seasons of worst-in-NBA records (2024-25, 2025-26) means ceiling is constrained by injury to stars (Young, Davis).
+      weight: high
+    - reason_code: recent_playoff_success
+      detail: Negative constraint—zero playoff appearance since 2023; fanbase and owner patience finite.
+      weight: medium
+  trigger_events:
+    - Trae Young and Anthony Davis health status determines 2026-27 trajectory; if both play <50 games again, rebuild reset likely.
+    - 2026 NBA Draft lottery outcome (pick 7–10 range likely); acquisition of elite prospect accelerates timeline.
+    - "Mid-season 2026-27 record inflection: if <25 wins by All-Star break, Leonsis may lose patience and pivot to aggressive trade targets."
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: between_aprons
+  current_payroll_estimate: 189949625
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Trae Young player option ($48.97M) and Anthony Davis cap hit ($58.5M) will consume ~$107M; limited flexibility unless trades occur.
+    - season: 2027-28
+      projected_status: Multiple rookie scale expirations (Sarr, Carrington, Johnson, Coulibaly) create relief window; opportunity to consolidate around Young-Davis core or reset.
+  exceptions_available:
+    - Biennial exception available (unused)
+  source: https://www.spotrac.com/nba/washington-wizards/yearly
+  source_fallbacks_used:
+    - https://www.salaryswish.com/teams/wizards
+    - https://www.hoopshype.com/salaries/teams/washington-wizards/27/
+  confidence: medium
+trade_dna:
+  frequent_partners:
+    - NOP
+    - ATL
+    - DAL
+  preferred_deal_archetypes:
+    - Youth + future picks for established scoring guards (McCollum, Young).
+    - Expiring contracts + role players for All-Star caliber talent (Davis).
+    - "Asset rotation: trading flipped veterans (Poole, Middleton) for youth development."
+  recent_significant_trades:
+    - date: 2025-06-24
+      summary: Acquired CJ McCollum, Kelly Olynyk, 2nd-round pick from Pelicans for Jordan Poole, Saddiq Bey, 40th pick.
+      counterparties:
+        - NOP
+    - date: 2026-01-09
+      summary: Acquired Trae Young from Hawks for CJ McCollum, Corey Kispert.
+      counterparties:
+        - ATL
+    - date: 2026-02-05
+      summary: "Three-team trade: Wizards acquired Anthony Davis, Jaden Hardy, D'Angelo Russell, Dante Exum from Mavericks; sent Khris Middleton, AJ Johnson, Malaki Branham, Marvin Bagley III, 2 first-round picks, 3 second-round picks."
+      counterparties:
+        - DAL
+  confidence: high
+cultural_signals:
+  stability:
+    value: low
+    detail: Head coach Brian Keefe retained after 17-65 season; ownership backing evident but roster churn (five trades in 12 months) signals organizational instability.
+  player_friendly:
+    value: mixed
+    detail: Leonsis invested in franchise but trading active veterans (Poole, McCollum, Middleton) on short notice; Young and Davis acquisitions signal contention intent but health situation volatile.
+  analytics_orientation:
+    value: balanced
+    detail: Winger (former Clippers GM) emphasizes modern positional fluidity and three-point shooting; youth focus suggests data-driven development but direct evidence limited.
+  risk_tolerance:
+    value: aggressive
+    detail: Mid-season blockbuster trades (Young, Davis) despite 17-65 record indicate willingness to bet on injury recovery and veteran leadership; unconventional by rebuild standards.
+  notable_traits:
+    - developmental_org
+    - star_chasing
+    - coach_carousel
+    - ownership_meddling
+  rationale: Wizards organization reflects owner's ambitious five-year rebuild philosophy balanced against impatience. Recent mid-season additions of Young and Davis suggest ownership pressure to accelerate timeline. Coaching stability (Keefe retained) contrasts with frequent front-office transitions and aggressive trade activity.
+  confidence: medium
+roster:
+  - player_id: alex_sarr
+    name: Alex Sarr
+    age: 21
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: functional
+      special_traits:
+        - elite_rebounder
+        - elite_athlete
+    tier: star
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: 23610480
+      annual_value_current_season: 11808240
+      annual_value_next_season: 11802240
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2027
+      bird_rights: full
+      contract_through: "2027"
+      source: https://www.salaryswish.com/players/alexandre-sarr
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: generational_talent
+          weight: high
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: high
+      falsification_conditions:
+        - Public statement from Winger or Leonsis naming another player as franchise centerpiece.
+        - Trade rumors involving Sarr linked to a veteran All-Star acquisition.
+    team_relationship:
+      tenure_with_team: 1.9
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie scale contract; team controls 2027 team option.
+    confidence: high
+    source: https://www.basketball-reference.com/players/s/sarral01.html
+  - player_id: bub_carrington
+    name: Bub Carrington
+    age: 20
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - secondary_creator
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_passer
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: 9130000
+      annual_value_current_season: 4614000
+      annual_value_next_season: 4516000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2027
+      bird_rights: full
+      contract_through: "2027"
+      source: https://www.salaryswish.com/players/carlton-carrington
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: primary_initiator_scarcity
+          weight: high
+      falsification_conditions:
+        - Carrington plays <25 games in 2026-27 due to injury.
+        - Wizards trade for veteran lead guard and bench Carrington consistently.
+    team_relationship:
+      tenure_with_team: 1.9
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie scale; team controls through 2027.
+    confidence: high
+    source: https://www.basketball-reference.com/players/c/carrica01.html
+  - player_id: bilal_coulibaly
+    name: Bilal Coulibaly
+    age: 21
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: 14580000
+      annual_value_current_season: 7290000
+      annual_value_next_season: 7290000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2027
+      bird_rights: full
+      contract_through: "2027"
+      source: https://www.salaryswish.com/players/bilal-coulibaly
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: medium
+      falsification_conditions:
+        - Coulibaly signs extension prior to 2027; FO commits him as long-term piece.
+        - Trade involving Coulibaly reported by beat reporters.
+    team_relationship:
+      tenure_with_team: 2.9
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Team option for 2027 gives organization control.
+    confidence: high
+    source: https://www.basketball-reference.com/players/c/coulibi01.html
+  - player_id: tre_johnson
+    name: Tre Johnson
+    age: 20
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: 16475280
+      annual_value_current_season: 8237640
+      annual_value_next_season: 8237640
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: 2028
+      team_option: 2027
+      bird_rights: full
+      contract_through: "2027"
+      source: https://www.salaryswish.com/players/tre-johnson
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: high
+      falsification_conditions:
+        - Johnson averages <15 minutes per game for full 2026-27 season.
+        - FO trades Johnson for established star (publicly stated reset).
+    team_relationship:
+      tenure_with_team: 0.9
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie scale with team and player options.
+    confidence: high
+    source: https://www.basketball-reference.com/players/j/johnstr03.html
+  - player_id: trae_young
+    name: Trae Young
+    age: 27
+    position_listed: PG
+    contract_type: standard
+    availability_status: injured_long_term
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary: []
+      defensive_role: liability
+      shooting_profile: good
+      special_traits:
+        - elite_passer
+        - iso_creator
+    tier: star
+    trajectory: declining
+    contract:
+      years_remaining: 2
+      total_value_remaining: 97940000
+      annual_value_current_season: 48970000
+      annual_value_next_season: 48970000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: 2027
+      team_option: none
+      bird_rights: full
+      contract_through: "2027"
+      source: https://www.spotrac.com/nba/player/_/id/26971/trae-young
+    movement_constraints:
+      status: shopped
+      reasons:
+        - reason_code: injury_recovery_uncertain
+          weight: high
+        - reason_code: contract_expiring
+          weight: medium
+      falsification_conditions:
+        - Young returns to play >40 games in 2026-27 and averages >18 ppg.
+        - Wizards extend Young beyond 2027 player option.
+        - Beat reporters stop linking Young to trade market.
+      signal_strength: widely_reported
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Player option for 2027 creates mutual exit potential if health concerns persist.
+    confidence: medium
+    source: https://www.nba.com/news/hawks-trade-trae-young-to-wizards-for-cj-mccollum-corey-kispert
+  - player_id: anthony_davis
+    name: Anthony Davis
+    age: 33
+    position_listed: PF
+    contract_type: standard
+    availability_status: injured_long_term
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - playoff_riser
+    tier: star
+    trajectory: declining_peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 121300000
+      annual_value_current_season: 58500000
+      annual_value_next_season: 62800000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: 2028
+      team_option: none
+      bird_rights: full
+      contract_through: "2027"
+      source: https://www.nba.com/news/wizards-mavericks-anthony-davis-trade
+    movement_constraints:
+      status: shopped
+      reasons:
+        - reason_code: injury_recovery_uncertain
+          weight: high
+        - reason_code: aging_core
+          weight: high
+      falsification_conditions:
+        - Davis plays >50 games in 2026-27 and maintains All-NBA level defense.
+        - FO signs Davis to extension; expresses commitment beyond 2027.
+        - Davis publicly states desire to remain long-term.
+      signal_strength: rumor_only
+    team_relationship:
+      tenure_with_team: 0.2
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Player option for 2028 provides Davis exit strategy if health or competitiveness declines.
+    confidence: low
+    source: https://www.nba.com/news/wizards-mavericks-anthony-davis-trade
+  - player_id: jaden_hardy
+    name: Jaden Hardy
+    age: 22
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 2800000
+      annual_value_current_season: 2800000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: "2026"
+      source: https://www.nba.com/news/wizards-mavericks-anthony-davis-trade
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: expiring_contract_value
+          weight: high
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Wizards sign Hardy to multi-year extension in summer 2026.
+        - Hardy averages >15 ppg in 2026-27 and team moves to retain.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Unrestricted free agent after 2025-26; Wizards no cap flexibility to retain if market offers more.
+    confidence: medium
+    source: https://www.nba.com/news/wizards-mavericks-anthony-davis-trade
+  - player_id: kyshawn_george
+    name: Kyshawn George
+    age: 21
+    position_listed: SF
+    contract_type: standard
+    availability_status: injured_season_ending
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: 12240000
+      annual_value_current_season: 6120000
+      annual_value_next_season: 6120000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2028
+      bird_rights: full
+      contract_through: "2028"
+      source: https://roundtable.io/sports/nba/wizards/news/kyshawn-george-to-miss-rest-of-washington-wizards-2025-26-season
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: injury_recovery_uncertain
+          weight: medium
+      falsification_conditions:
+        - George misses entire 2026-27 season due to elbow injury; FO trades him for future assets.
+        - FO signs George to extension; commits to long-term development.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.9
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: Team option for 2028 protects organization; young player under contract control.
+    confidence: medium
+    source: https://roundtable.io/sports/nba/wizards/news/kyshawn-george-to-miss-rest-of-washington-wizards-2025-26-season
+  - player_id: will_riley
+    name: Will Riley
+    age: 20
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - screen_setter
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 11100000
+      annual_value_current_season: 3700000
+      annual_value_next_season: 3700000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: 2028
+      team_option: 2029
+      bird_rights: full
+      contract_through: "2028"
+      source: https://www.salaryswish.com/players/will-riley
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Riley traded in multi-player deal for All-Star caliber player.
+        - Riley sits significant minutes two consecutive seasons; FO moves him for draft capital.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.9
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie scale with team options through 2029.
+    confidence: medium
+    source: https://www.basketball-reference.com/players/r/rileywi01.html
+  - player_id: julian_reese
+    name: Julian Reese
+    age: 21
+    position_listed: C
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - connector
+      defensive_role: helper
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+        - offensive_rebound_specialist
+    tier: two_way
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: null
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: "2027"
+      source: https://www.hoopsrumors.com/2025/7/14/24462832-wizards-assign-reese-to-g-league-affiliate
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: medium
+      falsification_conditions:
+        - Reese traded to contending team for draft capital.
+        - Reese reassigned to G-League long-term without recall.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.9
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way deal provides minimal leverage; team can assign freely.
+    confidence: medium
+    source: https://www.si.com/nba/draft/nba-rookies/2025-nba-draft-second-round-pick-earns-standard-contract-from-wizards-01kjg676hjtk
+  - player_id: jamir_watkins
+    name: Jamir Watkins
+    age: 20
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2028
+      bird_rights: full
+      contract_through: "2027"
+      source: https://www.hoopsrumors.com/2026/02/wizards-jamir-watkins-to-receive-promotion-two-year-deal.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: medium
+      falsification_conditions:
+        - Watkins traded away as part of veteran acquisition.
+        - Watkins reassigned to G-League; no return to active roster.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Team option for 2028 provides control; young player on affordable deal.
+    confidence: medium
+    source: https://www.hoopsrumors.com/2026/02/wizards-jamir-watkins-to-receive-promotion-two-year-deal.html
+  - player_id: jamir_watson
+    name: Jamir Watson
+    age: unknown
+    position_listed: G
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: connector
+        secondary:
+          - secondary_creator
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - unknown
+    tier: fringe
+    trajectory: unknown
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: "2026"
+      source: https://www.basketball-reference.com/teams/WAS/2026_transactions.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Wizards sign Watson to multi-year extension.
+        - Watson plays 20+ minutes per game in 2026-27 season.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Expiring contract; UFA after 2025-26 unless extended.
+    confidence: low
+    source: https://www.basketball-reference.com/teams/WAS/2026_transactions.html
+pending_free_agents:
+  - player_id: trae_young
+    name: Trae Young
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Player option for 2027; if exercised, free agency in 2027. Health status (recovery from injury) will drive re-signing likelihood.
+    notes: Acquired mid-season (Jan 2026); missed majority of 2025-26 with shoulder/injury recovery.
+    source: https://www.spotrac.com/nba/player/_/id/26971/trae-young
+  - player_id: anthony_davis
+    name: Anthony Davis
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Player option for 2028; if exercised, UFA in 2028. Recovery from hand and groin injuries will determine market value.
+    notes: Acquired February 2026; missed 29 of 40 games due to injury before trade; health status volatile.
+    source: https://www.spotrac.com/nba/player/_/id/9419/anthony-davis
+  - player_id: jaden_hardy
+    name: Jaden Hardy
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: walk
+    expected_market_detail: Unrestricted free agent after 2025-26; no cap flexibility for Wizards to retain given payroll constraints.
+    notes: Bridge veteran; averaged 12.6 ppg in 23 games with Wizards post-trade.
+    source: https://www.nba.com/news/wizards-mavericks-anthony-davis-trade
+known_target_history:
+  - target: CJ McCollum
+    year: 2025
+    outcome: acquired
+    detail: Acquired from New Orleans Pelicans (July 2025) for Jordan Poole, Saddiq Bey; later traded to Hawks for Trae Young.
+    source: https://www.nba.com/news/wizards-pelicans-trade-cj-mccollum-jordan-poole
+  - target: Trae Young
+    year: 2026
+    outcome: acquired
+    detail: Acquired from Atlanta Hawks (January 2026) for CJ McCollum, Corey Kispert in mid-game trade.
+    source: https://www.nba.com/news/hawks-trade-trae-young-to-wizards-for-cj-mccollum-corey-kispert
+  - target: Anthony Davis
+    year: 2026
+    outcome: acquired
+    detail: Three-team trade (February 2026) with Dallas Mavericks; acquired Davis, Jaden Hardy, D'Angelo Russell, Dante Exum.
+    source: https://www.nba.com/news/wizards-mavericks-anthony-davis-trade
+near_term_priorities:
+  - priority: Health recovery for Trae Young and Anthony Davis
+    timeline: this_season
+    type: structural
+    detail: Both players injured as of season end (May 2026); 2026-27 success contingent on return to form and availability.
+    confidence: high
+  - priority: 2026 NBA Draft selection (7th–10th projected range)
+    timeline: this_offseason
+    type: draft
+    detail: Wizards secured their 2026 first-round pick (avoided top-8 protection); high lottery pick allows youth core bolstering.
+    confidence: high
+  - priority: 2026-27 rotation refinement and roster depth
+    timeline: next_season
+    type: roster
+    detail: If Young and Davis healthy, Wizards must address bench depth and rim protection (Sarr is lone reliable big).
+    confidence: medium
+  - priority: Contract extension discussions with core youth
+    timeline: by_trade_deadline
+    type: extension
+    detail: Coulibaly and Sarr eligible for extensions by 2026-27; FO must lock in core to avoid RFA complications.
+    confidence: medium
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: None (top-8 protection expired; secured 7th–10th range pick).
+      source: https://www.bulletsforever.com/washington-wizards-news/69555/washington-wizards-2026-offseason-preview
+    - year: 2027
+      round: 1
+      protections: Unprotected (own).
+      source: https://fanspo.com/nba/teams/Wizards/30/draft-picks
+    - year: 2028
+      round: 1
+      protections: Unprotected (own).
+      source: https://fanspo.com/nba/teams/Wizards/30/draft-picks
+    - year: 2029
+      round: 1
+      protections: Unprotected (own).
+      source: https://fanspo.com/nba/teams/Wizards/30/draft-picks
+    - year: 2030
+      round: 1
+      protections: Unprotected (own).
+      source: https://fanspo.com/nba/teams/Wizards/30/draft-picks
+    - year: 2031
+      round: 1
+      protections: Unprotected (own).
+      source: https://fanspo.com/nba/teams/Wizards/30/draft-picks
+    - year: 2026
+      round: 1
+      from_team: CHA
+      protections: Swap rights routing
+      source: unknown
+    - year: 2027
+      round: 2
+      from_team: POR
+      protections: unknown
+      source: https://www.hoopshype.com/salaries/teams/portland-trail-blazers/22/
+  draft_picks_owed:
+    - year: 2026
+      round: 2
+      to_team: NYK
+      protections: As compensation (Wizards did not convey unprotected 2026 first-round pick; top-8 protection expired).
+      source: https://fanspo.com/nba/teams/Wizards/30/draft-picks
+    - year: 2026
+      round: 2
+      to_team: CHI
+      protections: None.
+      source: https://fanspo.com/nba/teams/Wizards/30/draft-picks
+  trade_exceptions:
+    - value: unknown
+      expires: unknown
+      source: unknown
+      confidence: low
+team_team_relationships:
+  rivalries:
+    - team_id: ATL
+      type: personnel_grudge
+      basis: Traded Trae Young mid-season (Jan 2026); expected ongoing negotiation over rotational fit and draft capital.
+    - team_id: BOS
+      type: geographic
+      basis: Atlantic Division geographic neighbor; light recent trade history.
+    - team_id: PHI
+      type: competitive_historical
+      basis: Division historical rivalry; limited current interaction.
+  notable_personnel_connections:
+    - person: Michael Winger
+      connected_team: LAC
+      connection_type: former_GM
+      detail: Winger was GM of LA Clippers (2017–2023); brings Clippers asset-building philosophy (young talent + flexibility).
+    - person: Will Dawkins
+      connected_team: unknown
+      connection_type: unknown
+      detail: Unknown prior stops; hired mid-2023 by Wizards as GM directly under Winger.
+    - person: Brian Keefe
+      connected_team: New York Knicks
+      connection_type: former_assistant
+      detail: Keefe has no documented major mentorship ties; retained despite 17-65 record.
+g_league_and_stash:
+  affiliate_team: Capital City Go-Go
+  notable_affiliate_players:
+    - Julian Reese (two-way center; high NBA ceiling as rebounder; rotational player in 2025-26).
+    - Jamir Watkins (two-way combo guard; promoted to multi-year standard contract in February 2026).
+    - Unknown stash or inactive roster players.
+  international_stash: []
+narrative_summary:
+  one_paragraph: The Washington Wizards endured their second consecutive lottery season (17-65 record), pursuing a youth-development rebuild under new President Michael Winger and GM Will Dawkins. The core—Alex Sarr (age 21, franchise centerpiece), Bub Carrington (lead guard, age 20), Bilal Coulibaly (wing, age 21), and Tre Johnson (rookie guard, age 20)—forms one of the NBA's youngest rosters. However, owner Ted Leonsis and Winger shifted course mid-season, acquiring All-Stars Trae Young (January 2026) and Anthony Davis (February 2026) in blockbuster trades, signaling a pivot toward contention if both recover from injuries. The move contradicted the pure rebuild narrative but reflects Leonsis's impatience and confidence in the young core. Retained head coach Brian Keefe and an aggressive offseason (2026 lottery pick expected 7–10 range) suggest the organization is now targeting a 2026-27 competitive window, contingent entirely on Young and Davis health.
+  three_things_to_watch:
+    - "Health recovery of Trae Young and Anthony Davis: Both missed significant time in 2025-26 due to shoulder and hand/groin injuries, respectively. If either plays <40 games in 2026-27, the contention timeline resets."
+    - "Alex Sarr's ascent: At 21, the 2024 second overall pick emerged as the young core's best player (16.3 ppg, 7.4 rpg, 2.0 bpg). Sarr's two-way development will determine whether the youth core becomes a dynasty or another missed rebuild."
+    - "Ownership patience on rebuild completion: Leonsis committed to a five-year rebuild but mid-season trades signal he may reset expectations. If the 2026-27 season yields <30 wins and no playoff path emerges, aggressive trade deadline moves or coaching changes could accelerate."
+sources_used:
+  - https://www.basketball-reference.com/teams/WAS/2026.html
+  - https://www.nba.com/wizards/roster
+  - https://www.washingtonpost.com/sports/2025/09/25/wizards-rebuild-will-dawkins/
+  - https://www.washingtonpost.com/sports/2023/05/24/michael-winger-wizards-general-manager/
+  - https://www.nba.com/news/wizards-pelicans-trade-cj-mccollum-jordan-poole
+  - https://www.nba.com/news/hawks-trade-trae-young-to-wizards-for-cj-mccollum-corey-kispert
+  - https://www.nba.com/news/wizards-mavericks-anthony-davis-trade
+  - https://www.spotrac.com/nba/washington-wizards/yearly
+  - https://www.salaryswish.com/teams/wizards
+  - https://monumentalsports.com/people/michael-winger/
+  - https://monumentalsports.com/people/ted-leonsis/
+  - https://sports.yahoo.com/nba/breaking-news/article/wizards-anticipate-return-of-brian-keefe-as-head-coach-after-last-place-finish-in-2025-26-season-171754827.html
+  - https://www.salaryswish.com/players/alexandre-sarr
+  - https://www.salaryswish.com/players/carlton-carrington
+  - https://www.salaryswish.com/players/bilal-coulibaly
+  - https://www.salaryswish.com/players/tre-johnson
+  - https://www.spotrac.com/nba/player/_/id/26971/trae-young
+  - https://www.salaryswish.com/players/will-riley
+  - https://www.basketball-reference.com/players/s/sarral01.html
+  - https://www.basketball-reference.com/players/c/carrica01.html
+  - https://www.basketball-reference.com/players/c/coulibi01.html
+  - https://www.basketball-reference.com/players/j/johnstr03.html
+  - https://www.basketball-reference.com/players/r/rileywi01.html
+  - https://www.si.com/nba/draft/nba-rookies/2025-nba-draft-second-round-pick-earns-standard-contract-from-wizards-01kjg676hjtk
+  - https://www.hoopsrumors.com/2026/02/wizards-jamir-watkins-to-receive-promotion-two-year-deal.html
+  - https://roundtable.io/sports/nba/wizards/news/kyshawn-george-to-miss-rest-of-washington-wizards-2025-26-season
+  - https://www.bulletsforever.com/washington-wizards-news/69555/washington-wizards-2026-offseason-preview
+  - https://fanspo.com/nba/teams/Wizards/30/draft-picks
+  - https://www.hoopsrumors.com/2025/7/14/24462832-wizards-assign-reese-to-g-league-affiliate
+fields_marked_unknown:
+  - "Jamir Watson: age, birth date, full contract value, bird rights status."
+  - "Dante Exum: Contract details (waived mid-season)."
+  - "D'Angelo Russell: Status unknown; never reported to Wizards post-February trade."
+  - "Kelly Olynyk: Traded to San Antonio Spurs (July 2025) within weeks of acquisition."
+  - "Richaun Holmes: Waived (July 2025)."
+  - "Marcus Smart: Bought out and signed with Lakers (July 2025)."
+  - "Johnny Davis: Traded to Memphis/later Milwaukee before 2025-26 season."
+  - "Notable advisors/consultants: Unknown."
+  - "Assistant coaches beyond head coach: Unknown."
+  - Exact trade exception amounts and expiration dates.
+  - Julian Reese contract value and exact terms.
+  - Jamir Watkins exact salary and contract year details.
+vocabulary_flags:
+  - "Player availability statuses for Trae Young and Anthony Davis marked as 'injured_long_term' rather than 'season_ending' because both could return for 2026-27 playoffs if recovery progresses (caveat: season effectively over by May 2, 2026)."
+  - Kyshawn George marked 'injured_season_ending' per official Wizards announcement (elbow injury); expected full recovery before 2026-27.
+  - Trae Young, Anthony Davis, and Jaden Hardy marked 'shopped' / 'available' based on contract structure and injury uncertainty; no primary source reporting explicit trade demand, but cap leverage and health volatility create implicit trade eligibility.
+  - D'Angelo Russell never officially joined roster post-trade (February 2026); therefore excluded from main roster pending confirmation of status.
+  - Contract values for some players (Watkins, Watson, Exum, Reese) marked 'unknown' due to two-way / minimum deal complexity or mid-season transactions where terms not disclosed.

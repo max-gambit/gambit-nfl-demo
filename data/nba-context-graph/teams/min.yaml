@@ -1,0 +1,979 @@
+team_id: MIN
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Minnesota Timberwolves
+  conference: Western
+  division: Northwest
+  market_tier: tier_2
+  market_tier_rationale: Major Upper Midwest market with strong regional reach; significant but not mega-market revenue profile compared to NYC, LA, Chicago.
+ownership:
+  primary_owner:
+    name: Marc Lore and Alex Rodriguez
+    type: group
+    tenure_years: 0.9
+    source: https://www.nba.com/news/nba-approves-sale-minnesota-timberwolves-marc-lore-and-alex-rodriguez
+    confidence: high
+  governance_notes: Co-ownership; Lore serves as Timberwolves Governor and Rodriguez as Alternate Governor. Glen Taylor fully exited ownership in June 2025 after arbitration ruling (Feb 2025) favored Rodriguez/Lore. No remaining minority stakes.
+  recent_transitions: Ownership transfer from Glen Taylor to Marc Lore/Alex Rodriguez completed June 2025. Taylor retained minority stake until full arbitration resolution in favor of new owners.
+  spending_posture: aggressive_spender
+  spending_posture_evidence:
+    - Fourth-highest payroll in NBA (2024-25) at $198 million
+    - Projected $84+ million luxury tax bill for 2024-25 with willingness to exceed first and second aprons
+    - Major extensions signed to core players (Edwards, Randle, Gobert, Reid, McDaniels) to lock in championship window
+    - Willingness to pay significant tax penalties demonstrates commitment to contend-now approach
+front_office:
+  president_basketball_ops:
+    name: Tim Connelly
+    tenure_start: 2022-05
+    prior_stops:
+      - Denver Nuggets (President of Basketball Operations, 2013-2022)
+    public_philosophy_signals:
+      - '"Timberwolves need to be creative as possible with roster" (June 2025 statement, per Yardbarker)'
+      - Explicit championship-window focus; constructed all-in rosters with major star acquisitions
+      - Aggressive trade approach evidenced by Rudy Gobert (5 picks + 5 players, 2022) and Karl-Anthony Towns for Julius Randle/Donte DiVincenzo swap (2024)
+      - Opted into final two years of original contract (Aug 2025), signaling continuity; negotiations for longer extension ongoing
+    confidence: high
+    source: https://www.espn.com/nba/story/_/id/33971725/sources-minnesota-timberwolves-hire-executive-tim-connelly-5-year-deal-worth-40m-includes-ownership-equity
+  general_manager:
+    name: unknown
+    tenure_start: unknown
+    prior_stops: []
+    public_philosophy_signals: []
+    confidence: low
+    source: unknown
+  head_coach:
+    name: Chris Finch
+    tenure_start: 2021-02
+    contract_through: 2027-28
+    style_notes: High-pace, three-point heavy offense; switchable defense emphasis; holds high standards for all players including stars (Edwards). Direct coaching approach with strong accountability culture.
+    coaching_tree: thibodeau_tree
+    confidence: high
+    source: https://www.nba.com/timberwolves/news/wolves-sign-head-coach-chris-finch-to-multi-year-contract-extension
+  assistant_coaches_notable:
+    - unknown
+  notable_advisors_or_consultants: []
+strategic_posture:
+  timeframe: contend_now
+  confidence: high
+  derived_from:
+    - Championship-window core (Edwards, Randle, Gobert, Reid) locked in with multi-year extensions through 2027-28
+    - 2025 WCF appearance (lost to OKC in 5) demonstrates playoff readiness
+    - Connelly explicitly stated aggressive in-season moves necessary to capitalize on current roster
+    - Second-apron constraints now limiting trade flexibility; standing pat at Feb 2026 deadline despite seeking Giannis
+    - Ownership willing to sustain $80M+ annual luxury tax bills to maintain contention
+  constraints:
+    - reason_code: second_apron_constraints
+      detail: Wolves are near second apron (within $3-7M), limiting salary-matching flexibility in trades; hard-cap acceptance restricts mid-season acquisitions.
+      weight: high
+    - reason_code: max_contract_lockup
+      detail: Edwards, Randle, Gobert, Reid, McDaniels represent ~77% of cap over next 3-4 years; no flexibility for new max signings.
+      weight: high
+    - reason_code: ownership_directive
+      detail: New ownership (Lore/Rodriguez) committed to aggressive spending; internal mandate to compete annually in championship window.
+      weight: high
+  trigger_events:
+    - First-round playoff exit or major injury to Edwards/Gobert would signal need for mid-season pivot
+    - OKC Thunder's ascent and sustained West dominance could force re-evaluation of timeline
+    - Failed extension negotiations with Randle or DiVincenzo would trigger fire-sale consideration
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: between_aprons
+  current_payroll_estimate: 193821377
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Still above first apron; Edwards/Randle/Gobert max contracts carry through 2027-28. Limited mid-level exception and trade exception availability only.
+    - season: 2027-28
+      projected_status: Potential inflection point if Gobert declines 2027-28 PO or Edwards extension restructures.
+  exceptions_available:
+    - Trade exception (amount and expiration unknown from available sources)
+  source: https://sportsbusinessclassroom.com/nba-2025-26-luxury-tax-tracker/
+  source_fallbacks_used:
+    - https://www.spotrac.com/nba/minnesota-timberwolves/tax
+    - https://fanspo.com/nba/teams/Timberwolves/18
+  confidence: medium
+trade_dna:
+  frequent_partners:
+    - DEN
+    - NYK
+    - UTA
+  preferred_deal_archetypes:
+    - Star acquisitions at premium cost (Gobert 2022, Randle 2024)
+    - Using multiple picks and depth pieces to move up or acquire All-NBA talent
+    - Salary-matching in multi-team scenarios to manage apron constraints
+    - Preference for proven players over young assets; "win-now" posture
+  recent_significant_trades:
+    - date: 2024-09
+      summary: Traded Karl-Anthony Towns to Knicks for Julius Randle, Donte DiVincenzo, Keita Bates-Diop, and Detroit 1st (protected).
+      counterparties:
+        - DET
+        - NYK
+    - date: 2024-06
+      summary: Restructured Tim Connelly contract after playoff loss; no other headline moves that offseason.
+    - date: 2023-07
+      summary: Signed Anthony Edwards to 5-year, $244M max extension with All-NBA escalators.
+  confidence: high
+cultural_signals:
+  stability:
+    value: medium
+    detail: Ownership transition (Glen Taylor to Lore/Rodriguez) resolved in June 2025 after 14-month arbitration dispute; now settled. Coaching staff stable (Finch extended through 2027-28). Front office (Connelly) opted in and negotiating longer deal. Organizational turbulence subsiding but new ownership still ramping up.
+  player_friendly:
+    value: mixed
+    detail: Max extensions given to core four (Edwards, Randle, Gobert, McDaniels); Naz Reid signed $125M deal. However, team operates at second apron, limiting mid-season additions and signaling "built-to-contend-now" rather than player acquisition flexibility. High-accountability coaching culture under Finch.
+  analytics_orientation:
+    value: heavy
+    detail: Connelly (ex-Denver, noted for analytics adoption) emphasizes three-point volume, spacing, and switchability. Pace-and-space offense under Finch aligns with modern analytics. However, public FO philosophy statements are limited; confidence moderate-to-high based on roster construction and trade patterns.
+  risk_tolerance:
+    value: aggressive
+    detail: Willing to pay $80M+ annual luxury tax. Blockbuster trades at premium cost (Gobert, Randle). Four max contracts on payroll. Draft capital largely depleted. No conservative salary cap management evident.
+  notable_traits:
+    - star_chasing
+    - family_culture
+    - thibodeau_tree
+  rationale: Ownership transition from longtime patriarch (Taylor) to younger, tech-focused ownership (Lore, A-Rod) signals potential cultural shift. Connelly emphasizes team cohesion and player development ("family" language in reporting). Willingness to spend aggressively on stars reflects star-chasing DNA. New ownership remains relatively untested on long-term cultural impact.
+  confidence: medium
+roster:
+  - player_id: anthony_edwards
+    name: Anthony Edwards
+    age: 23
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+        - offensive_rebound_specialist
+        - foul_drawer
+        - transition_threat
+        - iso_creator
+    tier: superstar
+    trajectory: ascending
+    contract:
+      years_remaining: 5
+      total_value_remaining: 244623120
+      annual_value_current_season: 42176400
+      annual_value_next_season: 45269840
+      no_trade_clause: none
+      trade_kicker: 0.15
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.spotrac.com/nba/minnesota-timberwolves/anthony-edwards-70643/
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: generational_talent
+          weight: high
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: franchise_brand_equity
+          weight: high
+      falsification_conditions:
+        - Trade request from Edwards himself; any public statement indicating desire to leave
+        - Team explicitly trades Edwards for multiple first-rounders/young assets
+        - Media reporting of deep roster dysfunction or Edwards discontentment sustained over 2+ weeks
+      signal_strength: confirmed_shopped
+    team_relationship:
+      tenure_with_team: 4.1
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Edwards controls trade leverage via 15% kicker and max contract; younger age (23) reduces team leverage in any negotiation.
+    confidence: high
+    source: https://www.espn.com/nba/story/_/id/37953985/timberwolves-agree-5-year-extension-anthony-edwards
+  - player_id: julius_randle
+    name: Julius Randle
+    age: 30
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - post_hub
+          - finisher
+          - connector
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - foul_drawer
+        - elite_rebounder
+    tier: star
+    trajectory: declining_peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 100000000
+      annual_value_current_season: 33333333
+      annual_value_next_season: 33333333
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: "2028"
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://sports.yahoo.com/nba/breaking-news/article/julius-randle-agrees-to-three-year-100-million-deal-with-minnesota-timberwolves-173039776.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: recent_extension_poison_pill
+          weight: high
+        - reason_code: positional_redundancy
+          detail: With Edwards leading offense, Randle's scoring role diminished; locker room friction hinted in some reporting (unconfirmed)
+          weight: low
+      falsification_conditions:
+        - Public reporting of Randle requesting trade or expressing unhappiness
+        - Integration into playoff rotation diminished (sitting in 4th quarters, bench minutes in playoffs)
+        - Explicit FO statements indicating Randle available
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.6
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Player option in final year; extension just signed (June 2025) limits team's ability to move him without retention. Extension carried poison pill (limited negotiating leverage).
+    confidence: medium
+    source: https://www.nba.com/news/julius-randle-timberwolves-contract-extension-2025
+  - player_id: rudy_gobert
+    name: Rudy Gobert
+    age: 32
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - post_hub
+          - connector
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+        - rim_protector
+    tier: star
+    trajectory: declining
+    contract:
+      years_remaining: 3
+      total_value_remaining: 110000000
+      annual_value_current_season: 36666667
+      annual_value_next_season: 36666667
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: "2028"
+      team_option: none
+      bird_rights: full
+      contract_through: "2028"
+      source: https://www.cbsnews.com/minnesota/news/timberwolves-rudy-gobert-contract-extension/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: recent_extension_poison_pill
+          weight: high
+        - reason_code: age
+          detail: 32 years old; limited trade market for aging centers on large contracts
+          weight: medium
+      falsification_conditions:
+        - Reporting of Gobert injury requiring surgery or season-ending rehab
+        - Team publicly stating willingness to move Gobert for flexibility
+        - Player publicly requesting trade
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2.8
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Player option in final year (2027-28); age and contract size limit trade market. Extension (Oct 2024) binds him to Timberwolves long-term.
+    confidence: high
+    source: https://www.nba.com/news/rudy-gobert-minnesota-timberwolves-extension
+  - player_id: donte_divincenzo
+    name: Donte DiVincenzo
+    age: 30
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+          - connector
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 2
+      total_value_remaining: 46800000
+      annual_value_current_season: 11700000
+      annual_value_next_season: 11700000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: "2027"
+      source: https://www.spotrac.com/nba/player/_/id/3934673/donte-divincenzo
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: expiring_contract_value
+          weight: medium
+        - reason_code: extension_decline
+          detail: Eligible for extension since July 2025; no agreement reached. Toe injury complications reported. Team likely waiting to see 2025-26 performance before extending.
+          weight: medium
+      falsification_conditions:
+        - Multi-year extension signed (mid-season or offseason 2026)
+        - DiVincenzo returned to starting lineup and consistent 30+ MPG through playoffs
+        - FO public statement re-committing to DiVincenzo long-term
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.6
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: No NTC, no player option; team controls decision. Injury history (toe) and expiring deal limit his leverage. Team can let him walk or extend based on 2025-26 performance.
+    confidence: medium
+    source: https://dunkingwithwolves.com/timberwolves-are-facing-an-impossible-donte-divincenzo-decision/
+  - player_id: jaden_mcdaniels
+    name: Jaden McDaniels
+    age: 23
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - spacer
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - switchable
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 4
+      total_value_remaining: 105000000
+      annual_value_current_season: 26200000
+      annual_value_next_season: 26200000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: early
+      contract_through: 2028
+      source: https://www.espn.com/nba/story/_/id/38726877/timberwolves-jaden-mcdaniels-agree-5-year-136m-deal
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: high
+      falsification_conditions:
+        - McDaniels explicitly requests trade or sits out games
+        - Severe injury derailing career trajectory
+        - Team publicly indicates willingness to trade young core (contradicts stated contend-now strategy)
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 4.1
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Early bird rights; restricted free agent path. Extension locked in for 4 more years at ~$26M AAV (well below market). Team holds all leverage.
+    confidence: high
+    source: https://www.espn.com/nba/story/_/id/38726877/timberwolves-jaden-mcdaniels-agree-5-year-136m-deal
+  - player_id: naz_reid
+    name: Naz Reid
+    age: 24
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: finisher
+        secondary:
+          - connector
+          - post_hub
+      defensive_role: helper
+      shooting_profile: good
+      special_traits:
+        - elite_rebounder
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 5
+      total_value_remaining: 125000000
+      annual_value_current_season: 25000000
+      annual_value_next_season: 25000000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: "2030"
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.startribune.com/naz-reid-timberwolves-new-contract-five-years-125-million/601372041
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: extension_recent
+          weight: high
+      falsification_conditions:
+        - Publicly reported rift between Reid and Finch or locker room conflict
+        - Reid injured long-term or career trajectory derails
+        - Team trades Reid as part of blockbuster deal (indicating rebuild pivot)
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 3.9
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Extension signed June 2025; $25M AAV below market. Player option in final year provides minimal leverage.
+    confidence: high
+    source: https://www.spotrac.com/nba/minnesota-timberwolves/naz-reid-73091/
+  - player_id: mike_conley
+    name: Mike Conley
+    age: 37
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - connector
+      defensive_role: point_of_attack
+      shooting_profile: good
+      special_traits:
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 1148727
+      annual_value_current_season: 1148727
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/player/_/id/2532/mike-conley
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: declining_role
+          detail: Traded to Chicago Bulls Feb 3, 2026, then re-signed Timberwolves Feb 17, 2026 on minimum deal after clearing waivers. Diminished role in rotation.
+          weight: high
+      falsification_conditions:
+        - Conley re-signed on longer-term deal (multi-year extension)
+        - Returns to starting lineup with 25+ MPG consistently through season end
+        - Team explicitly commits to Conley long-term in public statement
+      signal_strength: confirmed_shopped
+    team_relationship:
+      tenure_with_team: 1.9
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Veteran minimum deal after trade/waiver; no leverage. UFA after 2025-26.
+    confidence: high
+    source: https://www.salaryswish.com/players/mike-conley
+  - player_id: terrance_shannon
+    name: Terrance Shannon Jr.
+    age: 22
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2027
+      source: https://www.basketball-reference.com/teams/MIN/2026.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: behind_younger_player
+          weight: low
+          detail: Rotational wing depth; limited starter minutes behind Edwards/McDaniels.
+      falsification_conditions:
+        - Shannon develops into rotation regular (15+ MPG avg over full season)
+        - Team extends Shannon multi-year deal
+        - Explicit FO statement indicating Shannon part of core/future
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Rookie scale contract, non-bird rights, very young (22). Team controls all decisions.
+    confidence: medium
+    source: https://www.basketball-reference.com/teams/MIN/2026.html
+  - player_id: joan_beringer
+    name: Joan Beringer
+    age: 20
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - connector
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits: []
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2027
+      source: https://www.basketball-reference.com/teams/MIN/2026.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: behind_younger_player
+          weight: low
+      falsification_conditions:
+        - Beringer develops into meaningful bench contributor (8+ MPG, visible in lineups)
+        - Team signs multi-year extension with Beringer
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: 17th pick (2025), rookie scale, non-bird. Team has full control of development arc.
+    confidence: low
+    source: https://www.nba.com/draft/2025/team-profiles/2025-minnesota-timberwolves
+  - player_id: ayo_dosunmu
+    name: Ayo Dosunmu
+    age: 25
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits: []
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 0
+      total_value_remaining: 0
+      annual_value_current_season: 7518518
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/player/_/id/74145/ayo-dosunmu
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: positional_redundancy
+          weight: medium
+          detail: Backup guard behind Conley/Edwards/DiVincenzo; limited rotation role
+      falsification_conditions:
+        - Dosunmu signs long-term extension (multi-year deal)
+        - Returns to consistent 15+ MPG rotation role for remainder of season and playoffs
+        - Team makes explicit statement re-committing to Dosunmu
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.4
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Acquired mid-season (likely trade deadline); expires 2026. UFA unless re-signed.
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/_/id/74145/ayo-dosunmu
+  - player_id: joe_ingles
+    name: Joe Ingles
+    age: 36
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - spacer
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits:
+        - vet_leadership
+        - elite_passer
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.basketball-reference.com/teams/MIN/2026.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: aging_core
+          detail: 36 years old; limited minutes and bench role in contender
+          weight: low
+      falsification_conditions:
+        - Ingles re-signed to multi-year deal
+        - Returns to starting role or 20+ MPG consistently
+        - Team explicitly commits to Ingles long-term
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Veteran minimum or low-salary deal; expiring. UFA after 2025-26.
+    confidence: low
+    source: https://www.basketball-reference.com/teams/MIN/2026.html
+  - player_id: rocco_zikarsky
+    name: Rocco Zikarsky
+    age: 22
+    position_listed: C
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary: []
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+    tier: two_way
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.basketball-reference.com/teams/MIN/2026.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: behind_younger_player
+          weight: low
+      falsification_conditions:
+        - Zikarsky promoted to standard contract or given multi-year deal
+        - Emerges as contributor in NBA rotation
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Two-way contract; team has complete control of development.
+    confidence: low
+    source: https://www.startribune.com/minnesota-timberwolves-nba-draft-second-round-trade-tim-connelly/601372039
+  - player_id: jesse_edwards
+    name: Jesse Edwards
+    age: 23
+    position_listed: C
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary: []
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits: []
+    tier: two_way
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.basketball-reference.com/teams/MIN/2026.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: behind_younger_player
+          weight: low
+      falsification_conditions:
+        - Edwards signed to standard contract and given meaningful rotation role
+        - Team extends Edwards multi-year deal
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Two-way contract; team retains full control.
+    confidence: low
+    source: https://www.basketball-reference.com/teams/MIN/2026.html
+pending_free_agents: []
+known_target_history:
+  - target: Giannis Antetokounmpo
+    year: 2026
+    outcome: pursued_no_deal
+    detail: Timberwolves pursued Giannis at 2026 trade deadline (Feb) but could not construct deal; constrained by second-apron salary-matching rules and lack of trade pieces. Antetokounmpo remained with Milwaukee.
+    source: https://www.startribune.com/giannis-antetokounmpo-mike-conley-minnesota-timberwolves-milwaukee-bucks-nba-trade-deadline/601576083
+  - target: Rudy Gobert
+    year: 2022
+    outcome: acquired
+    detail: Timberwolves acquired Gobert from Jazz for 5 picks and 5 players; major star acquisition to anchor contend-now window.
+    source: https://www.nba.com/news/timberwolves-acquire-rudy-gobert
+known_target_history_continued:
+  - target: Julius Randle
+    year: 2024
+    outcome: acquired
+    detail: "Blockbuster trade: Timberwolves sent Karl-Anthony Towns to Knicks and received Julius Randle, Donte DiVincenzo, Keita Bates-Diop, and protected 2025 first."
+    source: https://www.nba.com/news/julius-randle-timberwolves-contract-extension-2025
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "Minnesota Timberwolves hold No. 28 from DET, No. 59 from SAS in the official post-lottery order. Mock-source layer: No. 28: Ebuka Okorie; treat prospect names as low-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: low
+  - priority: Resolve Donte DiVincenzo extension decision
+    timeline: this_offseason
+    type: extension
+    detail: DiVincenzo eligible for 3-year, $64.5M extension since July 2025; toe injury complicates decision. Team likely waits until post-2025-26 season to finalize terms based on performance and injury recovery.
+    confidence: high
+  - priority: Navigate second-apron trade flexibility constraints
+    timeline: by_trade_deadline
+    type: structural
+    detail: Team within $3-7M of second apron; hard-cap status prevents aggressive mid-season trades without salary matching. Must prioritize internal development or minimal-impact swaps.
+    confidence: high
+  - priority: Evaluate playoff performance and title window duration
+    timeline: this_season
+    type: coaching_decision
+    detail: 2025 WCF loss to OKC (5 games) indicates potential gap vs. top contenders. Season performance will inform offseason moves and timeline re-assessment.
+    confidence: medium
+  - priority: Potential coaching evaluation if playoff drought
+    timeline: by_trade_deadline
+    type: coaching_decision
+    detail: Finch extended through 2027-28; first-round exit would prompt ownership/FO discussion on system fit or roster construction vs. coaching ability.
+    confidence: low
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 28 overall; from DET.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: DET
+    - year: 2026
+      round: 2
+      protections: 2026 No. 59 overall; from SAS via IND.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: SAS
+    - year: 2027
+      round: 1
+      protections: unknown
+      source: unknown
+    - year: 2027
+      round: 2
+      protections: Via Denver/Golden State; more favorable of the two
+      source: https://dunkingwithwolves.com/posts/timberwolves-draft-picks-updated-look-every-selection-2025-2026-beyond
+    - year: 2032
+      round: 2
+      protections: More favorable of Phoenix/Houston second-round picks
+      source: https://dunkingwithwolves.com/posts/timberwolves-draft-picks-updated-look-every-selection-2025-2026-beyond
+    - year: 2033
+      round: 1
+      protections: unknown
+      source: unknown
+    - year: 2025
+      round: 1
+      from_team: NYK
+      protections: unknown (via DET)
+      source: https://www.nba.com/knicks/news/new-york-knicks-acquire-karl-anthony-towns
+  draft_picks_owed:
+    - year: 2026
+      round: 1
+      to_team: DET
+      protections: 2026 No. 21 overall; from MIN.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 2
+      to_team: WAS
+      protections: 2026 No. 51 overall; from MIN via DET and NYK.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2025
+      round: 1
+      to_team: DET
+      protections: Protected first-rounder via Karl-Anthony Towns trade (Sept 2024)
+      source: https://www.nba.com/news/julius-randle-timberwolves-contract-extension-2025
+  trade_exceptions:
+    - value: unknown
+      expires: unknown
+      source: unknown
+      confidence: low
+team_team_relationships:
+  rivalries:
+    - team_id: DEN
+      type: competitive_recent
+      basis: Recent playoff encounters and overlapping Western Conference contention; Connelly's prior employment (2013-2022 as Nuggets PBO) creates personnel familiarity.
+    - team_id: OKC
+      type: competitive_recent
+      basis: 2025 Western Conference Finals (Timberwolves lost in 5); re-match likely if both seeded high in 2025-26 playoffs.
+    - team_id: GSW
+      type: competitive_historical
+      basis: Multiple playoff meetings in prior years; faded as Warriors declined.
+  notable_personnel_connections:
+    - person: Tim Connelly
+      connected_team: DEN
+      connection_type: former_executive
+      detail: Connelly served as Nuggets PBO 2013-2022; left to join Timberwolves May 2022. Maintains familiarity with Denver FO.
+    - person: Chris Finch
+      connected_team: DEN
+      connection_type: former_assistant
+      detail: Finch was an assistant coach with Denver Nuggets before joining Timberwolves (2021). Maintains ties to organization.
+g_league_and_stash:
+  affiliate_team: Iowa Wolves
+  notable_affiliate_players:
+    - G League affiliate serves as development hub for fringe roster players and two-way signings
+    - Joan Beringer, Rasheer Fleming, Rocco Zikarsky, Leonard Miller expected to spend time in Iowa for development
+  international_stash: []
+narrative_summary:
+  one_paragraph: The Minnesota Timberwolves enter the 2025-26 season as a contend-now roster led by superstar Anthony Edwards and complemented by All-Star acquisitions Rudy Gobert, Julius Randle, and talented homegrown core (McDaniels, Naz Reid). Under Tim Connelly's aggressive front-office leadership and new ownership (Lore/Rodriguez, assuming control in June 2025 after resolving arbitration dispute with Glen Taylor), the team is willing to sustain $80M+ annual luxury tax penalties to maintain a championship window. However, a second-round loss to Oklahoma City in 2025 exposed potential gaps versus top contenders, and the team's position near the second apron significantly constrains mid-season trade flexibility. The roster lacks depth and draft capital due to prior star acquisitions. Coach Chris Finch (extended through 2027-28) runs a pace-heavy, three-point offense with switchable defense. Key near-term decisions include resolving Donte DiVincenzo's extension eligibility and evaluating whether the current core can breach the Finals; failure to advance past the first round would trigger serious timeline re-assessment.
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 28 from DET, No. 59 from SAS; The Athletic mock-source layer lists No. 28: Ebuka Okorie as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - "Anthony Edwards' continued ascent and durability: superstar role requires sustaining 25-28 PPG while improving playmaking and playoff consistency to justify championship window."
+    - "Julius Randle's integration and longevity: recent extension (3yr/$100M with PO) locks in $100M commitment; underperformance or locker room friction could force difficult mid-contract decisions."
+    - "Second-apron salary cap management: with limited flexibility and no surplus draft capital, any injuries to core players or trade deadline needs could force reluctant budget cuts or rotation changes mid-season."
+sources_used:
+  - https://www.nba.com/news/nba-approves-sale-minnesota-timberwolves-marc-lore-and-alex-rodriguez
+  - https://www.espn.com/nba/story/_/id/33971725/sources-minnesota-timberwolves-hire-executive-tim-connelly-5-year-deal-worth-40m-includes-ownership-equity
+  - https://www.nba.com/timberwolves/news/wolves-sign-head-coach-chris-finch-to-multi-year-contract-extension
+  - https://sportsbusinessclassroom.com/nba-2025-26-luxury-tax-tracker/
+  - https://www.spotrac.com/nba/minnesota-timberwolves/cash
+  - https://www.spotrac.com/nba/minnesota-timberwolves/tax
+  - https://www.spotrac.com/nba/minnesota-timberwolves/anthony-edwards-70643/
+  - https://www.espn.com/nba/story/_/id/37953985/timberwolves-agree-5-year-extension-anthony-edwards
+  - https://www.startribune.com/naz-reid-timberwolves-new-contract-five-years-125-million/601372041
+  - https://www.cbsnews.com/minnesota/news/timberwolves-rudy-gobert-contract-extension/
+  - https://www.nba.com/news/rudy-gobert-minnesota-timberwolves-extension
+  - https://www.spotrac.com/nba/player/_/id/3934673/donte-divincenzo
+  - https://dunkingwithwolves.com/timberwolves-are-facing-an-impossible-donte-divincenzo-decision/
+  - https://www.espn.com/nba/story/_/id/38726877/timberwolves-jaden-mcdaniels-agree-5-year-136m-deal
+  - https://sports.yahoo.com/nba/breaking-news/article/julius-randle-agrees-to-three-year-100-million-deal-with-minnesota-timberwolves-173039776.html
+  - https://www.nba.com/news/julius-randle-timberwolves-contract-extension-2025
+  - https://www.spotrac.com/nba/player/_/id/2532/mike-conley
+  - https://www.salaryswish.com/players/mike-conley
+  - https://www.spotrac.com/nba/player/_/id/91736/rob-dillingham
+  - https://www.basketball-reference.com/teams/MIN/2026.html
+  - https://www.nba.com/draft/2025/team-profiles/2025-minnesota-timberwolves
+  - https://www.spotrac.com/nba/player/_/id/74145/ayo-dosunmu
+  - https://www.startribune.com/minnesota-timberwolves-nba-draft-second-round-trade-tim-connelly/601372039
+  - https://dunkingwithwolves.com/posts/timberwolves-draft-picks-updated-look-every-selection-2025-2026-beyond
+  - https://www.startribune.com/giannis-antetokounmpo-mike-conley-minnesota-timberwolves-milwaukee-bucks-nba-trade-deadline/601576083
+  - https://www.sportico.com/business/team-sales/2025/arod-lore-win-timberwolves-lynx-arbitration-taylor-1234825589/
+  - https://www.startribune.com/five-keys-minnesota-timberwolves-nba-season-edwards-conley-gobert-dillingham-mcdaniels-naz-reid/601461882
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - front_office.general_manager (no GM identified in current structure; operations report to Connelly as PBO)
+  - front_office.assistant_coaches_notable (not found in sources)
+  - several_player_contract_details (specific annual values for Terrance Shannon Jr., Leonard Miller, Joan Beringer, Rasheer Fleming, Joe Ingles, Rocco Zikarsky, Jesse Edwards)
+  - trade_exception_details (value, expiration date unknown from available sources)
+  - draft_pick_details_2027_onward (protections for 2027 1st round unknown)
+  - contract_through_for_several_young_players (inferred from draft year; exact years unknown for fringe roster players)
+  - ownership_transition_details (specific equity arrangements between Lore and Rodriguez unknown; governance structure partially unclear)
+vocabulary_flags:
+  - "No GM role identified: Minnesota Timberwolves may operate with President (Connelly) managing all basketball operations. No separate GM reported in available sources as of May 2026. Marked as 'unknown' rather than inventing title."
+  - "Connelly's tenure computation: Started May 2022. As of May 2026 = 4.0 years. Marked as '4 years' (or 4.0 decimal) in output."
+  - "Anthony Edwards trade kicker: Contract documentation states 15% trade kicker (Rose Rule language). Encoded as 0.15 (decimal) per schema requirement."
+  - "Julius Randle extension: Contract documentation states 3-year, $100M deal with player option in final year (2027-28). Encoded as player_option: 2027-28."
+  - "Rudy Gobert player option: Extension (Oct 2024) added PO for 2027-28. Contract runs through 2027-28 with PO in final year."
+  - "Ownership resolution: Glen Taylor fully exited June 2025 per arbitration ruling (Feb 2025). New ownership (Lore/Rodriguez) approved by NBA Board June 2025. No remaining Taylor stake."
+  - "Mike Conley mid-season trade: Traded to Chicago Feb 3, 2026, re-signed Minnesota Feb 17, 2026 on minimum deal. Reflects current (May 2026) 2025-26 contract status, not prior extension."
+  - "Nickeil Alexander-Walker exit: Left as free agent (sign-and-trade to Atlanta, July 2025) and thus not on 2025-26 roster. Excluded from active roster per instruction to include only current players."
+  - "Keita Bates-Diop exit: Waived by Timberwolves (Oct 2024), later signed CBA deal. Not on active roster; excluded per instruction."
+  - "Second-apron status: Team projected $3-7M below second apron for 2025-26 (sources show slight variance). Encoded as 'between_aprons' per vocabulary; actual hard-cap status is 'no' as team is not at second-apron threshold."

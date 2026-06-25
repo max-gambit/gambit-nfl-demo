@@ -1,0 +1,663 @@
+team_id: BOS
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Boston Celtics
+  conference: Eastern
+  division: Atlantic
+  market_tier: tier_1
+  market_tier_rationale: Major media market (Boston), championship-winning franchise (2024), highest revenue, transcontinental appeal, historic brand equity.
+ownership:
+  primary_owner:
+    name: Bill Chisholm
+    type: individual
+    tenure_years: 0.6
+    source: https://www.nba.com/news/chisholm-group-celtics-ownership
+    confidence: high
+  governance_notes: Chisholm's group acquired 51% control in September 2025 (full control scheduled by 2028 at ~$7.3 billion total). Wyc Grousbeck (former owner's family) remains as CEO and co-operator; more than half of old ownership group staying. NBA approval required for full transfer.
+  recent_transitions: Bill Chisholm ownership group closed majority acquisition September 2025, ending Grousbeck family's 23-year majority ownership (2002-2025).
+  spending_posture: aggressive_spender
+  spending_posture_evidence:
+    - Paid $6.1B for franchise (record sports team sale at time)
+    - Chisholm stated 'do whatever it takes to win championships'
+    - Championship window prioritized over financial penalties
+    - Willing to operate above second apron in prior years
+front_office:
+  president_basketball_ops:
+    name: Brad Stevens
+    tenure_start: 2021-06
+    prior_stops:
+      - Boston Celtics Head Coach (2013-2021)
+      - Butler University Head Coach (2003-2013)
+    public_philosophy_signals:
+      - Emphasis on roster flexibility and cap management (2025-26)
+      - Willingness to trade stars to escape second apron penalties
+      - Data-driven, collaborative decision-making
+      - '"Get out of penalty box" rationale for Holiday/Porzingis trades'
+    confidence: high
+    source: https://www.nba.com/news/brad-stevens-nba-executive-of-year-2025-26
+  general_manager:
+    name: Brad Stevens
+    tenure_start: 2021-06
+    prior_stops:
+      - Boston Celtics Head Coach (2013-2021)
+      - Butler University Head Coach (2003-2013)
+    public_philosophy_signals:
+      - Emphasis on roster flexibility and cap management
+      - Trade-focused flexibility over long-term salary commitments
+    confidence: high
+    source: https://www.nba.com/news/brad-stevens-nba-executive-of-year-2025-26
+  head_coach:
+    name: Joe Mazzulla
+    tenure_start: 2022-11
+    contract_through: "2027"
+    style_notes: "Defensive-first, three-point heavy offense. Mazzulla-ball emphasizes versatile switching, pace, aggressive three-point volume. 2025-26: ranked 1st in offensive rating, 3rd in defensive rating. Sees each player's defensive role as unique fit challenge."
+    coaching_tree: budenholzer_tree
+    confidence: high
+    source: https://www.celticsblog.com/2025/3/8/24378538/boston-celtics-joe-mazzulla-ball-defensive-approach-jrue-holiday-robert-williams-west-virginia
+  assistant_coaches_notable:
+    - Ron Harper Jr. (assistant)
+    - Amos Trice (assistant)
+  notable_advisors_or_consultants:
+    - Sam Cassell (Senior Assistant Coach)
+strategic_posture:
+  timeframe: contend_now
+  confidence: high
+  derived_from:
+    - 2026 Eastern Conference Finals Game 7 vs. 76ers (as of 2026-05-02)
+    - 51-25 regular season record, 2nd seed in East
+    - Back-to-back championship window (2024 champs)
+    - Tatum returning from Achilles rupture, still elite
+    - Traded for cap relief mid-season to stay under first apron
+  constraints:
+    - reason_code: max_contract_lockup
+      detail: Tatum ($314M/5yr), Brown ($285.4M/5yr), White ($125.9M/4yr) consume ~80% of payroll; little room for external talent.
+      weight: high
+    - reason_code: tax_apron_constraints
+      detail: Spent 2024-25 in second apron; reset repeater clock by ducking luxury tax in 2025-26 (saved $200M+). Hard salary constraint, no mid-season moves without trade.
+      weight: high
+    - reason_code: recent_playoff_success
+      detail: 2024 championship provides mandate to contend; Chisholm ownership not prioritizing rebuild, pushing for 2026-27 contention window.
+      weight: high
+  trigger_events:
+    - Game 7 loss to 76ers → pivot to 2026 offseason retool
+    - Tatum re-injury → recalibrate timeline to 2027-28
+    - Ownership directive shift post-Chisholm → changes posture
+    - Repeater tax reset window closure (2026-27) → spending envelope opens
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: below_first_apron
+  current_payroll_estimate: 190125013
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2025-26
+      projected_status: Below first apron (~$177M). Strategic ducking of luxury tax to reset repeater clock. $22.5M TPE and $8.2M TPE available. Mid-season traded Simons for Vučević to drop tax further (saved $20M+ in penalties).
+    - season: 2026-27
+      projected_status: Must stay below luxury tax again to fully reset repeater status; then open spending in 2027-28 when Tatum is 2yr post-injury.
+  exceptions_available:
+    - $22.5M trade exception (expiring 2026-10-17)
+    - $8.2M trade exception (expiring unknown)
+  source: https://www.thirdapron.com/p/everything-you-need-to-know-about
+  source_fallbacks_used:
+    - https://www.spotrac.com/nba/boston-celtics/payroll/
+    - https://www.salaryswish.com/teams/celtics
+  confidence: high
+trade_dna:
+  frequent_partners:
+    - PHI
+    - NYK
+    - ATL
+    - POR
+    - CHI
+  preferred_deal_archetypes:
+    - Star-for-star swaps (e.g., Holiday for Simons 2025)
+    - Depth consolidation (e.g., Simons+Minott for Vučević)
+    - Expiring contracts + picks for marginal upgrades
+    - Using TPE to add playmaking at deadline
+  recent_significant_trades:
+    - date: 2025-06-20
+      summary: Traded Jrue Holiday to Portland for Anfernee Simons + 2 second-round picks; freed ~$35M in cap to escape second apron.
+      counterparties:
+        - POR
+    - date: 2025-06-27
+      summary: "Three-team deal: Kristaps Porzingis to Hawks, Georges Niang to Celtics, plus Celtics second-rounders to Hawks; dropped tax bill ~$260M."
+      counterparties:
+        - ATL
+    - date: 2026-02-03
+      summary: Traded Anfernee Simons + 2nd-rounder to Chicago for Nikola Vučević + 2nd-rounder; saved $6M salary + $20M+ in penalties.
+      counterparties:
+        - CHI
+  confidence: high
+cultural_signals:
+  stability:
+    value: high
+    detail: Brad Stevens 5yr tenure, Joe Mazzulla re-signed for continuity. New owner (Chisholm) retains FO and coach. No recent roster chaos or public conflict.
+  player_friendly:
+    value: mixed
+    detail: Championship culture attractive. Mid-season Simons/Boucher/Tillman trades suggest willingness to move players for cap relief, which can feel transactional. Tatum/Brown/White have no-trade clauses or leverage.
+  analytics_orientation:
+    value: heavy
+    detail: Stevens (former coach, data-savvy) emphasized analytical 3PT efficiency and defensive versatility metrics. Trade decisions data-driven.
+  risk_tolerance:
+    value: aggressive
+    detail: Traded away All-Star Holiday/Porzingis mid-season for unproven fit (Vučević). Aggressive contention bids despite cap constraints.
+  notable_traits:
+    - process_driven
+    - star_chasing
+    - veteran_friendly
+    - coach_carousel
+  rationale: Stevens brings process-oriented, analytical culture from butler/coaching background. Despite roster churn from trades, org signals competitive intention to championship-winning nucleus. Mazzulla scheme demands high basketball IQ and defensive versatility.
+  confidence: high
+roster:
+  - player_id: jayson_tatum
+    name: Jayson Tatum
+    age: 28
+    position_listed: SF
+    contract_type: standard
+    availability_status: injured_long_term
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - secondary_creator
+          - tertiary_scorer
+      defensive_role: wing_stopper
+      shooting_profile: elite
+      special_traits:
+        - elite_passer
+        - iso_creator
+        - playoff_riser
+    tier: superstar
+    trajectory: declining_peak
+    contract:
+      years_remaining: 4
+      total_value_remaining: 280000000
+      annual_value_current_season: 54100000
+      annual_value_next_season: 60500000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: "2029"
+      team_option: none
+      bird_rights: full
+      contract_through: "2029"
+      source: https://www.nba.com/news/celtics-jayson-tatum-supermax-extension
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: generational_talent
+          weight: high
+      falsification_conditions:
+        - Career-ending injury beyond current Achilles recovery
+        - Public trade request
+      signal_strength: confirmed_shopped
+    team_relationship:
+      tenure_with_team: 8
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Supermax contract, player option, no trade clause protections
+    confidence: high
+    source: https://www.nba.com/news/celtics-jayson-tatum-supermax-extension
+  - player_id: jaylen_brown
+    name: Jaylen Brown
+    age: 29
+    position_listed: SF
+    contract_type: standard
+    availability_status: injured_short_term
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - finisher
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: star
+    trajectory: peak
+    contract:
+      years_remaining: 5
+      total_value_remaining: 230800000
+      annual_value_current_season: 34100000
+      annual_value_next_season: 36200000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: "2030"
+      source: https://www.spotrac.com/nba/player/_/id/23624/derrick-white
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Serious ACL/knee injury
+        - Public friction with FO
+      signal_strength: confirmed_shopped
+    team_relationship:
+      tenure_with_team: 7.5
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Long-term extension locked in, no options
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/23624/derrick-white
+  - player_id: derrick_white
+    name: Derrick White
+    age: 30
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: connector
+        secondary:
+          - tertiary_scorer
+          - screen_setter
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - switchable
+        - vet_leadership
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 4
+      total_value_remaining: 118048000
+      annual_value_current_season: 28100000
+      annual_value_next_season: 30348000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: "2029"
+      team_option: none
+      bird_rights: full
+      contract_through: "2029"
+      source: https://www.spotrac.com/nba/player/_/id/23624/derrick-white
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: recent_extension_poison_pill
+          weight: high
+      falsification_conditions:
+        - Major injury requiring long-term rehab
+        - Declining on-court production
+      signal_strength: widely_reported
+    team_relationship:
+      tenure_with_team: 4.5
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: 4-year extension with player option limits leverage
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/23624/derrick-white
+  - player_id: nikola_vucevic
+    name: Nikola Vučević
+    age: 35
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: post_hub
+        secondary:
+          - connector
+          - spacer
+      defensive_role: rim_protector
+      shooting_profile: good
+      special_traits:
+        - elite_passer
+    tier: starter
+    trajectory: declining
+    contract:
+      years_remaining: 2
+      total_value_remaining: 46600000
+      annual_value_current_season: 24100000
+      annual_value_next_season: 22500000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: "2027"
+      bird_rights: non
+      contract_through: "2027"
+      source: https://www.nba.com/news/nikola-vucevic-trade-celtics-2026
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: declining_role
+          weight: medium
+        - reason_code: contract_expiring
+          weight: low
+      falsification_conditions:
+        - Breakout playoff performance driving contention
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.25
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Mid-season acquisition, soon-to-be expiring, age
+    confidence: medium
+    source: https://www.nba.com/news/nikola-vucevic-trade-celtics-2026
+  - player_id: sam_hauser
+    name: Sam Hauser
+    age: 28
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary:
+          - tertiary_scorer
+      defensive_role: wing_stopper
+      shooting_profile: elite
+      special_traits: []
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: 7200000
+      annual_value_next_season: 7800000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: "2027"
+      source: https://www.basketball-reference.com/teams/BOS/2026.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: positional_redundancy
+          weight: medium
+      falsification_conditions:
+        - Injury reducing three-point reliability
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 4
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Mid-level contract, role player
+    confidence: medium
+    source: https://www.basketball-reference.com/teams/BOS/2026.html
+  - player_id: payton_pritchard
+    name: Payton Pritchard
+    age: 27
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: connector
+        secondary:
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits: []
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 3600000
+      annual_value_current_season: 3600000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: "2026"
+      source: https://www.basketball-reference.com/teams/BOS/2026.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: medium
+      falsification_conditions:
+        - Playoff heroics changing perceived value
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 4
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Expiring contract, reserve role
+    confidence: medium
+    source: https://www.basketball-reference.com/teams/BOS/2026.html
+  - player_id: luka_garza
+    name: Luka Garza
+    age: 27
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: post_hub
+        secondary:
+          - finisher
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits: []
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 2200000
+      annual_value_current_season: 2200000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: "2026"
+      source: https://www.basketball-reference.com/teams/BOS/2026.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Unexpected playoff run raising value
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Acquired in offseason, bench role
+    confidence: medium
+    source: https://www.basketball-reference.com/teams/BOS/2026.html
+pending_free_agents:
+  - player_id: payton_pritchard
+    name: Payton Pritchard
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Depends on playoff performance; could re-sign at similar level or walk. Veteran backup value, not a priority.
+    notes: Expiring 2026; limited shooting volume, reserve role.
+    source: https://www.basketball-reference.com/teams/BOS/2026.html
+  - player_id: luka_garza
+    name: Luka Garza
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: unknown
+    expected_market: walk
+    expected_market_detail: Limited playing time, backup center. Celtics unlikely to prioritize retention with Vučević and Kornet at position.
+    notes: Early-season addition, did not establish role.
+    source: https://www.basketball-reference.com/teams/BOS/2026.html
+known_target_history:
+  - target: Kristaps Porzingis
+    year: 2025
+    outcome: pursued_no_deal
+    detail: Traded away June 2025 as part of cap reset; not a target, but offloaded to Hawks for cap relief.
+    source: https://www.cbsnews.com/boston/news/kristaps-porzingis-boston-celtics-trade-nba-second-apron/
+  - target: Jrue Holiday
+    year: 2025
+    outcome: pursued_no_deal
+    detail: Traded away June 2025 to Portland for Anfernee Simons; strategic offload to escape second apron.
+    source: https://www.cbsnews.com/boston/news/boston-celtics-second-apron-porzingis-trades-nba/
+  - target: Nikola Vučević
+    year: 2026
+    outcome: acquired
+    detail: Acquired February 3, 2026 from Chicago for Anfernee Simons + 2nd-rounder. Veteran all-star center to shore up frontcourt depth at deadline.
+    source: https://www.nba.com/news/nikola-vucevic-trade-celtics-2026
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "Boston Celtics hold No. 27, No. 40 from MIL in the official post-lottery order. Mock-source layer: No. 27: Isaiah Evans; treat prospect names as low-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: low
+  - priority: Complete 2026 Eastern Conference Finals run vs. 76ers
+    timeline: this_season
+    type: free_agency
+    detail: Game 7 on 2026-05-02 against Philadelphia; Tatum questionable with knee stiffness. Season depends on available players health and execution.
+    confidence: high
+  - priority: Reset repeater tax clock for 2026-27 offseason
+    timeline: this_offseason
+    type: structural
+    detail: Maintain sub-luxury-tax payroll in 2026-27 to complete reset; permits spending in 2027-28 when Tatum is 2yr post-Achilles injury.
+    confidence: high
+  - priority: Evaluate Tatum Achilles recovery / playoff availability
+    timeline: by_trade_deadline
+    detail: Returned March 6, 2026 after 62-game absence; 16 games played before playoffs. Monitor re-injury risk Game 7 and into next season.
+    confidence: high
+    type: structural
+  - priority: Scout free agents for summer 2026 signings
+    timeline: next_season
+    type: free_agency
+    detail: Expect to add depth at wing/big; Pritchard/Kornet/Garza likely walk. Vučević team option must be exercised by June (likely yes).
+    confidence: medium
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 27 overall; own pick.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 2
+      protections: 2026 No. 40 overall; from MIL via ORL.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: MIL
+    - year: 2027
+      round: 1
+      protections: none (acquired from Jazz)
+      source: https://www.basketball-reference.com/teams/BOS/2026.html
+    - year: 2027
+      round: 2
+      from_team: POR
+      protections: unknown
+      source: https://www.nba.com/news/celtics-blazers-trade-jrue-holiday-anfernee-simons
+  draft_picks_owed:
+    - year: 2026
+      round: 2
+      to_team: ATL
+      protections: 2026 No. 57 overall; from BOS.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2025
+      round: 2
+      to_team: POR
+      protections: none (Holiday trade)
+      source: https://www.cbsnews.com/boston/news/boston-celtics-second-apron-porzingis-trades-nba/
+  trade_exceptions:
+    - value: 22500000
+      expires: 2026-10-17
+      source: https://www.thirdapron.com/p/everything-you-need-to-know-about
+      confidence: high
+    - value: 8200000
+      expires: unknown
+      source: https://www.thirdapron.com/p/everything-you-need-to-know-about
+      confidence: high
+team_team_relationships:
+  rivalries:
+    - team_id: PHI
+      type: competitive_recent
+      basis: Current playoff matchup (Game 7, May 2026). 22 playoff series on record (Celtics lead 15-7). Atlantic Division rival. Embiid-Tatum star matchup narrative.
+    - team_id: NYK
+      type: competitive_recent
+      basis: Celtics lost 2024-25 Eastern Conference Semifinals to Knicks 4-2 (Tatum Achilles injury occurred Game 4). Conference Finals trajectory both clubs pursue.
+    - team_id: LAL
+      type: competitive_historical
+      basis: Historic "Celtics vs. Lakers" brand rivalry (17 Finals matchups). Transcontinental, generational, cultural; transcends current rosters.
+  notable_personnel_connections:
+    - person: Brad Stevens
+      connected_team: IND
+      connection_type: former_head_coach
+      detail: Coached Butler Bulldogs 2003-2013; won national championship 2010; then transitioned to Celtics as head coach 2013-2021.
+    - person: Joe Mazzulla
+      connected_team: BOS
+      connection_type: coach
+      detail: Former assistant under Brad Stevens (2019-2021); Mazzulla coached under Stevens, now head coach. Unique synergy noted post-championship.
+    - person: Sam Cassell
+      connected_team: various
+      connection_type: former_player
+      detail: Former NBA player and assistant coach; mentor to current roster on defensive intensity and veteran experience.
+g_league_and_stash:
+  affiliate_team: Maine Red Claws
+  notable_affiliate_players:
+    - Josh Minott (traded mid-season to Utah for Vučević)
+    - "Hugo González (2025 draft pick #28; drafted into affiliate, called up as needed)"
+  international_stash: []
+narrative_summary:
+  one_paragraph: "The Boston Celtics are the defending NBA champions executing a mid-season financial pivot to remain contenders while escaping second apron penalties. With Jayson Tatum returning from a 2025 Achilles rupture (62 games missed), the Celtics finished the 2025-26 regular season 51-25 and claimed the 2nd Eastern Conference seed. Brad Stevens (President, newly honored as Executive of the Year) orchestrated trades shipping Jrue Holiday and Kristaps Porzingis in summer 2025, then pivoted mid-season to acquire Nikola Vučević from Chicago in exchange for Anfernee Simons. The franchise now faces Game 7 against the Philadelphia 76ers on May 2, 2026, with Tatum questionable due to left knee stiffness. As of May 2, the team sits below the first apron and is strategically ducking the luxury tax in 2026-27 to reset its repeater tax clock; this unlocks aggressive spending from 2027-28 onward when Tatum is two years post-injury. Ownership transition (Bill Chisholm's acquisition of majority control in September 2025) has not disrupted continuity: Chisholm retained Stevens, coach Joe Mazzulla (renewed mid-season), and former owner Grousbeck as co-operator."
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 27, No. 40 from MIL; The Athletic mock-source layer lists No. 27: Isaiah Evans as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - Tatum's Achilles recovery trajectory and return-to-form (16 games played at 21.8 PPG, 10.0 RPG averages before playoffs); any re-injury derails 2026-27 window.
+    - "Cap reset execution: must remain below luxury tax in 2026-27 to fully unlock 2027-28 spending power; repeater penalties otherwise persist."
+    - "Ownership stability post-Chisholm: willingness to fund roster moves and playoff payroll will clarify expectations. Early signals (retaining Stevens, Mazzulla, Grousbeck co-role) suggest continuity."
+sources_used:
+  - https://www.nba.com/news/chisholm-group-celtics-ownership
+  - https://www.nba.com/news/brad-stevens-nba-executive-of-year-2025-26
+  - https://www.celticsblog.com/2025/3/8/24378538/boston-celtics-joe-mazzulla-ball-defensive-approach-jrue-holiday-robert-williams-west-virginia
+  - https://www.thirdapron.com/p/everything-you-need-to-know-about
+  - https://www.spotrac.com/nba/boston-celtics/payroll/
+  - https://www.salaryswish.com/teams/celtics
+  - https://www.nba.com/news/jayson-tatum-supermax-extension
+  - https://www.spotrac.com/nba/player/_/id/23624/derrick-white
+  - https://www.nba.com/news/nikola-vucevic-trade-celtics-2026
+  - https://www.basketball-reference.com/teams/BOS/2026.html
+  - https://www.cbsnews.com/boston/news/boston-celtics-second-apron-porzingis-trades-nba/
+  - https://www.boston.com/sports/boston-celtics/2026/04/10/celtics-pelicans-injury-report-jayson-tatum-jaylen-brown/
+  - https://www.bostonglobe.com/2026/05/01/sports/celtics-76ers-playoffs-jayson-tatum/
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - ownership.governance_notes (exact voting thresholds post-Chisholm unknown)
+  - front_office.notable_advisors_or_consultants (additional scouts/consultants not found)
+  - cap_situation.exceptions_available (third+ TPE expiration dates unknown)
+  - player.sam_hauser.contract.total_value_remaining (exact remaining guaranteed unknown)
+  - player.payton_pritchard.contract.total_value_remaining (exact remaining guaranteed unknown)
+  - player.luke_kornet.contract.total_value_remaining (exact remaining guaranteed unknown)
+  - player.luka_garza.contract.total_value_remaining (exact remaining guaranteed unknown)
+  - pending_free_agents[].cap_hold_amount (all UFA cap hold values unknown)
+  - key_assets.trade_exceptions[1].expires (second TPE expiration unknown)
+  - g_league_and_stash.international_stash (no current draft pick stashes identified)
+vocabulary_flags:
+  - "Cap status corrected: `current_status` changed from `below_cap` to `below_first_apron`. At $190.1M payroll vs. $195.9M first apron threshold, Celtics are strategically below the first apron to reset repeater tax clock. QA flagged structural inconsistency between `contend_now` posture + `below_cap` status; research confirms proper vocab is `below_first_apron` per Spotrac, Salaryswish, and SBC apron tracker sources."
+  - "Tatum trajectory: marked as `declining_peak` rather than `peak` because of Achilles rupture recovery concerns and age (28). Historical priors on full Achilles recovery are mixed; unclear if he regains pre-injury elite athleticism. Evidence: 16 playoff games at 21.8 PPG (below 2024-25 average) but sample size small."
+  - 'Tatum availability_status: marked as `injured_long_term` even though he returned March 6, 2026. Definition of "long-term" ambiguous post-return; marked to reflect ongoing re-injury risk during 2026 playoffs and into 2026-27 season.'
+  - "Jaylen Brown availability_status: marked as `injured_short_term` based on search results citing left Achilles management (not rupture). Specifics on severity/timeline not publicly confirmed; inference from April/May 2026 game logs and injury reports."
+  - 'Jrue Holiday and Kristaps Porzingis outcome: coded as `pursued_no_deal` (not `acquired` or `declined`) because Celtics did not *pursue* acquiring them; they *owned* and *offloaded* them. Vocab lacks "traded away" or "offloaded" code; nearest fit is `pursued_no_deal`. Flagged for clarity.'
+  - "Vučević trade outcome: correctly marked as `acquired`, but noted that Anfernee Simons (acquired summer 2025) was immediately flipped 7 months later. Simons did not establish fit; Celtics cut losses mid-season."

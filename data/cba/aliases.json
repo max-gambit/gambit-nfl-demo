@@ -1,0 +1,269 @@
+{
+  "query_groups": [
+    {
+      "terms": [
+        "non-taxpayer mid-level",
+        "non taxpayer mid level",
+        "non-taxpayer mle",
+        "non taxpayer mle",
+        "ntmle",
+        "mid-level exception",
+        "mle"
+      ],
+      "aliases": [
+        "non-taxpayer mid-level salary exception",
+        "non-taxpayer mid-level",
+        "mid-level salary exception",
+        "mid-level exception"
+      ]
+    },
+    {
+      "terms": [
+        "taxpayer mid-level",
+        "taxpayer mle",
+        "tmle"
+      ],
+      "aliases": [
+        "taxpayer mid-level salary exception",
+        "taxpayer mid-level",
+        "mid-level salary exception"
+      ]
+    },
+    {
+      "terms": [
+        "room exception",
+        "room mle",
+        "room mid-level"
+      ],
+      "aliases": [
+        "mid-level salary exception for room teams",
+        "room teams",
+        "salary cap room"
+      ]
+    },
+    {
+      "terms": [
+        "second apron",
+        "first apron",
+        "hard cap",
+        "apron restriction",
+        "frozen pick"
+      ],
+      "aliases": [
+        "apron team salary",
+        "transaction restrictions table",
+        "first apron level",
+        "second apron level",
+        "draft pick penalty",
+        "second apron team"
+      ]
+    },
+    {
+      "terms": [
+        "bird rights",
+        "bird exception",
+        "early bird",
+        "non-bird",
+        "qualifying veteran free agent"
+      ],
+      "aliases": [
+        "veteran free agent exception",
+        "qualifying veteran free agent",
+        "early qualifying veteran free agent",
+        "non-qualifying veteran free agent",
+        "free agent exception"
+      ]
+    },
+    {
+      "terms": [
+        "trade aggregation",
+        "salary aggregation",
+        "traded player exception",
+        "trade exception",
+        "tpe",
+        "aggregation"
+      ],
+      "aliases": [
+        "traded player exception",
+        "standard traded player exception",
+        "aggregated standard traded player exception",
+        "expanded traded player exception",
+        "replacement players",
+        "trade rules"
+      ]
+    },
+    {
+      "terms": [
+        "sign and trade",
+        "sign-and-trade",
+        "signed and traded"
+      ],
+      "aliases": [
+        "signed and traded",
+        "sign and trade player",
+        "section 8(e)",
+        "trade rules"
+      ]
+    },
+    {
+      "terms": [
+        "qualifying offer",
+        "restricted free agent",
+        "restricted free agency",
+        "offer sheet",
+        "right of first refusal"
+      ],
+      "aliases": [
+        "qualifying offers",
+        "restricted free agency",
+        "restricted free agents",
+        "offer sheet",
+        "right of first refusal",
+        "rofr"
+      ]
+    },
+    {
+      "terms": [
+        "rookie scale",
+        "first round pick",
+        "rookie salary scale"
+      ],
+      "aliases": [
+        "rookie scale contracts for first round picks",
+        "rookie salary scale",
+        "rookie scale amount",
+        "first round pick"
+      ]
+    }
+  ],
+  "section_aliases": {
+    "Article II §6": [
+      "minimum player salary",
+      "minimum annual salary",
+      "minimum salary"
+    ],
+    "Article II §7": [
+      "maximum annual salary",
+      "maximum salary",
+      "max salary"
+    ],
+    "Article II §11": [
+      "two-way contract",
+      "two-way player",
+      "two way contract"
+    ],
+    "Article II §15": [
+      "moratorium period",
+      "free agency moratorium",
+      "july moratorium"
+    ],
+    "Article VII §1": [
+      "definitions",
+      "basketball related income",
+      "bri",
+      "salary cap definitions"
+    ],
+    "Article VII §2": [
+      "first apron",
+      "second apron",
+      "hard cap",
+      "apron hard cap",
+      "apron team salary",
+      "transaction restrictions table",
+      "frozen pick",
+      "draft pick penalty",
+      "tax level",
+      "minimum team salary"
+    ],
+    "Article VII §4": [
+      "team salary",
+      "determination of team salary",
+      "cap hold",
+      "free agent amount",
+      "qualifying offer amount"
+    ],
+    "Article VII §5": [
+      "salary cap contract structure",
+      "contract structure rules",
+      "annual increases",
+      "annual decreases"
+    ],
+    "Article VII §6": [
+      "non-taxpayer mle",
+      "non taxpayer mle",
+      "ntmle",
+      "taxpayer mle",
+      "tmle",
+      "room exception",
+      "room mle",
+      "mid-level exception",
+      "mid-level salary exception",
+      "bi-annual exception",
+      "bae",
+      "disabled player exception",
+      "dpe",
+      "rookie scale exception",
+      "minimum salary exception",
+      "bird rights",
+      "bird exception",
+      "early bird",
+      "non-bird",
+      "veteran free agent exception",
+      "traded player exception",
+      "trade exception",
+      "tpe",
+      "aggregated standard traded player exception",
+      "expanded traded player exception"
+    ],
+    "Article VII §7": [
+      "extensions",
+      "renegotiations",
+      "designated veteran player extension",
+      "rookie scale extension"
+    ],
+    "Article VII §8": [
+      "trade rules",
+      "cash in trades",
+      "trade consent",
+      "sign and trade",
+      "sign-and-trade",
+      "signed and traded",
+      "aggregation trade restriction"
+    ],
+    "Article VII §10": [
+      "accounting procedures",
+      "audit report",
+      "salary cap accounting"
+    ],
+    "Article VII §11": [
+      "players association audit rights",
+      "nbpa audit rights",
+      "audit rights"
+    ],
+    "Article VII §12": [
+      "designated share arrangement",
+      "designated share",
+      "league designated share"
+    ],
+    "Article VIII §1": [
+      "rookie scale",
+      "rookie scale contract",
+      "rookie scale contracts for first round picks",
+      "rookie salary scale",
+      "first round pick"
+    ],
+    "Article XI §4": [
+      "qualifying offer",
+      "maximum qualifying offer",
+      "restricted free agent qualifying offer",
+      "make certain players restricted"
+    ],
+    "Article XI §5": [
+      "restricted free agency",
+      "restricted free agent",
+      "offer sheet",
+      "right of first refusal",
+      "rofr"
+    ]
+  }
+}

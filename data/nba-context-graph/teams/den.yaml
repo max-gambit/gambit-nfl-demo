@@ -1,0 +1,946 @@
+team_id: DEN
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Denver Nuggets
+  conference: Western
+  division: Northwest
+  market_tier: tier_2
+  market_tier_rationale: Metro population 1.79M, 15th-largest TV market, higher-end of small-market tier alongside Minneapolis, classified mid-pack economically with higher franchise valuation (~$3.6B).
+ownership:
+  primary_owner:
+    name: Stan Kroenke (family holding via Josh Kroenke)
+    type: corporate
+    tenure_years: 17
+    source: https://en.wikipedia.org/wiki/Josh_Kroenke
+    confidence: high
+  governance_notes: Josh Kroenke serves as Vice Chairman of KSE and Nuggets team president. Stan Kroenke holds ownership stake; Josh Kroenke assumed executive role post-Malone/Booth firings (April 2025). Interim presidential duties post-April 2025.
+  recent_transitions: April 8, 2025 - fired head coach Michael Malone and GM Calvin Booth with 3 games left in regular season; June 23, 2025 - promoted Ben Tenzer to EVP Basketball Operations, hired Jonathan Wallace as EVP Player Personnel (dual leadership structure replacing single GM role).
+  spending_posture: aggressive_spender
+  spending_posture_evidence:
+    - Consistently paid luxury tax since 2023 championship win; payroll hovering $192-207M, second apron bound.
+    - Signed Jokic 5yr/$276M supermax (2022); Murray 4yr/$208M max extension (2023); Aaron Gordon 4yr/$133M extension (Oct 2024).
+    - Pursued FA signings of Bruce Brown, Tim Hardaway Jr., Jonas Valanciunas to compete immediately post-MPJ trade.
+    - "Yet strategic constraints evident: traded MPJ to save $17M annually; second apron restrictions limit roster construction; no first-round picks available through 2031 due to Stepien rule violations."
+front_office:
+  president_basketball_ops:
+    name: Josh Kroenke (interim, owner taking role)
+    tenure_start: 2025-04
+    prior_stops:
+      - Vice Chairman, Kroenke Sports & Entertainment
+      - Team President, Denver Nuggets
+    public_philosophy_signals:
+      - Described co-EVP structure as 'unorthodox,' emphasizing specialization (Tenzer on operations/cap, Wallace on personnel).
+      - Stated focus on retaining Jokic and building around core in first-round exit aftermath.
+    confidence: high
+    source: https://www.espn.com/nba/story/_/id/45577471/nuggets-josh-kroenke-explains-unorthodox-front-office-approach
+  general_manager:
+    name: Dual EVP structure (not traditional single GM)
+    tenure_start: 2025-06
+    prior_stops: []
+    public_philosophy_signals:
+      - "Ben Tenzer: 17-year org veteran; cap/operations specialist; responsible for salary cap navigation and structural decisions."
+      - "Jonathan Wallace: ex-Timberwolves Director Player Personnel; Iowa Wolves GM; former Nuggets employee; focused on personnel acquisition and roster construction."
+      - First dual-leadership since Warkentien-Chapman (2006-2010).
+    confidence: medium
+    source: https://www.espn.com/nba/story/_/id/45568184/sources-nuggets-name-ben-tenzer-jon-wallace-executive-vps
+  head_coach:
+    name: David Adelman
+    tenure_start: 2025-05
+    contract_through: unknown
+    style_notes: "Interim HC after Malone firing (April 8); named full-time May 22, 2025. Assistant background: Timberwolves (2011-2016 under Rick/Flip/Mitchell), Magic (2016-17 under Vogel), Nuggets assistant (2017-25 under Malone). Emphasis on pace-neutral, defensive intensity per interim stretch; known for collaborative player management style from Timberwolves tenure."
+    coaching_tree: unknown
+    confidence: high
+    source: https://www.nba.com/nuggets/news/denver-nuggets-name-david-adelman-head-coach
+  assistant_coaches_notable:
+    - Johnnie Bryant (reported as key assistant)
+    - Coaching staff holdovers from Malone era
+  notable_advisors_or_consultants: []
+strategic_posture:
+  timeframe: contend_now
+  confidence: medium
+  derived_from:
+    - Jokic (3x MVP) still in prime, expressed desire to be 'Nugget forever'; franchise built around his timeline.
+    - First-round exit to 6-seed Timberwolves (4-2 series) signals window still open but fragile; 54-28 regular season record indicates baseline competitiveness.
+    - Post-championship (2023), two consecutive 2nd-round exits followed by 1st-round exit; urgency to add depth and address defense.
+    - Constrained by second-apron hard cap; no first-round picks available through Stepien rule; limited flexibility despite Jokic commitment.
+  constraints:
+    - reason_code: second_apron_hard_cap
+      detail: Payroll $207.8M projection exceeds second apron; hard-capped, cannot aggregate, cannot send cash, cannot trade year-7+ picks.
+      weight: high
+    - reason_code: max_contract_lockup
+      detail: Jokic ($55.2M), Murray ($46.4M), Aaron Gordon ($22.8M), Cameron Johnson ($21.1M) = $145.5M tied to four players; limited flexibility for depth adds.
+      weight: high
+    - reason_code: ownership_directive
+      detail: Kroenke family historically conservative on extreme tax spending; April firings signal reset; dual EVP structure designed to optimize cap vs. performance.
+      weight: medium
+    - reason_code: recent_playoff_success
+      detail: 2023 championship creates expectation to compete; 2024-25 2nd-round, 2025-26 1st-round exits raise urgency to retool.
+      weight: high
+  trigger_events:
+    - Jokic contract extension decision (summer 2026 eligible for 4yr/$293M vs. prior 3yr/$212M offer); signals long-term commitment or openness to reset.
+    - Peyton Watson restricted free agency (June 2026); decision to match or let walk will shape depth, cap trajectory.
+    - Resolution of dual-EVP structure; market indicators on whether Tenzer/Wallace partnership succeeds or leads to traditional GM hire in 2026-27.
+    - Trade deadline activity Feb 2026 (e.g., Hunter Tyson→Nets for tax relief) suggests willingness to optimize; future deadline deals will indicate contention window length.
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: second_apron
+  current_payroll_estimate: 207824000
+  hard_capped: yes
+  hard_cap_reason: Second apron penalty; exceeded first apron threshold; subject to hard-cap restrictions, no aggregation, no cash-out trades.
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Depends on Jokic extension decision and Peyton Watson RFA resolution; currently projected $180M+ with potential to reduce via trades (e.g., Cameron Johnson $23M expiring) or non-renewals.
+  exceptions_available:
+    - Mid-level exception (limited due to second apron); veteran minimum slots.
+  source: https://www.spotrac.com/nba/denver-nuggets/yearly
+  source_fallbacks_used:
+    - https://www.salaryswish.com/teams/nuggets/2026
+    - https://fanspo.com/nba/teams/Nuggets/8
+  confidence: high
+trade_dna:
+  frequent_partners:
+    - BKN
+    - SAC
+    - MIN
+  preferred_deal_archetypes:
+    - Wing defenders and spacing (e.g., Cameron Johnson acquisition for MPJ).
+    - Cap-shedding trades to stay under hard cap (e.g., Dario Saric→SAC for Jonas Valanciunas; Hunter Tyson→BRK for future pick).
+    - Depth/salary-flexible acquisitions on expiring or team-option deals.
+  recent_significant_trades:
+    - date: 2025-07-08
+      summary: Traded Michael Porter Jr. and unprotected 2032 1st-rounder to Brooklyn Nets for Cameron Johnson; freed $17M annually for FA signings.
+      counterparties:
+        - BKN
+    - date: 2025-07
+      summary: Traded Dario Saric to Sacramento Kings for Jonas Valanciunas; added backup center depth.
+      counterparties:
+        - SAC
+    - date: 2026-02-05
+      summary: Traded Hunter Tyson and 2032 2nd-rounder to Brooklyn Nets for lesser Clippers/Hawks 2026 2nd-rounder; created roster spot, ducked luxury tax.
+      counterparties:
+        - ATL
+        - BKN
+        - LAC
+  confidence: high
+cultural_signals:
+  stability:
+    value: low
+    detail: April 2025 surprise firing of Malone (10 years tenure) and Booth mid-season created organizational shock; dual-EVP structure is experiment with no parallel since 2006-2010. Adelman elevated mid-season from assistant; unclear if structure will persist.
+  player_friendly:
+    value: mixed
+    detail: Jokic publicly committed ('Nugget forever'); franchise retained core. Yet contractual constraints (second apron hard cap) limit front office ability to add star-tier help; cap-shedding trades (MPJ, Saric) signal willingness to disassemble for flexibility.
+  analytics_orientation:
+    value: balanced
+    detail: Tenzer known as cap analyst/optimizer; Wallace brings Timberwolves analytics exposure. Yet coaching change and emphasis on 'unorthodox' structure suggests empirical decision-making over rigid formula.
+  risk_tolerance:
+    value: aggressive
+    detail: Dual EVP structure is high-risk organizational bet; mid-season firing of established coach/GM is aggressive reset; willingness to trade established contributors (MPJ) for salary flexibility indicates roster risk-taking.
+  notable_traits:
+    - process_driven
+    - coach_carousel
+    - star_chasing
+  rationale: "Nuggets under Kroenke ownership prioritize contention around franchise cornerstones (Jokic) but face constraints from tax exposure and hard-cap penalties. Malone/Booth firings and dual-EVP experiment signal instability and strategic reset, yet public commitment to Jokic and immediate roster retooling (FA signings, trades) reflect aggressive contention posture. Cultural hallmark: tension between ownership's tax-aversion and on-court urgency."
+  confidence: medium
+roster:
+  - player_id: nikola_jokic
+    name: Nikola Jokic
+    age: 31
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - post_hub
+          - secondary_creator
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits:
+        - elite_passer
+        - iso_creator
+        - elite_athlete
+    tier: superstar
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 117424526
+      annual_value_current_season: 55224526
+      annual_value_next_season: 62200000
+      no_trade_clause: full
+      trade_kicker: none
+      player_option: "2027"
+      team_option: none
+      bird_rights: full
+      contract_through: "2027"
+      source: https://www.salaryswish.com/players/nikola-jokic
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: generational_talent
+          weight: high
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: ownership_relationship
+          weight: high
+      falsification_conditions:
+        - Jokic publicly declines extension offer summer 2026 or requests trade.
+        - Jokic's health degrades materially (e.g., season-ending injury, chronic decline in statistical output >15% YoY).
+        - Ownership explicitly states franchise is pivoting away from contention window.
+    team_relationship:
+      tenure_with_team: 8.5
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Supermax extension locked through 2027; full no-trade clause; franchise built entirely around him; will be 31 in Sept 2026, still elite but window finite.
+    confidence: high
+    source: https://www.cbssports.com/nba/news/nuggets-nikola-jokic-era-2026-offseason/
+  - player_id: jamal_murray
+    name: Jamal Murray
+    age: 27
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - primary_initiator
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: elite
+      special_traits:
+        - iso_creator
+        - foul_drawer
+        - playoff_riser
+    tier: star
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 161451468
+      annual_value_current_season: 46394100
+      annual_value_next_season: 50844969
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: "2027"
+      team_option: none
+      bird_rights: full
+      contract_through: "2028"
+      source: https://www.spotrac.com/nba/player/_/id/20212/jamal-murray
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: playoff_riser
+          weight: medium
+      falsification_conditions:
+        - Reports of Nuggets actively shopping Murray to contenders (e.g., public trade interest from front office).
+        - Murray's scoring/efficiency declines >20% from 2025-26 baseline for full season.
+        - Jokic publicly requests new co-star; front office indicates Murray no longer part of core.
+    team_relationship:
+      tenure_with_team: 7.5
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Signed 4yr/$208M max extension Oct 2023; player option 2027; tied long-term; both Jokic/Murray are organizational anchors.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/20212/jamal-murray
+  - player_id: aaron_gordon
+    name: Aaron Gordon
+    age: 29
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - connector
+          - screen_setter
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_rebounder
+    tier: starter
+    trajectory: declining_peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 103000000
+      annual_value_current_season: 22841455
+      annual_value_next_season: 34700000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: "2029"
+      team_option: none
+      bird_rights: full
+      contract_through: "2029"
+      source: https://www.spotrac.com/nba/player/_/id/15356/aaron-gordon
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: homegrown_loyalty
+          weight: high
+        - reason_code: locker_room_anchor
+          weight: medium
+      falsification_conditions:
+        - Reports of trade interest from Nuggets or Aaron Gordon requesting move (e.g., via agent).
+        - Durability issues emerge (e.g., multiple significant injuries in 2026-27).
+    team_relationship:
+      tenure_with_team: 6
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: 4yr/$133M extension (Oct 2024) locks him through 2029 with player option; 2023 championship centerpiece; expected roster cornerstone.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/15356/aaron-gordon
+  - player_id: cameron_johnson
+    name: Cameron Johnson
+    age: 29
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary:
+          - tertiary_scorer
+      defensive_role: wing_stopper
+      shooting_profile: elite
+      special_traits: []
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 44140956
+      annual_value_current_season: 20543478
+      annual_value_next_season: 23597478
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: "2027"
+      source: https://www.spotrac.com/nba/player/_/id/31568/cameron-johnson
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: expiring_contract_value
+          weight: medium
+        - reason_code: cap_relief_target
+          weight: medium
+      falsification_conditions:
+        - Nuggets sign Johnson to extension mid-2026 offseason.
+        - Johnson included in rotation through full 2026-27 season; front office publicly commits to retention.
+        - Johnson averages >16 PPG on >40% 3P shooting in 2026-27, demonstrating untradeable offensive value.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Acquired July 2025 for MPJ/2032 1st; expiring $23M in 2026-27 makes him logical trade candidate to create cap relief for Peyton Watson RFA or other additions. Yet 43% 3P shooter valuable to contention window.
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/_/id/31568/cameron-johnson
+  - player_id: christian_braun
+    name: Christian Braun
+    age: 23
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 5
+      total_value_remaining: 120078203
+      annual_value_current_season: 4921797
+      annual_value_next_season: 25000000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: "2030"
+      source: https://www.spotrac.com/nba/player/_/id/78148/christian-braun
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: recent_extension_poison_pill
+          weight: medium
+      falsification_conditions:
+        - Performance drops significantly (e.g., <10% growth in contributions, injury concerns).
+        - Front office publicly explores trades to clear cap space, including Braun consideration.
+    team_relationship:
+      tenure_with_team: 3
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: 5yr/$125M extension signed Oct 2025; locks him through 2030 at increasingly expensive rates ($25M+ years 2-5); young asset, team likely holds.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/78148/christian-braun
+  - player_id: peyton_watson
+    name: Peyton Watson
+    age: 23
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: 4300000
+      annual_value_current_season: 4300000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: "2026"
+      bird_rights: full
+      contract_through: "2026"
+      source: https://www.spotrac.com/nba/player/_/id/28925/peyton-watson
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: positional_redundancy
+          weight: low
+      falsification_conditions:
+        - Nuggets exercise team option, committing to Watson for 2026-27.
+        - Nuggets sign Watson to multi-year extension before June 2026 RFA deadline.
+        - Watson averages <12 PPG or declines athleticism metrics (dunk rate, transition %); front office re-evaluates retention.
+      signal_strength: single_source_reported
+    team_relationship:
+      tenure_with_team: 1.8
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: "RFA status (June 2026); Nuggets' #1 offseason priority per reports; $4.3M team option; likely qualifies for restricted free agent, but matching offers may be prohibitive given second apron hard cap. Expected to command $10-12M+ in market."
+    confidence: high
+    source: https://www.hoopsrumors.com/2026/05/nuggets-notes-offseason-watson-johnson-valanciunas.html
+  - player_id: zeke_nnaji
+    name: Zeke Nnaji
+    age: 23
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits:
+        - elite_rebounder
+    tier: fringe
+    trajectory: declining
+    contract:
+      years_remaining: 2
+      total_value_remaining: 15000000
+      annual_value_current_season: 7500000
+      annual_value_next_season: 7500000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: "2027"
+      source: https://www.spotrac.com/nba/player/_/id/28938/zeke-nnaji
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: declining_role
+          weight: medium
+        - reason_code: positional_redundancy
+          weight: low
+      falsification_conditions:
+        - Nnaji averages >10 PPG on >50% FG for full 2026-27 season, establishing rotation role.
+        - Injury to Jokic/Gordon elevates Nnaji's minutes; front office commits to development.
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 2.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: 4yr rookie-scale extension (2023); $7.5M remaining through 2027; described as 'negative trade asset' in beat reporting; limited trade market demand.
+    confidence: high
+    source: https://www.hoopsrumors.com/2026/05/nuggets-notes-offseason-watson-johnson-valanciunas.html
+  - player_id: julian_strawther
+    name: Julian Strawther
+    age: 23
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits: []
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: 9500000
+      annual_value_current_season: 4800000
+      annual_value_next_season: 4700000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: "2027"
+      source: https://www.spotrac.com/nba/player/_/id/28925/julian-strawther
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: positional_fit
+          weight: medium
+      falsification_conditions:
+        - Front office explores trades to create cap space, including bench players like Strawther.
+    team_relationship:
+      tenure_with_team: 2
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie-scale; affordable depth piece shooting 38.7% 3P; trade asset value limited due to non-star status, but contract flexibility exists.
+    confidence: medium
+    source: https://www.hoopsrumors.com/2026/05/nuggets-notes-offseason-watson-johnson-valanciunas.html
+  - player_id: jonas_valanciunas
+    name: Jonas Valanciunas
+    age: 34
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - post_hub
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 10000000
+      annual_value_current_season: 10300000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: "2026"
+      source: https://www.hoopsrumors.com/2025/07/nuggets-plan-to-complete-jonas-valanciunas-trade-keep-him-on-the-roster.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: injury_recovery_uncertain
+          weight: low
+      falsification_conditions:
+        - Valanciunas signs multi-year extension with Nuggets offseason 2026.
+        - Valanciunas averages >12 PPG and >10 RPG on >55% FG through 2026-27, entrenching as Jokic backup.
+      signal_strength: rumor_only
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Acquired July 2025 (Dario Saric trade); $10M in 2025-26, $10M (partial guarantee $2M) 2026-27; likely waive candidate post-season given guard/wing priority.
+    confidence: medium
+    source: https://www.hoopsrumors.com/2025/11/nuggets-jonas-valanciunas-agree-to-restructured-contract.html
+  - player_id: bruce_brown
+    name: Bruce Brown
+    age: 27
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - screen_setter
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - transition_threat
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 3626970
+      annual_value_current_season: 3626970
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: "2026"
+      source: https://www.spotrac.com/nba/player/_/id/25282/bruce-brown
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Nuggets sign Bruce Brown to multi-year extension or re-sign as RFA.
+        - Brown featured prominently through 2026-27, signaling retention intent.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: One-year min deal (summer 2025); 2023 championship veteran; UFA status likely; team unlikely to match significant offers given cap constraints.
+    confidence: high
+    source: https://www.espn.com/nba/story/_/id/45634625/denver-nuggets-sign-tim-hardaway-jr
+  - player_id: tim_hardaway_jr
+    name: Tim Hardaway Jr.
+    age: 33
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary:
+          - tertiary_scorer
+      defensive_role: wing_stopper
+      shooting_profile: elite
+      special_traits: []
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 3626970
+      annual_value_current_season: 3626970
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: "2026"
+      source: https://www.espn.com/nba/story/_/id/45634625/denver-nuggets-sign-tim-hardaway-jr
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: declining_role
+          weight: medium
+      falsification_conditions:
+        - Hardaway Jr. signs multi-year extension or Nuggets re-sign him at favorable rate.
+        - Age/injury concerns prevent separation; front office commits through 2026-27.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: One-year min deal (July 2025); age 33; UFA path; surpassed MPJ's single-season 3P record (216) but bench role; unlikely retention candidate given age, cap constraints.
+    confidence: high
+    source: https://www.espn.com/nba/story/_/id/45634625/denver-nuggets-sign-tim-hardaway-jr
+  - player_id: spencer_jones
+    name: Spencer Jones
+    age: 24
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary:
+          - tertiary_scorer
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: 3626970
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: "2026"
+      source: https://www.espn.com/nba/story/_/id/47969933/nuggets-convert-spencer-jones-deal-standard-contract
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: recent_extension_poison_pill
+          weight: low
+      falsification_conditions:
+        - Spencer Jones is traded in offseason or bench role substantially reduced.
+        - Performance regresses significantly from 2025-26 baseline (avg 6 PPG, 41% 3P in 34 starts).
+      signal_strength: single_source_reported
+    team_relationship:
+      tenure_with_team: 1
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Converted two-way to standard contract Feb 18, 2026; restricted free agent June 2026; likely candidate for qualifying offer and match/restricted retention given affordability and emerging role.
+    confidence: high
+    source: https://www.espn.com/nba/story/_/id/47969933/nuggets-convert-spencer-jones-deal-standard-contract
+pending_free_agents:
+  - player_id: peyton_watson
+    name: Peyton Watson
+    type: RFA
+    bird_rights_status: full
+    cap_hold_amount: 4300000
+    expected_market: bidding_war
+    expected_market_detail: Watson's athleticism and 3P improvement (49.1% 3P, 14.6 PPG) will attract offers; Nuggets' top priority but hard-capped; likely needs trade (e.g., Cameron Johnson move) to match.
+    notes: "RFA status June 2026; Nuggets explicitly stated retention as #1 priority post-playoff loss; challenging given second apron constraints."
+    source: https://www.hoopsrumors.com/2026/05/nuggets-notes-offseason-watson-johnson-valanciunas.html
+  - player_id: bruce_brown
+    name: Bruce Brown
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: walk
+    expected_market_detail: One-year min deal; age 27 guard/wing; likely to test market; Nuggets unlikely to match competitive offers given cap constraints.
+    notes: 2023 championship ring; solid depth role; UFA path clear.
+    source: https://www.spotrac.com/nba/player/_/id/25282/bruce-brown
+  - player_id: tim_hardaway_jr
+    name: Tim Hardaway Jr.
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: walk
+    expected_market_detail: Age 33; min deal; likely to explore other options or accept another vet-min role elsewhere.
+    notes: UFA; veteran depth piece; unlikely retention candidate.
+    source: https://www.espn.com/nba/story/_/id/45634625/denver-nuggets-sign-tim-hardaway-jr
+  - player_id: jonas_valanciunas
+    name: Jonas Valanciunas
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: 10000000
+    expected_market: walk
+    expected_market_detail: Age 34 backup center; $10M partially guaranteed salary likely waived; Nuggets may non-renew. If re-signed, expect min deal or cap-shedding scenario.
+    notes: Contract restructured (Nov 2025) to push guarantee cliff to July 8; likely waive candidate given depth priorities.
+    source: https://www.hoopsrumors.com/2025/11/nuggets-jonas-valanciunas-agree-to-restructured-contract.html
+known_target_history:
+  - target: Peyton Watson (RFA retention)
+    year: 2026
+    outcome: pursued_no_deal
+    detail: Nuggets' top offseason priority; retention discussions ongoing; hard-cap constraints may prevent match, making acquisition of additional wings via trade more likely than retention of Watson alone.
+    source: https://www.hoopsrumors.com/2026/05/nuggets-notes-offseason-watson-johnson-valanciunas.html
+  - target: Jamal Murray (trade exploration)
+    year: 2026
+    outcome: pursued_no_deal
+    detail: Beat reports suggest Nuggets exploring trade market for Murray (e.g., to contenders) post-first-round exit; yet no formal trade interest confirmed; Murray remains cornerstone.
+    source: https://www.yardbarker.com/nba/articles/report_suggests_nuggets_could_explore_moving_jamal_murray_this_offseason/s1_17176_43795121
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "Denver Nuggets hold No. 26, No. 49 from ATL in the official post-lottery order. Mock-source layer: No. 26: Bennett Stirtz; treat prospect names as low-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: low
+  - priority: Retain Peyton Watson or acquire secondary star wing defender
+    timeline: this_offseason
+    type: free_agency
+    detail: "Watson restricted free agent June 2026; Nuggets' stated #1 offseason priority. Alternative: trade (e.g., Cameron Johnson) to create cap space for external wing acquisition."
+    confidence: high
+  - priority: Stabilize dual EVP leadership structure and confirm coaching continuity
+    timeline: this_offseason
+    type: coaching_decision
+    detail: Ben Tenzer/Jonathan Wallace partnership is experiment; early evaluation of structure success will inform whether traditional GM hire or continued dual model emerges.
+    confidence: medium
+  - priority: Address defensive depth and athleticism gaps exposed vs. Minnesota (1st-round upset)
+    timeline: this_season
+    type: roster
+    detail: Timberwolves without Edwards/DiVincenzo won 4 of 6 games; Nuggets' perimeter defense and bench athleticism flagged as vulnerabilities; expect deadline trades or FA acquisitions focused on 3-and-D wings.
+    confidence: high
+  - priority: Navigate second apron hard-cap constraints while maintaining contention window
+    timeline: by_trade_deadline
+    type: structural
+    detail: "Payroll $207.8M with hard cap; limited flexibility for star additions. Likely solutions: trade (Cameron Johnson $23M expiring, value acquisitions from buyout market, or deeper rotations via development)."
+    confidence: high
+  - priority: Evaluate Jokic contract extension decision (summer 2026 eligible)
+    timeline: this_offseason
+    type: extension
+    detail: Jokic eligible for 4yr/$293M extension summer 2026; decision signals long-term commitment or franchise reset intent. Public statements ('Nugget forever') suggest extension likely, but timing/structure will impact cap flexibility.
+    confidence: medium
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 26 overall; own pick.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 2
+      protections: 2026 No. 49 overall; from ATL via BKN and GSW.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: ATL
+    - year: 2032
+      round: 2
+      protections: None; unprotected; traded away (via MPJ deal to BRK July 2025)
+      source: https://www.spotrac.com/nba/denver-nuggets/cap
+  draft_picks_owed:
+    - year: 2026
+      round: 2
+      to_team: CHI
+      protections: 2026 No. 56 overall; from DEN via MIN, PHX, CHA, and PHX.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2025
+      round: 1
+      to_team: ORL
+      protections: Owed to Orlando Magic (Aaron Gordon trade 2021)
+      source: https://fanspo.com/nba/teams/Nuggets/8/draft-picks
+    - year: 2027
+      round: 1
+      to_team: ORL
+      protections: Potentially owed; Stepien rule violations prevent clarity
+      source: https://nugglove.com/posts/denver-nuggets-draft-picks-updated-look-every-selection-2025-2026-beyond
+  trade_exceptions:
+    - value: unknown
+      expires: unknown
+      source: unknown
+      confidence: low
+team_team_relationships:
+  rivalries:
+    - team_id: MIN
+      type: competitive_recent
+      basis: Timberwolves beat Nuggets 4-2 in 2026 Western Conference 1st Round despite being 6-seed without Edwards/DiVincenzo; rivalry intensified post-upset.
+    - team_id: LAL
+      type: competitive_recent
+      basis: Historical Western Conference competition; Lakers under new regime (2024-25+) represent playoff-path rivals.
+  notable_personnel_connections:
+    - person: David Adelman
+      connected_team: MIN
+      connection_type: former_assistant
+      detail: Served as assistant coach for Minnesota Timberwolves 2011-2016 under Rick Adelman, Flip Saunders, Sam Mitchell; intimate knowledge of MIN organization structure and personnel development.
+    - person: Jonathan Wallace
+      connected_team: MIN
+      connection_type: former_executive
+      detail: Former Timberwolves Director of Player Personnel; Iowa Wolves GM; joined Nuggets June 2025 as EVP Player Personnel; brings Minnesota organizational knowledge.
+    - person: Josh Kroenke
+      connected_team: unknown
+      connection_type: owner
+      detail: Owner/executive role; son of Stan Kroenke (Walmart heir); also owns Arsenal FC, LA Rams. Meddling reputation post-Malone/Booth firings signals engagement in basketball decisions.
+g_league_and_stash:
+  affiliate_team: Grand Rapids Gold
+  notable_affiliate_players:
+    - Spencer Jones (converted two-way to standard Feb 2026, initially two-way assignment during 2025-26)
+    - Other two-way and developmental assignments (specific names unavailable via search; recommend verification with NBA G League official roster)
+  international_stash: []
+narrative_summary:
+  one_paragraph: "The Denver Nuggets face a critical organizational inflection point in summer 2026 following a shocking first-round exit to the 6-seed Minnesota Timberwolves despite a 54-28 record. Despite possessing three-time MVP Nikola Jokic in his prime (age 31, still elite) and co-star Jamal Murray, the franchise has won only one championship (2023) in this core's four-year window, with consecutive second-round exits (2024-25) now punctuated by the first-round upset. The April 2025 mid-season firing of 10-year head coach Michael Malone and GM Calvin Booth, followed by a novel dual-EVP leadership structure (Ben Tenzer, Jonathan Wallace), signals both urgency and organizational instability. Second-apron hard-cap constraints ($207.8M payroll) severely limit roster flexibility, forcing difficult trade decisions (Michael Porter Jr. to Brooklyn for Cameron Johnson, Hunter Tyson to clear tax headroom) that failed to produce playoff success. The front office faces three intertwined challenges: (1) retaining restricted free agent Peyton Watson (June 2026), the top offseason priority but nearly impossible without trading away salary (e.g., Cameron Johnson); (2) stabilizing the unproven dual-EVP structure and confirming David Adelman (elevated mid-season from assistant) as permanent head coach; (3) maintaining contention window credibility around Jokic while constrained by ownership's historical tax-aversion and second-apron penalties. Jokic's public commitment ('Nugget forever') and eligibility for a 4yr/$293M summer extension suggest the franchise will pursue retooling rather than reset, yet the margin for error is paper-thin: further playoff underperformance could force more radical moves (e.g., Murray trade exploration already circulating). The 2026 offseason will define whether Denver's front office can salvage a championship window that appeared championship-bound 18 months ago."
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 26, No. 49 from ATL; The Athletic mock-source layer lists No. 26: Bennett Stirtz as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - "Peyton Watson's market value and Nuggets' ability to retain him (or alternative wing-acquisition strategy via trade). Watson is the #1 priority but hard-cap math may force Cameron Johnson or Zeke Nnaji into trade market. How creatively the new FO navigates second apron will determine rotation competitiveness."
+    - Jokic's contract extension decision (summer 2026 eligible for 4yr/$293M) and any franchise signals about long-term commitment. A signed extension would anchor contention timeline; hesitation or delay would trigger speculation about window closure and potential dismantling.
+    - Stability of dual-EVP leadership structure (Tenzer/Wallace partnership). Early evaluation of their decision-making (trade, FA, draft, coaching stability) will determine if the 'unorthodox' model becomes permanent or reverts to traditional GM hiring, signaling either organizational confidence or crisis management.
+sources_used:
+  - https://www.basketball-reference.com/teams/DEN/2026.html
+  - https://www.nba.com/nuggets/roster
+  - https://www.espn.com/nba/team/roster/_/name/den/denver-nuggets
+  - https://en.wikipedia.org/wiki/2025%E2%80%9326_Denver_Nuggets_season
+  - https://www.si.com/nba/nuggets/onsi/news/former-denver-nuggets-gm-calvin-booth-announces-new-career-path
+  - https://www.kktv.com/2025/04/08/denver-nuggets-part-ways-with-head-coach-michael-malone-general-manager-calvin-booth/
+  - https://en.wikipedia.org/wiki/Josh_Kroenke
+  - https://www.spotrac.com/nba/denver-nuggets/yearly
+  - https://www.salaryswish.com/teams/nuggets/2026
+  - https://fanspo.com/nba/teams/Nuggets/8
+  - https://www.cbssports.com/nba/news/nuggets-nikola-jokic-era-2026-offseason/
+  - https://www.spotrac.com/nba/player/_/id/15393/nikola-jokic
+  - https://www.spotrac.com/nba/player/_/id/20212/jamal-murray
+  - https://www.nba.com/news/nuggets-trade-michael-porter-jr-nets-cameron-johnson
+  - https://www.spotrac.com/nba/player/_/id/15356/aaron-gordon
+  - https://www.espn.com/nba/story/_/id/41932195/denver-nuggets-aaron-gordon-agree-4-year-extension
+  - https://www.espn.com/nba/story/_/id/47969933/nuggets-convert-spencer-jones-deal-standard-contract
+  - https://www.espn.com/nba/story/_/id/45568184/sources-nuggets-name-ben-tenzer-jon-wallace-executive-vps
+  - https://www.espn.com/nba/story/_/id/45577471/nuggets-josh-kroenke-explains-unorthodox-front-office-approach
+  - https://www.nba.com/nuggets/news/denver-nuggets-name-david-adelman-head-coach
+  - https://denversports.com/nuggets-reaction/get-to-know-david-adelman/2119364
+  - https://www.nba.com/news/2026-nba-playoffs-western-conference-first-round-timberwolves-vs-nuggets
+  - https://www.nba.com/news/hunter-tyson-trade-nuggets-nets-2026
+  - https://www.hoopsrumors.com/2026/05/nuggets-notes-offseason-watson-johnson-valanciunas.html
+  - https://www.yardbarker.com/nba/articles/report_suggests_nuggets_could_explore_moving_jamal_murray_this_offseason/s1_17176_43795121
+  - https://www.spotrac.com/nba/player/_/id/31568/cameron-johnson
+  - https://www.spotrac.com/nba/player/_/id/78148/christian-braun
+  - https://www.spotrac.com/nba/player/_/id/28925/peyton-watson
+  - https://www.spotrac.com/nba/player/_/id/28938/zeke-nnaji
+  - https://www.spotrac.com/nba/player/_/id/28925/julian-strawther
+  - https://www.hoopsrumors.com/2025/07/nuggets-plan-to-complete-jonas-valanciunas-trade-keep-him-on-the-roster.html
+  - https://www.hoopsrumors.com/2025/11/nuggets-jonas-valanciunas-agree-to-restructured-contract.html
+  - https://www.spotrac.com/nba/player/_/id/25282/bruce-brown
+  - https://www.espn.com/nba/story/_/id/45634625/denver-nuggets-sign-tim-hardaway-jr
+  - https://grandrapids.gleague.nba.com/news/grand-rapids-gold-announce-2025-26-season-schedule
+  - https://nugglove.com/posts/denver-nuggets-draft-picks-updated-look-every-selection-2025-2026-beyond
+  - https://betzillion.net/blog/nba-market-size/
+  - https://www.nbacoaches.com/david-adelman/
+  - https://www.nbcsports.com/nba/news/nikola-jokic-i-still-want-be-nugget-forever-but-other-changes-coming-denver
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - player.contract.trade_kicker (Jamal Murray, Aaron Gordon, Cameron Johnson, Christian Braun, Peyton Watson, Zeke Nnaji, Julian Strawther, Jonas Valanciunas, Bruce Brown, Tim Hardaway Jr., Spencer Jones)
+  - player.contract.no_trade_clause (most players except Jokic and Murray)
+  - head_coach.contract_through (David Adelman; marked 'unknown' due to lack of public contract details)
+  - player.contract.annual_value_current_season (some bench players; marked where Spotrac unavailable)
+  - trade_exceptions.value and trade_exceptions.expires (no available data from sources)
+  - g_league_and_stash.notable_affiliate_players (specifics unavailable; only Spencer Jones confirmed)
+  - international_stash (no international stash confirmed for Nuggets)
+  - head_coach.coaching_tree (David Adelman not attributed to traditional coaching tree; son of Rick Adelman but tree association unclear)
+vocabulary_flags:
+  - player.movement_constraints.signal_strength for Peyton Watson marked 'single_source_reported' (Shams Charania X post; not yet widely confirmed in beat coverage).
+  - player.trajectory for Peyton Watson, Julian Strawther, Spencer Jones marked 'ascending' despite limited multi-year track record; confidence intentionally medium/high due to 2025-26 breakout role.
+  - David Adelman's coaching_tree marked 'unknown' rather than specific tree (e.g., dantoni_tree, popovich_tree) because Adelman is assistant-promoted, not traditionally mentored through single tree; son of Rick Adelman but no explicit affiliation to Rick's network claimed.
+  - Cameron Johnson movement_constraints status marked 'available' based on expiring contract (2027) and cap-relief mentions in beat reporting; no formal trade reports confirmed, so signal_strength is 'inferred_from_actions' (cap math, guard/wing redundancy, front office quiet on extension).
+  - Aaron Gordon movement_constraints.status marked 'unlikely' despite high contract leverage and declining-peak trajectory; justification is homegrown loyalty (6-year tenure) and championship core centerpiece status, yet falsification conditions acknowledge durability/injury risks.
+  - "Ownership spending_posture marked 'aggressive_spender' despite Kroenke family's historical conservatism on extreme tax; justification: 2023-26 era shows consistent tax payment and max-contract commitments, yet April 2025 mid-season firings and dual-EVP structure suggest ownership pivot toward cost optimization and structural efficiency rather than pure aggressiveness."
+  - Strategic posture timeframe marked 'contend_now' with confidence 'medium' (not high) because first-round exit + front-office instability + cap constraints create significant uncertainty; Jokic's prime window and public commitment anchor contention, but organizational execution risk is elevated.
+  - Jamal Murray movement_constraints.status marked 'untouchable' per source reporting, yet falsification conditions acknowledge possible trade exploration (already circulating in beat rumors post-playoff exit). Status reflects current consensus, not absolute organizational position.

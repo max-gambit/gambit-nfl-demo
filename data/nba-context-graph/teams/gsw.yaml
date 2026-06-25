@@ -1,0 +1,1103 @@
+team_id: GSW
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Golden State Warriors
+  conference: Western
+  division: Pacific
+  market_tier: tier_1
+  market_tier_rationale: San Francisco Bay Area major metropolitan market, NBA historic brand, premium market positioning for global audiences and tech sector wealth concentration.
+ownership:
+  primary_owner:
+    name: Joe Lacob
+    type: individual
+    tenure_years: 15.5
+    source: https://sfstandard.com/2025/11/10/joe-lacob-warriors-owner-peter-guber/
+    confidence: high
+  governance_notes: Joe Lacob is managing member and primary decision-maker; Peter Guber serves as co-executive chairman and co-managing partner with Lacob since 2010 purchase. Group ownership structure with Lacob leading basketball ops philosophy.
+  recent_transitions: none
+  spending_posture: aggressive_spender
+  spending_posture_evidence:
+    - Led league in 2024-25 spending with $184M cap space, $175M+ luxury tax, over $360M total spend
+    - Aggressive midseason acquisition of Jimmy Butler via five-team trade (Feb 2025), committing to $121M extension
+    - Signed Al Horford to multi-year deal via TMLE (Oct 2025) despite second apron constraints
+    - "Joe Lacob stated: 'I'm not here to screw around' regarding championship investments"
+    - "Historical pattern: willing to trigger new CBA apron restrictions to maintain contention window"
+front_office:
+  president_basketball_ops:
+    name: unknown
+    tenure_start: unknown
+    prior_stops: []
+    public_philosophy_signals: []
+    confidence: low
+    source: unknown
+  general_manager:
+    name: Mike Dunleavy Jr.
+    tenure_start: 2023-06
+    prior_stops:
+      - Pro scout, Warriors (2018-09 to 2019-08)
+      - Assistant GM, Warriors (2019-09 to 2021-09)
+      - VP Basketball Operations, Warriors (2021-09 to 2023-06)
+    public_philosophy_signals:
+      - Data-informed decision-making with emphasis on analytics as tool, not replacement for judgment
+      - Aggressive midseason trading (Jimmy Butler acquisition Feb 2025) signals willingness to reshape roster in-season
+      - Recent extension signed (multiple years remaining as of May 2026)
+    confidence: high
+    source: https://www.nbcsportsbayarea.com/nba/golden-state-warriors/mike-dunleavy-general-manager-contract-extension/1932716/
+  head_coach:
+    name: Steve Kerr
+    tenure_start: 2014-05
+    contract_through: uncertain
+    style_notes: Pace-and-space offensive system emphasizing ball movement, spacing, and three-point shooting. Motion-heavy triangle-influenced offense blended with uptempo principles. Defensive identity built on perimeter versatility and switching. Blends democratic offensive philosophy from Jackson/Popovich influences.
+    coaching_tree: Phil Jackson tree (protege) / Gregg Popovich tree (former player-coach in San Antonio)
+    confidence: high
+    source: https://sfstandard.com/2026/04/26/steve-kerr-warriors-contract-status-tv-options/
+  assistant_coaches_notable:
+    - Unknown (coaching staff details not fully confirmed in search)
+  notable_advisors_or_consultants:
+    - Google Cloud partnership for real-time data pipeline and analytics infrastructure
+strategic_posture:
+  timeframe: contend_now
+  confidence: high
+  derived_from:
+    - Roster construction around aging core (Curry 37, Butler 36, Green 35) signals present-tense window
+    - Aggressive trade (Jimmy Butler for Andrew Wiggins + picks + salary) and free agent signings (Al Horford, De'Anthony Melton, Seth Curry) indicate all-in mentality
+    - "2024-25 season: 7th seed, beat 2nd-seed Rockets in Game 7, validated playoff potential despite regular season struggles"
+    - Championship expectations set by FO and ownership despite age concerns
+  constraints:
+    - reason_code: max_contract_lockup
+      detail: Curry ($59.6M), Butler ($55.5M/yr on $121M extension), Green ($25.9M) locked into significant contracts through 2026-27
+      weight: high
+    - reason_code: tax_apron_constraints
+      detail: Team is $3.5M below second apron after TMLE signing (Al Horford); hard-capped at $207.8M, limiting roster flexibility
+      weight: high
+    - reason_code: aging_core
+      detail: Three core players (Curry, Butler, Green) age 35+; injury risk and decline trajectory create urgency
+      weight: high
+    - reason_code: ownership_directive
+      detail: Joe Lacob has signaled commitment to present-window spending regardless of apron penalties
+      weight: medium
+  trigger_events:
+    - Significant injury to Curry, Butler, or Green would force roster restructuring
+    - Coach Kerr's decision (expected May 2026) will inform 2026-27 continuity
+    - First-round playoff exit would prompt strategic reset discussion
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: between_aprons
+  current_payroll_estimate: 204350146
+  hard_capped: yes
+  hard_cap_reason: Signed Al Horford via Taxpayer Mid-Level Exception (TMLE), triggering hard cap at second apron ($207.824M)
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Likely to remain between first ($195.945M) and second apron. Curry extension eligible this summer (potential 2-year deal). Draymond Green holds player option. Significant uncertainty pending Kerr decision and potential roster moves.
+  exceptions_available:
+    - Taxpayer MLE exhausted (Al Horford)
+    - Non-taxpayer MLE unavailable (would trigger first apron hard cap)
+    - Minimum salary slots available for rest of roster
+  source: https://www.spotrac.com/nba/golden-state-warriors/cap/_/year/2025
+  source_fallbacks_used:
+    - https://sportsbusinessclassroom.com/nba-2025-26-apron-tracker/
+    - https://www.salaryswish.com/teams/warriors/2026
+  confidence: high
+trade_dna:
+  frequent_partners:
+    - HOU
+    - LAL
+    - MEM
+    - SAC
+    - MIA
+  preferred_deal_archetypes:
+    - Win-now trades for playoff-ready wings/bigs (Butler trade exemplar)
+    - Salary cap maneuvering to stay between aprons
+    - Young asset+pick packaging for star acquisitions
+    - Selling future picks to maintain 15-man continuity
+  recent_significant_trades:
+    - date: 2025-02
+      summary: Acquired Jimmy Butler from Miami (5-team deal); sent Andrew Wiggins, Dennis Schröder, Kyle Anderson, Lindy Waters, protected first-round pick; Butler signed 2-year, $121M extension
+      counterparties:
+        - MIA
+    - date: 2024-07
+      summary: Added depth signings (Buddy Hield, Brandin Podziemski retained)
+  confidence: high
+cultural_signals:
+  stability:
+    value: medium
+    detail: Front office stable under Lacob/Dunleavy (post-Myers); coaching future uncertain (Kerr exploring options post-season). 15 years of ownership continuity but recurring playoff disappointments 2021-2025 have created org-wide evaluation pressures.
+  player_friendly:
+    value: yes
+    detail: Warriors have historically maintained positive player relationships. Butler extension negotiated smoothly post-trade. Curry retention prioritized. However, recent roster churn (Wiggins departure, Kuminga RFA stalemate) signals pragmatic rather than romantic approach.
+  analytics_orientation:
+    value: heavy
+    detail: Google Cloud partnership enables real-time data pipelines. Dunleavy has transitioned org from analytics-validation model to analytics-first decision framework. Trade analysis relies on simulation modeling. However, human judgment remains central (e.g., Butler trade driven by championship window assessment).
+  risk_tolerance:
+    value: aggressive
+    detail: Owner Lacob explicitly dismisses apron penalties in service of contention. Midseason trades, luxury tax spending, willingness to restructure core. New CBA constraints have moderated spending relative to 2014-2019 dynasty, but still among league's most aggressive.
+  notable_traits:
+    - kerr_tree
+    - process_driven
+    - star_chasing
+    - homegrown_priority
+  rationale: Warriors culture reflects owner's championship-or-bust philosophy balanced with analytics-informed front office under Dunleavy. Coaching tree influence (Jackson/Popovich via Kerr) emphasizes democratic offense and player autonomy, though recent seasons show pragmatic acquisition focus. Org maintains homegrown DNA (Curry, Green) while aggressively targeting star free agents (Butler, Horford).
+  confidence: high
+roster:
+  - player_id: stephen_curry
+    name: Stephen Curry
+    age: 37
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - secondary_creator
+          - spacer
+      defensive_role: point_of_attack
+      shooting_profile: elite
+      special_traits:
+        - elite_passer
+        - iso_creator
+        - transition_threat
+        - foul_drawer
+    tier: superstar
+    trajectory: declining_peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 122200000
+      annual_value_current_season: 59606817
+      annual_value_next_season: 62600000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/6287/stephen-curry
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: generational_talent
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: high
+      falsification_conditions:
+        - Public statement by Lacob/Dunleavy indicating trade consideration
+        - Curry requests trade or expresses desire to leave
+        - Career-threatening injury diagnosis
+    team_relationship:
+      tenure_with_team: 12.7
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Curry has full control; team cannot trade him absent extraordinary circumstance
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/6287/stephen-curry
+  - player_id: jimmy_butler
+    name: Jimmy Butler
+    age: 36
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - finisher
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits:
+        - playoff_riser
+        - foul_drawer
+        - vet_leadership
+        - iso_creator
+    tier: star
+    trajectory: declining_peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 110959223
+      annual_value_current_season: 55479612
+      annual_value_next_season: 55479612
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/8081/jimmy-butler
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: recently_acquired
+          weight: high
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: recent_extension_poison_pill
+          weight: medium
+      falsification_conditions:
+        - Butler publicly expresses unhappiness with Warriors or requests trade
+        - Warriors front office publicly signals willingness to move Butler
+        - Butler suffers significant injury affecting value
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Recently extended; team prioritized long-term commitment but acquisition cost high
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/8081/jimmy-butler
+  - player_id: draymond_green
+    name: Draymond Green
+    age: 35
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: connector
+        secondary:
+          - screen_setter
+          - secondary_creator
+      defensive_role: switchable
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_passer
+        - vet_leadership
+    tier: starter
+    trajectory: declining
+    contract:
+      years_remaining: 2
+      total_value_remaining: 53492857
+      annual_value_current_season: 25892857
+      annual_value_next_season: 27600000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: 2027
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/10860/draymond-green
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: homegrown_loyalty
+          weight: high
+        - reason_code: locker_room_anchor
+          weight: high
+        - reason_code: coach_relationship
+          weight: medium
+      falsification_conditions:
+        - Green opts out and explores free agency
+        - Team publicly signals desire to trade for salary relief
+        - Locker room friction reports from credible beat reporters
+    team_relationship:
+      tenure_with_team: 12.2
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Player option for 2026-27; Green has stated preference to 'decline and extend'
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/10860/draymond-green
+  - player_id: al_horford
+    name: Al Horford
+    age: 39
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: post_hub
+        secondary:
+          - spacer
+          - screen_setter
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits:
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 5685000
+      annual_value_current_season: 5685000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: 0.15
+      player_option: none
+      team_option: 2027
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/player/_/id/2199/al-horford
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: expiring_contract_value
+          weight: high
+        - reason_code: age_decline
+          weight: medium
+      falsification_conditions:
+        - Team exercises 2026-27 option and commits to Horford for another season
+        - Warriors extend Horford beyond current terms
+        - Horford's defensive performance elevates team playoff success
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.6
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Veteran minimum signing; limited leverage in negotiations
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/_/id/2199/al-horford
+  - player_id: brandin_podziemski
+    name: Brandin Podziemski
+    age: 32
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: spacer
+        secondary:
+          - connector
+          - finisher
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - transition_threat
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 3
+      total_value_remaining: 12551859
+      annual_value_current_season: 3687960
+      annual_value_next_season: 3903922
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2026
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/84438/brandin-podziemski
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: expiring_contract_value
+          weight: medium
+      falsification_conditions:
+        - Warriors trade Podziemski for pick assets or future flexibility
+        - Podziemski publicly requests trade
+      signal_strength: rumor_only
+    team_relationship:
+      tenure_with_team: 3.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Club options give Warriors full control; veteran at end of career
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/84438/brandin-podziemski
+  - player_id: buddy_hield
+    name: Buddy Hield
+    age: 32
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary:
+          - finisher
+      defensive_role: wing_stopper
+      shooting_profile: elite
+      special_traits:
+        - transition_threat
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 2
+      total_value_remaining: 16223096
+      annual_value_current_season: 9439024
+      annual_value_next_season: 9000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: 2027
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/20211/buddy-hield
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: expiring_contract_value
+          weight: high
+        - reason_code: declining_role
+          weight: medium
+      falsification_conditions:
+        - Warriors extend Hield or sign to long-term deal
+        - Beat reporters consistently report Hield as cornerstone (not bench piece)
+        - Player option exercised and team retains him for 2026-27
+      signal_strength: rumor_only
+    team_relationship:
+      tenure_with_team: 1.8
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Player option gives Hield agency; contract slightly above minimum
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/_/id/20211/buddy-hield
+  - player_id: jonathan_kuminga
+    name: Jonathan Kuminga
+    age: 22
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: finisher
+        secondary: []
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - playoff_riser
+        - iso_creator
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: 48500000
+      annual_value_current_season: 22500000
+      annual_value_next_season: 24300000
+      no_trade_clause: none
+      trade_kicker: 0.15
+      player_option: none
+      team_option: 2027
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/74114/jonathan-kuminga
+    movement_constraints:
+      status: shopped
+      reasons:
+        - reason_code: trade_kicker_prohibitive
+          weight: medium
+        - reason_code: positional_redundancy
+          weight: medium
+      falsification_conditions:
+        - Warriors extend Kuminga beyond 2026-27 with long-term deal
+        - Kuminga becomes primary scorer in next two seasons
+        - Warriors publicly deny trade discussions
+      signal_strength: widely_reported
+    team_relationship:
+      tenure_with_team: 3
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: RFA holdout resolved mid-2025 season; trade kicker (15%) increases cost; eligible for trade starting Jan 15, 2026
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/74114/jonathan-kuminga
+  - player_id: moses_moody
+    name: Moses Moody
+    age: 23
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary:
+          - finisher
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - transition_threat
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: 24921150
+      annual_value_current_season: 11574075
+      annual_value_next_season: 13347075
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/74121/moses-moody
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: homegrown_loyalty
+          weight: medium
+      falsification_conditions:
+        - Warriors trade Moody for star-tier player
+        - Moody becomes primary option or key rotation piece
+      signal_strength: denied_publicly
+    team_relationship:
+      tenure_with_team: 3.4
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: Early career trajectory monitored; extension signed Oct 2024 signals commitment
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/74121/moses-moody
+  - player_id: deanthony_melton
+    name: De'Anthony Melton
+    age: 28
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: connector
+        secondary:
+          - spacer
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - transition_threat
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 6532700
+      annual_value_current_season: 3080921
+      annual_value_next_season: 3451779
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/27012/deanthony-melton
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: expiring_contract_value
+          weight: medium
+        - reason_code: positional_redundancy
+          weight: low
+      falsification_conditions:
+        - Warriors extend Melton beyond two-year deal
+        - Melton becomes primary ball-handler in rotation
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.5
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Minimum deal; limited leverage
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/_/id/27012/deanthony-melton
+  - player_id: quinten_post
+    name: Quinten Post
+    age: 22
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+          - post_hub
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+        - offensive_rebound_specialist
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: unknown
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: uncertain
+      source: https://www.goldenstateofmind.com/2025/2/7/24361178/warriors-quinten-post-contract-conversion-jimmy-butler
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Warriors trade Post for veteran asset
+        - Post loses significant playing time or is demoted
+      signal_strength: rumor_only
+    team_relationship:
+      tenure_with_team: 1.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Converted two-way; young player under team control
+    confidence: medium
+    source: https://www.goldenstateofmind.com/2025/2/7/24361178/warriors-quinten-post-contract-conversion-jimmy-butler
+  - player_id: will_richard
+    name: Will Richard
+    age: 23
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: spacer
+        secondary:
+          - secondary_creator
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: unknown
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: uncertain
+      source: https://www.nbcsportsbayarea.com/nba/golden-state-warriors/will-richard-draft-grade-analysis/1858477/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Warriors trade Richard for proven NBA asset
+        - Richard's playing time declines significantly
+      signal_strength: rumor_only
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: 2025 rookie; under team control for 3+ years
+    confidence: medium
+    source: https://www.nbcsportsbayarea.com/nba/golden-state-warriors/will-richard-draft-grade-analysis/1858477/
+  - player_id: gary_payton_ii
+    name: Gary Payton II
+    age: 32
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: finisher
+        secondary:
+          - connector
+      defensive_role: point_of_attack
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: fringe
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 3303774
+      annual_value_current_season: 3303774
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/player/_/id/20272/gary-payton-ii
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: expiring_contract_value
+          weight: medium
+      falsification_conditions:
+        - Warriors extend Payton II to multi-year deal
+        - Warriors re-sign Payton II as unrestricted free agent (2026-27)
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 4
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Veteran minimum salary; expiring
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/_/id/20272/gary-payton-ii
+  - player_id: gui_santos
+    name: Gui Santos
+    age: 23
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: finisher
+        secondary:
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: unknown
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: uncertain
+      source: https://www.goldenstateofmind.com/2025/2/7/24361178/warriors-quinten-post-contract-conversion-jimmy-butler
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: medium
+      falsification_conditions:
+        - Warriors trade Santos for veteran piece
+      signal_strength: rumor_only
+    team_relationship:
+      tenure_with_team: 2.1
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Young player under team control
+    confidence: low
+    source: https://www.goldenstateofmind.com/2025/2/7/24361178/warriors-quinten-post-contract-conversion-jimmy-butler
+  - player_id: seth_curry
+    name: Seth Curry
+    age: 35
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: spacer
+        secondary:
+          - secondary_creator
+      defensive_role: wing_stopper
+      shooting_profile: elite
+      special_traits:
+        - transition_threat
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: unknown
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: 2026
+      source: https://www.nbcsportsbayarea.com/nba/golden-state-warriors/pat-spencer-alex-toohey/1877932/
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Warriors extend Curry (unlikely at age 35)
+      signal_strength: rumor_only
+    team_relationship:
+      tenure_with_team: 0.4
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Signed mid-season to rest-of-year deal
+    confidence: low
+    source: https://www.nbcsportsbayarea.com/nba/golden-state-warriors/pat-spencer-alex-toohey/1877932/
+  - player_id: pat_spencer
+    name: Pat Spencer
+    age: 25
+    position_listed: PG
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: connector
+        secondary:
+          - spacer
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - transition_threat
+    tier: two_way
+    trajectory: uncertain
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: 2026
+      source: https://www.nbcsportsbayarea.com/nba/golden-state-warriors/pat-spencer-alex-toohey/1877932/
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Warriors convert Pat Spencer to standard contract
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way player; limited control
+    confidence: low
+    source: https://www.nbcsportsbayarea.com/nba/golden-state-warriors/pat-spencer-alex-toohey/1877932/
+  - player_id: alex_toohey
+    name: Alex Toohey
+    age: 22
+    position_listed: SF
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary:
+          - finisher
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: two_way
+    trajectory: uncertain
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: 2026
+      source: https://www.nbcsportsbayarea.com/nba/golden-state-warriors/pat-spencer-alex-toohey/1877932/
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Warriors convert Toohey to standard contract
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: 2025 draft pick on two-way; limited control
+    confidence: low
+    source: https://www.nbcsportsbayarea.com/nba/golden-state-warriors/pat-spencer-alex-toohey/1877932/
+pending_free_agents: []
+known_target_history:
+  - target: Jimmy Butler
+    year: 2025
+    outcome: acquired
+    detail: Five-team trade (Feb 2025); Warriors sent Wiggins, Schröder, Anderson, Waters, protected FRP; Butler signed 2-year, $121M extension
+    source: https://www.nba.com/news/jimmy-butler-heading-to-warriors-in-multi-player-deal-with-heat
+  - target: Al Horford
+    year: 2025
+    outcome: acquired
+    detail: Free agent signing via TMLE (Oct 2025); multi-year deal with team option and 15% trade kicker
+    source: https://www.nba.com/news/al-horford-golden-state-warriors-free-agency-2025
+  - target: Seth Curry
+    year: 2025
+    outcome: acquired
+    detail: Training camp signing; waived Oct 18; re-signed mid-season (Dec 2025) to rest-of-year deal
+    source: https://www.nbcsportsbayarea.com/nba/golden-state-warriors/pat-spencer-alex-toohey/1877932/
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "Golden State Warriors hold No. 11, No. 54 from LAL in the official post-lottery order. Mock-source layer: No. 11: Aday Mara; treat prospect names as low-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: low
+  - priority: Resolve Steve Kerr coaching future
+    timeline: next_30_days
+    type: coaching_decision
+    detail: Kerr's contract expires post-2025-26 season; team wants multiyear extension if he returns; Kerr indicated 50-50 on remaining
+    confidence: high
+  - priority: Stephen Curry contract extension
+    timeline: this_offseason
+    type: extension
+    detail: Curry eligible for 2-year extension this summer; team planning extension talks; Curry interested per recent interviews
+    confidence: high
+  - priority: Draymond Green extension or trade decision
+    timeline: this_offseason
+    type: extension
+    detail: Green holds 2026-27 player option; expressed interest in 'decline and extend'; alternative is 2026 trade if opt-out signals departure
+    confidence: high
+  - priority: Jonathan Kuminga roster position
+    timeline: by_trade_deadline
+    type: trade
+    detail: Multiple beat reports indicate Warriors shopping Kuminga (15% trade kicker, redundant wing); eligible for trade Jan 15, 2026
+    confidence: high
+  - priority: Hard cap roster management
+    timeline: this_offseason
+    type: structural
+    detail: Warriors at $204.4M payroll (below second apron by $3.5M); limited flexibility; any transaction must respect second apron hard cap
+    confidence: high
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 11 overall; own pick.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 2
+      protections: 2026 No. 54 overall; from LAL via TOR, MIA, and CLE.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: LAL
+    - year: 2027
+      round: 1
+      protections: unknown
+      source: unknown
+  draft_picks_owed:
+    - year: 2026
+      round: 2
+      to_team: MIA
+      protections: 2026 No. 41 overall; from GSW via CHA, NYK, OKC, and ATL.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2032
+      round: 2
+      to_team: MEM
+      protections: protected (traded for Will Richard)
+      source: https://www.si.com/nba/golden-state-warriors-updated-draft-picks-following-trade-for-jimmy-butler
+  trade_exceptions:
+    - value: unknown
+      expires: unknown
+      source: unknown
+      confidence: low
+team_team_relationships:
+  rivalries:
+    - team_id: HOU
+      type: competitive_recent
+      basis: 2025 First Round playoff series (Warriors won Game 7); recent intensity in Western Conference race
+    - team_id: LAL
+      type: competitive_recent
+      basis: Division rivals; persistent Western Conference playoff contention; historical playoff history
+    - team_id: MEM
+      type: competitive_recent
+      basis: Western Conference playoff competition; recent playoff matchups
+    - team_id: SAC
+      type: geographic
+      basis: Division rivals; geographic proximity; recurring playoff implications
+    - team_id: MIN
+      type: competitive_recent
+      basis: Western Conference playoff positioning; recent competitive matchups
+  notable_personnel_connections:
+    - person: Joe Lacob
+      connected_team: unknown
+      connection_type: owner
+      detail: Joe Lacob is primary owner and managing member of Warriors; acquired team in 2010 with Guber
+    - person: Peter Guber
+      connected_team: LAL
+      connection_type: owner
+      detail: Co-owner/executive chairman of Warriors; also owns LA Dodgers (MLB)
+    - person: Steve Kerr
+      connected_team: unknown
+      connection_type: former_player
+      detail: Played under Phil Jackson (Chicago) and Gregg Popovich (San Antonio); influences current coaching tree
+g_league_and_stash:
+  affiliate_team: Santa Cruz Warriors
+  notable_affiliate_players:
+    - Jonathan Kuminga (assigned for development)
+    - De'Anthony Melton (assigned for development)
+    - Gui Santos (assigned for development)
+  international_stash: []
+narrative_summary:
+  one_paragraph: "The Golden State Warriors remain in 'contend now' mode with Stephen Curry (37), Jimmy Butler (36), and Draymond Green (35) forming an aging but championship-tested core, complemented by recent additions Al Horford and De'Anthony Melton. The Feb 2025 Butler trade—sending Andrew Wiggins and picks to Miami—signals owner Joe Lacob's aggressive willingness to spend beyond the second apron. The 2024-25 season's surprising first-round upset of the #2 Rockets validated the playoff potential despite regular-season mediocrity. Near-term focus is managing hard-cap constraints ($204.4M payroll, $3.5M below second apron), resolving Kerr's coaching future, securing Curry's extension, and determining Kuminga's long-term fit. Analytics-heavy front office under Mike Dunleavy Jr. (GM since June 2023) continues blending data with human judgment, though roster-construction challenges persist from new CBA apron restrictions that directly target perennial high-spenders like Golden State."
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 11, No. 54 from LAL; The Athletic mock-source layer lists No. 11: Aday Mara as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - "Steve Kerr's coaching decision (likely May/June 2026): Kerr expressed 50-50 confidence on returning; team prefers multiyear extension. New coach would signal strategic reset."
+    - "Jonathan Kuminga trade deadline movement (Jan-Feb 2027): Beat reporters widely expect Warriors to shop the 22-year-old wing due to 15% trade kicker, redundancy with Butler, and salary optimization."
+    - "Stephen Curry extension negotiation (summer 2026): Curry eligible for 2-year deal; extension likely but terms (years, AAV) will signal team's post-Butler commitment window."
+sources_used:
+  - https://www.basketball-reference.com/teams/GSW/2026.html
+  - https://www.spotrac.com/nba/golden-state-warriors/cap/_/year/2025
+  - https://www.nba.com/news/jimmy-butler-heading-to-warriors-in-multi-player-deal-with-heat
+  - https://sfstandard.com/2025/11/10/joe-lacob-warriors-owner-peter-guber/
+  - https://www.nbcsportsbayarea.com/nba/golden-state-warriors/mike-dunleavy-general-manager-contract-extension/1932716/
+  - https://sfstandard.com/2026/04/26/steve-kerr-warriors-contract-status-tv-options/
+  - https://www.spotrac.com/nba/player/_/id/6287/stephen-curry
+  - https://www.spotrac.com/nba/player/_/id/8081/jimmy-butler
+  - https://www.spotrac.com/nba/player/_/id/10860/draymond-green
+  - https://www.spotrac.com/nba/player/_/id/2199/al-horford
+  - https://www.spotrac.com/nba/player/_/id/84438/brandin-podziemski
+  - https://www.spotrac.com/nba/player/_/id/20211/buddy-hield
+  - https://www.spotrac.com/nba/player/_/id/74114/jonathan-kuminga
+  - https://www.spotrac.com/nba/player/_/id/74121/moses-moody
+  - https://www.spotrac.com/nba/player/_/id/27012/deanthony-melton
+  - https://www.spotrac.com/nba/player/_/id/84443/trayce-jackson-davis
+  - https://www.spotrac.com/nba/player/_/id/20272/gary-payton-ii
+  - https://www.goldenstateofmind.com/2025/2/7/24361178/warriors-quinten-post-contract-conversion-jimmy-butler
+  - https://www.nbcsportsbayarea.com/nba/golden-state-warriors/will-richard-draft-grade-analysis/1858477/
+  - https://www.nbcsportsbayarea.com/nba/golden-state-warriors/pat-spencer-alex-toohey/1877932/
+  - https://www.nba.com/news/al-horford-golden-state-warriors-free-agency-2025
+  - https://sportsbusinessclassroom.com/nba-2025-26-apron-tracker/
+  - https://www.salaryswish.com/teams/warriors/2026
+  - https://cloud.google.com/blog/products/data-analytics/warriors-use-on-court-data-for-competitive-edge
+  - https://santacruz.gleague.nba.com/
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - front_office.president_basketball_ops (role title/name not confirmed)
+  - quinten_post.contract details (exact salary/years)
+  - will_richard.contract details (exact salary/years)
+  - gui_santos.contract details (exact salary/years)
+  - seth_curry.contract details (exact salary/annual_value)
+  - pat_spencer.contract details (salary/cap hit)
+  - alex_toohey.contract details (salary/cap hit)
+  - key_assets.draft_picks_owned.2026_protections
+  - key_assets.draft_picks_owned.2027_protections
+  - key_assets.trade_exceptions (Warriors' current exceptions post-deadline)
+vocabulary_flags:
+  - All player movement statuses confirmed within controlled vocab.
+  - Kerr coaching tree tagged as 'kerr_tree' (non-standard vocab); should be 'popovich_tree' or 'jackson_tree' per v2.2.1 list. Using multiple tags instead.
+  - No source conflicts detected between primary and fallback sources for key facts.
+  - "Confidence levels assigned based on reporting tier: Spotrac/ESPN Tier 1 = high; beat reporter consensus = high; inferred from partial data = medium; speculative = low."

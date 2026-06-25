@@ -1,0 +1,1172 @@
+team_id: BKN
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Brooklyn Nets
+  conference: Eastern
+  division: Atlantic
+  market_tier: tier_1
+  market_tier_rationale: NYC metropolitan area; Barclays Center in Brooklyn; strong media market despite recent years of competitive struggles.
+ownership:
+  primary_owner:
+    name: Joseph C. Tsai
+    type: individual
+    tenure_years: 9.3
+    source: https://clutchpoints.com/nba/brooklyn-nets/nets-news-joe-tsai-hints-brooklyns-strategy-2025-26-season
+    confidence: high
+  governance_notes: Tsai is sole majority owner; no minority stakes reported impacting strategic decisions.
+  recent_transitions: none
+  spending_posture: aggressive_spender
+  spending_posture_evidence:
+    - Committed to multi-year rebuild with 5 first-round draft picks in 2025 despite low payroll.
+    - Extended coach Jordi Fernandez and entire staff to multi-year deals despite 20-62 season.
+    - Acquired Michael Porter Jr. from Denver for Cameron Johnson (July 2025); MPJ signed extension talks underway.
+front_office:
+  president_basketball_ops:
+    name: unknown
+    tenure_start: unknown
+    prior_stops: []
+    public_philosophy_signals: []
+    confidence: low
+    source: unknown
+  general_manager:
+    name: Sean Marks
+    tenure_start: 2016-02
+    prior_stops:
+      - San Spurs (5 years, assistant general manager 2014-16)
+      - San Antonio Spurs (assistant general manager, 2014-2016)
+    public_philosophy_signals:
+      - "In exclusive interview (Jan 2025): Sean Marks says he and Jordi Fernandez in sync on rebuild"
+      - Analytics-forward approach inherited from San Antonio Spurs culture
+      - Focus on player development and sustainability over short-term contention
+    confidence: high
+    source: https://www.nba.com/nets/news/2016/02/18/brooklyn-nets-name-sean-marks-general-manager
+  head_coach:
+    name: Jordi Fernandez
+    tenure_start: 2024-04
+    contract_through: 2027+
+    style_notes: "Player development focus; emphasis on young roster building; permissive offensive approach encouraging player creativity. Two-season record: 46-118. First two seasons focused on developing lottery-acquired prospects."
+    coaching_tree: brown_tree
+    confidence: high
+    source: https://www.nba.com/news/brooklyn-nets-jordi-fernandez-staff-extension
+  assistant_coaches_notable:
+    - Entire coaching staff extended to multi-year deals (April 2026)
+  notable_advisors_or_consultants:
+    - Logan MacPhail, Director of Coaching Analytics (Spurs connection)
+strategic_posture:
+  timeframe: rebuild
+  confidence: high
+  derived_from:
+    - "Owner Joe Tsai: 'We hope to get a good pick' this season; lottery produced the No. 6 pick."
+    - "5 first-round picks (2025): Egor Demin (#8), Nolan Traore (#19), Drake Powell (#22), Ben Saraf (#26), Danny Wolf (#27)"
+    - Waived Cam Thomas (Feb 2026) despite 15.6 PPG; no extension offers; explicit salary flexibility signal
+    - Lowest payroll in league ($144.3M) with $91.8M cap space available
+    - Half roster under age 24; developmental-focused coaching staff extended long-term
+  constraints:
+    - reason_code: multi_year_lottery
+      detail: Team finished 20-62 in 2025-26; Houston Rockets own swap rights to Nets' 2027 first-rounder, forcing focus on securing top lottery pick in 2026.
+      weight: high
+    - reason_code: ownership_directive
+      detail: Tsai publicly committed to rebuild after acknowledging 2024-25 crossroads; no immediate contention timeline stated.
+      weight: high
+    - reason_code: new_front_office
+      detail: Jordi Fernandez in only second season; extended to multi-year deal signaling long-term developmental arc rather than immediate wins.
+      weight: medium
+  trigger_events:
+    - Signing of premium free agent would indicate shift away from pure rebuild (e.g., star UFA acquisition)
+    - Trade of first-round picks or lottery-acquired youngsters for established star
+    - Firing or departure of Jordi Fernandez would reset development philosophy
+    - Owner public statements prioritizing contention over youth development
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: below_apron
+  current_payroll_estimate: 144300000
+  hard_capped: yes
+  hard_cap_reason: One or more transactions triggered hard-cap status despite below-second-apron payroll (possibly mid-level exception or trade structure).
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Continued significant cap space; likely below first apron as young core still on rookie/low-year deals.
+  exceptions_available:
+    - Bi-annual exception (estimated ~$4-5M)
+    - Minimum salary exception (if applicable)
+  source: https://www.salaryswish.com/teams/nets
+  source_fallbacks_used:
+    - https://fanspo.com/nba/teams/Nets/3
+    - https://www.spotrac.com/nba/brooklyn-nets/cap
+  confidence: medium
+trade_dna:
+  frequent_partners:
+    - NYK
+    - DEN
+    - PHX
+  preferred_deal_archetypes:
+    - Draft-capital acquisitions for star players (Mikal Bridges, Cam Johnson trades 2024-25)
+    - Salary-relief flips of veterans (e.g., waiving Cam Thomas to clear space)
+    - Young player + picks for established talent (willing to flip recent lottery picks for proven assets)
+  recent_significant_trades:
+    - date: 2024-06
+      summary: Nets traded Mikal Bridges to Knicks for ~5 first-round picks (unprotected/minimally protected) signaling full rebuild pivot.
+      counterparties:
+        - NYK
+    - date: 2025-07
+      summary: Nets acquired Michael Porter Jr. from Denver for Cameron Johnson and received unprotected 2032 first-rounder; MPJ averaged 24.2 PPG, 46.3 FG%, 36.3 3P%.
+      counterparties:
+        - DEN
+    - date: 2025-06
+      summary: Nets drafted Adou Thiero (#36) then traded him to Lakers; used lottery assets to accumulate future draft capital.
+      counterparties:
+        - LAL
+  confidence: high
+cultural_signals:
+  stability:
+    value: medium
+    detail: Coach extended through 2027+; GM in place since 2016 (10 years tenure). However, franchise went through multiple head coaches (7 since Marks hired) until Fernandez hire. Current stability signals commitment to rebuild, but volatility in coaching history tempers assessment.
+  player_friendly:
+    value: mixed
+    detail: Extended Fernandez coaching staff and offered Nic Claxton $100M extension ($25.4M/yr for 2025-26). However, waived Cam Thomas mid-season despite 15.6 PPG without extension offer. Front office prioritizes young development over veteran accommodation.
+  analytics_orientation:
+    value: heavy
+    detail: Logan MacPhail (Analytics Director) hired from San Antonio Spurs. Team publicly uses advanced metrics and player valuation models for trade/FA decisions. Roster built via lottery optimization and cap flexibility rather than free-agent spending.
+  risk_tolerance:
+    value: aggressive
+    detail: Spent 5 first-round picks in single draft (2025) on unproven young talent; acquired Michael Porter Jr. on long-term extension despite injury concerns; extended Fernandez and entire staff after 46-118 two-year record.
+  notable_traits:
+    - developmental_org
+    - process_driven
+    - homegrown_priority
+  rationale: Nets prioritize long-term player development and internal infrastructure (Fernandez extension, analytics hire) over immediate competitiveness. Tsai's willingness to publicly embrace rebuild signals organizational patience. Analytics-driven decision-making inherited from Marks' Spurs background shapes all personnel moves.
+  confidence: medium
+roster:
+  - player_id: michael_porter_jr
+    name: Michael Porter Jr.
+    age: 27
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - secondary_creator
+          - finisher
+      defensive_role: switchable
+      shooting_profile: elite
+      special_traits:
+        - iso_creator
+        - elite_athlete
+    tier: star
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: 38333050
+      annual_value_next_season: 41000000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.clutchpoints.com/nba/brooklyn-nets/nets-news-michael-porter-jr-definitive-message-to-brooklyn-with-extension-trade-talks-on-horizon
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: recent_extension_poison_pill
+          weight: high
+      falsification_conditions:
+        - Major injury announcement (long-term or career-threatening)
+        - Public statements from Tsai or Marks indicating trade consideration
+      signal_strength: denied_publicly
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Extended through 2027; expressed desire to stay with franchise; new extension pending. Has full leverage.
+    confidence: high
+    source: https://clutchpoints.com/nba/brooklyn-nets/nets-news-michael-porter-jr-sends-definitive-message-to-brooklyn-with-extension-trade-talks-on-horizon
+  - player_id: nic_claxton
+    name: Nicolas Claxton
+    age: 25
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - finisher
+          - connector
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 4
+      total_value_remaining: 74648000
+      annual_value_current_season: 25352272
+      annual_value_next_season: 26500000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.cbssports.com/nba/news/nic-claxton-agrees-to-four-year-100-million-contract-extension-with-brooklyn-nets-per-report/
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: medium
+      falsification_conditions:
+        - Nic Claxton formally requests trade
+        - Claxton incurs season-ending injury requiring rebuilding timeline
+      signal_strength: denied_publicly
+    team_relationship:
+      tenure_with_team: 4.3
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: Signed extension June 2024; long-term deal gives team leverage, but young core status makes him untradeable.
+    confidence: high
+    source: https://www.cbssports.com/nba/news/nic-claxton-agrees-to-four-year-100-million-contract-extension-with-brooklyn-nets-per-report/
+  - player_id: egor_demin
+    name: Egor Demin
+    age: 20
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - secondary_creator
+          - spacer
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_passer
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: 5000000
+      annual_value_next_season: 5000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.si.com/nba/nets/onsi/draft/nets-head-coach-jordi-fernandez-gm-sean-marks-break-down-2025-nba-draft
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Demin waived or traded during first three seasons
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie contract; minimal leverage.
+    confidence: medium
+    source: https://www.nba.com/news/nets-draft-egor-demin-eighth-overall
+  - player_id: nolan_traore
+    name: Nolan Traoré
+    age: 19
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - secondary_creator
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits: []
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: 3000000
+      annual_value_next_season: 3000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.si.com/nba/nets/onsi/draft/nets-head-coach-jordi-fernandez-gm-sean-marks-break-down-2025-nba-draft
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Traoré waived or traded before fourth season
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie contract; no leverage.
+    confidence: medium
+    source: https://www.basketball-reference.com/teams/BRK/2026.html
+  - player_id: drake_powell
+    name: Drake Powell
+    age: 19
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+          - connector
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits: []
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: 3000000
+      annual_value_next_season: 3000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.si.com/nba/nets/onsi/draft/nets-head-coach-jordi-fernandez-gm-sean-marks-break-down-2025-nba-draft
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: behind_younger_player
+          weight: medium
+      falsification_conditions:
+        - Powell plays 20+ minutes per game over extended stretch
+        - Draft class peer (Demin, Traore) traded before Powell is dealt
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie contract; minimal guaranteed value.
+    confidence: low
+    source: https://www.basketball-reference.com/teams/BRK/2026.html
+  - player_id: ben_saraf
+    name: Ben Saraf
+    age: 19
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary: []
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits: []
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: 3000000
+      annual_value_next_season: 3000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.basketball-reference.com/teams/BRK/2026.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: behind_younger_player
+          weight: medium
+      falsification_conditions:
+        - Saraf secures consistent rotation minutes
+        - Team publicly commits to Saraf as backup center long-term
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie contract; development asset.
+    confidence: low
+    source: https://www.basketball-reference.com/teams/BRK/2026.html
+  - player_id: danny_wolf
+    name: Danny Wolf
+    age: 19
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - finisher
+      defensive_role: helper
+      shooting_profile: non_shooter
+      special_traits: []
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: 3000000
+      annual_value_next_season: 3000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.basketball-reference.com/teams/BRK/2026.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: behind_younger_player
+          weight: medium
+      falsification_conditions:
+        - Wolf emerges as rotation piece (15+ minutes)
+        - Noah Clowney is traded, opening forward minutes
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie contract; depth asset.
+    confidence: low
+    source: https://www.basketball-reference.com/teams/BRK/2026.html
+  - player_id: noah_clowney
+    name: Noah Clowney
+    age: 22
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits: []
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2027
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.si.com/nba/nets/onsi/news/how-the-nets-two-way-players-have-performed-over-the-past-month
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: medium
+      falsification_conditions:
+        - Clowney traded before October 2026
+        - Clowney waived or not tendered team option
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2
+      homegrown: unknown
+      contract_leverage:
+        value: medium
+        detail: Team option 2027 gives Nets control; modest leverage.
+    confidence: medium
+    source: https://www.si.com/nba/nets/onsi/news/nets-key-retentions-signal-commitment-to-culture-and-continuity-in-brooklyn
+  - player_id: day_ron_sharpe
+    name: Day'Ron Sharpe
+    age: 23
+    position_listed: C
+    contract_type: standard
+    availability_status: season_ending
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: connector
+        secondary:
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: functional
+      special_traits:
+        - elite_rebounder
+    tier: rotation
+    trajectory: declining_peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.nba.com/news/nets-center-dayron-sharpe-suffers-season-ending-thumb-injury
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: injury_recovery_uncertain
+          weight: high
+      falsification_conditions:
+        - Sharpe signs long-term extension with Nets
+        - Sharpe makes full recovery statement from team in offseason
+      signal_strength: confirmed_shopped
+    team_relationship:
+      tenure_with_team: 3
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Expiring contract; coming off season-ending thumb surgery (UCL).
+    confidence: high
+    source: https://www.nba.com/news/nets-center-dayron-sharpe-suffers-season-ending-thumb-injury
+  - player_id: ziaire_williams
+    name: Ziaire Williams
+    age: 23
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+          - connector
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.youtube.com/watch?v=aQwvyd8A2uk
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Williams signed multi-year extension before July 2026
+        - Williams traded mid-season 2025-26
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Expiring contract; UFA after 2025-26 season.
+    confidence: medium
+    source: https://www.youtube.com/watch?v=aQwvyd8A2uk
+  - player_id: jalen_wilson
+    name: Jalen Wilson
+    age: 24
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits: []
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: 2221677
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.youtube.com/watch?v=aQwvyd8A2uk
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Wilson signs long-term extension before July 2026
+        - Wilson traded before trade deadline 2025-26
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Expiring contract on minimum deal.
+    confidence: medium
+    source: https://www.youtube.com/watch?v=aQwvyd8A2uk
+  - player_id: ochai_agbaji
+    name: Ochai Agbaji
+    age: 24
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.basketball-reference.com/teams/BRK/2026.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Agbaji signed multi-year extension
+        - Agbaji included in trade package
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Expiring contract; potential UFA.
+    confidence: medium
+    source: https://www.basketball-reference.com/teams/BRK/2026.html
+  - player_id: terance_mann
+    name: Terance Mann
+    age: 27
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: connector
+        secondary:
+          - tertiary_scorer
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits: []
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.basketball-reference.com/teams/BRK/2026.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Mann signed extension before July 2026
+        - Mann included in veteran trade package
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Expiring contract; depth/veteran presence.
+    confidence: medium
+    source: https://www.basketball-reference.com/teams/BRK/2026.html
+  - player_id: josh_minott
+    name: Josh Minott
+    age: 22
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+      defensive_role: switchable
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.basketball-reference.com/teams/BRK/2026.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: behind_younger_player
+          weight: medium
+      falsification_conditions:
+        - Minott becomes rotation piece (20+ minutes)
+        - Minott traded to contender for picks
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.5
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Non-guaranteed deal; depth asset.
+    confidence: low
+    source: https://www.basketball-reference.com/teams/BRK/2026.html
+  - player_id: tyson_etienne
+    name: Tyson Etienne
+    age: 26
+    position_listed: SG
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits: []
+    tier: two_way
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.si.com/nba/nets/onsi/news/how-the-nets-two-way-players-have-performed-over-the-past-month
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Etienne converted to multi-year standard contract
+        - Etienne plays 25+ games at NBA level
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.5
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way deal; development asset.
+    confidence: medium
+    source: https://www.si.com/nba/nets/onsi/news/how-the-nets-two-way-players-have-performed-over-the-past-month
+  - player_id: ej_liddell
+    name: E.J. Liddell
+    age: 25
+    position_listed: PF
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits: []
+    tier: two_way
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.hoopsrumors.com/2025/09/nets-sign-liddell-to-two-way-contract-finalize-sharpe-deal.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Liddell converted to standard contract
+        - Liddell re-signed to two-way deal
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.7
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way contract; development player.
+    confidence: medium
+    source: https://www.hoopsrumors.com/2025/09/nets-sign-liddell-to-two-way-contract-finalize-sharpe-deal.html
+  - player_id: chaney_johnson
+    name: Chaney Johnson
+    age: unknown
+    position_listed: unknown
+    contract_type: two_way
+    availability_status: unknown
+    archetype:
+      physical_position: unknown
+      offensive_role:
+        primary: unknown
+        secondary: []
+      defensive_role: unknown
+      shooting_profile: unknown
+      special_traits: []
+    tier: two_way
+    trajectory: unknown
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: unknown
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: 2026
+      source: https://www.threads.com/@thebasketballnation__/post/DU3ZFyqEq6F/updated-brooklyn-nets-roster-starters-nolan-traore-egor-demin-michael-porter-jr
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Johnson signed to standard contract
+        - Johnson waived or not re-signed
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: unknown
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way contract; minimal leverage.
+    confidence: low
+    source: https://www.threads.com/@thebasketballnation__/post/DU3ZFyqEq6F/updated-brooklyn-nets-roster-starters-nolan-traore-egor-demin-michael-porter-jr
+pending_free_agents:
+  - player_id: ziaire_williams
+    name: Ziaire Williams
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Expiring contract; role undefined in rebuild. May return on minimum deal or sign elsewhere.
+    notes: Averaged 11.4 PPG in recent stretch; young developmental asset.
+    source: https://www.si.com/nba/nets/onsi/news/how-the-nets-two-way-players-have-performed-over-the-past-month
+  - player_id: jalen_wilson
+    name: Jalen Wilson
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Expiring minimum-deal contract; likely walk to seek opportunity elsewhere.
+    notes: Appeared in 13 games post-All-Star break; averaging 6.5 PPG.
+    source: https://www.si.com/nba/nets/onsi/news/how-the-nets-two-way-players-have-performed-over-the-past-month
+  - player_id: day_ron_sharpe
+    name: Day'Ron Sharpe
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Expiring contract; returning from season-ending thumb surgery. Uncertain market value pending recovery.
+    notes: Career-high 60.1% FG% before injury; young ceiling but injury clouds timeline.
+    source: https://www.nba.com/news/nets-center-dayron-sharpe-suffers-season-ending-thumb-injury
+known_target_history:
+  - target: Mikal Bridges
+    year: 2024
+    outcome: acquired
+    detail: Acquired from Suns; traded to Knicks for draft capital (June 2024).
+    source: https://www.nba.com/news/nets-acquire-mikal-bridges-cameron-johnson-draft-compensation-four-team-trade
+  - target: Michael Porter Jr.
+    year: 2025
+    outcome: acquired
+    detail: Acquired from Denver for Cameron Johnson (July 2025); averaged 24.2 PPG, 46.3 FG%, 36.3 3P%.
+    source: https://www.si.com/nba/nets/onsi/looking-back-at-the-trade-that-brought-michael-porter-jr-to-the-brooklyn-nets
+  - target: Cam Johnson (traded away)
+    year: 2025
+    outcome: acquired
+    detail: Acquired via Bridges trade (2024); traded to Denver for Michael Porter Jr. (2025).
+    source: https://www.si.com/nba/nets/onsi/looking-back-at-the-trade-that-brought-michael-porter-jr-to-the-brooklyn-nets
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "Brooklyn Nets hold No. 6, No. 33, No. 43 from LAC in the official post-lottery order. Mock-source layer: No. 6: Darius Acuff Jr.; treat prospect names as low-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: low
+  - priority: Extend Michael Porter Jr. to long-term max deal
+    timeline: this_offseason
+    type: extension
+    detail: Porter expressed interest in staying; eligible for $234M/4-year extension. Marks stated extension talks ongoing.
+    confidence: high
+  - priority: Evaluate Day'Ron Sharpe's post-surgery trajectory
+    timeline: this_offseason
+    type: roster
+    detail: Season-ending UCL surgery (thumb); expected to recover in time for 2026-27. Contract expires 2026; decision required on re-signing or trade.
+    confidence: high
+  - priority: Coaching staff continuity and player development infrastructure
+    timeline: this_offseason
+    type: coaching_decision
+    detail: Fernandez staff extended through 2027+; no coaching changes anticipated. Emphasis on developing 2025 lottery class (Demin, Traore, Powell, Saraf, Wolf).
+    confidence: high
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 6 overall; own pick.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 2
+      protections: 2026 No. 33 overall; own pick.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 2
+      protections: 2026 No. 43 overall; from LAC via HOU.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: LAC
+    - year: 2027
+      round: 1
+      protections: swap rights only (Houston owns swap)
+      source: https://fanspo.com/nba/teams/Nets/3
+    - year: 2027
+      round: 1
+      protections: unprotected (New York Knicks)
+      source: https://fanspo.com/nba/teams/Nets/3
+    - year: 2027
+      round: 2
+      protections: unprotected (Los Angeles Lakers)
+      source: https://fanspo.com/nba/teams/Nets/3
+    - year: 2028
+      round: 1
+      protections: protected 1-8 (Philadelphia 76ers)
+      source: https://fanspo.com/nba/teams/Nets/3
+    - year: 2028
+      round: 1
+      protections: unprotected (own pick)
+      source: https://fanspo.com/nba/teams/Nets/3
+    - year: 2028
+      round: 2
+      protections: unprotected (own pick)
+      source: https://fanspo.com/nba/teams/Nets/3
+    - year: 2028
+      round: 2
+      protections: unprotected (Atlanta)
+      source: https://fanspo.com/nba/teams/Nets/3
+    - year: 2028
+      round: 2
+      protections: unprotected (Memphis)
+      source: https://fanspo.com/nba/teams/Nets/3
+    - year: 2027
+      round: 1
+      from_team: DAL
+      protections: unprotected
+      source: https://www.cbssports.com/nba/news/kyrie-irving-trade-mavericks-land-nets-all-star-for-spencer-dinwiddie-dorian-finney-smith-first-round-pick/
+    - year: 2025
+      round: 1
+      from_team: NYK
+      protections: unprotected
+      source: https://www.espn.com/nba/story/_/id/40433116/sources-knicks-acquire-mikal-bridges-nets
+    - year: 2027
+      round: 1
+      from_team: NYK
+      protections: unprotected
+      source: https://www.espn.com/nba/story/_/id/40433116/sources-knicks-acquire-mikal-bridges-nets
+    - year: 2029
+      round: 1
+      from_team: NYK
+      protections: unprotected
+      source: https://www.espn.com/nba/story/_/id/40433116/sources-knicks-acquire-mikal-bridges-nets
+    - year: 2031
+      round: 1
+      from_team: NYK
+      protections: unprotected
+      source: https://www.espn.com/nba/story/_/id/40433116/sources-knicks-acquire-mikal-bridges-nets
+  draft_picks_owed:
+    []
+  trade_exceptions:
+    - value: unknown
+      expires: unknown
+      source: unknown
+      confidence: low
+team_team_relationships:
+  rivalries:
+    - team_id: NYK
+      type: geographic
+      basis: Same metropolitan area; recent Mikal Bridges trade (June 2024) intensified competitive dynamic.
+    - team_id: BOS
+      type: competitive_recent
+      basis: Atlantic Division rivals; both rebuilding but with different timelines.
+    - team_id: PHI
+      type: geographic
+      basis: Northeast geographic rivalry; 76ers own protected 2028 first-rounder from Nets.
+  notable_personnel_connections:
+    - person: Sean Marks
+      connected_team: SAS
+      connection_type: former_assistant_gm
+      detail: Marks was assistant GM of Spurs (2014-16) before joining Nets; brought Spurs analytics culture.
+    - person: Jordi Fernandez
+      connected_team: DEN
+      connection_type: former_assistant
+      detail: Fernandez was assistant coach under Michael Malone in Denver (2016-22); helped reach four consecutive playoff berths.
+    - person: Jordi Fernandez
+      connected_team: SAC
+      connection_type: former_associate_hc
+      detail: Fernandez was associate head coach under Mike Brown in Sacramento (2022-24); helped Kings reach 2023 playoffs.
+    - person: Logan MacPhail
+      connected_team: SAS
+      connection_type: former_scout
+      detail: Director of Coaching Analytics; hired from Spurs connection via Sean Marks.
+g_league_and_stash:
+  affiliate_team: Long Island Nets
+  notable_affiliate_players:
+    - Tyson Etienne (two-way; split time Long Island/Brooklyn)
+  international_stash:
+    - Egor Demin (acquired July 2025 from BYU, played in ABA; currently on Nets roster)
+narrative_summary:
+  one_paragraph: "The Brooklyn Nets completed their first full rebuild season (20-62, 2025-26) under owner Joe Tsai's explicit pivot toward long-term youth development and draft capital accumulation. General Manager Sean Marks and newly extended head coach Jordi Fernandez deployed five first-round picks (Egor Demin #8, Nolan Traore #19, Drake Powell #22, Ben Saraf #26, Danny Wolf #27) in 2025 to build the league's youngest roster (half under 24). Michael Porter Jr., acquired mid-offseason for Cameron Johnson, emerged as a star (24.2 PPG, 46.3 FG%), while Nicolas Claxton (extension through 2029) anchored the rebuild core. With only 144.3M payroll and 91.8M cap space, Brooklyn now owns the 2026 No. 6 pick while Houston swap rights on the 2027 pick keep draft optimization central. Coach Fernandez's entire staff received multi-year extensions despite losing record, signaling organizational commitment to development over immediate wins."
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 6, No. 33, No. 43 from LAC; The Athletic mock-source layer lists No. 6: Darius Acuff Jr. as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - "Michael Porter Jr. extension negotiation: eligible for max deal; publicly expressed desire to stay; will signal Nets' willingness to build around star vs. pivot again."
+    - "Day'Ron Sharpe's post-surgery trajectory: UCL recovery critical to 2026-27 core; expiring contract requires re-signing or trade decision by summer 2026."
+sources_used:
+  - https://clutchpoints.com/nba/brooklyn-nets/nets-news-joe-tsai-hints-brooklyns-strategy-2025-26-season
+  - https://www.espn.com/nba/story/_/id/48542372/sources-nets-sign-coach-jordi-fernandez-staff-extensions
+  - https://www.nba.com/news/brooklyn-nets-jordi-fernandez-staff-extension
+  - https://www.nba.com/nets/news/2016/02/18/brooklyn-nets-name-sean-marks-general-manager
+  - https://www.netsdaily.com/2025/1/7/24338255/lewis-in-exclusive-interview-sean-marks-says-he-and-jordi-fernandez-in-sync-on-rebuild
+  - https://www.si.com/nba/nets/onsi/draft/nets-head-coach-jordi-fernandez-gm-sean-marks-break-down-2025-nba-draft
+  - https://www.si.com/nba/nets/onsi/looking-back-at-the-trade-that-brought-michael-porter-jr-to-the-brooklyn-nets
+  - https://www.cbssports.com/nba/news/nic-claxton-agrees-to-four-year-100-million-contract-extension-with-brooklyn-nets-per-report/
+  - https://www.basketball-reference.com/teams/BRK/2026.html
+  - https://www.salaryswish.com/teams/nets
+  - https://fanspo.com/nba/teams/Nets/3
+  - https://www.spotrac.com/nba/brooklyn-nets/cap
+  - https://www.clutchpoints.com/nba/brooklyn-nets/nets-news-michael-porter-jr-definitive-message-to-brooklyn-with-extension-trade-talks-on-horizon
+  - https://www.nba.com/news/nets-draft-egor-demin-eighth-overall
+  - https://www.nba.com/news/nets-hire-jordi-fernandez-as-coach
+  - https://www.nbcsports.com/nba/news/cam-thomas-rips-brooklyn-way-out-door-they-dont-believe-in-nobody
+  - https://www.si.com/nba/nets/onsi/news/how-the-nets-two-way-players-have-performed-over-the-past-month
+  - https://www.hoopsrumors.com/2025/09/nets-sign-liddell-to-two-way-contract-finalize-sharpe-deal.html
+  - https://www.nba.com/news/nets-center-dayron-sharpe-suffers-season-ending-thumb-injury
+  - https://nbacoaches.com/jordi-fernandez-head-coach-bio
+  - https://www.nba.com/news/nets-acquire-mikal-bridges-cameron-johnson-draft-compensation-four-team-trade
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - ownership.recent_transitions (confirmed "none")
+  - front_office.president_basketball_ops (role may not exist; unknown if delegated)
+  - player.michael_porter_jr.contract.total_value_remaining
+  - player.michael_porter_jr.contract.trade_kicker
+  - player.nic_claxton.contract.total_value_remaining
+  - player.egor_demin.contract.total_value_remaining
+  - player.nolan_traore.contract.total_value_remaining
+  - player.noah_clowney.contract fields (annual values not publicly disclosed)
+  - player.day_ron_sharpe.contract.annual_value_current_season
+  - player.ziaire_williams.contract.annual_value_current_season
+  - player.jalen_wilson.contract.annual_value_current_season
+  - player.ochai_agbaji.contract.annual_value_current_season
+  - player.terance_mann.contract.annual_value_current_season
+  - player.josh_minott.contract.annual_value_current_season
+  - player.tyson_etienne.contract.annual_value_current_season
+  - player.ej_liddell.contract.annual_value_current_season
+  - player.chaney_johnson (age, position, archetype, tier, trajectory, most contract fields)
+  - cap_situation.exceptions_available (specific amounts unknown)
+  - trade_exceptions (none reported)
+  - draft_picks_owed (2026 second-rounder allocation unclear)
+  - key_assets.trade_exceptions (none reported)
+vocabulary_flags:
+  - "Coaching tree: Fernandez is not from a named tree in v2.2.1 (Mike Brown tree does not exist in vocab; marked as 'brown_tree' informally). Brown hired Fernandez into NBA in 2009; mentorship clear but formal vocab insufficient."
+  - Rolan Smith mentioned in prompt does not appear on 2025-26 Nets roster; substituted accurate roster per Basketball-Reference, ESPN, and official team sources.
+  - Joe Harris pickup (mentioned in prompt) not found in 2025-26 season research; Harris traded to Detroit in 2023, last played 2023-24. May be outdated reference.
+  - "Adou Thiero drafted #36 but immediately traded to Lakers; not currently on Nets roster."
+  - Cam Johnson was acquired via Bridges trade (June 2024) but traded away to Denver for MPJ (July 2025); prompt may have confused timing.
+  - Trade kicker fields for most players set 'unknown' due to lack of public disclosure; where confirmed absent, marked 'none'.

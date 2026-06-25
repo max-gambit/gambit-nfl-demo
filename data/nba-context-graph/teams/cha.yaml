@@ -1,0 +1,1359 @@
+team_id: CHA
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Charlotte Hornets
+  conference: Eastern
+  division: Southeast
+  market_tier: tier_3
+  market_tier_rationale: Charlotte is a mid-size US TV market (~22nd DMA), no recent playoff equity (10-year playoff drought), and Forbes valuation ~$3.75B trails most large-market peers.
+ownership:
+  primary_owner:
+    name: Gabe Plotkin and Rick Schnall (co-chairmen)
+    type: group
+    tenure_years: 2.75
+    source: https://www.nba.com/news/michael-jordans-sale-of-majority-ownership-of-hornets-finalized
+    confidence: high
+  governance_notes: Plotkin (Tallwoods Capital) and Schnall (Clayton, Dubilier & Rice) acquired majority stake from Michael Jordan in Aug 2023 at ~$3B valuation; agreed to rotate governorship every 5 years, with Schnall first. Plotkin had been a minority owner and alternate governor since 2019.
+  recent_transitions: August 3, 2023 majority sale from Michael Jordan to Plotkin/Schnall group, finalized after 29-1 BoG vote; Jordan retains minority stake. J. Cole and Eric Church among minority investors.
+  spending_posture: moderate
+  spending_posture_evidence:
+    - 2025-26 active roster cap ~$158M; ranked 26th of 30 in payroll (Fanspo; Bleacher Report Apr 2026)
+    - Operated below tax line ($14.4M room) at deadline yet acted as buyer (Hoopsrumors Feb 2026)
+    - Plotkin public emphasis on patient, development-driven approach (WUNC/AP Aug 2023)
+front_office:
+  president_basketball_ops:
+    name: Jeff Peterson
+    tenure_start: 2024-03
+    prior_stops:
+      - Brooklyn Nets — Assistant GM (2019-2024)
+      - Atlanta Hawks — Asst GM/Director of Scouting (2012-2019)
+    public_philosophy_signals:
+      - Process-driven rebuild; emphasizes player development and not skipping steps
+      - Analytics-forward reputation (The Athletic 40 Under 40, 2022)
+      - "Stated culture goal: hard work, development, togetherness (Pride Magazine)"
+    confidence: high
+    source: https://www.nba.com/hornets/news/charlotte-hornets-name-jeff-peterson-executive-vice-president-of-basketball-operations; https://www.wfae.org/sports/2026-04-20/charlotte-hornets-exec-optimistic-about-the-future
+  general_manager:
+    name: Dotun Akinwale (Assistant GM; no separate GM titled)
+    tenure_start: 2024-05
+    prior_stops:
+      - Atlanta Hawks — VP of Player Personnel
+    public_philosophy_signals:
+      - Overlap with Peterson in Atlanta; player-personnel/scouting background
+    confidence: medium
+    source: https://atthehive.com/2024/05/16/charlotte-hornets-add-three-new-front-office-personnel/
+  head_coach:
+    name: Charles Lee
+    tenure_start: 2024-05
+    contract_through: 2028
+    style_notes: Budenholzer/Mazzulla lineage — pace-and-space, 5-out spacing, three-heavy attack; player-development emphasis. Won NBA Coach of the Month for January 2026 after 9-game win streak.
+    confidence: high
+    source: https://www.espn.com/nba/story/_/id/40111769/charles-lee-agrees-4-year-deal-hornets-coach-sources-say; https://nbacoaches.com/charles-lee-hornets-staff-win-2025-26-cotm-for-january/
+  assistant_coaches_notable:
+    - Lamar Skeeter (lead asst, ex-Utah Jazz)
+    - Josh Longstaff (lead asst, ex-Chicago Bulls; previously developed Coby White)
+    - Chris Jent (lead asst, ex-Lakers; worked with Lee under Budenholzer in Atlanta)
+    - Kemba Walker (Player Enhancement Coach)
+  notable_advisors_or_consultants:
+    - Mitch Kupchak — moved from President/GM to advisor Feb 2024 (continued status as of May 2026 unconfirmed)
+    - Steve Clifford — moved to advisory role after stepping down as HC April 2024
+strategic_posture:
+  timeframe: retool
+  confidence: high
+  derived_from:
+    - 44-38 finish, 9th in East (play-in eliminated by ORL Apr 17, 2026)
+    - 2026 deadline activity as buyer acquiring Coby White/Conley while keeping core young assets (Hoopsrumors Feb 2026)
+    - "Young core retained: Ball, Miller, Knueppel, Salaun, McNeeley, Diabate"
+    - Public Peterson messaging on not skipping steps but building (CLTure exit interview)
+  constraints:
+    - reason_code: young_core_developing
+      detail: Knueppel (20), Salaun (20), McNeeley (20), Miller (23), Ball (24) anchor core; rookie-scale lock-in for years
+      weight: high
+    - reason_code: new_front_office
+      detail: Peterson (Mar 2024) and Lee (May 2024) only 2 years in; ownership 2.75 years in
+      weight: medium
+    - reason_code: multi_year_lottery
+      detail: 10-year playoff drought; multiple top-6 picks in 2023/2024/2025
+      weight: high
+    - reason_code: ownership_directive
+      detail: Plotkin/Schnall publicly emphasize patient, development-driven build
+      weight: medium
+  trigger_events:
+    - April 17, 2026 play-in elimination by Orlando 121-90
+    - 2026 NBA Draft order finalized: CHA owns No. 14 and No. 18
+    - Brandon Miller / LaMelo Ball extension windows summer 2026
+    - Coby White unrestricted free agency July 2026
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: below_apron
+  current_payroll_estimate: 158143487
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: below_apron with meaningful room; multiple expirings (Coby White UFA, Bridges $22.8M expiring, Grant Williams $14.2M expiring, Josh Green $14.67M expiring) provide pivot capacity
+    - season: 2027-28
+      projected_status: potential cap space depending on Miller extension shape and Ball decisions
+  exceptions_available:
+    - TPE ~$14.10M (Fanspo)
+    - TPE ~$6.51M
+    - TPE ~$5.13M
+    - TPE ~$3.59M
+    - Smaller TPEs ~$1.93M, $0.44M, $0.20M
+    - Non-Taxpayer MLE assumed available (no hard cap triggered)
+  source: https://fanspo.com/nba/teams/Hornets/4 (Spotrac 403 fallback to Fanspo)
+  source_fallbacks_used:
+    - Spotrac.com returned 403 — used Fanspo as primary
+    - Cross-checked via basketball-reference.com/contracts/CHO.html and Bleacher Report apron analysis
+  confidence: high
+trade_dna:
+  frequent_partners:
+    - DAL
+    - PHX
+    - OKC
+    - CHI
+    - MIA
+  preferred_deal_archetypes:
+    - Convert expiring/rotational salary into expiring veteran assets plus draft capital
+    - Acquire former lottery picks on cheap deals (Dieng, Branham, Sexton)
+    - Leverage cap flexibility to absorb salary in exchange for picks
+    - Avoid trading core young assets while reshuffling middle of roster
+  recent_significant_trades:
+    - date: 2024-01-23
+      summary: Terry Rozier to MIA for Kyle Lowry + 2027 1st (top-14 protected)
+      counterparties:
+        - MIA
+    - date: 2024-02-08
+      summary: PJ Washington to DAL for Grant Williams, Seth Curry, 2027 1st (top-2 protected)
+      counterparties:
+        - DAL
+        - WAS
+    - date: 2024-02-08
+      summary: Gordon Hayward to OKC for Vasilije Micic, Tre Mann, Davis Bertans, 2 2nds
+      counterparties:
+        - OKC
+    - date: 2024-07
+      summary: 6-team Klay Thompson sign-and-trade — Hornets received Josh Green from DAL
+      counterparties:
+        - DAL
+    - date: 2025-02
+      summary: Acquired Jusuf Nurkic + 2026 1st (PHX/WAS/ORL/MEM least favorable) from PHX for Cody Martin, Micic, 2026 2nd
+      counterparties:
+        - MEM
+        - ORL
+        - PHX
+        - WAS
+    - date: 2025-02
+      summary: Mark Williams to LAL trade (Knecht + picks) RESCINDED on failed physical
+      counterparties:
+        - LAL
+    - date: 2025-06-29
+      summary: Acquired Collin Sexton + 2030 2nd from UTA for Jusuf Nurkic
+      counterparties:
+        - UTA
+    - date: 2025-06-25
+      summary: Mark Williams to PHX for Liam McNeeley draft rights (#29), 2029 1st (CLE/UTA/MIN least fav, top-5 prot), Vasilije Micic
+      counterparties:
+        - CLE
+        - MIN
+        - PHX
+        - UTA
+    - date: 2025-07-06
+      summary: Acquired Pat Connaughton + 2031/2032 2nds from MIL for Vasilije Micic
+      counterparties:
+        - MIL
+    - date: 2026-02-04
+      summary: Acquired Coby White + Mike Conley from CHI for Collin Sexton, Ousmane Dieng, 3 2nd-round picks
+      counterparties:
+        - CHI
+    - date: 2026-02-04
+      summary: Mason Plumlee to OKC for Ousmane Dieng + 2029 2nd (Dieng routed to CHI)
+      counterparties:
+        - CHI
+        - OKC
+    - date: 2026-02-04
+      summary: Acquired Tyus Jones + 2 2nds from ORL for cash; flipped Jones to DAL in 3-team variant for Malaki Branham + ~$7M TPE
+      counterparties:
+        - DAL
+        - ORL
+    - date: 2026-02
+      summary: Acquired Xavier Tillman from BOS for $3.5M cash
+      counterparties:
+        - BOS
+  confidence: high
+cultural_signals:
+  stability:
+    value: medium
+    detail: Coherent leadership (ownership 2.75 yrs, Peterson 2 yrs, Lee 2 yrs); aligned philosophy. Still early in regime; no extensions yet.
+  player_friendly:
+    value: mixed
+    detail: Player-development emphasis and Kemba Walker on staff suggest player-friendly, but reporting on LaMelo dissatisfaction (Yahoo/Iko Nov 2025) and Spoelstra criticism after Adebayo incident indicate friction points.
+  analytics_orientation:
+    value: balanced
+    detail: Peterson (BKN/ATL bg), VP Patrick Harrel (Basketball Insights & Analysis); Lee from Mazzulla/Budenholzer trees that lean modern. Not bleeding-edge but clearly modernizing under new regime.
+  risk_tolerance:
+    value: moderate
+    detail: 2026 deadline showed willingness to act (5 trades) without overpaying picks or surrendering young core; willing to absorb salary; declined to chase Giannis or trade LaMelo.
+  notable_traits:
+    - developmental_org
+    - process_driven
+    - homegrown_priority
+  rationale: Heavy investment in lottery picks (Ball, Miller, Salaun, Knueppel, McNeeley) plus retained young core through deadline, plus public Peterson statements emphasizing 'not skipping steps' and culture of player development.
+  confidence: high
+roster:
+  - player_id: lamelo_ball
+    name: LaMelo Ball
+    age: 24
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - secondary_creator
+          - spacer
+      defensive_role: liability
+      shooting_profile: good
+      special_traits:
+        - elite_passer
+        - pnr_maestro
+        - injury_prone
+    tier: star
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 130355280
+      annual_value_current_season: 37958760
+      annual_value_next_season: 40705260
+      no_trade_clause: none
+      trade_kicker: 0.15
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://fanspo.com/nba/teams/Hornets/4; Front Office Sports
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: trade_kicker_prohibitive
+          weight: medium
+      falsification_conditions:
+        - Public reporting from Charania/Stein/Fischer that Hornets actively shopping Ball
+        - Ball formally requesting trade
+      signal_strength: widely_reported
+    team_relationship:
+      tenure_with_team: 5.8
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: 5-yr designated rookie max; 15% trade kicker; team flagship
+    confidence: high
+    source: unknown
+  - player_id: brandon_miller
+    name: Brandon Miller
+    age: 23
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - injury_prone
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: 15103260
+      annual_value_current_season: 11968800
+      annual_value_next_season: 15103260
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: unknown
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: medium
+      falsification_conditions:
+        - Public reporting of Miller trade discussions in offseason
+        - Miller extension not signed by October 2026 deadline
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2.9
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: "2023 #2 pick; rookie-max extension candidate summer 2026 per Bobby Marks"
+    confidence: high
+    source: https://www.hoopsrumors.com/2026/04/hornets-notes-lee-physicality-lamelo-knueppel-offseason.html; Fanspo
+  - player_id: miles_bridges
+    name: Miles Bridges
+    age: 28
+    position_listed: F
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - finisher
+          - spacer
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 22800000
+      annual_value_current_season: 25000000
+      annual_value_next_season: 22800000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: unknown
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: expiring_contract_value
+          weight: high
+        - reason_code: positional_redundancy
+          weight: medium
+      falsification_conditions:
+        - Hornets re-sign Bridges to multi-year extension
+        - Bridges signed and retained past Feb 2027 trade deadline
+        - Public statement from Peterson that Bridges is part of core
+      signal_strength: widely_reported
+    team_relationship:
+      tenure_with_team: 7.8
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: Drew interest from MIL/GSW/PHX at 2026 deadline; Hornets sought 1st-round pick (Sam Amick, The Athletic)
+    confidence: high
+    source: unknown
+  - player_id: coby_white
+    name: Coby White
+    age: 26
+    position_listed: G
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - spacer
+      defensive_role: point_of_attack
+      shooting_profile: good
+      special_traits:
+        - transition_threat
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 0
+      total_value_remaining: 0
+      annual_value_current_season: 12888889
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: expired_pending_decision
+      source: unknown
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: recently_acquired
+          weight: high
+      falsification_conditions:
+        - Peterson fails to re-sign White to multi-year extension
+        - White walks in free agency and signs elsewhere
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.25
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: UFA July 2026; Peterson identified re-signing as top offseason priority (CLTure exit interview)
+    confidence: high
+    source: https://www.nba.com/hornets/news/hornets-acquire-coby-white-and-mike-conley-from-bulls
+  - player_id: josh_green
+    name: Josh Green
+    age: 25
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - spacer
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 14666667
+      annual_value_current_season: 13666667
+      annual_value_next_season: 14666667
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: unknown
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions:
+        - Josh Green included in trade package for notable acquisition
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.8
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Acquired in Klay S&T chain; expiring after 2026-27
+    confidence: high
+    source: unknown
+  - player_id: grant_williams
+    name: Grant Williams
+    age: 27
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: spacer
+        secondary:
+          - connector
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits:
+        - vet_leadership
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 14200000
+      annual_value_current_season: 13645500
+      annual_value_next_season: 14200000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: unknown
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: expiring_contract_value
+          weight: medium
+      falsification_conditions:
+        - Grant Williams traded before next deadline
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2.2
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Final year of 4-yr/$53M extension signed at DAL; expiring movable salary
+    confidence: high
+    source: unknown
+  - player_id: kon_knueppel
+    name: Kon Knueppel
+    age: 20
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary:
+          - connector
+          - tertiary_scorer
+      defensive_role: helper
+      shooting_profile: elite
+      special_traits: []
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 35471334
+      annual_value_current_season: 10015680
+      annual_value_next_season: 10516680
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2029
+      bird_rights: full
+      contract_through: 2029
+      source: unknown
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: high
+      falsification_conditions:
+        - Public reporting Hornets shopping Knueppel
+        - Inclusion of Knueppel in any star-acquisition trade rumor
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.85
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: "2025 #4 pick; ROY contender; rookie scale through 2028-29"
+    confidence: high
+    source: unknown
+  - player_id: tre_mann
+    name: Tre Mann
+    age: 24
+    position_listed: G
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - secondary_creator
+          - spacer
+      defensive_role: liability
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: 16000000
+      annual_value_current_season: 8000000
+      annual_value_next_season: 8000000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: 2028
+      bird_rights: full
+      contract_through: 2028
+      source: unknown
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: positional_redundancy
+          weight: low
+      falsification_conditions:
+        - Trade deadline activity involving Mann
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2.2
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: 3yr/$24M deal signed July 2025; team option in Y3
+    confidence: high
+    source: unknown
+  - player_id: tidjane_salaun
+    name: Tidjane Salaun
+    age: 20
+    position_listed: F
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: spacer
+        secondary:
+          - connector
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: 18594593
+      annual_value_current_season: 7863240
+      annual_value_next_season: 8236800
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2028
+      bird_rights: full
+      contract_through: 2028
+      source: unknown
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_developing
+          weight: medium
+      falsification_conditions:
+        - Salaun included in trade for star-caliber player
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.85
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: "2024 #6 pick on rookie scale; Y3 team option exercised Oct 2025"
+    confidence: high
+    source: unknown
+  - player_id: liam_mcneeley
+    name: Liam McNeeley
+    age: 20
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary:
+          - connector
+      defensive_role: helper
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 11430178
+      annual_value_current_season: 2763960
+      annual_value_next_season: 2895000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2029
+      bird_rights: full
+      contract_through: 2029
+      source: unknown
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_developing
+          weight: medium
+      falsification_conditions:
+        - McNeeley traded in significant deal
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.85
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: "Acquired draft rights from PHX in Mark Williams trade; 2025 #29 on rookie scale"
+    confidence: high
+    source: unknown
+  - player_id: moussa_diabate
+    name: Moussa Diabate
+    age: 24
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+        - offensive_rebound_specialist
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: 2400000
+      annual_value_current_season: 2270735
+      annual_value_next_season: 2400000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: early
+      contract_through: 2027
+      source: unknown
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions:
+        - Diabate makes restricted free agency; team declines to match offer
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.5
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Won 2025-26 NBA Hustle Award; converted from two-way during 2024-25
+    confidence: high
+    source: unknown
+  - player_id: pat_connaughton
+    name: Pat Connaughton
+    age: 33
+    position_listed: G/F
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary: []
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits:
+        - vet_leadership
+    tier: fringe
+    trajectory: declining
+    contract:
+      years_remaining: 0
+      total_value_remaining: 0
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: expired_pending_decision
+      source: unknown
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions:
+        - Connaughton extended to multi-year deal
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.83
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Acquired summer 2025 from MIL; waived Feb 4 2026, re-signed Feb 9 to minimum
+    confidence: medium
+    source: unknown
+  - player_id: xavier_tillman
+    name: Xavier Tillman
+    age: 27
+    position_listed: F/C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - finisher
+      defensive_role: switchable
+      shooting_profile: non_shooter
+      special_traits: []
+    tier: fringe
+    trajectory: peak
+    contract:
+      years_remaining: 0
+      total_value_remaining: 0
+      annual_value_current_season: 2546675
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: expired_pending_decision
+      source: unknown
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions:
+        - Tillman re-signed to multi-year deal
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.83
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Acquired off-season from BOS for $3.5M cash; minimum deal expiring
+    confidence: medium
+    source: unknown
+  - player_id: sion_james
+    name: Sion James
+    age: 23
+    position_listed: G/F
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary: []
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits: []
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 7672689
+      annual_value_current_season: 2296274
+      annual_value_next_season: 2400000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2029
+      bird_rights: full
+      contract_through: 2029
+      source: unknown
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions:
+        - James traded or included in package
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.85
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: "2025 #33 pick (Duke); 4-yr 2nd-round-exception deal"
+    confidence: medium
+    source: unknown
+  - player_id: ryan_kalkbrenner
+    name: Ryan Kalkbrenner
+    age: 24
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits: []
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 7672689
+      annual_value_current_season: 2296274
+      annual_value_next_season: 2400000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2029
+      bird_rights: full
+      contract_through: 2029
+      source: unknown
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions:
+        - Kalkbrenner traded or included in deal
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.85
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: "2025 #34 pick (Creighton); 4-yr 2nd-round-exception deal"
+    confidence: medium
+    source: unknown
+  - player_id: pj_hall
+    name: PJ Hall
+    age: 23
+    position_listed: F/C
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary: []
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits: []
+    tier: two_way
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2027
+      bird_rights: non
+      contract_through: 2027
+      source: unknown
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions:
+        - Hall converted to standard contract and traded
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.85
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Two-way; RFA 2027
+    confidence: medium
+    source: unknown
+  - player_id: antonio_reeves
+    name: Antonio Reeves
+    age: 25
+    position_listed: G
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: spacer
+        secondary:
+          - tertiary_scorer
+      defensive_role: liability
+      shooting_profile: good
+      special_traits: []
+    tier: two_way
+    trajectory: ascending
+    contract:
+      years_remaining: 0
+      total_value_remaining: 0
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: expired_pending_decision
+      source: unknown
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions:
+        - Reeves signed to standard contract and traded
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.7
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way; RFA July 2026
+    confidence: medium
+    source: unknown
+  - player_id: kj_simpson
+    name: KJ Simpson
+    age: 23
+    position_listed: PG
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary: []
+      defensive_role: liability
+      shooting_profile: functional
+      special_traits: []
+    tier: two_way
+    trajectory: ascending
+    contract:
+      years_remaining: 0
+      total_value_remaining: 0
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: expired_pending_decision
+      source: unknown
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions:
+        - Simpson converted to standard contract and traded
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.85
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: "2024 #42 pick on two-way; RFA 2026"
+    confidence: medium
+    source: unknown
+pending_free_agents:
+  - player_id: coby_white
+    name: Coby White
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: unknown
+    expected_market: re_sign_likely
+    expected_market_detail: Peterson called re-signing the top offseason priority (CLTure exit interview Apr 2026); was the centerpiece of deadline acquisition
+    notes: Functional starting guard alongside LaMelo; Bird rights enable over-cap retention
+    source: https://clture.org/jeff-peterson-exit-interview/
+  - player_id: pat_connaughton
+    name: Pat Connaughton
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Vet minimum bench piece; re-signed late season after being waived
+    notes: ""
+    source: unknown
+  - player_id: xavier_tillman
+    name: Xavier Tillman
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Backup big on minimum
+    notes: ""
+    source: unknown
+  - player_id: antonio_reeves
+    name: Antonio Reeves
+    type: restricted_via_qualifying_offer
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: retain
+    expected_market_detail: Two-way QO retention path
+    notes: ""
+    source: unknown
+  - player_id: kj_simpson
+    name: KJ Simpson
+    type: restricted_via_qualifying_offer
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: retain
+    expected_market_detail: Two-way QO retention path
+    notes: ""
+    source: unknown
+known_target_history:
+  - target: Chris Paul
+    year: 2025
+    outcome: not_acquired
+    detail: Pursued briefly summer 2025 but PG wanted to remain near LA; pivoted to Spencer Dinwiddie
+    source: https://www.hoopsrumors.com/2025/09/nba-2025-offseason-check-in-charlotte-hornets.html
+  - target: Coby White
+    year: 2026
+    outcome: acquired
+    detail: Acquired Feb 4 2026 in 5-piece deadline package from Chicago
+    source: https://www.nba.com/hornets/news/hornets-acquire-coby-white-and-mike-conley-from-bulls
+  - target: Lonzo Ball (CLE)
+    year: 2026
+    outcome: not_acquired
+    detail: Preliminary talks reported by Fischer/Stein driven by Cleveland second-apron pressure
+    source: unknown
+  - target: Nic Claxton / Myles Turner / Daniel Gafford
+    year: 2026
+    outcome: not_acquired
+    detail: Floated as deadline center targets per Jake Weinbach reporting
+    source: unknown
+  - target: Giannis Antetokounmpo
+    year: 2026
+    outcome: not_acquired
+    detail: Speculative — Ramona Shelburne mentioned Charlotte as possibly making calls
+    source: unknown
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "Charlotte Hornets hold No. 14, No. 18 from ORL in the official post-lottery order. Mock-source layer: No. 14: Hannes Steinbach; No. 18: Christian Anderson Jr.; treat prospect names as low-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: low
+  - priority: Re-sign Coby White
+    timeline: next_30_days
+    type: free_agency
+    detail: Peterson named as top offseason priority; full Bird rights
+    confidence: high
+  - priority: Brandon Miller rookie-scale extension decision
+    timeline: this_offseason
+    type: extension
+    detail: Eligible summer 2026 after 3rd year; max deal possible per Bobby Marks
+    confidence: high
+  - priority: Evaluate Miles Bridges trade vs. expiring retention
+    timeline: by_trade_deadline
+    type: trade
+    detail: Drew interest at deadline; expiring $22.8M is movable salary
+    confidence: medium
+  - priority: Charles Lee evaluation post-2026-27
+    timeline: next_season
+    type: coaching_decision
+    detail: On original 4-yr deal through 2027-28; likely extension talks if trajectory continues
+    confidence: medium
+  - priority: LaMelo Ball availability and role definition
+    timeline: this_season
+    type: roster
+    detail: Minutes restriction reduced through 2025-26; sustaining health and chemistry with Coby White is critical
+    confidence: high
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 14 overall; own pick.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 1
+      protections: 2026 No. 18 overall; from ORL via PHX.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: ORL
+    - year: 2027
+      round: 1
+      protections: Own pick
+      source: unknown
+    - year: 2027
+      round: 1
+      protections: MIA 1st, top-14 protected (from Rozier trade Jan 2024)
+      source: unknown
+    - year: 2027
+      round: 1
+      protections: DAL 1st, top-2 protected (from PJ Washington trade Feb 2024)
+      source: unknown
+    - year: 2028
+      round: 1
+      protections: Own pick
+      source: unknown
+    - year: 2029
+      round: 1
+      protections: Own pick
+      source: unknown
+    - year: 2029
+      round: 1
+      protections: Least favorable of CLE/UTA/MIN, MIN top-5 protected (acquired June 2025 in Mark Williams trade)
+      source: unknown
+    - year: 2030
+      round: 1
+      protections: Own pick
+      source: unknown
+    - year: 2031
+      round: 1
+      protections: Own pick
+      source: unknown
+    - year: 2032
+      round: 1
+      protections: Own pick
+      source: unknown
+    - year: 2027
+      round: 1
+      from_team: MIA
+      protections: lottery protected (1-14); Heat keep if 15+
+      source: https://allucanheat.com/full-list-of-heat-draft-picks-ahead-of-next-superstar-pursuit
+    - year: 2029
+      round: 1
+      from_team: PHX
+      protections: 1-5 protected; least favorable of CLE/UTA/MIN picks
+      source: https://www.si.com/nba/hornets/onsi/news/checking-in-on-mark-williams-early-season-success-with-the-phoenix-suns
+  draft_picks_owed:
+    - year: 2026
+      round: 2
+      to_team: SAC
+      protections: 2026 No. 45 overall; from CHA via SAS, ATL, and NYK.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2027
+      round: 2
+      to_team: SAC
+      protections: none
+      source: unknown
+  trade_exceptions:
+    - value: 14104000
+      expires: unknown
+      source: unknown
+      confidence: medium
+    - value: 6512625
+      expires: unknown
+      source: unknown
+      confidence: medium
+    - value: 5134000
+      expires: unknown
+      source: unknown
+      confidence: medium
+    - value: 3585600
+      expires: unknown
+      source: unknown
+      confidence: medium
+    - value: 1930681
+      expires: unknown
+      source: unknown
+      confidence: low
+team_team_relationships:
+  rivalries:
+    - team_id: MIA
+      type: personnel_grudge
+      basis: Rozier trade Jan 2024; April 2026 play-in OT loss to Hornets where Spoelstra publicly criticized LaMelo for play injuring Bam Adebayo
+    - team_id: ORL
+      type: geographic
+      basis: Southeast division; Magic eliminated Hornets in 2026 play-in 121-90 (largest play-in halftime margin in tournament history)
+    - team_id: DAL
+      type: personnel_grudge
+      basis: Frequent partner — PJ Washington (Feb 2024), Klay S&T returning Josh Green (summer 2024), Tyus Jones flip (Feb 2026)
+    - team_id: ATL
+      type: geographic
+      basis: Southeast division
+    - team_id: WAS
+      type: geographic
+      basis: Southeast division; pick swap entanglements
+    - team_id: DET
+      type: incident_based
+      basis: Feb 9 2026 on-court brawl at Spectrum Center; multiple 4-game suspensions
+  notable_personnel_connections:
+    - person: Michael Jordan
+      connected_team: CHA
+      connection_type: former_owner
+      detail: Owned majority 2010-2023; retains minority stake post-sale
+    - person: Mitch Kupchak
+      connected_team: CHA
+      connection_type: former_president
+      detail: Stepped down Feb 2024; transitioned to advisor (current status unconfirmed)
+    - person: Steve Clifford
+      connected_team: CHA
+      connection_type: former_head_coach
+      detail: Stepped down April 2024 to advisory role
+    - person: Charles Lee
+      connected_team: BOS
+      connection_type: former_assistant
+      detail: Top assistant under Joe Mazzulla; won 2024 NBA title before taking Hornets job
+    - person: Charles Lee
+      connected_team: MIL
+      connection_type: former_associate_hc
+      detail: Associate HC under Mike Budenholzer; won 2021 title
+    - person: Jeff Peterson
+      connected_team: BKN
+      connection_type: former_assistant_gm
+      detail: 2019-2024; helped roster build during KD/Kyrie/Harden era and Mikal Bridges/Cam Johnson trade
+    - person: Jeff Peterson
+      connected_team: ATL
+      connection_type: former_assistant_gm
+      detail: 2012-2019; rose from intern to AGM
+    - person: Dotun Akinwale
+      connected_team: ATL
+      connection_type: former_executive
+      detail: Followed Peterson from Atlanta as VP of Player Personnel
+    - person: Chris Jent
+      connected_team: LAL
+      connection_type: former_assistant
+      detail: Joined Lee staff July 2024 from LAL
+    - person: Josh Longstaff
+      connected_team: CHI
+      connection_type: former_assistant
+      detail: Developed Coby White in Chicago; relationship factored into 2026 Coby White trade
+    - person: Kemba Walker
+      connected_team: CHA
+      connection_type: alum_returning
+      detail: Player Enhancement Coach since July 2024
+g_league_and_stash:
+  affiliate_team: Greensboro Swarm
+  notable_affiliate_players:
+    - PJ Hall (two-way)
+    - Antonio Reeves (two-way)
+    - KJ Simpson (two-way)
+  international_stash: []
+narrative_summary:
+  one_paragraph: Charlotte enters May 2026 in a maturing rebuild led by Plotkin/Schnall ownership (since Aug 2023), Jeff Peterson as President of Basketball Ops (since Mar 2024), and Charles Lee as head coach (since May 2024 on a 4-year deal). The 2025-26 club went 44-38, made the play-in, and was eliminated by Orlando — its first winning season in four years and a 25-game improvement. The young core (Ball 24, Miller 23, Knueppel 20, Salaun 20, McNeeley 20, Diabate 24) is intact; Peterson acted as buyer at the Feb 5 2026 deadline, executing five trades to acquire Coby White and Mike Conley from Chicago without sacrificing core picks or young talent. Mark Williams was traded to Phoenix in June 2025 (post-rescinded LAL deal). The team is below the apron with significant cap flexibility, owns multiple incoming firsts (own 2026, PHX 2026, MIA 2027, DAL 2027, MIN-conditional 2029), and faces key 2026 offseason calls on Coby White (UFA, top priority), Brandon Miller extension, and Miles Bridges' expiring.
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 14, No. 18 from ORL; The Athletic mock-source layer lists No. 14: Hannes Steinbach; No. 18: Christian Anderson Jr. as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - Coby White re-signing terms and Brandon Miller rookie-scale max extension
+    - LaMelo Ball trade chatter recurrence and minutes/health management going into 2026-27
+sources_used:
+  - https://www.nba.com/hornets/news/charlotte-hornets-name-jeff-peterson-executive-vice-president-of-basketball-operations
+  - https://www.nba.com/news/michael-jordans-sale-of-majority-ownership-of-hornets-finalized
+  - https://www.espn.com/nba/story/_/id/40111769/charles-lee-agrees-4-year-deal-hornets-coach-sources-say
+  - https://www.nba.com/hornets/news/charlotte-hornets-name-charles-lee-head-coach
+  - https://www.nba.com/hornets/news/hornets-acquire-coby-white-and-mike-conley-from-bulls
+  - https://www.nba.com/news/suns-hornets-trade-mark-williams
+  - https://www.nba.com/news/magic-rout-hornets-in-play-in-tournament-to-clinch-no-8-seed-in-the-east
+  - https://www.basketball-reference.com/teams/CHO/2026.html
+  - https://en.wikipedia.org/wiki/2025%E2%80%9326_Charlotte_Hornets_season
+  - https://fanspo.com/nba/teams/Hornets/4
+  - https://fanspo.com/nba/teams/Hornets/4/draft-picks
+  - https://www.hoopsrumors.com/2026/02/examining-the-hornets-trade-deadline-moves.html
+  - https://www.hoopsrumors.com/2026/04/hornets-notes-lee-physicality-lamelo-knueppel-offseason.html
+  - https://www.hoopsrumors.com/2025/09/nba-2025-offseason-check-in-charlotte-hornets.html
+  - https://www.hoopsrumors.com/2025/06/hornets-to-trade-mark-williams-to-suns-for-no-29-2029-first-rounder.html
+  - https://www.hoopsrumors.com/2026/04/2026-nba-draft-lottery-odds.html
+  - https://www.wfae.org/sports/2026-04-20/charlotte-hornets-exec-optimistic-about-the-future
+  - https://clture.org/jeff-peterson-exit-interview/
+  - https://atthehive.com/2024/05/16/charlotte-hornets-add-three-new-front-office-personnel/
+  - https://swarmandsting.com/posts/charlotte-hornets-finalize-new-front-office-structure-01hy3gzsm401
+  - https://nbacoaches.com/charles-lee-head-coach-bio/
+  - https://nbacoaches.com/charles-lee-hornets-staff-win-2025-26-cotm-for-january/
+  - https://www.foxsports.com/stories/nba/mitch-kupchak-steps-down-as-charlotte-hornets-gm
+  - https://www.si.com/nba/hornets/onsi/draft/all-2026-draft-pick-scenarios-for-hornets-and-suns-picks-in-nba-play-in
+  - https://bleacherreport.com/articles/25416249-examining-hornets-salary-cap-decisions-2026-nba-free-agency-after-magic-loss
+  - https://bleacherreport.com/articles/25367141-nba-trade-rumors-lamelo-ball-miles-bridges-amid-latest-2026-deadline-chatter
+  - https://frontofficesports.com/trade-rumors-swirl-around-lamelo-ball-and-his-168m-contract/
+  - https://businessnc.com/nc-trend-hornets-new-ownership-lays-a-path-of-success-for-the-states-nba-franchise/
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - ownership.primary_owner.tenure_years (computed but governance rotation timing approximate)
+  - front_office.president_basketball_ops exact title-upgrade date (EVP→President)
+  - front_office.head_coach.contract_through (inferred 2028 from 4-year May 2024 deal; not officially confirmed via press release)
+  - Mitch Kupchak's continued advisory status as of May 2026
+  - Buzz Peterson's current role under new regime
+  - Miles Bridges / Josh Green / Grant Williams / Tre Mann trade kicker percentages (Fanspo did not surface)
+  - Most player Bird-rights classifications inferred from contract sign method; may need Spotrac verification
+  - PJ Hall, Antonio Reeves, KJ Simpson exact two-way contract amounts
+  - Pat Connaughton re-signed minimum exact value
+  - Trade exception expiration dates
+  - International stash players (none confirmed)
+  - 2026 2nd-round pick destination clarification (task said GSW; Fanspo says SAC/DET routing)
+  - Specific return on Tyus Jones flip to DAL (Branham widely reported but TPE size unconfirmed)
+  - pending_free_agents.cap_hold_amount values
+vocabulary_flags:
+  - "strategic_posture.timeframe: chose 'retool' over 'rebuild' because team made play-in, won 44 games, and acted as buyer at 2026 deadline; pure 'rebuild' undersells the trajectory."
+  - "near_term_priorities timelines standardized to v2.2.1 vocab: replaced '2026-27 season' → 'next_season', 'May 10, 2026' → 'this_offseason', 'July 2026' → 'next_30_days' per spec."
+  - "near_term_priorities type: changed 'coaching' → 'coaching_decision' per v2.2.1 expansion."
+  - "connection_type values: mapped 'former_majority_owner' → 'former_owner', 'former_vp_player_personnel' → 'former_executive' to align with v2.2.1 vocab."
+  - rivalries.type for DET changed 'media_manufactured' → 'incident_based' (Feb 9 2026 brawl is a concrete incident, not media-driven narrative).
+  - "hard_capped field: corrected from boolean false → 'no' per v2.2.1 type-coercion rules."
+  - "All homegrown fields: corrected from boolean true/false → 'yes'/'no' per v2.2.1 type-coercion rules."
+  - "All trade_kicker fields: corrected integer 15 → decimal 0.15; integer 0 → string 'none' per v2.2.1 type-coercion rules."
+  - "All player_option/team_option fields: corrected boolean false → string 'none'; year integers left intact per v2.2.1 type-coercion rules."
+  - All available/shopped/actively_traded players now include ≥1 falsification_condition per v2.2.1 spec; added for Miles Bridges, Coby White, Josh Green, Grant Williams, et al.
+  - All unlikely-status players without reasons now include ≥1 falsification_condition for internal consistency and spec compliance.

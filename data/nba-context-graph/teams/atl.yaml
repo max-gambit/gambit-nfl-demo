@@ -1,0 +1,1045 @@
+team_id: ATL
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Atlanta Hawks
+  conference: Eastern
+  division: Southeast
+  market_tier: tier_2
+  market_tier_rationale: Major metro area (ATL) with strong sports culture, but mid-sized TV market compared to tier_1 cities (NYC, LA, Boston); franchise has won championships but hasn't contended consistently since 2021.
+ownership:
+  primary_owner:
+    name: Tony Ressler
+    type: individual
+    tenure_years: 10.9
+    source: https://www.nba.com/hawks/tony-ressler-bio
+    confidence: high
+  governance_notes: Principal owner and governor. Minority investors include Grant Hill, Sara Blakely, Jesse Itzler, Steven Price, Rick Schnall. Ressler leads Apollo Global Management and Ares Management; estimated net worth $10.5B (2026).
+  recent_transitions: None in past 3 years.
+  spending_posture: aggressive_spender
+  spending_posture_evidence:
+    - 2025-26 payroll $187M places team above cap; acquired Kristaps Porzingis at deadline in major three-team trade.
+    - Extended Dyson Daniels ($100M/4yr) and Jalen Johnson ($150M/5yr) in October 2024-2025; extended Onyeka Okongwu ($62M/4yr) before 2023-24 season.
+    - Signed Luke Kennard ($11M/1yr) and Nickeil Alexander-Walker ($62M/4yr) in summer 2025 free agency.
+front_office:
+  president_basketball_ops:
+    name: unknown
+    tenure_start: unknown
+    prior_stops: []
+    public_philosophy_signals: []
+    confidence: low
+    source: https://www.nba.com/news/onsi-saleh-new-gm-landry-fields-out-hawks
+  general_manager:
+    name: Onsi Saleh
+    tenure_start: 2025-04
+    prior_stops:
+      - San Antonio Spurs (assistant GM, 2022-2024)
+      - Golden State Warriors (VP basketball strategy and team counsel, 2021-2024)
+    public_philosophy_signals:
+      - Draft best player available philosophy; influenced by R.C. Buford (Spurs) and Bob Myers (Warriors).
+      - Emphasis on roster construction via draft with strong chemistry and culture development, citing Pacers and Thunder as models.
+      - Focus on building through youth development within cap constraints.
+    confidence: high
+    source: https://www.peachtreehoops.com/2025/6/24/24455043/atlanta-hawks-onsi-salehs-quotes-nba-draft
+  head_coach:
+    name: Quin Snyder
+    tenure_start: 2023-02
+    contract_through: 2027
+    style_notes: Defense-first identity; emphasizes switching and positionless basketball. Former Utah Jazz coach (8 seasons). Prioritizes ball movement and discipline.
+    coaching_tree: popovich_tree
+    confidence: high
+    source: https://www.nba.com/hawks/news/atlanta-hawks-name-quin-snyder-head-coach
+  assistant_coaches_notable: []
+  notable_advisors_or_consultants: []
+strategic_posture:
+  timeframe: contend_soon
+  confidence: medium
+  derived_from:
+    - Made playoffs for first time since 2023; avoided play-in in 2025-26 with 6th seed despite mid-season Trae Young trade.
+    - Core backcourt (Dyson Daniels, CJ McCollum) and frontcourt (Jalen Johnson, Onyeka Okongwu, Kristaps Porzingis) positioning for sustained contention.
+    - Young core developing (Zaccharie Risacher, Asa Newell) while maintaining veteran presence; 2025-26 offseason additions focused on complementary pieces.
+  constraints:
+    - reason_code: young_core_developing
+      detail: Risacher (21), Newell (19), Daniels (23) still in growth phases; Johnson (24) ramping up after shoulder injury.
+      weight: high
+    - reason_code: tax_apron_constraints
+      detail: Currently below first apron but committed to Young/Daniels/Johnson extensions; limited future cap flexibility.
+      weight: medium
+    - reason_code: coaching_decision_pending
+      detail: Snyder contract discussion expected after season; unclear if long-term extension reached by May 2026.
+      weight: low
+  trigger_events:
+    - Early playoff exit vs. Knicks (Game 6) signals need for defensive and spacing upgrades; likely to inform 2026 offseason moves.
+    - Kristaps Porzingis UFA in summer 2026; extension or re-sign decision critical to frontcourt durability.
+    - CJ McCollum expiring; retain or pivot to younger guards in rotation.
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: below_apron
+  current_payroll_estimate: 186769942
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Significant flexibility if Porzingis and McCollum depart as free agents; Dyson Daniels and Jalen Johnson extensions lock in core salary.
+  exceptions_available: []
+  source: https://www.spotrac.com/nba/atlanta-hawks/payroll
+  source_fallbacks_used: []
+  confidence: high
+trade_dna:
+  frequent_partners:
+    - NOP
+    - LAC
+    - BOS
+    - WAS
+  preferred_deal_archetypes:
+    - Salary relief trades (e.g., Porzingis for flexibility; Young to Wizards for McCollum/Kispert).
+    - Young talent exchanges (Dejounte Murray → Dyson Daniels; Bogdan Bogdanovic → Bones Hyland).
+    - Multi-team complexity (3-team Porzingis deal with Celtics/Nets; 5-team swap involving Pelicans/Clippers/Grizzlies/Thunder).
+  recent_significant_trades:
+    - date: 2026-01-09
+      summary: Trae Young traded to Wizards for CJ McCollum and Corey Kispert; catalyzed 27-15 second-half record and playoff seeding.
+      counterparties:
+        - WAS
+    - date: 2025-07-10
+      summary: Kristaps Porzingis acquired from Celtics in 3-team deal with Nets; Terance Mann and picks to Nets, Georges Niang to Celtics.
+      counterparties:
+        - BKN
+        - BOS
+    - date: 2024-07-06
+      summary: Dejounte Murray traded to Pelicans for Dyson Daniels, Larry Nance Jr., Cody Zeller, and draft picks; reset backcourt around Trae Young.
+      counterparties:
+        - NOP
+  confidence: high
+cultural_signals:
+  stability:
+    value: medium
+    detail: New GM (Saleh) in place since April 2025; Snyder contract potentially unsettled beyond 2026-27. Ownership stable (Ressler). Recent trade of franchise cornerstone (Young) signals willingness to pivot.
+  player_friendly:
+    value: mixed
+    detail: Trae Young departure despite 10+ seasons suggests less player retention focus; Dyson Daniels and Jalen Johnson extensions indicate commitment to core. McCollum expressed interest in return.
+  analytics_orientation:
+    value: balanced
+    detail: Saleh background (Warriors, Spurs analytics-forward orgs) suggests heavier orientation; drafting approach emphasizes best player available over positional need.
+  risk_tolerance:
+    value: aggressive
+    detail: Mid-season Trae Young trade for aging McCollum was bold; Porzingis acquisition on expiring contract risky. New FO leadership implies willingness to experiment.
+  notable_traits:
+    - new_front_office
+    - star_chasing
+    - young_core_developing
+    - coach_carousel
+    - process_driven
+  rationale: "Saleh's first year as GM marks philosophical reset: from Landry Fields' balanced approach to emphasis on draft development and culture-building (emulating Spurs/Warriors). Snyder's defense-first mandate and team's young core suggest intentional departure from Trae-centric isolation offense. McCollum trade mid-season was unorthodox and succeeded, demonstrating organizational flexibility. Stability unclear with HC contract discussions pending."
+  confidence: medium
+roster:
+  - player_id: dyson_daniels
+    name: Dyson Daniels
+    age: 23
+    position_listed: SG/PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - connector
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_passer
+        - elite_athlete
+        - foul_drawer
+        - playoff_riser
+    tier: star
+    trajectory: ascending
+    contract:
+      years_remaining: 4
+      total_value_remaining: 100000000
+      annual_value_current_season: 25000000
+      annual_value_next_season: 25000000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.nba.com/news/hawks-guard-dyson-daniels-agrees-to-four-year-100m-extension
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: generational_talent
+          weight: high
+        - reason_code: recent_extension_poison_pill
+          weight: high
+      falsification_conditions:
+        - Public statements from FO that Daniels is available or on trade block.
+        - Trade demand reported from Daniels himself.
+      signal_strength: confirmed_shopped
+    team_relationship:
+      tenure_with_team: 1.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Recently extended; locked in at fair market value through 2029.
+    confidence: high
+    source: https://www.nba.com/news/hawks-guard-dyson-daniels-agrees-to-four-year-100m-extension
+  - player_id: jalen_johnson
+    name: Jalen Johnson
+    age: 24
+    position_listed: PF
+    contract_type: standard
+    availability_status: injured_short_term
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - finisher
+          - connector
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_rebounder
+        - iso_creator
+    tier: star
+    trajectory: ascending
+    contract:
+      years_remaining: 5
+      total_value_remaining: 150000000
+      annual_value_current_season: 30000000
+      annual_value_next_season: 30000000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2030
+      source: https://www.spotrac.com/nba/player/_/id/74127/jalen-johnson
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: high
+      falsification_conditions:
+        - Recovery from shoulder/hip injuries with full 2026-27 campaign at career-high production levels.
+        - Trade offer exceeding 2+ star caliber players in return.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 5
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Signed 5-year extension in Oct 2024; locked through 2030 with no optionality.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/74127/jalen-johnson
+  - player_id: onyeka_okongwu
+    name: Onyeka Okongwu
+    age: 25
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - post_hub
+          - connector
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+        - offensive_rebound_specialist
+        - playoff_riser
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 31000000
+      annual_value_current_season: 15500000
+      annual_value_next_season: 15500000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.nba.com/hawks/news/atlanta-hawks-sign-onyeka-okongwu-to-multi-year-extension
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: locker_room_anchor
+          weight: high
+        - reason_code: young_core_centerpiece
+          weight: medium
+      falsification_conditions:
+        - Trade demand or public dissatisfaction from Okongwu.
+        - Multiple injury setbacks limiting availability to <40 games.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 5
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Well-compensated extension signed in Oct 2023; undermarket value for rim protection and rebounding.
+    confidence: high
+    source: https://www.nba.com/hawks/news/atlanta-hawks-sign-onyeka-okongwu-to-multi-year-extension
+  - player_id: kristaps_porzingis
+    name: Kristaps Porzingis
+    age: 30
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: spacer
+        secondary:
+          - post_hub
+          - secondary_creator
+      defensive_role: rim_protector
+      shooting_profile: good
+      special_traits:
+        - elite_passer
+        - transition_threat
+    tier: starter
+    trajectory: declining_peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 30700000
+      annual_value_current_season: 30700000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.nba.com/news/hawks-acquire-kristaps-porzingis-3-team-trade
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: recent_extension_poison_pill
+          weight: medium
+      falsification_conditions:
+        - Long-term extension signed before June 2026 free agency.
+        - Public statement from Porzingis or FO indicating stay-and-contend intent.
+        - Mid-season injury proving durability concerns unfounded.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Expiring contract gives Hawks limited negotiation power; UFA in summer 2026 can test market or command near-max extension (~$40M/yr).
+    confidence: medium
+    source: https://www.nba.com/news/hawks-acquire-kristaps-porzingis-3-team-trade
+  - player_id: zaccharie_risacher
+    name: Zaccharie Risacher
+    age: 21
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+          - finisher
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits:
+        - transition_threat
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: 5481780
+      annual_value_next_season: 5753625
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.nba.com/hawks/news/atlanta-hawks-select-zaccharie-risacher-with-first-pick-in-2024-nba-draft
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: recent_extension_poison_pill
+          weight: medium
+      falsification_conditions:
+        - Repeated injury setbacks limiting development trajectory.
+        - Trade for established star to accelerate contention window.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.9
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Rookie scale contract with significant remaining value; Hawks under no pressure to extend or trade soon.
+    confidence: high
+    source: https://www.nba.com/hawks/news/atlanta-hawks-select-zaccharie-risacher-with-first-pick-in-2024-nba-draft
+  - player_id: cj_mccollum
+    name: C.J. McCollum
+    age: 34
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - connector
+      defensive_role: wing_stopper
+      shooting_profile: elite
+      special_traits:
+        - iso_creator
+        - foul_drawer
+        - playoff_riser
+    tier: starter
+    trajectory: declining_peak
+    contract:
+      years_remaining: 0
+      total_value_remaining: 30600000
+      annual_value_current_season: 30600000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://x.com/BobbyMarks42/status/2009090020934889562
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: aging_core
+          weight: medium
+      falsification_conditions:
+        - Multi-year extension signed before June 2026 free agency.
+        - Trade to contender mid-season or before deadline.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Expiring contract; mutual interest in return reported, but limited control. Age (34) limits long-term attractiveness.
+    confidence: high
+    source: https://x.com/BobbyMarks42/status/2009090020934889562
+  - player_id: corey_kispert
+    name: Corey Kispert
+    age: 26
+    position_listed: SF/SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary:
+          - tertiary_scorer
+          - finisher
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 40100000
+      annual_value_current_season: 14000000
+      annual_value_next_season: 14000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2029
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.nba.com/news/hawks-trade-trae-young-to-wizards-for-cj-mccollum-corey-kispert
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: failed_fit
+          weight: low
+      falsification_conditions:
+        - Significant role reduction or benching in favor of youth development.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Team option in 2029 gives Hawks control; solid 3-and-D role player locked in at fair value.
+    confidence: medium
+    source: https://www.nba.com/news/hawks-trade-trae-young-to-wizards-for-cj-mccollum-corey-kispert
+  - player_id: nickeil_alexander-walker
+    name: Nickeil Alexander-Walker
+    age: 26
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+          - finisher
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - transition_threat
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 62000000
+      annual_value_current_season: 15500000
+      annual_value_next_season: 15500000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.nba.com/news/hawks-trade-trae-young-to-wizards-for-cj-mccollum-corey-kispert
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: positional_redundancy
+          weight: low
+      falsification_conditions:
+        - Declining efficiency or role further diminished by draft additions.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Acquired in sign-and-trade summer 2025; role solidified as tertiary scorer and wing defender.
+    confidence: medium
+    source: https://www.nba.com/news/hawks-trade-trae-young-to-wizards-for-cj-mccollum-corey-kispert
+  - player_id: asa_newell
+    name: Asa Newell
+    age: 19
+    position_listed: PF/C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: spacer
+        secondary:
+          - finisher
+          - secondary_creator
+      defensive_role: helper
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: 2647920
+      annual_value_next_season: 2769120
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.nba.com/news/hawks-acquire-the-draft-rights-of-asa-newell-the-no-23-pick-in-the-2025-nba-draft
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_developing
+          weight: high
+      falsification_conditions:
+        - Repeated injury or stagnation in development.
+        - Trade for win-now piece during contention window.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Rookie scale contract with full control through 2027; no pressure to extend or move.
+    confidence: high
+    source: https://www.nba.com/news/hawks-acquire-the-draft-rights-of-asa-newell-the-no-23-pick-in-the-2025-nba-draft
+  - player_id: mouhamed_gueye
+    name: Mouhamed Gueye
+    age: 21
+    position_listed: PF/C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - post_hub
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - offensive_rebound_specialist
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: 2221677
+      annual_value_current_season: 2221677
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/player/_/id/70648/onyeka-okongwu
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: behind_younger_player
+          weight: medium
+      falsification_conditions:
+        - Extension offer and significant increased role in rotation.
+        - Standout playoff performance elevating profile.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Minimum salary, expiring; limited leverage in negotiations.
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/_/id/70648/onyeka-okongwu
+  - player_id: nfaly_dante
+    name: N'Faly Dante
+    age: 24
+    position_listed: PF/C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - post_hub
+      defensive_role: helper
+      shooting_profile: non_shooter
+      special_traits: []
+    tier: fringe
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 2048494
+      annual_value_current_season: 2048494
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/payroll
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Extension and significantly expanded role in playoff rotation.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Minimum contract, expiring; low value depth piece.
+    confidence: low
+    source: https://www.spotrac.com/nba/payroll
+  - player_id: keaton_wallace
+    name: Keaton Wallace
+    age: 25
+    position_listed: PG/SG
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits: []
+    tier: two_way
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.nba.com/hawks/news/atlanta-hawks-convert-keaton-wallace-from-two-way-to-standard-contract
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Full 15-man roster spot earned and multi-year deal offered.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way player; minimal leverage in contract negotiations.
+    confidence: medium
+    source: https://www.nba.com/hawks/news/atlanta-hawks-convert-keaton-wallace-from-two-way-to-standard-contract
+  - player_id: eli_ndiaye
+    name: Eli Ndiaye
+    age: 22
+    position_listed: PF/C
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - post_hub
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits: []
+    tier: two_way
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.nba.com/hawks/roster
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Breakout G League performance leading to call-ups and development contract.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way player with G League affiliate focus; minimal NBA roster control.
+    confidence: low
+    source: https://www.nba.com/hawks/roster
+  - player_id: caleb_houstan
+    name: Caleb Houstan
+    age: 22
+    position_listed: SF/PF
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary:
+          - tertiary_scorer
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits: []
+    tier: two_way
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.nba.com/hawks/roster
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Significantly expanded role in rotation and multi-year deal offered.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way depth piece; limited negotiating leverage.
+    confidence: low
+    source: https://www.nba.com/hawks/roster
+pending_free_agents:
+  - player_id: cj_mccollum
+    name: C.J. McCollum
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: 30600000
+    expected_market: re_sign_likely
+    expected_market_detail: Hawks reportedly planning to bring him back; McCollum confirmed productive conversations with FO post-season.
+    notes: Expiring contract; mutual interest in return. Hawks seeking re-sign; McCollum age (34) may limit market competition.
+    source: https://www.si.com/nba/hawks/onsi/report-atlanta-is-expected-to-bring-back-quin-snyder-cj-mccollum-next-season-01kqfscqp5hy
+  - player_id: kristaps_porzingis
+    name: Kristaps Porzingis
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: bidding_war
+    expected_market_detail: Expiring contract; UFA status allows testing market. Extension eligible at up to $43M/yr, but likely $30-35M/yr range if re-signed.
+    notes: Key decision point for Hawks frontcourt. Durability questions (age 30, injury history) may limit offer sheet competitiveness.
+    source: https://clutchpoints.com/nba/atlanta-hawks/hawks-2-best-trade-upgrade-options-using-kristaps-porzingis-30-7-million-expiring-contract
+  - player_id: mouhamed_gueye
+    name: Mouhamed Gueye
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: walk
+    expected_market_detail: Minimum salary depth piece; likely to seek opportunities for increased playing time elsewhere.
+    notes: Limited role with Hawks; injury-prone history (fractured femoral condyle in 2024-25).
+    source: https://www.spotrac.com/nba/payroll
+  - player_id: nfaly_dante
+    name: N'Faly Dante
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: walk
+    expected_market_detail: Minimum salary player with limited role; likely to explore other opportunities.
+    notes: Non-guaranteed contract; limited upside in Hawks rotation.
+    source: https://www.spotrac.com/nba/payroll
+known_target_history:
+  - target: Trae Young (traded away)
+    year: 2026
+    outcome: actively_traded
+    detail: Traded mid-season (Jan 9, 2026) to Wizards for CJ McCollum and Corey Kispert; catalyzed second-half surge.
+    source: https://www.nba.com/news/hawks-trade-trae-young-to-wizards-for-cj-mccollum-corey-kispert
+  - target: Kristaps Porzingis
+    year: 2025
+    outcome: acquired
+    detail: Acquired in 3-team trade with Celtics/Nets (July 2025); expiring contract acquired for salary cap flexibility.
+    source: https://www.nba.com/news/hawks-acquire-kristaps-porzingis-3-team-trade
+  - target: Nickeil Alexander-Walker
+    year: 2025
+    outcome: acquired
+    detail: Signed 4-year, $62M sign-and-trade from Timberwolves; key wing depth acquisition.
+    source: https://www.nba.com/news/hawks-trade-trae-young-to-wizards-for-cj-mccollum-corey-kispert
+  - target: Dyson Daniels
+    year: 2024
+    outcome: acquired
+    detail: Acquired in Dejounte Murray trade to Pelicans (July 2024); emerged as Most Improved Player in 2024-25.
+    source: https://www.nba.com/news/hawks-trade-murray-to-pelicans
+  - target: Zaccharie Risacher
+    year: 2024
+    outcome: acquired
+    detail: Selected 1st overall in 2024 NBA Draft; French wing with 3-and-D upside.
+    source: https://www.nba.com/hawks/news/atlanta-hawks-select-zaccharie-risacher-with-first-pick-in-2024-nba-draft
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "Atlanta Hawks hold No. 8 from NOP, No. 23 from CLE, No. 57 from BOS in the official post-lottery order. Mock-source layer: No. 8: Mikel Brown Jr.; No. 23: Chris Cenac Jr.; treat prospect names as low-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: low
+  - priority: Retain or extend CJ McCollum
+    timeline: this_offseason
+    type: free_agency
+    detail: McCollum's improved fit and strong playoff performance (27 PPG vs. Knicks) suggest retention. Re-signing negotiations likely in June 2026.
+    confidence: high
+  - priority: Kristaps Porzingis contract decision
+    timeline: this_offseason
+    type: free_agency
+    detail: UFA in summer 2026; decision to extend, re-sign, or allow to test market critical for frontcourt composition.
+    confidence: high
+  - priority: Jalen Johnson health and integration
+    timeline: next_season
+    type: structural
+    detail: Shoulder/hip injuries limited impact in 2025-26; full recovery and return to form (career highs in scoring/rebounding) essential for contention window.
+    confidence: high
+  - priority: Head coach contract extension
+    timeline: this_offseason
+    type: coaching_decision
+    detail: Quin Snyder entering final year of contract; FO expected to initiate extension discussions after season-ending playoff loss.
+    confidence: medium
+  - priority: Draft capital allocation
+    timeline: next_season
+    type: draft
+    detail: Limited first-round picks in near future; prioritize replenishing through trades or acquisition of future picks to balance aging vets.
+    confidence: medium
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 8 overall; from NOP.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: NOP
+    - year: 2026
+      round: 1
+      protections: 2026 No. 23 overall; from CLE.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: CLE
+    - year: 2026
+      round: 2
+      protections: 2026 No. 57 overall; from BOS.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: BOS
+    - year: 2027
+      round: 1
+      protections: unknown
+      source: unknown
+    - year: 2027
+      round: 2
+      from_team: LAC
+      protections: From Lou Williams trade
+      source: https://www.si.com/nba/clippers/onsi/breaking-down-clippers-draft-picks-protections-lottery-odds-01kpdmcqxe07
+  draft_picks_owed:
+    - year: 2026
+      round: 1
+      to_team: SAS
+      protections: 2026 No. 20 overall; from ATL.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 2
+      to_team: DEN
+      protections: 2026 No. 49 overall; from ATL via BKN and GSW.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2027
+      round: 1
+      to_team: NOP
+      protections: Most favorable of New Orleans and Milwaukee
+      source: https://www.nba.com/news/hawks-trade-murray-to-pelicans
+  trade_exceptions:
+    - value: unknown
+      expires: unknown
+      source: unknown
+      confidence: low
+team_team_relationships:
+  rivalries:
+    - team_id: BOS
+      type: playoff_rematch
+      basis: Celtics-Hawks playoff history; recent Porzingis acquisition from Boston adds new dimension.
+    - team_id: NYK
+      type: playoff_rematch
+      basis: Knicks defeated Hawks 4-2 in first round 2025-26; Game 6 saw worst playoff loss in franchise history (47-point halftime deficit).
+    - team_id: MIA
+      type: competitive_recent
+      basis: Southeast division rivals; Hawks beat Heat in play-in to secure 6th seed.
+  notable_personnel_connections:
+    - person: Onsi Saleh
+      connected_team: SAS
+      connection_type: former_assistant_gm
+      detail: Learned under RC Buford at Spurs; influenced by Pop's culture-first approach.
+    - person: Quin Snyder
+      connected_team: UTA
+      connection_type: former_head_coach
+      detail: Coached Jazz for 8 seasons before joining Hawks; Popovich tree coach emphasizing defense and discipline.
+    - person: Jalen Johnson
+      connected_team: DET
+      connection_type: alum_returning
+      detail: Duke alum; no personnel connection to DET but drafted by Hawks and homegrown.
+    - person: Kobe Johnson
+      connected_team: ATL
+      connection_type: family
+      detail: Younger brother of Jalen Johnson; joined Hawks on Exhibit 10 contract in training camp.
+g_league_and_stash:
+  affiliate_team: College Park Skyhawks
+  notable_affiliate_players:
+    - Eli Ndiaye (2-way, developmental focus)
+    - Keaton Wallace (2-way, competing for 15-man roster spot)
+    - Jacob Toppin (2-way, season-ending labrum surgery Nov 2025)
+  international_stash: []
+narrative_summary:
+  one_paragraph: "The Atlanta Hawks completed their first non-play-in season since 2020-21, finishing 6th in the Eastern Conference and advancing through the first round before losing decisively to the Knicks. Under new GM Onsi Saleh (hired April 2025), the franchise executed a bold mid-season trade of franchise cornerstone Trae Young to Washington for aging veteran C.J. McCollum, catalyzing a 27-15 second-half surge. The core Young-Daniels-Johnson-Okongwu backcourt was reshaped by acquisition of Kristaps Porzingis (expiring) and Alexander-Walker (4yr/$62M) in summer 2025, emphasizing defensive intensity and spacing over isolation offense. Quin Snyder's defense-first coaching mandate and Saleh's draft-and-develop philosophy (evidenced by Zaccharie Risacher #1OA 2024, Asa Newell #23 2025) signal a multi-year contention window built on youth development rather than quick fixes. Key decision points loom: Porzingis UFA status (extension vs. test market), McCollum's re-signing likelihood, and Jalen Johnson's health trajectory after shoulder/hip injuries."
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 8 from NOP, No. 23 from CLE, No. 57 from BOS; The Athletic mock-source layer lists No. 8: Mikel Brown Jr.; No. 23: Chris Cenac Jr. as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - "Kristaps Porzingis free agency decision: Expiring contract and UFA status give Hawks limited leverage; extension could cost $30-35M+/yr or he could test market. Durability concerns (age 30, injury history) may limit competing offers."
+    - "Jalen Johnson injury recovery: Shoulder and hip issues plagued 2025-26; full return to career-high production levels essential for contention window. Young core (Daniels, Risacher, Newell, Okongwu) depends on his star-caliber wing/PF impact."
+sources_used:
+  - https://www.nba.com/hawks/tony-ressler-bio
+  - https://www.nba.com/news/onsi-saleh-new-gm-landry-fields-out-hawks
+  - https://www.peachtreehoops.com/2025/6/24/24455043/atlanta-hawks-onsi-salehs-quotes-nba-draft
+  - https://www.nba.com/hawks/news/atlanta-hawks-name-quin-snyder-head-coach
+  - https://www.spotrac.com/nba/atlanta-hawks/payroll
+  - https://www.nba.com/news/hawks-acquire-kristaps-porzingis-3-team-trade
+  - https://www.nba.com/news/hawks-guard-dyson-daniels-agrees-to-four-year-100m-extension
+  - https://www.nba.com/news/hawks-trade-trae-young-to-wizards-for-cj-mccollum-corey-kispert
+  - https://www.nba.com/news/hawks-trade-murray-to-pelicans
+  - https://www.nba.com/hawks/news/atlanta-hawks-select-zaccharie-risacher-with-first-pick-in-2024-nba-draft
+  - https://www.nba.com/hawks/news/atlanta-hawks-sign-onyeka-okongwu-to-multi-year-extension
+  - https://www.nba.com/news/hawks-acquire-the-draft-rights-of-asa-newell-the-no-23-pick-in-the-2025-nba-draft
+  - https://x.com/BobbyMarks42/status/2009090020934889562
+  - https://www.si.com/nba/hawks/onsi/report-atlanta-is-expected-to-bring-back-quin-snyder-cj-mccollum-next-season-01kqfscqp5hy
+  - https://clutchpoints.com/nba/atlanta-hawks/hawks-2-best-trade-upgrade-options-using-kristaps-porzingis-30-7-million-expiring-contract
+  - https://www.spotrac.com/nba/payroll
+  - https://www.nba.com/hawks/roster
+  - https://www.basketball-reference.com/teams/ATL/2026.html
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - front_office.president_basketball_ops (search for new president ongoing as of May 2026)
+  - notable_advisors_or_consultants (not publicly available)
+  - roster[Kristaps Porzingis].contract.trade_kicker (unknown)
+  - roster[CJ McCollum].contract.trade_kicker (unknown)
+  - roster[various].total_value_remaining (incomplete from public sources)
+  - roster[Keaton Wallace].contract.annual_value_current_season (two-way salary details)
+  - roster[Eli Ndiaye].contract.annual_value_current_season (two-way salary details)
+  - roster[Caleb Houstan].contract.annual_value_current_season (two-way salary details)
+  - key_assets.draft_picks_owned.2026.protections (not confirmed)
+  - key_assets.draft_picks_owned.2027.protections (not confirmed)
+  - key_assets.trade_exceptions (details unclear)
+  - g_league_and_stash.international_stash (no players identified as of May 2026)
+vocabulary_flags:
+  - Trae Young was traded to Washington on Jan 9, 2026 (mid-season), before as_of_date of May 2, 2026. Young is NOT on the May 2 roster, so he was excluded from roster section despite being drafted by Hawks. CJ McCollum and Corey Kispert acquired in return are included.
+  - Vít Krejčí was traded to Portland on Feb 1, 2026; not on May 2 roster and therefore excluded.
+  - Larry Nance Jr. left via free agency to Cavaliers in July 2025 before 2025-26 season; not on roster.
+  - Jacob Toppin (two-way) suffered season-ending labrum surgery in Nov 2025; included on roster but marked injured per public reporting.
+  - Kristaps Porzingis was subsequently traded to Golden State Warriors before 2026-27 season; current status as of May 2026 is on Hawks (last updated date).
+  - Contract cap figure ($186.7M) represents apron payroll and excludes minimum salary hold-outs; exact luxury tax standing complex due to second apron rules and trade exceptions.
+  - Quin Snyder contract runs through 2026-27 season per sources; no confirmed extension as of May 2, 2026.
+  - Draft picks owned/owed situation complex due to multiple multi-team trades; Dejounte Murray deal included swap mechanics not fully detailed in available sources.

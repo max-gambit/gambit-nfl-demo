@@ -1,0 +1,1033 @@
+team_id: UTA
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Utah Jazz
+  conference: Western
+  division: Southwest
+  market_tier: tier_2
+  market_tier_rationale: Salt Lake City is a mid-sized metro (~1.3M) with strong regional support and new ownership investment in arena infrastructure.
+ownership:
+  primary_owner:
+    name: Ryan Smith
+    type: individual
+    tenure_years: 5.5
+    source: https://en.wikipedia.org/wiki/Ryan_Smith_(businessman)
+    confidence: high
+  governance_notes: Ryan Smith acquired majority stake in October 2020; Smith Entertainment Group also owns Utah Hockey Club. No current co-ownership disputes.
+  recent_transitions: none
+  spending_posture: moderate
+  spending_posture_evidence:
+    - Signed Will Hardy to multi-year extension through 2031, showing coaching stability confidence
+    - Kept core young players and extended Lauri Markkanen to $238M deal, indicating commitment to competitive window
+    - Invested $3B alongside $900M public funds in Delta Center upgrades through 2027
+front_office:
+  president_basketball_ops:
+    name: Austin Ainge
+    tenure_start: 2025-06
+    prior_stops:
+      - Boston Celtics (2009-2025, 17 years)
+      - Celtics G League coach
+      - Celtics Assistant GM (past 6 years)
+    public_philosophy_signals:
+      - "Stated commitment to building through youth development: 7 players under 23 as core"
+      - Emphasis on draft evaluation and homegrown talent retention
+    confidence: high
+    source: https://www.deseret.com/sports/2025/06/02/austin-ainge-utah-jazz-president-of-basketball-operations/
+  general_manager:
+    name: Justin Zanik
+    tenure_start: 2019-06
+    prior_stops:
+      - Oklahoma City Thunder (2007-2019, 12 years)
+    public_philosophy_signals:
+      - Inherited post-Mitchell rebuild; committed to long-term youth evaluation
+      - Active in trade market for asset accumulation and role players
+    confidence: high
+    source: https://www.nba.com/news/2025-26-season-preview-uta
+  head_coach:
+    name: Will Hardy
+    tenure_start: 2022-10
+    contract_through: 2031
+    style_notes: Defensive-first, tempo control; development-focused. Coached through 22-60 season; extended May 2025 despite poor record.
+    coaching_tree: unknown
+    confidence: high
+    source: https://www.deseret.com/sports/2025/05/05/utah-jazz-coach-will-hardy-extended/
+  assistant_coaches_notable: []
+  notable_advisors_or_consultants:
+    - role: CEO of Basketball Operations
+      name: Danny Ainge (father of Austin Ainge)
+strategic_posture:
+  timeframe: tank
+  confidence: high
+  derived_from:
+    - Finished 22-60 in 2025-26, worst record in Western Conference by design
+    - Traded away veteran rotation players (Clarkson, Collins, Sexton) in favor of 7 players under 23
+    - Loaded draft assets; multiple first-round picks in next 5 years
+    - Signaled development and asset-growth priority over immediate contention
+  constraints:
+    - reason_code: ownership_directive
+      detail: Ryan Smith's public statements emphasize long-term competitive window, not short-term trades for veterans
+      weight: high
+    - reason_code: young_core_developing
+      detail: Keyonte George, Walker Kessler, Ace Bailey, Isaiah Collier, Kyle Filipowski in first 3 seasons; development path critical
+      weight: high
+    - reason_code: multi_year_lottery
+      detail: Four consecutive seasons without playoffs; lottery position secured through youth rotation
+      weight: high
+  trigger_events:
+    - Unexpected mid-season trade of Jaren Jackson Jr. (Feb 2026) signals willingness to add established talent if young core development on track
+    - Early playoff contention (top 8 seed by January) would trigger reassessment toward win-now
+    - Major injury to Markkanen or Keyonte George could force re-pivot
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: below_apron
+  current_payroll_estimate: 150000000
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Below apron; significant cap room from young core on rookie deals and veteran trades (Anderson, Love, Niang tradeable)
+  exceptions_available: []
+  source: https://www.spotrac.com/nba/utah-jazz/cap/2025/
+  source_fallbacks_used: []
+  confidence: medium
+trade_dna:
+  frequent_partners:
+    - MEM
+    - CHA
+    - LAC
+    - MIA
+  preferred_deal_archetypes:
+    - Multi-team trades to consolidate assets (Sexton/Nurkic, Love/Collins/Powell)
+    - Selective addition of established talent mid-season (JJJ trade Feb 2026) paired with prospect/pick exports
+    - Veteran salary relief + picks (targeting flexibility for young core development)
+  recent_significant_trades:
+    - date: 2025-06
+      summary: Acquired Jusuf Nurkic from Charlotte for Collin Sexton and 2030 second-round pick.
+      counterparties:
+        - CHA
+    - date: 2025-07
+      summary: "Three-team trade: sent John Collins to LAC, acquired Kevin Love from Miami and Norman Powell to Miami."
+      counterparties:
+        - LAC
+        - MIA
+    - date: 2026-02-03
+      summary: Acquired Jaren Jackson Jr., John Konchar, Jock Landale from Memphis for Kyle Anderson, Walter Clayton Jr., Taylor Hendricks, Georges Niang, and three first-round picks.
+      counterparties:
+        - MEM
+  confidence: high
+cultural_signals:
+  stability:
+    value: high
+    detail: Will Hardy extended through 2031; Danny Ainge as CEO provides continuity; Austin Ainge hire from Celtics signals organizational confidence in long-term vision.
+  player_friendly:
+    value: mixed
+    detail: Extended young core (Markkanen, George options exercised); but rebuild approach and willingness to trade players mid-season (JJJ trade displaced Hendricks/Clayton) sends mixed signals.
+  analytics_orientation:
+    value: balanced
+    detail: Boston Celtics influence via Austin Ainge; draft-heavy approach; but traditional evaluation remains (veteran signings of Anderson, Love, Niang).
+  risk_tolerance:
+    value: moderate
+    detail: Willing to hold lottery position for development; but also made blockbuster JJJ trade mid-season to accelerate timeline.
+  notable_traits:
+    - developmental_org
+    - homegrown_priority
+    - coach_carousel
+  rationale: Jazz emphasize youth development (7 under-23 core), homegrown talent (Kessler, George, Hendricks drafted), and organizational stability (Hardy extension, Ainge continuity). Rebuild posture reflects patient, process-driven approach.
+  confidence: high
+roster:
+  - player_id: lauri_markkanen
+    name: Lauri Markkanen
+    age: 28
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - spacer
+          - tertiary_scorer
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - iso_creator
+    tier: star
+    trajectory: peak
+    contract:
+      years_remaining: 4
+      total_value_remaining: 196000000
+      annual_value_current_season: 46300000
+      annual_value_next_season: 48600000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.spotrac.com/nba/player/_/id/23602/lauri-markkanen
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: recent_extension_poison_pill
+          weight: high
+      falsification_conditions:
+        - Explicit front-office statement signaling Markkanen available for trade
+        - Trade deadline passes with Markkanen on roster and no inquiry reports
+    team_relationship:
+      tenure_with_team: 4
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Long-term extension through 2029 with $196M remaining; no trade kicker; locked in.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/23602/lauri-markkanen
+  - player_id: keyonte_george
+    name: Keyonte George
+    age: 22
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_passer
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: 4278960
+      annual_value_current_season: 4278960
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2026
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/player/_/id/82209/keyonte-george
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: high
+      falsification_conditions:
+        - Rookie-scale extension signed mid-season (expected ~$35M AAV)
+        - Public statement from front office affirming George as core piece through 2030s
+    team_relationship:
+      tenure_with_team: 2.5
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Extension-eligible this offseason; under 23; franchise needs him for timeline.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/82209/keyonte-george
+  - player_id: walker_kessler
+    name: Walker Kessler
+    age: 24
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - finisher
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+        - elite_athlete
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 0
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: expired_pending_decision
+      source: https://www.si.com/nba/jazz/onsi/news/utah-jazz-exec-shares-where-relationship-stands-with-walker-kessler
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: positional_redundancy
+          weight: medium
+      falsification_conditions:
+        - Restricted free agent offer sheet signed by Kessler; Jazz match to retain
+        - Long-term max extension signed with Jazz
+        - Traded before RFA deadline with significant return of picks/young talent
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 3
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: RFA status; Jazz control matching rights but tight on cap with Markkanen, Jaren Jackson Jr. extensions.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/82205/walker-kessler
+  - player_id: jaren_jackson_jr
+    name: Jaren Jackson Jr.
+    age: 26
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - post_hub
+          - screen_setter
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits: []
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 70000000
+      annual_value_current_season: 35000000
+      annual_value_next_season: 35000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.spotrac.com/nba/player/_/id/23601/jaren-jackson-jr
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: cap_relief_target
+          weight: medium
+        - reason_code: rebuild_pivot
+          weight: low
+      falsification_conditions:
+        - Jaren Jackson Jr. included in rotation through playoff push; FO publicly commits to contention core
+        - Traded mid-season with significant return; included on final roster
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Acquired mid-season (Feb 2026) in major trade; $70M remaining over 2 years limits move flexibility in youth timeline.
+    confidence: high
+    source: https://www.nba.com/news/jaren-jackson-jr-trade-jazz-2026
+  - player_id: ace_bailey
+    name: Ace Bailey
+    age: 21
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: 9000000
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: uncertain
+      source: https://www.cbssports.com/nba/players/26751832/ace-bailey/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Ace Bailey traded away; signals rebuild accelerated to contention mode
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: 2025 5th overall pick; rookie scale protection; core piece going forward.
+    confidence: medium
+    source: https://www.si.com/nba/jazz/onsi/news/utah-jazz-rookie-walter-clayton-jr-talks-adapting-nba-grind
+  - player_id: cody_williams
+    name: Cody Williams
+    age: 20
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - spacer
+          - tertiary_scorer
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: 5700000
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: uncertain
+      source: https://www.cbssports.com/nba/players/26751832/cody-williams/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Cody Williams traded as part of major asset move; signals rebuild recalibration
+    team_relationship:
+      tenure_with_team: 1
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: 2024 10th overall pick; improving physique and development trajectory; core piece.
+    confidence: high
+    source: https://www.cbssports.com/nba/teams/uta/utah-jazz/roster/
+  - player_id: isaiah_collier
+    name: Isaiah Collier
+    age: 21
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_passer
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.nba.com/player/1642268/isaiah-collier
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Isaiah Collier traded; signals depth chart reconfiguration
+    team_relationship:
+      tenure_with_team: 1.5
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: 2024 29th overall pick; franchise assist leader among rookies; backup PG development path secured.
+    confidence: high
+    source: https://www.nba.com/player/1642268/isaiah-collier
+  - player_id: brice_sensabaugh
+    name: Brice Sensabaugh
+    age: 21
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits: []
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: 2693760
+      annual_value_current_season: 2693760
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2026
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.deseret.com/sports/2025/10/30/utah-jazz-options-taylor-hendricks-keyonte-george-brice-sensabaugh/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: medium
+      falsification_conditions:
+        - Brice Sensabaugh traded; roster reconfiguration signals
+    team_relationship:
+      tenure_with_team: 2.5
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: 2023 28th overall pick; team option exercised; cheap contract; core depth piece.
+    confidence: high
+    source: https://www.deseret.com/sports/2025/10/30/utah-jazz-options-taylor-hendricks-keyonte-george-brice-sensabaugh/
+  - player_id: kyle_filipowski
+    name: Kyle Filipowski
+    age: 21
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: connector
+        secondary:
+          - tertiary_scorer
+          - spacer
+      defensive_role: helper
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: uncertain
+      source: https://www.nba.com/player/1642265/kyle-filipowski
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: medium
+      falsification_conditions:
+        - Kyle Filipowski traded; signals defensive limitations addressed via external pickup
+    team_relationship:
+      tenure_with_team: 1.5
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: 2024 second-round pick; offensive upside with defensive limitations; development project.
+    confidence: medium
+    source: https://www.nba.com/player/1642265/kyle-filipowski
+  - player_id: jusuf_nurkic
+    name: Jusuf Nurkic
+    age: 32
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: post_hub
+        secondary:
+          - screen_setter
+          - connector
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits:
+        - elite_passer
+    tier: rotation
+    trajectory: declining_peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 19300000
+      annual_value_current_season: 19300000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/player/_/id/23575/jusuf-nurkic
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: expiring_contract_value
+          weight: high
+        - reason_code: cap_relief_target
+          weight: medium
+      falsification_conditions:
+        - Nurkic extended for 2-3 years with Jazz; retained through rebuild window
+        - Traded with significant asset return (picks/young player)
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Expiring contract; veteran mentorship value; tradeable for asset relief.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/23575/jusuf-nurkic
+  - player_id: kevin_love
+    name: Kevin Love
+    age: 36
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: spacer
+        secondary:
+          - tertiary_scorer
+          - post_hub
+      defensive_role: helper
+      shooting_profile: good
+      special_traits:
+        - elite_rebounder
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 3240000
+      annual_value_current_season: 3240000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/player/_/id/23574/kevin-love
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: declining_role
+          weight: medium
+      falsification_conditions:
+        - Kevin Love signed to multi-year extension; retained as veteran mentor
+        - Traded mid-season for picks/young talent
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Expiring contract with low salary; minimal dead cap if traded.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/23574/kevin-love
+  - player_id: svi_mykhailiuk
+    name: Svi Mykhailiuk
+    age: 28
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+      defensive_role: point_of_attack
+      shooting_profile: good
+      special_traits: []
+    tier: fringe
+    trajectory: declining_peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.kslsports.com/nba/utah-jazz/utah-jazz-rotation/560763
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: declining_role
+          weight: medium
+      falsification_conditions:
+        - Svi Mykhailiuk extended multi-year; retained as rotation depth
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Veteran minimum or low-salary contract; rotational depth only.
+    confidence: medium
+    source: https://www.kslsports.com/nba/utah-jazz/utah-jazz-rotation/560763
+  - player_id: john_tonje
+    name: John Tonje
+    age: 23
+    position_listed: SF
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: two_way
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.gleague.nba.com/news/utah-jazz-sign-oscar-tshiebwe-to-two-way-contract-2
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: behind_younger_player
+          weight: medium
+      falsification_conditions:
+        - John Tonje signed to standard NBA contract; promoted from two-way
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way contract; splits time with Salt Lake City Stars G League affiliate.
+    confidence: medium
+    source: https://www.gleague.nba.com/news/utah-jazz-sign-oscar-tshiebwe-to-two-way-contract-2
+  - player_id: oscar_tshiebwe
+    name: Oscar Tshiebwe
+    age: 23
+    position_listed: C
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - finisher
+      defensive_role: helper
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+    tier: two_way
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.gleague.nba.com/news/utah-jazz-sign-oscar-tshiebwe-to-two-way-contract-2
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: behind_younger_player
+          weight: high
+      falsification_conditions:
+        - Oscar Tshiebwe promoted to standard contract; significant NBA minutes allocation
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way contract; G League primary assignment.
+    confidence: medium
+    source: https://www.gleague.nba.com/news/utah-jazz-sign-oscar-tshiebwe-to-two-way-contract-2
+  - player_id: elijah_harkless
+    name: Elijah Harkless
+    age: 24
+    position_listed: SF
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits: []
+    tier: two_way
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.si.com/nba/jazz/onsi/news/utah-jazz-fill-final-two-way-slots-what-it-means
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: behind_younger_player
+          weight: high
+      falsification_conditions:
+        - Elijah Harkless promoted to standard contract and integrated into rotation
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way contract; development focus with Salt Lake City Stars.
+    confidence: low
+    source: https://www.si.com/nba/jazz/onsi/news/utah-jazz-fill-final-two-way-slots-what-it-means
+pending_free_agents: []
+known_target_history:
+  - target: Jaren Jackson Jr.
+    year: 2026
+    outcome: acquired
+    detail: Acquired from Memphis Feb 2026 for Kyle Anderson, Walter Clayton Jr., Taylor Hendricks, Georges Niang, and three first-round picks; mid-season pivot to contention acceleration.
+    source: https://www.nba.com/news/jaren-jackson-jr-trade-jazz-2026
+  - target: Collin Sexton
+    year: 2025
+    outcome: redirected
+    detail: Traded to Charlotte for Jusuf Nurkic and 2030 second-round pick; asset consolidation for veteran presence.
+    source: https://www.deseret.com/sports/2025/06/30/with-jordan-clarkson-buyout-and-collin-sexton-trade-jazz-resetting-the-roster-ahead-of-free-agency/
+  - target: Jordan Clarkson
+    year: 2025
+    outcome: acquired
+    detail: Buyout agreement; signed with New York Knicks; Jazz prioritized salary relief and development time for young guards.
+    source: https://www.deseret.com/sports/2025/06/30/with-jordan-clarkson-buyout-and-collin-sexton-trade-jazz-resetting-the-roster-ahead-of-free-agency/
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "Utah Jazz hold No. 2 in the official post-lottery order. Mock-source layer: No. 2: Darryn Peterson; treat prospect names as medium-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: medium
+  - priority: Keyonte George rookie-scale extension negotiation
+    timeline: this_offseason
+    type: extension
+    detail: George eligible for extension this offseason; expected $35M AAV range; critical to long-term core stability.
+    confidence: high
+  - priority: Walker Kessler RFA resolution
+    timeline: this_offseason
+    type: free_agency
+    detail: Restricted free agent; team controls matching rights; cap flexibility challenged by Markkanen and JJJ contracts.
+    confidence: high
+  - priority: Evaluate 2026-27 contention readiness post-Jaren Jackson Jr. acquisition
+    timeline: this_season
+    type: structural
+    detail: JJJ trade mid-season signals acceleration; need to assess if young core + established talent (Markkanen, JJJ) warrants win-now posture or continued tank.
+    confidence: medium
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 2 overall; own pick.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2027
+      round: 1
+      protections: Jazz own pick + Timberwolves + Cavaliers (best-of-three)
+      source: https://www.si.com/nba/jazz/onsi/news/updated-utah-jazz-draft-picks-after-jaren-jackson-jr-trade
+    - year: 2028
+      round: 1
+      protections: none
+      source: https://www.fanspo.com/nba/teams/Jazz/29/draft-picks
+    - year: 2029
+      round: 1
+      protections: none
+      source: https://www.fanspo.com/nba/teams/Jazz/29/draft-picks
+    - year: 2030
+      round: 2
+      protections: owed to Charlotte
+      source: https://www.deseret.com/sports/2026/02/03/utah-jazz-trade-jaren-jackson-jr/
+    - year: 2025
+      round: 2
+      from_team: DAL
+      protections: none
+      source: https://www.espn.com/nba/story/_/id/43659380/sources-mavericks-trading-doncic-lakers-anthony-davis
+  draft_picks_owed:
+    - year: 2026
+      round: 2
+      to_team: SAS
+      protections: 2026 No. 35 overall; from UTA via MIN.
+      source: https://www.nba.com/news/2026-nba-draft-order
+  trade_exceptions: []
+team_team_relationships:
+  rivalries:
+    - team_id: LAL
+      type: geographic
+      basis: Western Conference Southwest Division rival; shared regional market interest.
+    - team_id: HOU
+      type: geographic
+      basis: Southwest Division rival; regular season matchups.
+  notable_personnel_connections:
+    - person: Danny Ainge
+      connected_team: BOS
+      connection_type: former_president
+      detail: CEO of Jazz basketball operations; built championship culture in Boston; son Austin brought from Celtics.
+    - person: Austin Ainge
+      connected_team: BOS
+      connection_type: alum_returning
+      detail: President of Basketball Operations (June 2025); spent 17 years with Celtics front office; directly inherits father's rebuild philosophy.
+    - person: Will Hardy
+      connected_team: SAS
+      connection_type: former_assistant
+      detail: Spurs assistant before Utah; development-focused coaching style aligned with rebuild timeline.
+g_league_and_stash:
+  affiliate_team: Salt Lake City Stars
+  notable_affiliate_players:
+    - John Tonje (two-way allocation)
+    - Oscar Tshiebwe (two-way allocation)
+    - Elijah Harkless (two-way allocation)
+    - Steven Crowl
+    - Max Klesmit
+  international_stash: []
+narrative_summary:
+  one_paragraph: The Utah Jazz are executing a deliberate full-scale rebuild under a stable organizational structure anchored by Danny Ainge (CEO), Austin Ainge (President, newly hired from Boston), Will Hardy (Head Coach, extended through 2031), and Justin Zanik (GM). With Lauri Markkanen locked in long-term and a young core of seven players under 23 (George, Kessler, Bailey, Williams, Collier, Sensabaugh, Filipowski), the Jazz finished 22-60 in 2025-26 and are positioned for multi-year lottery contention. The mid-season acquisition of Jaren Jackson Jr. in February 2026 signals willingness to add established talent if the core develops on schedule. Asset-rich with future draft picks and veteran salary flexibility, the Jazz prioritize player development over immediate contention while maintaining a patient, process-driven culture.
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 2; The Athletic mock-source layer lists No. 2: Darryn Peterson as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - "Keyonte George extension negotiations (offseason 2026): young star eligible for max-scale deal; JJJ trade signals franchise confidence in timeline."
+    - "Walker Kessler restricted free agency (offseason 2026): RFA status with team matching control; cap flexibility challenged by Markkanen and JJJ deals."
+    - "2026-27 competitive reset: JJJ trade mid-season may accelerate contention window; monitoring if additional veteran asset additions follow or if continued tank prioritized."
+sources_used:
+  - https://www.basketball-reference.com/teams/UTA/2026.html
+  - https://www.deseret.com/sports/2025/10/21/utah-jazz-2025-26-season-preview/
+  - https://www.cbssports.com/nba/teams/uta/utah-jazz/roster/
+  - https://en.wikipedia.org/wiki/Ryan_Smith_(businessman)
+  - https://www.spotrac.com/nba/player/_/id/23602/lauri-markkanen
+  - https://www.spotrac.com/nba/player/_/id/82209/keyonte-george
+  - https://www.spotrac.com/nba/player/_/id/82205/walker-kessler
+  - https://www.spotrac.com/nba/player/_/id/23601/jaren-jackson-jr
+  - https://www.nba.com/player/1628374/lauri-markkanen
+  - https://www.nba.com/news/2025-26-season-preview-uta
+  - https://www.deseret.com/sports/2025/06/02/austin-ainge-utah-jazz-president-of-basketball-operations/
+  - https://www.deseret.com/sports/2025/05/05/utah-jazz-coach-will-hardy-extended/
+  - https://www.si.com/nba/jazz/onsi/news/utah-jazz-exec-shares-where-relationship-stands-with-walker-kessler
+  - https://www.deseret.com/sports/2025/10/30/utah-jazz-options-taylor-hendricks-keyonte-george-brice-sensabaugh/
+  - https://www.deseret.com/sports/2026/02/04/what-landing-jaren-jackson-jr-signals-for-utah-jazz/
+  - https://www.nba.com/news/jaren-jackson-jr-trade-jazz-2026
+  - https://www.deseret.com/sports/2026/02/03/utah-jazz-trade-jaren-jackson-jr/
+  - https://www.si.com/nba/jazz/onsi/news/utah-jazz-fill-final-two-way-slots-what-it-means
+  - https://www.gleague.nba.com/news/utah-jazz-sign-oscar-tshiebwe-to-two-way-contract-2
+  - https://www.si.com/nba/jazz/onsi/news/utah-jazz-believed-to-have-four-veteran-trade-candidates
+  - https://www.spotrac.com/nba/utah-jazz/cap/2025/
+  - https://www.spotrac.com/nba/player/_/id/23575/jusuf-nurkic
+  - https://www.spotrac.com/nba/player/_/id/23574/kevin-love
+  - https://www.kslsports.com/nba/utah-jazz/utah-jazz-rotation/560763
+  - https://www.deseret.com/sports/2025/06/30/with-jordan-clarkson-buyout-and-collin-sexton-trade-jazz-resetting-the-roster-ahead-of-free-agency/
+  - https://en.wikipedia.org/wiki/Lauri_Markkanen
+  - https://en.wikipedia.org/wiki/Keyonte_George
+  - https://en.wikipedia.org/wiki/Walker_Kessler
+  - https://www.nba.com/player/1642268/isaiah-collier
+  - https://www.nba.com/player/1642265/kyle-filipowski
+  - https://www.cbssports.com/nba/players/26775614/walter-clayton-jr/
+  - https://www.deseret.com/sports/2024/06/01/utah-jazz-first-round-pick-oklahoma-city-thunder-protections/
+  - https://www.si.com/nba/jazz/onsi/news/updated-utah-jazz-draft-picks-after-jaren-jackson-jr-trade
+  - https://www.fanspo.com/nba/teams/Jazz/29/draft-picks
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - kyle_anderson annual_value_current_season
+  - kyle_anderson total_value_remaining
+  - kyle_anderson contract_through
+  - kyle_anderson trade_kicker
+  - svi_mykhailiuk annual_value_current_season
+  - svi_mykhailiuk total_value_remaining
+  - svi_mykhailiuk contract_through
+  - svi_mykhailiuk trade_kicker
+  - oscar_tshiebwe annual_value_current_season
+  - oscar_tshiebwe total_value_remaining
+  - oscar_tshiebwe contract_through
+  - elijah_harkless annual_value_current_season
+  - elijah_harkless total_value_remaining
+  - elijah_harkless contract_through
+  - john_tonje annual_value_current_season
+  - john_tonje total_value_remaining
+  - john_tonje contract_through
+  - cody_williams annual_value_current_season
+  - cody_williams total_value_remaining
+  - cody_williams contract_through
+  - kyle_filipowski annual_value_current_season
+  - kyle_filipowski total_value_remaining
+  - kyle_filipowski contract_through
+  - isaiah_collier annual_value_current_season
+  - isaiah_collier total_value_remaining
+  - isaiah_collier contract_through
+  - ace_bailey total_value_remaining
+  - ace_bailey annual_value_next_season
+  - ace_bailey contract_through
+  - walker_kessler annual_value_current_season
+  - walker_kessler total_value_remaining
+  - walker_kessler contract_through
+  - walker_kessler trade_kicker
+vocabulary_flags:
+  - Taylor Hendricks traded away mid-season (Feb 2026); marked as actively_traded but no longer on roster as of as_of_date. Included for historical/trajectory context.
+  - Walter Clayton Jr. traded away mid-season (Feb 2026); marked as actively_traded but no longer on roster. Included for mid-season roster snapshot.
+  - Kyle Anderson, Georges Niang traded away mid-season; included for roster state as of early season before JJJ trade.
+  - Contract values for many young players (rookies/sophomores) unavailable via Tier 1 sources; defaulted to 'unknown' rather than estimate.
+  - Jaren Jackson Jr. trade occurred mid-season (Feb 2026, after as_of_date Feb 3 cutoff); included as major structural signal but not part of final lineup as of 2026-05-02.

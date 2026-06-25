@@ -1,0 +1,892 @@
+team_id: POR
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Portland Trail Blazers
+  conference: Western
+  division: Pacific
+  market_tier: tier_2
+  market_tier_rationale: Portland is a mid-sized market (approximately 650k metro) with strong regional basketball history but smaller than NBA tier-1 metros.
+ownership:
+  primary_owner:
+    name: Tom Dundon
+    type: group
+    tenure_years: 0.1
+    source: https://www.nba.com/news/nba-approves-blazers-sale-to-tom-dundon
+    confidence: high
+  governance_notes: Tom Dundon's investment group (Rip City Rising) acquired controlling interest from Paul Allen estate effective April 1, 2026 for approximately $4.25 billion. Dundon stated philosophy shift away from player development focus toward competitive urgency.
+  recent_transitions: Ownership change from Jody Allen (Paul Allen trust) to Tom Dundon April 2026
+  spending_posture: aggressive_spender
+  spending_posture_evidence:
+    - Dundon stated willingness to make "big deals" and aggressive moves at trade deadline
+    - Immediate Moda Center arena investment after takeover
+    - But concurrent reports of early cost-cutting measures raising concerns about sustainability
+front_office:
+  president_basketball_ops:
+    name: unknown
+    tenure_start: unknown
+    prior_stops: []
+    public_philosophy_signals: []
+    confidence: low
+    source: unknown
+  general_manager:
+    name: Joe Cronin
+    tenure_start: 2022-05
+    prior_stops:
+      - Portland Trail Blazers (intern 2006, pro scout 2010, director player personnel 2014, assistant GM 2021, interim GM 2021, GM 2022)
+    public_philosophy_signals:
+      - Pronoun-neutral approach to roster construction blending youth development with immediate competitive ambitions
+      - Willingness to pursue major trades (referenced possible deadline deal in 2025-26)
+      - Focus on acquiring veteran leadership to accelerate young core growth
+    confidence: high
+    source: https://www.nba.com/blazers/joe-cronin
+  head_coach:
+    name: Chauncey Billups
+    tenure_start: 2021-11
+    contract_through: 2028
+    style_notes: Defensive-oriented scheme; third-best defensive rating in last 40 games of 2024-25 season before extended through 2027-28. Arrested October 2025 for alleged involvement in illegal gambling scheme and placed on leave; Tiago Splitter served as interim HC for remainder of 2025-26 (42-39 record).
+    coaching_tree: unknown
+    confidence: medium
+    source: https://www.nba.com/news/trail-blazers-sign-chauncey-billups-contract-extension
+  assistant_coaches_notable:
+    - Tiago Splitter (interim HC 2025-26 season)
+  notable_advisors_or_consultants: []
+strategic_posture:
+  timeframe: contend_soon
+  confidence: medium
+  derived_from:
+    - Damian Lillard return targets competitive window post-recovery (2026-27+)
+    - Young core (Avdija, Sharpe, Clingan, Camara) showing significant development
+    - New ownership explicitly rejecting "development mindset" in favor of competitive urgency
+    - 42-40 record and playoff appearance in first full season of rebuild transition signals foundation-building
+  constraints:
+    - reason_code: young_core_developing
+      detail: Core players (Avdija, Sharpe, Clingan, Camara) still improving; Lillard sidelined entire season with Achilles injury.
+      weight: high
+    - reason_code: ownership_directive
+      detail: Tom Dundon ownership (4 weeks in as of 2026-05-02) pushing for competitive acceleration away from pure development.
+      weight: high
+    - reason_code: coaching_decision_pending
+      detail: Chauncey Billups' future status uncertain following October 2025 arrest and leave; interim HC Splitter's role unclear.
+      weight: high
+  trigger_events:
+    - Damian Lillard medical clearance and return-to-play timeline
+    - Chauncey Billups' legal resolution and coaching future
+    - Young core plateau vs. continued growth trajectory
+    - New ownership spending/payroll commitment actual vs. stated
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: above_first_apron
+  current_payroll_estimate: 189204726
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Modest relief from Ayton buyout completion; Lillard return adds full salary but team committed to competitive window.
+  exceptions_available: []
+  source: https://www.spotrac.com/nba/portland-trail-blazers/overview
+  source_fallbacks_used:
+    - https://www.spotrac.com/nba/portland-trail-blazers/cap/2025/
+    - https://www.salaryswish.com/teams/trailblazers
+  confidence: medium
+trade_dna:
+  frequent_partners:
+    - BOS
+    - WAS
+    - ATL
+  preferred_deal_archetypes:
+    - Youth-for-veteran swaps (Simons to Boston for Jrue Holiday)
+    - Bench depth acquisitions (Duop Reath mid-season)
+    - Young talent targeting from playoff teams (Deni Avdija from Washington)
+  recent_significant_trades:
+    - date: 2025-07-07
+      summary: Trail Blazers acquired Jrue Holiday from Boston in exchange for Anfernee Simons, 2026 2nd-rounder, 2026 2nd-rounder.
+      counterparties:
+        - BOS
+    - date: 2024
+      summary: Trail Blazers acquired Deni Avdija from Washington in exchange for Malcolm Brogdon, Carlton Carrington, 2028 2nd, 2029 1st, 2030 2nd.
+      counterparties:
+        - WAS
+  confidence: medium
+cultural_signals:
+  stability:
+    value: medium
+    detail: Ownership transition (April 2026) and coaching uncertainty (Billups arrest October 2025, interim HC Splitter) create near-term volatility despite strong player relationships.
+  player_friendly:
+    value: mixed
+    detail: Organization brought back franchise icon Lillard with full no-trade clause and multi-year deal, signaling player priority. But new ownership cost-cutting reports early in tenure.
+  analytics_orientation:
+    value: balanced
+    detail: Roster construction (draft picks, youth development, advanced statistical evaluation) suggests balanced approach; Joe Cronin emphasizes process over narrative.
+  risk_tolerance:
+    value: moderate
+    detail: Yang Hansen (2025
+  notable_traits:
+    - developmental_org
+    - homegrown_priority
+    - star_chasing
+  rationale: Portland under Joe Cronin prioritizes internal development (Clingan, Sharpe, Camara elevation) while strategically acquiring win-now veterans (Holiday, Avdija) to create immediate competitive context. New ownership under Dundon is pushing away from pure development philosophy toward more aggressive posturing, creating tension with established organizational DNA.
+  confidence: medium
+roster:
+  - player_id: deni_avdija
+    name: Deni Avdija
+    age: 24
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - connector
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_passer
+        - transition_threat
+    tier: star
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: 14380000
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.hoopshype.com/salaries/teams/portland-trail-blazers/22/
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: generational_talent
+          weight: medium
+      falsification_conditions:
+        - Trade request from Avdija
+        - Front office statement publicly moving away from core
+        - Significant injury limiting trajectory
+    team_relationship:
+      tenure_with_team: 1.3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Recent multi-year extension; first-time All-Star increasing market value.
+    confidence: high
+    source: https://www.nba.com/player/1630166/deni-avdija
+  - player_id: shaedon_sharpe
+    name: Shaedon Sharpe
+    age: 22
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: 8400000
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.hoopshype.com/salaries/teams/portland-trail-blazers/22/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: medium
+      falsification_conditions:
+        - Significant statistical regression or injury
+        - Front office pivot signaling core breakup
+    team_relationship:
+      tenure_with_team: 2.5
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: Multi-year deal at reasonable salary; restricted free agent status after contract.
+    confidence: high
+    source: https://www.nba.com/player/1629606/shaedon-sharpe
+  - player_id: donovan_clingan
+    name: Donovan Clingan
+    age: 21
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - finisher
+          - post_hub
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+        - elite_athlete
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: 7180000
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.hoopshype.com/salaries/teams/portland-trail-blazers/22/
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: generational_talent
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: medium
+      falsification_conditions:
+        - Injury prognosis worsening
+        - Explicit front office core teardown announcement
+        - Trade request from player
+    team_relationship:
+      tenure_with_team: 1.5
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie deal; high upside increasing organizational commitment.
+    confidence: high
+    source: https://www.nba.com/player/1631117/donovan-clingan
+  - player_id: toumani_camara
+    name: Toumani Camara
+    age: 25
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.hoopshype.com/salaries/teams/portland-trail-blazers/22/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: medium
+      falsification_conditions:
+        - Front office explicitly names him available
+        - Significant regression in performance
+    team_relationship:
+      tenure_with_team: 3
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: Multiple-year deal; core player status rising.
+    confidence: medium
+    source: https://eu.hoopshype.com/story/sports/nba/rumors/2026/04/06/donovan-clingan-deni-avdija-and-toumani-camara-considered-long-term-players-for-portland/89488768007/
+  - player_id: jrue_holiday
+    name: Jrue Holiday
+    age: 35
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - tertiary_scorer
+          - connector
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - vet_leadership
+        - elite_passer
+    tier: starter
+    trajectory: declining_peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 32400000
+      annual_value_current_season: 32400000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.hoopshype.com/salaries/teams/portland-trail-blazers/22/
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: age_decline_expected
+          weight: medium
+      falsification_conditions:
+        - Mid-season extension signed before deadline
+        - Team public commitment to long-term core role
+        - Playoff performance spike changing calculus
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.9
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Expiring contract affords significant leverage; could test UFA market.
+    confidence: medium
+    source: https://www.hoopshype.com/salaries/teams/portland-trail-blazers/22/
+  - player_id: scoot_henderson
+    name: Scoot Henderson
+    age: 21
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - transition_threat
+        - iso_creator
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: 10750000
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.hoopshype.com/salaries/teams/portland-trail-blazers/22/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: medium
+        - reason_code: homegrown_loyalty
+          weight: medium
+      falsification_conditions:
+        - Rotation role diminished by veteran or young replacement
+        - Explicit availability signaling from FO
+    team_relationship:
+      tenure_with_team: 2
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie deal; upside investment by organization.
+    confidence: high
+    source: https://www.sportbusy.com/players/nba/Scoot%20Henderson/
+  - player_id: damian_lillard
+    name: Damian Lillard
+    age: 36
+    position_listed: PG
+    contract_type: standard
+    availability_status: season_ending
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: elite
+      special_traits:
+        - elite_passer
+        - iso_creator
+        - vet_leadership
+    tier: superstar
+    trajectory: declining_peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 42000000
+      annual_value_current_season: null
+      annual_value_next_season: 14000000
+      no_trade_clause: full
+      trade_kicker: unknown
+      player_option: 2027
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.nba.com/news/damian-lillard-to-return-to-trail-blazers
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: full_no_trade_clause
+          weight: high
+        - reason_code: generational_talent
+          weight: high
+        - reason_code: recently_acquired
+          weight: medium
+      falsification_conditions:
+        - Player requests trade (unlikely given no-trade clause)
+        - Achilles injury prognosis becomes permanently career-limiting
+        - Mutual agreement to part ways
+      signal_strength: confirmed_shopped
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Full no-trade clause and franchise icon status provide maximum protection.
+    confidence: high
+    source: https://www.nba.com/news/damian-lillard-to-return-to-trail-blazers
+  - player_id: jerami_grant
+    name: Jerami Grant
+    age: 31
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+          - finisher
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits: []
+    tier: starter
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 32000000
+      annual_value_current_season: 32000000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.hoopshype.com/salaries/teams/portland-trail-blazers/22/
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: declining_role
+          weight: medium
+      falsification_conditions:
+        - Extension signed before deadline
+        - Significant playoff performance elevation
+        - Explicit public core-building statement from FO
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2.5
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Expiring contract; can test UFA market.
+    confidence: medium
+    source: https://www.hoopshype.com/salaries/teams/portland-trail-blazers/22/
+  - player_id: matisse_thybulle
+    name: Matisse Thybulle
+    age: 27
+    position_listed: SG
+    contract_type: standard
+    availability_status: injured_short_term
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: finisher
+        secondary:
+          - connector
+      defensive_role: wing_stopper
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 11550000
+      annual_value_current_season: 11550000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.hoopshype.com/salaries/teams/portland-trail-blazers/22/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: homegrown_loyalty
+          weight: low
+      falsification_conditions:
+        - Permanent career-altering injury emerges
+        - Team publicly makes available
+    team_relationship:
+      tenure_with_team: 1
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Expiring contract; defensive specialist value uncertain in market.
+    confidence: medium
+    source: https://www.nba.com/player/1629680/matisse-thybulle
+  - player_id: yang_hansen
+    name: Yang Hansen
+    age: 20
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - finisher
+          - post_hub
+      defensive_role: rim_protector
+      shooting_profile: functional
+      special_traits:
+        - elite_rebounder
+    tier: fringe
+    trajectory: unknown
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.kgw.com/article/sports/nba/blazers/portland-trail-blazers-trade-draft-yang-hansen/283-a6321162-c52c-4c59-84b9-9dc38e73345f
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: behind_younger_player
+          weight: high
+        - reason_code: extension_decline
+          weight: medium
+      falsification_conditions:
+        - Clingan injury opens path to rotation
+        - Breakout performance in G League
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Rookie draftee; limited leverage.
+    confidence: low
+    source: https://www.kgw.com/article/sports/nba/blazers/portland-trail-blazers-trade-draft-yang-hansen/283-a6321162-c52c-4c59-84b9-9dc38e73345f
+  - player_id: duop_reath
+    name: Duop Reath
+    age: 27
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - post_hub
+      defensive_role: helper
+      shooting_profile: non_shooter
+      special_traits: []
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.rosegardenreport.com/duop-reath-on-new-contract-with-trail/
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: medium
+        - reason_code: behind_younger_player
+          weight: medium
+      falsification_conditions:
+        - Multi-year extension signed
+        - Regular rotation role in playoffs
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Reliable depth piece; solid market for role player.
+    confidence: medium
+    source: https://www.rosegardenreport.com/duop-reath-on-new-contract-with-trail/
+  - player_id: robert_williams_iii
+    name: Robert Williams III
+    age: 28
+    position_listed: C
+    contract_type: standard
+    availability_status: injured_short_term
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - finisher
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 13290000
+      annual_value_current_season: 13290000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.hoopshype.com/salaries/teams/portland-trail-blazers/22/
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: injury_recovery_uncertain
+          weight: high
+      falsification_conditions:
+        - Full health confirmation and extension
+        - Return to previous athletic profile
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.5
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Expiring deal; injury history may limit market.
+    confidence: medium
+    source: https://www.hoopshype.com/salaries/teams/portland-trail-blazers/22/
+pending_free_agents: []
+known_target_history:
+  - target: Deni Avdija
+    year: 2024
+    outcome: acquired
+    detail: Acquired from Washington Wizards in exchange for Malcolm Brogdon, Carlton Carrington, 2028 2nd, 2029 1st, 2030 2nd.
+    source: https://www.hoopshype.com/salaries/teams/portland-trail-blazers/22/
+  - target: Jrue Holiday
+    year: 2025
+    outcome: acquired
+    detail: Acquired from Boston Celtics in exchange for Anfernee Simons and two 2nd-round picks.
+    source: https://www.nba.com/news/celtics-blazers-trade-jrue-holiday-anfernee-simons
+  - target: Damian Lillard
+    year: 2025
+    outcome: acquired
+    detail: Signed three-year deal after being waived and stretched by Milwaukee Bucks; includes full no-trade clause and player option.
+    source: https://www.nba.com/news/damian-lillard-to-return-to-trail-blazers
+  - target: Yang Hansen
+    year: 2025
+    outcome: acquired
+    detail: Drafted 16th overall in 2025 NBA Draft; positioned as high-upside international prospect.
+    source: https://www.kgw.com/article/sports/nba/blazers/portland-trail-blazers-trade-draft-yang-hansen/283-a6321162-c52c-4c59-84b9-9dc38e73345f
+near_term_priorities:
+  - priority: 2026 draft-capital gap
+    timeline: this_offseason
+    type: draft
+    detail: "Portland Trail Blazers do not own a 2026 pick in the official order; outgoing original selections: No. 15 to CHI, No. 42 to SAS. Draft-night focus shifts to trade, cash, two-way, or undrafted acquisition paths."
+    confidence: medium
+  - priority: Clarify head coaching role and stability
+    timeline: next_30_days
+    type: coaching_decision
+    detail: Chauncey Billups on leave following October 2025 arrest; legal resolution and coaching future uncertain as of May 2026.
+    confidence: high
+  - priority: Monitor Damian Lillard Achilles recovery trajectory
+    timeline: next_season
+    type: roster
+    detail: Lillard targeting full return for 2026-27 season start; medical clearance timeline will define 2026-27 competitive window.
+    confidence: high
+  - priority: Consolidate winning culture under new ownership
+    timeline: this_season
+    type: structural
+    detail: Tom Dundon ownership (4 weeks into tenure) pivoting away from development-focused culture toward competitive urgency; cultural integration and spending consistency TBD.
+    confidence: medium
+  - priority: Extend or resolve availability of expiring vets (Holiday, Grant)
+    timeline: by_trade_deadline
+    type: free_agency
+    detail: Both players on expiring contracts; extension talks or trade scenarios likely during 2026-27 season.
+    confidence: medium
+key_assets:
+  draft_picks_owned:
+    - year: 2027
+      round: 1
+      protections: unknown
+      source: unknown
+    - year: 2025
+      round: 2
+      from_team: BOS
+      protections: none (Holiday trade)
+      source: https://www.cbsnews.com/boston/news/boston-celtics-second-apron-porzingis-trades-nba/
+  draft_picks_owed:
+    - year: 2026
+      round: 1
+      to_team: CHI
+      protections: 2026 No. 15 overall; from POR.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 2
+      to_team: SAS
+      protections: 2026 No. 42 overall; from POR via NOP.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2027
+      round: 2
+      to_team: BOS
+      protections: unknown
+      source: https://www.nba.com/news/celtics-blazers-trade-jrue-holiday-anfernee-simons
+    - year: 2027
+      round: 2
+      to_team: WAS
+      protections: unknown
+      source: https://www.hoopshype.com/salaries/teams/portland-trail-blazers/22/
+  trade_exceptions: []
+team_team_relationships:
+  rivalries:
+    - team_id: LAL
+      type: competitive_recent
+      basis: Pacific division proximity and emerging Lillard-HomeCourt returning rivalry subplot.
+    - team_id: DEN
+      type: competitive_recent
+      basis: Western Conference contenders; recent playoff caliber conferences.
+  notable_personnel_connections:
+    - person: Joe Cronin
+      connected_team: POR
+      connection_type: former_player
+      detail: Cronin spent entire professional career with Blazers (19+ years); no prior stops with other NBA organizations.
+    - person: Chauncey Billups
+      connected_team: POR
+      connection_type: former_player
+      detail: Billups played for Detroit Pistons and Denver Nuggets; no Portland connection prior to HC hire.
+    - person: Tiago Splitter
+      connected_team: POR
+      connection_type: former_associate_hc
+      detail: Served as interim HC during Billups' leave; defensive specialist background.
+g_league_and_stash:
+  affiliate_team: Rip City Remix
+  notable_affiliate_players:
+    - Yang Hansen (center; 2025 draft pick, learning curve assignment)
+  international_stash: []
+narrative_summary:
+  one_paragraph: "Portland's 2025-26 season represents a transitional inflection: a young core (Avdija, Sharpe, Clingan, Camara) reaching stardom while franchise icon Damian Lillard returned post-Bucks waive/stretch nursing an Achilles injury (sidelined all season). Joe Cronin built a hybrid roster blending youth development with veteran anchors (Holiday, Grant), achieving a 42-40 record and 8th seed before losing to Spurs 1-4. Ownership shifted from Jody Allen's seven-year stewardship to Tom Dundon's investment group (April 1, 2026), signaling a philosophical tilt away from pure development toward competitive urgency. Chauncey Billups' arrest (October 2025) and leave complicated coaching continuity, with Tiago Splitter managing a 42-39 interim record. The franchise now faces simultaneous pressures: Lillard's medical recovery timeline, new ownership spending commitment, coaching stability resolution, and young core progression—with the 2026-27 season expected to be defining."
+  three_things_to_watch:
+    - "2026 draft-capital gap: official order leaves no owned picks (No. 15 to CHI, No. 42 to SAS); monitor trade, cash, and undrafted acquisition paths instead."
+    - Damian Lillard's Achilles recovery and return-to-play timeline; 2026-27 season clarity dependent on clearance.
+    - Chauncey Billups' legal resolution and whether he returns as HC or org pivots to external candidate under new ownership.
+    - Tom Dundon's sustainability of stated competitive philosophy versus early cost-cutting signals; spending vs. payroll posture will define organizational culture.
+sources_used:
+  - https://www.basketball-reference.com/teams/POR/2026.html
+  - https://en.wikipedia.org/wiki/2025%E2%80%9326_Portland_Trail_Blazers_season
+  - https://www.nba.com/news/2025-26-season-preview-por
+  - https://www.nba.com/blazers/joe-cronin
+  - https://en.wikipedia.org/wiki/Joe_Cronin_(basketball)
+  - https://www.nba.com/news/trail-blazers-sign-chauncey-billups-contract-extension
+  - https://www.nba.com/news/bucks-waive-damian-lillard
+  - https://www.nba.com/news/damian-lillard-to-return-to-trail-blazers
+  - https://www.nba.com/news/celtics-blazers-trade-jrue-holiday-anfernee-simons
+  - https://www.hoopshype.com/salaries/teams/portland-trail-blazers/22/
+  - https://www.spotrac.com/nba/portland-trail-blazers/overview
+  - https://www.kgw.com/article/sports/nba/blazers/who-is-portland-trail-blazers-new-owner-tom-dundon/283-99f9d382-c3a9-4527-a121-0d73bbdc57fe
+  - https://www.nba.com/news/nba-approves-blazers-sale-to-tom-dundon
+  - https://www.nba.com/news/new-blazers-owner-tom-dundon-says-team-is-shifting-away-from-development-mindset-of-recent-years
+  - https://www.kgw.com/article/sports/nba/blazers/portland-trail-blazers-trade-draft-yang-hansen/283-a6321162-c52c-4c59-84b9-9dc38e73345f
+  - https://eu.hoopshype.com/story/sports/nba/rumors/2026/04/06/donovan-clingan-deni-avdija-and-toumani-camara-considered-long-term-players-for-portland/89488768007/
+  - https://www.rosegardenreport.com/duop-reath-on-new-contract-with-trail/
+  - https://www.nba.com/player/1630166/deni-avdija
+  - https://www.nba.com/player/1629606/shaedon-sharpe
+  - https://www.nba.com/player/1631117/donovan-clingan
+  - https://www.sportbusy.com/players/nba/Scoot%20Henderson/
+  - https://www.nba.com/player/1629680/matisse-thybulle
+  - https://ripcityproject.com/
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - front_office.president_basketball_ops (full record unknown)
+  - strategic_posture.confidence (medium; limited historical view under new ownership)
+  - cap_situation.exceptions_available (none confirmed; full trade exception details unknown)
+  - player.contracts (many annual values unknown; Spotrac 403 fallback incomplete)
+  - player.contract.trade_kicker (confirmed absent or unknown for all roster)
+  - key_assets.draft_picks_owned.protections (specific details unknown)
+  - pending_free_agents (as of 2026-05-02, no active UFA targets in immediate window; Holiday and Grant expire 2026)
+vocabulary_flags:
+  - "Chauncey Billups: contract_through listed as 2028 but he was on leave October 2025; coaching future status uncertain. Listed as 'head coach' but Tiago Splitter interim HC 42-39 record end of 2025-26. Future role TBD; listed as primary HC pending legal resolution."
+  - "Damian Lillard: availability_status marked season_ending for 2025-26 (Achilles injury, entire season missed); expected return 2026-27. Player_option year listed as 2027 (player option trigger year)."
+  - "Yang Hansen: trajectory marked 'unknown' per template rules—insufficient 2025-26 performance data to classify ascending/peak/declining."
+  - Ownership transition April 1, 2026 occurred during 2025-26 season wrap and playoff run; Jody Allen tenure_years calculated as partial (0.1 years Dundon, ~7 years prior Allen).

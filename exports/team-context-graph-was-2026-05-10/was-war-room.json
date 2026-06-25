@@ -1,0 +1,1778 @@
+{
+  "metadata": {
+    "schema_version": 1,
+    "derived_updated_at": "2026-05-10T17:03:49.109Z",
+    "validation_report_path": "/Users/maxweiss/Documents/GitHub/Gambit UI Remix/data/nba-context-graph/derived/validation_report.md",
+    "overrides_path": "/Users/maxweiss/Documents/GitHub/Gambit UI Remix/data/nba-context-graph/overrides/team-preferences.local.json",
+    "overrides_updated_at": "2026-05-09T16:31:08.602Z"
+  },
+  "subject": {
+    "team_id": "WAS",
+    "name": "Washington Wizards",
+    "conference": "Eastern",
+    "division": "Southeast",
+    "market_tier": "tier_2",
+    "as_of_date": "2026-05-02",
+    "last_updated": "2026-05-02",
+    "has_overrides": true,
+    "override_updated_at": "2026-05-09T16:31:08.602Z",
+    "validation": {
+      "status": "pass",
+      "error_count": 0,
+      "warning_count": 0
+    },
+    "roster_summary": {
+      "roster_count": 12,
+      "pending_free_agents_count": 3,
+      "tier_counts": {
+        "star": 3,
+        "starter": 4,
+        "rotation": 3,
+        "two_way": 1,
+        "fringe": 1
+      }
+    },
+    "relationship_summary": {
+      "trade_partners": [
+        {
+          "team_id": "ATL",
+          "trade_count_recent": 2,
+          "last_trade_date": "2026-01-09"
+        },
+        {
+          "team_id": "DAL",
+          "trade_count_recent": 2,
+          "last_trade_date": "2026-02-06"
+        },
+        {
+          "team_id": "HOU",
+          "trade_count_recent": 1,
+          "last_trade_date": "2025-07-06"
+        },
+        {
+          "team_id": "MIL",
+          "trade_count_recent": 1,
+          "last_trade_date": "2025-02"
+        },
+        {
+          "team_id": "NOP",
+          "trade_count_recent": 2,
+          "last_trade_date": "2025-07"
+        },
+        {
+          "team_id": "POR",
+          "trade_count_recent": 1,
+          "last_trade_date": null
+        }
+      ],
+      "rivalries": [
+        {
+          "team_id": "ATL",
+          "rivalry_type": "personnel_grudge",
+          "basis": "Traded Trae Young mid-season (Jan 2026); expected ongoing negotiation over rotational fit and draft capital."
+        },
+        {
+          "team_id": "BOS",
+          "rivalry_type": "geographic",
+          "basis": "Atlantic Division geographic neighbor; light recent trade history."
+        },
+        {
+          "team_id": "PHI",
+          "rivalry_type": "competitive_historical",
+          "basis": "Division historical rivalry; limited current interaction."
+        }
+      ],
+      "personnel_connections": [
+        {
+          "person_name": "Michael Winger",
+          "connected_team": "LAC",
+          "connection_type": "former_GM"
+        },
+        {
+          "person_name": "Will Dawkins",
+          "connected_team": "unknown",
+          "connection_type": "unknown"
+        },
+        {
+          "person_name": "Brian Keefe",
+          "connected_team": "New York Knicks",
+          "connection_type": "former_assistant"
+        }
+      ],
+      "historical_pursuits": [
+        {
+          "target_name": "CJ McCollum",
+          "year": 2025,
+          "outcome": "acquired"
+        },
+        {
+          "target_name": "Trae Young",
+          "year": 2026,
+          "outcome": "acquired"
+        },
+        {
+          "target_name": "Anthony Davis",
+          "year": 2026,
+          "outcome": "acquired"
+        }
+      ],
+      "incoming_pick_count": 4,
+      "outgoing_pick_count": 4
+    },
+    "source_preferences": {
+      "ownership": {
+        "spending_posture": "moderate",
+        "spending_posture_evidence": [
+          "Finished 2025-26 payroll at $189.9M; below second apron but above luxury tax ($187.9M).",
+          "Willingness to add veteran talent mid-season (Young, Davis) suggests mid-rebuild reinvestment rather than hard tank.",
+          "Leonsis stated rebuild could take five seasons; patience evident but not aggressive free-agent spender."
+        ],
+        "governance_notes": "Leonsis majority owner since June 2010. Monumental Sports & Entertainment also owns Washington Mystics (WNBA) and Capital City Go-Go (G-League). Leonsis granted full authority to Michael Winger on basketball operations.",
+        "recent_transitions": "none"
+      },
+      "strategic_posture": {
+        "timeframe": "rebuild",
+        "confidence": "high",
+        "derived_from": [
+          "17-65 record (worst in NBA) confirms youth-first strategy with limited win-now pretense.",
+          "Trae Young and Anthony Davis acquisitions January–February 2026 signal medium-term contention target (2026-27 onward).",
+          "Leonsis public statements: 'these are the years to not be competitive' given strength of next two drafts; expects rebuild completion in 5 years total (3 years elapsed, 2 remaining as of 2026).",
+          "Deep roster youth (Alex Sarr age 20, Bub Carrington age 20, Tre Johnson age 20, Bilal Coulibaly age 21) precludes immediate contention."
+        ],
+        "constraints": [
+          {
+            "reason_code": "young_core_developing",
+            "detail": "Five first-year and second-year players in core rotation; chemistry and development cycle require 1–2 more seasons.",
+            "weight": "high"
+          },
+          {
+            "reason_code": "multi_year_lottery",
+            "detail": "Two consecutive seasons of worst-in-NBA records (2024-25, 2025-26) means ceiling is constrained by injury to stars (Young, Davis).",
+            "weight": "high"
+          },
+          {
+            "reason_code": "recent_playoff_success",
+            "detail": "Negative constraint—zero playoff appearance since 2023; fanbase and owner patience finite.",
+            "weight": "medium"
+          }
+        ],
+        "trigger_events": [
+          "Trae Young and Anthony Davis health status determines 2026-27 trajectory; if both play <50 games again, rebuild reset likely.",
+          "2026 NBA Draft lottery outcome (pick 7–10 range likely); acquisition of elite prospect accelerates timeline.",
+          "Mid-season 2026-27 record inflection: if <25 wins by All-Star break, Leonsis may lose patience and pivot to aggressive trade targets."
+        ],
+        "last_reviewed": "2026-05-02"
+      },
+      "trade_dna": {
+        "frequent_partners": [
+          "NOP",
+          "ATL",
+          "DAL"
+        ],
+        "preferred_deal_archetypes": [
+          "Youth + future picks for established scoring guards (McCollum, Young).",
+          "Expiring contracts + role players for All-Star caliber talent (Davis).",
+          "Asset rotation: trading flipped veterans (Poole, Middleton) for youth development."
+        ],
+        "recent_significant_trades": [
+          {
+            "date": "2025-06-24",
+            "summary": "Acquired CJ McCollum, Kelly Olynyk, 2nd-round pick from Pelicans for Jordan Poole, Saddiq Bey, 40th pick."
+          },
+          {
+            "date": "2026-01-09",
+            "summary": "Acquired Trae Young from Hawks for CJ McCollum, Corey Kispert."
+          },
+          {
+            "date": "2026-02-05",
+            "summary": "Three-team trade: Wizards acquired Anthony Davis, Jaden Hardy, D'Angelo Russell, Dante Exum from Mavericks; sent Khris Middleton, AJ Johnson, Malaki Branham, Marvin Bagley III, 2 first-round picks, 3 second-round picks."
+          }
+        ],
+        "confidence": "high"
+      },
+      "cultural_signals": {
+        "stability": {
+          "value": "low",
+          "detail": "Head coach Brian Keefe retained after 17-65 season; ownership backing evident but roster churn (five trades in 12 months) signals organizational instability."
+        },
+        "player_friendly": {
+          "value": "mixed",
+          "detail": "Leonsis invested in franchise but trading active veterans (Poole, McCollum, Middleton) on short notice; Young and Davis acquisitions signal contention intent but health situation volatile."
+        },
+        "analytics_orientation": {
+          "value": "balanced",
+          "detail": "Winger (former Clippers GM) emphasizes modern positional fluidity and three-point shooting; youth focus suggests data-driven development but direct evidence limited."
+        },
+        "risk_tolerance": {
+          "value": "aggressive",
+          "detail": "Mid-season blockbuster trades (Young, Davis) despite 17-65 record indicate willingness to bet on injury recovery and veteran leadership; unconventional by rebuild standards."
+        },
+        "notable_traits": [
+          "developmental_org",
+          "star_chasing",
+          "coach_carousel",
+          "ownership_meddling"
+        ],
+        "rationale": "Wizards organization reflects owner's ambitious five-year rebuild philosophy balanced against impatience. Recent mid-season additions of Young and Davis suggest ownership pressure to accelerate timeline. Coaching stability (Keefe retained) contrasts with frequent front-office transitions and aggressive trade activity.",
+        "confidence": "medium"
+      },
+      "near_term_priorities": [
+        {
+          "priority": "Health recovery for Trae Young and Anthony Davis",
+          "timeline": "this_season",
+          "type": "structural",
+          "detail": "Both players injured as of season end (May 2026); 2026-27 success contingent on return to form and availability.",
+          "confidence": "high"
+        },
+        {
+          "priority": "2026 NBA Draft selection (7th–10th projected range)",
+          "timeline": "this_offseason",
+          "type": "draft",
+          "detail": "Wizards secured their 2026 first-round pick (avoided top-8 protection); high lottery pick allows youth core bolstering.",
+          "confidence": "high"
+        },
+        {
+          "priority": "2026-27 rotation refinement and roster depth",
+          "timeline": "next_season",
+          "type": "roster",
+          "detail": "If Young and Davis healthy, Wizards must address bench depth and rim protection (Sarr is lone reliable big).",
+          "confidence": "medium"
+        },
+        {
+          "priority": "Contract extension discussions with core youth",
+          "timeline": "by_trade_deadline",
+          "type": "extension",
+          "detail": "Coulibaly and Sarr eligible for extensions by 2026-27; FO must lock in core to avoid RFA complications.",
+          "confidence": "medium"
+        }
+      ],
+      "narrative_summary": {
+        "one_paragraph": "The Washington Wizards endured their second consecutive lottery season (17-65 record), pursuing a youth-development rebuild under new President Michael Winger and GM Will Dawkins. The core—Alex Sarr (age 21, franchise centerpiece), Bub Carrington (lead guard, age 20), Bilal Coulibaly (wing, age 21), and Tre Johnson (rookie guard, age 20)—forms one of the NBA's youngest rosters. However, owner Ted Leonsis and Winger shifted course mid-season, acquiring All-Stars Trae Young (January 2026) and Anthony Davis (February 2026) in blockbuster trades, signaling a pivot toward contention if both recover from injuries. The move contradicted the pure rebuild narrative but reflects Leonsis's impatience and confidence in the young core. Retained head coach Brian Keefe and an aggressive offseason (2026 lottery pick expected 7–10 range) suggest the organization is now targeting a 2026-27 competitive window, contingent entirely on Young and Davis health.",
+        "three_things_to_watch": [
+          "Health recovery of Trae Young and Anthony Davis: Both missed significant time in 2025-26 due to shoulder and hand/groin injuries, respectively. If either plays <40 games in 2026-27, the contention timeline resets.",
+          "Alex Sarr's ascent: At 21, the 2024 second overall pick emerged as the young core's best player (16.3 ppg, 7.4 rpg, 2.0 bpg). Sarr's two-way development will determine whether the youth core becomes a dynasty or another missed rebuild.",
+          "Ownership patience on rebuild completion: Leonsis committed to a five-year rebuild but mid-season trades signal he may reset expectations. If the 2026-27 season yields <30 wins and no playoff path emerges, aggressive trade deadline moves or coaching changes could accelerate."
+        ]
+      },
+      "team_team_relationships": {
+        "rivalries": [
+          {
+            "team_id": "ATL",
+            "type": "personnel_grudge",
+            "basis": "Traded Trae Young mid-season (Jan 2026); expected ongoing negotiation over rotational fit and draft capital."
+          },
+          {
+            "team_id": "BOS",
+            "type": "geographic",
+            "basis": "Atlantic Division geographic neighbor; light recent trade history."
+          },
+          {
+            "team_id": "PHI",
+            "type": "competitive_historical",
+            "basis": "Division historical rivalry; limited current interaction."
+          }
+        ],
+        "notable_personnel_connections": [
+          {
+            "person": "Michael Winger",
+            "connected_team": "LAC",
+            "connection_type": "former_GM",
+            "detail": "Winger was GM of LA Clippers (2017–2023); brings Clippers asset-building philosophy (young talent + flexibility)."
+          },
+          {
+            "person": "Will Dawkins",
+            "connected_team": "unknown",
+            "connection_type": "unknown",
+            "detail": "Unknown prior stops; hired mid-2023 by Wizards as GM directly under Winger."
+          },
+          {
+            "person": "Brian Keefe",
+            "connected_team": "New York Knicks",
+            "connection_type": "former_assistant",
+            "detail": "Keefe has no documented major mentorship ties; retained despite 17-65 record."
+          }
+        ]
+      },
+      "onboarding_profile": {
+        "schema_version": 1,
+        "status": "not_started",
+        "team_id": "WAS",
+        "team_name": "Washington Wizards",
+        "started_at": null,
+        "updated_at": null,
+        "completed_at": null,
+        "skipped_sections": [],
+        "identity": {
+          "role": "",
+          "role_other": "",
+          "years_in_role": "",
+          "decision_authority": ""
+        },
+        "team_snapshot": {
+          "lifecycle": "",
+          "cap_posture": "",
+          "cornerstones": [],
+          "active_scenarios": [],
+          "star_extension_players": "",
+          "trade_deadline_window": "",
+          "other_scenarios": []
+        },
+        "strategic_priorities": {
+          "ninety_day_decision": "",
+          "ranked_priorities": [],
+          "decision_types": [],
+          "recent_decision_help": "",
+          "other_decision_types": []
+        },
+        "working_style": {
+          "recommendation_style": "",
+          "claim_requirements": [],
+          "risk_posture": "",
+          "cadence": "",
+          "briefing_time": "",
+          "briefing_timezone": "",
+          "channels": [],
+          "slack_workspace": "",
+          "slack_channel": "",
+          "other_channels": []
+        },
+        "stakeholders_rituals": {
+          "skipped": false,
+          "people": [],
+          "authority": {
+            "cap_contracts": "",
+            "basketball_ops": "",
+            "draft": "",
+            "coaching_staff": ""
+          },
+          "rituals": [],
+          "other_rituals": [],
+          "fire_drill_frequency": ""
+        },
+        "data_trust": {
+          "skipped": false,
+          "trust_panel_acknowledged": false,
+          "sources": [],
+          "other_sources": [],
+          "off_limits": [],
+          "off_limits_people": "",
+          "off_limits_topics": "",
+          "integrations": [],
+          "other_integrations": []
+        }
+      }
+    },
+    "preferences": {
+      "ownership": {
+        "spending_posture": "moderate",
+        "spending_posture_evidence": [
+          "Finished 2025-26 payroll at $189.9M; below second apron but above luxury tax ($187.9M).",
+          "Willingness to add veteran talent mid-season (Young, Davis) suggests mid-rebuild reinvestment rather than hard tank.",
+          "Leonsis stated rebuild could take five seasons; patience evident but not aggressive free-agent spender."
+        ],
+        "governance_notes": "Leonsis majority owner since June 2010. Monumental Sports & Entertainment also owns Washington Mystics (WNBA) and Capital City Go-Go (G-League). Leonsis granted full authority to Michael Winger on basketball operations.",
+        "recent_transitions": "none"
+      },
+      "strategic_posture": {
+        "timeframe": "rebuild",
+        "confidence": "high",
+        "derived_from": [
+          "17-65 record (worst in NBA) confirms youth-first strategy with limited win-now pretense.",
+          "Trae Young and Anthony Davis acquisitions January–February 2026 signal medium-term contention target (2026-27 onward).",
+          "Leonsis public statements: 'these are the years to not be competitive' given strength of next two drafts; expects rebuild completion in 5 years total (3 years elapsed, 2 remaining as of 2026).",
+          "Deep roster youth (Alex Sarr age 20, Bub Carrington age 20, Tre Johnson age 20, Bilal Coulibaly age 21) precludes immediate contention.",
+          "Gambit onboarding"
+        ],
+        "constraints": [
+          {
+            "reason_code": "young_core_developing",
+            "detail": "Five first-year and second-year players in core rotation; chemistry and development cycle require 1–2 more seasons.",
+            "weight": "high"
+          },
+          {
+            "reason_code": "multi_year_lottery",
+            "detail": "Two consecutive seasons of worst-in-NBA records (2024-25, 2025-26) means ceiling is constrained by injury to stars (Young, Davis).",
+            "weight": "high"
+          },
+          {
+            "reason_code": "recent_playoff_success",
+            "detail": "Negative constraint—zero playoff appearance since 2023; fanbase and owner patience finite.",
+            "weight": "medium"
+          }
+        ],
+        "trigger_events": [
+          "Trae Young and Anthony Davis health status determines 2026-27 trajectory; if both play <50 games again, rebuild reset likely.",
+          "2026 NBA Draft lottery outcome (pick 7–10 range likely); acquisition of elite prospect accelerates timeline.",
+          "Mid-season 2026-27 record inflection: if <25 wins by All-Star break, Leonsis may lose patience and pivot to aggressive trade targets."
+        ],
+        "last_reviewed": "2026-05-09"
+      },
+      "trade_dna": {
+        "frequent_partners": [
+          "NOP",
+          "ATL",
+          "DAL"
+        ],
+        "preferred_deal_archetypes": [
+          "Youth + future picks for established scoring guards (McCollum, Young).",
+          "Expiring contracts + role players for All-Star caliber talent (Davis).",
+          "Asset rotation: trading flipped veterans (Poole, Middleton) for youth development."
+        ],
+        "recent_significant_trades": [
+          {
+            "date": "2025-06-24",
+            "summary": "Acquired CJ McCollum, Kelly Olynyk, 2nd-round pick from Pelicans for Jordan Poole, Saddiq Bey, 40th pick."
+          },
+          {
+            "date": "2026-01-09",
+            "summary": "Acquired Trae Young from Hawks for CJ McCollum, Corey Kispert."
+          },
+          {
+            "date": "2026-02-05",
+            "summary": "Three-team trade: Wizards acquired Anthony Davis, Jaden Hardy, D'Angelo Russell, Dante Exum from Mavericks; sent Khris Middleton, AJ Johnson, Malaki Branham, Marvin Bagley III, 2 first-round picks, 3 second-round picks."
+          }
+        ],
+        "confidence": "high"
+      },
+      "cultural_signals": {
+        "stability": {
+          "value": "low",
+          "detail": "Head coach Brian Keefe retained after 17-65 season; ownership backing evident but roster churn (five trades in 12 months) signals organizational instability."
+        },
+        "player_friendly": {
+          "value": "mixed",
+          "detail": "Leonsis invested in franchise but trading active veterans (Poole, McCollum, Middleton) on short notice; Young and Davis acquisitions signal contention intent but health situation volatile."
+        },
+        "analytics_orientation": {
+          "value": "balanced",
+          "detail": "Winger (former Clippers GM) emphasizes modern positional fluidity and three-point shooting; youth focus suggests data-driven development but direct evidence limited."
+        },
+        "risk_tolerance": {
+          "value": "aggressive",
+          "detail": "Mid-season blockbuster trades (Young, Davis) despite 17-65 record indicate willingness to bet on injury recovery and veteran leadership; unconventional by rebuild standards."
+        },
+        "notable_traits": [
+          "developmental_org",
+          "star_chasing",
+          "coach_carousel",
+          "ownership_meddling"
+        ],
+        "rationale": "Wizards organization reflects owner's ambitious five-year rebuild philosophy balanced against impatience. Recent mid-season additions of Young and Davis suggest ownership pressure to accelerate timeline. Coaching stability (Keefe retained) contrasts with frequent front-office transitions and aggressive trade activity.",
+        "confidence": "medium"
+      },
+      "near_term_priorities": [
+        {
+          "priority": "Most important 90-day decision",
+          "timeline": "this_season",
+          "type": "structural",
+          "detail": "Onboarding capture: Define the evidence that would justify moving from youth-development rebuild posture into a veteran acceleration bet around Trae Young and Anthony Davis.",
+          "confidence": "high"
+        },
+        {
+          "priority": "Set the acceleration trigger for Alex Sarr / Bub Carrington / Bilal Coulibaly",
+          "timeline": "this_season",
+          "type": "structural",
+          "detail": "Onboarding capture: Define the evidence that would justify moving from rebuild posture to a veteran acceleration bet.",
+          "confidence": "high"
+        },
+        {
+          "priority": "Separate health-risk scenarios from roster-value scenarios",
+          "timeline": "this_season",
+          "type": "roster",
+          "detail": "Onboarding capture: Keep medical uncertainty from disguising fundamentally different basketball decisions.",
+          "confidence": "high"
+        },
+        {
+          "priority": "Manage apron exposure across the next two league years",
+          "timeline": "this_offseason",
+          "type": "structural",
+          "detail": "Onboarding capture: Convert cap posture into concrete legal trade and signing lanes.",
+          "confidence": "high"
+        },
+        {
+          "priority": "Health recovery for Trae Young and Anthony Davis",
+          "timeline": "this_season",
+          "type": "structural",
+          "detail": "Both players injured as of season end (May 2026); 2026-27 success contingent on return to form and availability.",
+          "confidence": "high"
+        },
+        {
+          "priority": "2026 NBA Draft selection (7th–10th projected range)",
+          "timeline": "this_offseason",
+          "type": "draft",
+          "detail": "Wizards secured their 2026 first-round pick (avoided top-8 protection); high lottery pick allows youth core bolstering.",
+          "confidence": "high"
+        },
+        {
+          "priority": "2026-27 rotation refinement and roster depth",
+          "timeline": "next_season",
+          "type": "roster",
+          "detail": "If Young and Davis healthy, Wizards must address bench depth and rim protection (Sarr is lone reliable big).",
+          "confidence": "medium"
+        },
+        {
+          "priority": "Contract extension discussions with core youth",
+          "timeline": "by_trade_deadline",
+          "type": "extension",
+          "detail": "Coulibaly and Sarr eligible for extensions by 2026-27; FO must lock in core to avoid RFA complications.",
+          "confidence": "medium"
+        }
+      ],
+      "narrative_summary": {
+        "one_paragraph": "The Washington Wizards endured their second consecutive lottery season (17-65 record), pursuing a youth-development rebuild under new President Michael Winger and GM Will Dawkins. The core—Alex Sarr (age 21, franchise centerpiece), Bub Carrington (lead guard, age 20), Bilal Coulibaly (wing, age 21), and Tre Johnson (rookie guard, age 20)—forms one of the NBA's youngest rosters. However, owner Ted Leonsis and Winger shifted course mid-season, acquiring All-Stars Trae Young (January 2026) and Anthony Davis (February 2026) in blockbuster trades, signaling a pivot toward contention if both recover from injuries. The move contradicted the pure rebuild narrative but reflects Leonsis's impatience and confidence in the young core. Retained head coach Brian Keefe and an aggressive offseason (2026 lottery pick expected 7–10 range) suggest the organization is now targeting a 2026-27 competitive window, contingent entirely on Young and Davis health.",
+        "three_things_to_watch": [
+          "Health recovery of Trae Young and Anthony Davis: Both missed significant time in 2025-26 due to shoulder and hand/groin injuries, respectively. If either plays <40 games in 2026-27, the contention timeline resets.",
+          "Alex Sarr's ascent: At 21, the 2024 second overall pick emerged as the young core's best player (16.3 ppg, 7.4 rpg, 2.0 bpg). Sarr's two-way development will determine whether the youth core becomes a dynasty or another missed rebuild.",
+          "Ownership patience on rebuild completion: Leonsis committed to a five-year rebuild but mid-season trades signal he may reset expectations. If the 2026-27 season yields <30 wins and no playoff path emerges, aggressive trade deadline moves or coaching changes could accelerate."
+        ]
+      },
+      "team_team_relationships": {
+        "rivalries": [
+          {
+            "team_id": "ATL",
+            "type": "personnel_grudge",
+            "basis": "Traded Trae Young mid-season (Jan 2026); expected ongoing negotiation over rotational fit and draft capital."
+          },
+          {
+            "team_id": "BOS",
+            "type": "geographic",
+            "basis": "Atlantic Division geographic neighbor; light recent trade history."
+          },
+          {
+            "team_id": "PHI",
+            "type": "competitive_historical",
+            "basis": "Division historical rivalry; limited current interaction."
+          }
+        ],
+        "notable_personnel_connections": [
+          {
+            "person": "Michael Winger",
+            "connected_team": "LAC",
+            "connection_type": "former_GM",
+            "detail": "Winger was GM of LA Clippers (2017–2023); brings Clippers asset-building philosophy (young talent + flexibility)."
+          },
+          {
+            "person": "Will Dawkins",
+            "connected_team": "unknown",
+            "connection_type": "unknown",
+            "detail": "Unknown prior stops; hired mid-2023 by Wizards as GM directly under Winger."
+          },
+          {
+            "person": "Brian Keefe",
+            "connected_team": "New York Knicks",
+            "connection_type": "former_assistant",
+            "detail": "Keefe has no documented major mentorship ties; retained despite 17-65 record."
+          }
+        ]
+      },
+      "onboarding_profile": {
+        "schema_version": 1,
+        "status": "completed",
+        "team_id": "WAS",
+        "team_name": "Washington Wizards",
+        "started_at": "2026-05-09T16:31:08.560Z",
+        "updated_at": "2026-05-09T16:31:08.596Z",
+        "completed_at": "2026-05-09T16:31:08.596Z",
+        "skipped_sections": [],
+        "identity": {
+          "role": "president",
+          "role_other": "",
+          "years_in_role": "3_7",
+          "decision_authority": "sign_off"
+        },
+        "team_snapshot": {
+          "lifecycle": "rebuilding",
+          "cap_posture": "between_aprons",
+          "cornerstones": [
+            "Alex Sarr",
+            "Bub Carrington",
+            "Bilal Coulibaly"
+          ],
+          "active_scenarios": [
+            "apron_management",
+            "trade_deadline_planning",
+            "draft_prep_board",
+            "long_term_cap_planning",
+            "roster_depth_chart"
+          ],
+          "star_extension_players": "Trae Young and Anthony Davis health and contract leverage",
+          "trade_deadline_window": "offseason",
+          "other_scenarios": [
+            "2026 NBA Draft lottery outcome",
+            "Trae Young and Anthony Davis recovery status",
+            "Owner patience if 2026-27 starts below playoff pace"
+          ]
+        },
+        "strategic_priorities": {
+          "ninety_day_decision": "Define the evidence that would justify moving from youth-development rebuild posture into a veteran acceleration bet around Trae Young and Anthony Davis.",
+          "ranked_priorities": [
+            "wizards-acceleration-trigger",
+            "health-scenario-separation",
+            "apron-exposure-plan"
+          ],
+          "decision_types": [
+            "roster_depth_chart",
+            "trade_evaluation",
+            "long_term_planning",
+            "contract_cap",
+            "draft_board"
+          ],
+          "recent_decision_help": "Context Graph source says Washington is still youth-development oriented, but mid-season acquisitions of Trae Young and Anthony Davis create a conditional 2026-27 acceleration path if both are healthy.",
+          "other_decision_types": [
+            "owner check-in recommendation",
+            "health-contingent acceleration trigger"
+          ]
+        },
+        "working_style": {
+          "recommendation_style": "single_best_answer",
+          "claim_requirements": [
+            "source_citation",
+            "confidence_level",
+            "counter_evidence"
+          ],
+          "risk_posture": "balanced",
+          "cadence": "daily_morning",
+          "briefing_time": "8_am",
+          "briefing_timezone": "ET",
+          "channels": [
+            "web_app",
+            "slack"
+          ],
+          "slack_workspace": "Gambit",
+          "slack_channel": "basketball-ops",
+          "other_channels": []
+        },
+        "stakeholders_rituals": {
+          "skipped": false,
+          "people": [
+            {
+              "id": "michael-winger",
+              "name": "Michael Winger",
+              "role": "president",
+              "decision_areas": [
+                "basketball_ops",
+                "trade_evaluation",
+                "long_term_planning",
+                "contract_cap"
+              ]
+            },
+            {
+              "id": "will-dawkins",
+              "name": "Will Dawkins",
+              "role": "gm",
+              "decision_areas": [
+                "basketball_ops",
+                "draft_board",
+                "roster_depth_chart"
+              ]
+            },
+            {
+              "id": "ted-leonsis",
+              "name": "Ted Leonsis",
+              "role": "owner_governor",
+              "decision_areas": [
+                "owner_governor_check_in",
+                "long_term_planning"
+              ]
+            },
+            {
+              "id": "brian-keefe",
+              "name": "Brian Keefe",
+              "role": "coaching_staff",
+              "decision_areas": [
+                "roster_depth_chart",
+                "player_development"
+              ]
+            }
+          ],
+          "authority": {
+            "cap_contracts": "Michael Winger sign-off with Will Dawkins input",
+            "basketball_ops": "Michael Winger owns final basketball-ops posture",
+            "draft": "Winger and Dawkins",
+            "coaching_staff": "Winger and Dawkins with Brian Keefe input"
+          },
+          "rituals": [
+            "weekly_basketball_ops",
+            "pre_deadline_war_room",
+            "draft_war_room",
+            "owner_governor_check_in"
+          ],
+          "other_rituals": [
+            "health-scenario review for Young and Davis"
+          ],
+          "fire_drill_frequency": "monthly"
+        },
+        "data_trust": {
+          "skipped": false,
+          "trust_panel_acknowledged": true,
+          "sources": [
+            "spotrac",
+            "internal_scouting_db",
+            "internal_sql",
+            "sheets"
+          ],
+          "other_sources": [
+            "NBA.com roster",
+            "Basketball Reference team page",
+            "Washington Post front-office reporting",
+            "Monumental Sports ownership and executive bios",
+            "SalarySwish cap and player pages"
+          ],
+          "off_limits": [
+            "generic_llms"
+          ],
+          "off_limits_people": "Do not invent private views for Winger, Dawkins, Leonsis, or Keefe beyond sourced context.",
+          "off_limits_topics": "Treat injury return dates and explicit trade availability as uncertain unless sourced by current team or public reporting.",
+          "integrations": [
+            "slack",
+            "drive",
+            "calendar"
+          ],
+          "other_integrations": [
+            "Context Graph local YAML and derived artifacts"
+          ]
+        }
+      }
+    },
+    "override": {
+      "strategic_posture": {
+        "derived_from": [
+          "17-65 record (worst in NBA) confirms youth-first strategy with limited win-now pretense.",
+          "Trae Young and Anthony Davis acquisitions January–February 2026 signal medium-term contention target (2026-27 onward).",
+          "Leonsis public statements: 'these are the years to not be competitive' given strength of next two drafts; expects rebuild completion in 5 years total (3 years elapsed, 2 remaining as of 2026).",
+          "Deep roster youth (Alex Sarr age 20, Bub Carrington age 20, Tre Johnson age 20, Bilal Coulibaly age 21) precludes immediate contention.",
+          "Gambit onboarding"
+        ],
+        "last_reviewed": "2026-05-09"
+      },
+      "near_term_priorities": [
+        {
+          "priority": "Most important 90-day decision",
+          "timeline": "this_season",
+          "type": "structural",
+          "detail": "Onboarding capture: Define the evidence that would justify moving from youth-development rebuild posture into a veteran acceleration bet around Trae Young and Anthony Davis.",
+          "confidence": "high"
+        },
+        {
+          "priority": "Set the acceleration trigger for Alex Sarr / Bub Carrington / Bilal Coulibaly",
+          "timeline": "this_season",
+          "type": "structural",
+          "detail": "Onboarding capture: Define the evidence that would justify moving from rebuild posture to a veteran acceleration bet.",
+          "confidence": "high"
+        },
+        {
+          "priority": "Separate health-risk scenarios from roster-value scenarios",
+          "timeline": "this_season",
+          "type": "roster",
+          "detail": "Onboarding capture: Keep medical uncertainty from disguising fundamentally different basketball decisions.",
+          "confidence": "high"
+        },
+        {
+          "priority": "Manage apron exposure across the next two league years",
+          "timeline": "this_offseason",
+          "type": "structural",
+          "detail": "Onboarding capture: Convert cap posture into concrete legal trade and signing lanes.",
+          "confidence": "high"
+        },
+        {
+          "priority": "Health recovery for Trae Young and Anthony Davis",
+          "timeline": "this_season",
+          "type": "structural",
+          "detail": "Both players injured as of season end (May 2026); 2026-27 success contingent on return to form and availability.",
+          "confidence": "high"
+        },
+        {
+          "priority": "2026 NBA Draft selection (7th–10th projected range)",
+          "timeline": "this_offseason",
+          "type": "draft",
+          "detail": "Wizards secured their 2026 first-round pick (avoided top-8 protection); high lottery pick allows youth core bolstering.",
+          "confidence": "high"
+        },
+        {
+          "priority": "2026-27 rotation refinement and roster depth",
+          "timeline": "next_season",
+          "type": "roster",
+          "detail": "If Young and Davis healthy, Wizards must address bench depth and rim protection (Sarr is lone reliable big).",
+          "confidence": "medium"
+        },
+        {
+          "priority": "Contract extension discussions with core youth",
+          "timeline": "by_trade_deadline",
+          "type": "extension",
+          "detail": "Coulibaly and Sarr eligible for extensions by 2026-27; FO must lock in core to avoid RFA complications.",
+          "confidence": "medium"
+        }
+      ],
+      "onboarding_profile": {
+        "status": "completed",
+        "started_at": "2026-05-09T16:31:08.560Z",
+        "updated_at": "2026-05-09T16:31:08.596Z",
+        "completed_at": "2026-05-09T16:31:08.596Z",
+        "identity": {
+          "role": "president",
+          "years_in_role": "3_7",
+          "decision_authority": "sign_off"
+        },
+        "team_snapshot": {
+          "lifecycle": "rebuilding",
+          "cap_posture": "between_aprons",
+          "cornerstones": [
+            "Alex Sarr",
+            "Bub Carrington",
+            "Bilal Coulibaly"
+          ],
+          "active_scenarios": [
+            "apron_management",
+            "trade_deadline_planning",
+            "draft_prep_board",
+            "long_term_cap_planning",
+            "roster_depth_chart"
+          ],
+          "star_extension_players": "Trae Young and Anthony Davis health and contract leverage",
+          "trade_deadline_window": "offseason",
+          "other_scenarios": [
+            "2026 NBA Draft lottery outcome",
+            "Trae Young and Anthony Davis recovery status",
+            "Owner patience if 2026-27 starts below playoff pace"
+          ]
+        },
+        "strategic_priorities": {
+          "ninety_day_decision": "Define the evidence that would justify moving from youth-development rebuild posture into a veteran acceleration bet around Trae Young and Anthony Davis.",
+          "ranked_priorities": [
+            "wizards-acceleration-trigger",
+            "health-scenario-separation",
+            "apron-exposure-plan"
+          ],
+          "decision_types": [
+            "roster_depth_chart",
+            "trade_evaluation",
+            "long_term_planning",
+            "contract_cap",
+            "draft_board"
+          ],
+          "recent_decision_help": "Context Graph source says Washington is still youth-development oriented, but mid-season acquisitions of Trae Young and Anthony Davis create a conditional 2026-27 acceleration path if both are healthy.",
+          "other_decision_types": [
+            "owner check-in recommendation",
+            "health-contingent acceleration trigger"
+          ]
+        },
+        "working_style": {
+          "recommendation_style": "single_best_answer",
+          "claim_requirements": [
+            "source_citation",
+            "confidence_level",
+            "counter_evidence"
+          ],
+          "risk_posture": "balanced",
+          "cadence": "daily_morning",
+          "briefing_time": "8_am",
+          "briefing_timezone": "ET",
+          "channels": [
+            "web_app",
+            "slack"
+          ],
+          "slack_workspace": "Gambit",
+          "slack_channel": "basketball-ops"
+        },
+        "stakeholders_rituals": {
+          "people": [
+            {
+              "id": "michael-winger",
+              "name": "Michael Winger",
+              "role": "president",
+              "decision_areas": [
+                "basketball_ops",
+                "trade_evaluation",
+                "long_term_planning",
+                "contract_cap"
+              ]
+            },
+            {
+              "id": "will-dawkins",
+              "name": "Will Dawkins",
+              "role": "gm",
+              "decision_areas": [
+                "basketball_ops",
+                "draft_board",
+                "roster_depth_chart"
+              ]
+            },
+            {
+              "id": "ted-leonsis",
+              "name": "Ted Leonsis",
+              "role": "owner_governor",
+              "decision_areas": [
+                "owner_governor_check_in",
+                "long_term_planning"
+              ]
+            },
+            {
+              "id": "brian-keefe",
+              "name": "Brian Keefe",
+              "role": "coaching_staff",
+              "decision_areas": [
+                "roster_depth_chart",
+                "player_development"
+              ]
+            }
+          ],
+          "authority": {
+            "cap_contracts": "Michael Winger sign-off with Will Dawkins input",
+            "basketball_ops": "Michael Winger owns final basketball-ops posture",
+            "draft": "Winger and Dawkins",
+            "coaching_staff": "Winger and Dawkins with Brian Keefe input"
+          },
+          "rituals": [
+            "weekly_basketball_ops",
+            "pre_deadline_war_room",
+            "draft_war_room",
+            "owner_governor_check_in"
+          ],
+          "other_rituals": [
+            "health-scenario review for Young and Davis"
+          ],
+          "fire_drill_frequency": "monthly"
+        },
+        "data_trust": {
+          "trust_panel_acknowledged": true,
+          "sources": [
+            "spotrac",
+            "internal_scouting_db",
+            "internal_sql",
+            "sheets"
+          ],
+          "other_sources": [
+            "NBA.com roster",
+            "Basketball Reference team page",
+            "Washington Post front-office reporting",
+            "Monumental Sports ownership and executive bios",
+            "SalarySwish cap and player pages"
+          ],
+          "off_limits": [
+            "generic_llms"
+          ],
+          "off_limits_people": "Do not invent private views for Winger, Dawkins, Leonsis, or Keefe beyond sourced context.",
+          "off_limits_topics": "Treat injury return dates and explicit trade availability as uncertain unless sourced by current team or public reporting.",
+          "integrations": [
+            "slack",
+            "drive",
+            "calendar"
+          ],
+          "other_integrations": [
+            "Context Graph local YAML and derived artifacts"
+          ]
+        }
+      }
+    }
+  },
+  "executive_summary": {
+    "headline": "Protect the rebuild optionality, but pre-wire the first calls now.",
+    "recommended_posture": "Operate as rebuild with aggressive risk tolerance. Treat moderate spending posture as a boundary condition, not the thesis. Start with ATL, DAL, NOP before widening the room.",
+    "decision_cards": [
+      {
+        "title": "Set the posture trigger",
+        "signal": "rebuild posture, aggressive risk tolerance, star-chasing trait",
+        "recommendation": "The organization can either preserve a youth-development timeline or use veteran star recovery as an acceleration bet, but the middle path is where asset leakage happens.",
+        "action": "What result would make us stop behaving like a rebuilding team before the deadline?",
+        "severity": "high"
+      },
+      {
+        "title": "Make first-wave calls",
+        "signal": "ATL hot / DAL hot / NOP hot",
+        "recommendation": "Use known relationship lanes to learn price, not to force an early structure.",
+        "action": "Given your contend_soon posture and aggressive_spender spend profile, what kind of Washington structure would you actually take seriously before the market forms?",
+        "severity": "high"
+      },
+      {
+        "title": "Resolve player pressure",
+        "signal": "Anthony Davis: market / Trae Young: market / Jaden Hardy: decision",
+        "recommendation": "Separate health, contract, and movement decisions before they collapse into one deadline problem.",
+        "action": "Decide what would move Anthony Davis from market to hold.",
+        "severity": "high"
+      }
+    ],
+    "top_calls": [
+      {
+        "team_id": "ATL",
+        "name": "Atlanta Hawks",
+        "priority": "First-wave call",
+        "trade_lane": "Start with posture discovery, then test whether their current timeline creates a trade lane.",
+        "opening_question": "Given your contend_soon posture and aggressive_spender spend profile, what kind of Washington structure would you actually take seriously before the market forms?",
+        "score": 62,
+        "tier": "hot",
+        "caveats": []
+      },
+      {
+        "team_id": "DAL",
+        "name": "Dallas Mavericks",
+        "priority": "First-wave call",
+        "trade_lane": "Revisit a known trade channel around veteran salary, draft capital, or reset mechanics.",
+        "opening_question": "Given your rebuild posture and aggressive_spender spend profile, what kind of Washington structure would you actually take seriously before the market forms?",
+        "score": 55,
+        "tier": "hot",
+        "caveats": []
+      },
+      {
+        "team_id": "NOP",
+        "name": "New Orleans Pelicans",
+        "priority": "First-wave call",
+        "trade_lane": "Revisit a known trade channel around veteran salary, draft capital, or reset mechanics.",
+        "opening_question": "Given your rebuild posture and moderate spend profile, what kind of Washington structure would you actually take seriously before the market forms?",
+        "score": 55,
+        "tier": "hot",
+        "caveats": []
+      }
+    ],
+    "confidence": {
+      "status": "high",
+      "label": "High-confidence briefing",
+      "detail": "Source as of 2026-05-02 · last updated 2026-05-02 · Settings assumptions active",
+      "source_as_of_date": "2026-05-02",
+      "source_last_updated": "2026-05-02",
+      "has_overrides": true,
+      "validation_status": "pass"
+    },
+    "caveats": [
+      "Settings overrides are active; confirm the edited assumptions reflect the room."
+    ]
+  },
+  "counterparties": [
+    {
+      "team_id": "ATL",
+      "name": "Atlanta Hawks",
+      "score": 62,
+      "tier": "hot",
+      "reasons": [
+        "Recent trade history, last 2026-01-09",
+        "Relationship signal: personnel_grudge"
+      ],
+      "relationship_types": [
+        "trade_partner",
+        "rivalry"
+      ],
+      "dossier": {
+        "call_priority": "First-wave call",
+        "likely_trade_lane": "Start with posture discovery, then test whether their current timeline creates a trade lane.",
+        "opening_question": "Given your contend_soon posture and aggressive_spender spend profile, what kind of Washington structure would you actually take seriously before the market forms?",
+        "leverage_notes": [
+          "Recent trade history, last 2026-01-09",
+          "Relationship signal: personnel_grudge",
+          "Counterparty posture: contend_soon",
+          "Counterparty spend: aggressive_spender"
+        ],
+        "risks": []
+      },
+      "validation": {
+        "status": "pass",
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "has_overrides": false,
+      "override_updated_at": null,
+      "posture": "contend_soon",
+      "spending_posture": "aggressive_spender",
+      "trade_count_recent": 2,
+      "last_trade_date": "2026-01-09"
+    },
+    {
+      "team_id": "DAL",
+      "name": "Dallas Mavericks",
+      "score": 55,
+      "tier": "hot",
+      "reasons": [
+        "Recent trade history, last 2026-02-06",
+        "Posture fit: rebuild"
+      ],
+      "relationship_types": [
+        "trade_partner",
+        "pursuit"
+      ],
+      "dossier": {
+        "call_priority": "First-wave call",
+        "likely_trade_lane": "Revisit a known trade channel around veteran salary, draft capital, or reset mechanics.",
+        "opening_question": "Given your rebuild posture and aggressive_spender spend profile, what kind of Washington structure would you actually take seriously before the market forms?",
+        "leverage_notes": [
+          "Recent trade history, last 2026-02-06",
+          "Posture fit: rebuild",
+          "Counterparty posture: rebuild",
+          "Counterparty spend: aggressive_spender"
+        ],
+        "risks": []
+      },
+      "validation": {
+        "status": "pass",
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "has_overrides": false,
+      "override_updated_at": null,
+      "posture": "rebuild",
+      "spending_posture": "aggressive_spender",
+      "trade_count_recent": 2,
+      "last_trade_date": "2026-02-06"
+    },
+    {
+      "team_id": "NOP",
+      "name": "New Orleans Pelicans",
+      "score": 55,
+      "tier": "hot",
+      "reasons": [
+        "Recent trade history, last 2025-07",
+        "Posture fit: rebuild"
+      ],
+      "relationship_types": [
+        "trade_partner",
+        "pursuit"
+      ],
+      "dossier": {
+        "call_priority": "First-wave call",
+        "likely_trade_lane": "Revisit a known trade channel around veteran salary, draft capital, or reset mechanics.",
+        "opening_question": "Given your rebuild posture and moderate spend profile, what kind of Washington structure would you actually take seriously before the market forms?",
+        "leverage_notes": [
+          "Recent trade history, last 2025-07",
+          "Posture fit: rebuild",
+          "Counterparty posture: rebuild",
+          "Counterparty spend: moderate"
+        ],
+        "risks": []
+      },
+      "validation": {
+        "status": "pass",
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "has_overrides": false,
+      "override_updated_at": null,
+      "posture": "rebuild",
+      "spending_posture": "moderate",
+      "trade_count_recent": 2,
+      "last_trade_date": "2025-07"
+    },
+    {
+      "team_id": "POR",
+      "name": "Portland Trail Blazers",
+      "score": 55,
+      "tier": "hot",
+      "reasons": [
+        "Recent trade history",
+        "Pick linkage: 2027 R2"
+      ],
+      "relationship_types": [
+        "trade_partner",
+        "pick"
+      ],
+      "dossier": {
+        "call_priority": "First-wave call",
+        "likely_trade_lane": "Use pick mechanics and swap/second-round cleanup as the low-friction opener.",
+        "opening_question": "Given your contend_soon posture and aggressive_spender spend profile, what kind of Washington structure would you actually take seriously before the market forms?",
+        "leverage_notes": [
+          "Recent trade history",
+          "Pick linkage: 2027 R2",
+          "Counterparty posture: contend_soon",
+          "Counterparty spend: aggressive_spender"
+        ],
+        "risks": []
+      },
+      "validation": {
+        "status": "pass",
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "has_overrides": false,
+      "override_updated_at": null,
+      "posture": "contend_soon",
+      "spending_posture": "aggressive_spender",
+      "trade_count_recent": 1,
+      "last_trade_date": null
+    },
+    {
+      "team_id": "MIL",
+      "name": "Milwaukee Bucks",
+      "score": 50,
+      "tier": "hot",
+      "reasons": [
+        "Recent trade history, last 2025-02",
+        "Posture fit: retool"
+      ],
+      "relationship_types": [
+        "trade_partner",
+        "pursuit"
+      ],
+      "dossier": {
+        "call_priority": "First-wave call",
+        "likely_trade_lane": "Revisit a known trade channel around veteran salary, draft capital, or reset mechanics.",
+        "opening_question": "Given your retool posture and moderate spend profile, what kind of Washington structure would you actually take seriously before the market forms?",
+        "leverage_notes": [
+          "Recent trade history, last 2025-02",
+          "Posture fit: retool",
+          "Counterparty posture: retool",
+          "Counterparty spend: moderate"
+        ],
+        "risks": []
+      },
+      "validation": {
+        "status": "pass",
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "has_overrides": false,
+      "override_updated_at": null,
+      "posture": "retool",
+      "spending_posture": "moderate",
+      "trade_count_recent": 1,
+      "last_trade_date": "2025-02"
+    },
+    {
+      "team_id": "HOU",
+      "name": "Houston Rockets",
+      "score": 45,
+      "tier": "hot",
+      "reasons": [
+        "Recent trade history, last 2025-07-06"
+      ],
+      "relationship_types": [
+        "trade_partner"
+      ],
+      "dossier": {
+        "call_priority": "First-wave call",
+        "likely_trade_lane": "Start with posture discovery, then test whether their current timeline creates a trade lane.",
+        "opening_question": "Given your contend_now posture and aggressive_spender spend profile, what kind of Washington structure would you actually take seriously before the market forms?",
+        "leverage_notes": [
+          "Recent trade history, last 2025-07-06",
+          "Counterparty posture: contend_now",
+          "Counterparty spend: aggressive_spender"
+        ],
+        "risks": []
+      },
+      "validation": {
+        "status": "pass",
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "has_overrides": false,
+      "override_updated_at": null,
+      "posture": "contend_now",
+      "spending_posture": "aggressive_spender",
+      "trade_count_recent": 1,
+      "last_trade_date": "2025-07-06"
+    },
+    {
+      "team_id": "NYK",
+      "name": "New York Knicks",
+      "score": 30,
+      "tier": "warm",
+      "reasons": [
+        "Personnel link: Brian Keefe",
+        "Pick linkage: 2026 R2"
+      ],
+      "relationship_types": [
+        "personnel",
+        "pick"
+      ],
+      "dossier": {
+        "call_priority": "Second-wave diligence",
+        "likely_trade_lane": "Use pick mechanics and swap/second-round cleanup as the low-friction opener.",
+        "opening_question": "Given your contend_now posture and aggressive_spender spend profile, what kind of Washington structure would you actually take seriously before the market forms?",
+        "leverage_notes": [
+          "Personnel link: Brian Keefe",
+          "Pick linkage: 2026 R2",
+          "Counterparty posture: contend_now",
+          "Counterparty spend: aggressive_spender"
+        ],
+        "risks": []
+      },
+      "validation": {
+        "status": "pass",
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "has_overrides": false,
+      "override_updated_at": null,
+      "posture": "contend_now",
+      "spending_posture": "aggressive_spender",
+      "trade_count_recent": 0,
+      "last_trade_date": null
+    },
+    {
+      "team_id": "CHA",
+      "name": "Charlotte Hornets",
+      "score": 27,
+      "tier": "warm",
+      "reasons": [
+        "Relationship signal: geographic",
+        "Pick linkage: 2026 R1",
+        "Posture fit: retool"
+      ],
+      "relationship_types": [
+        "rivalry",
+        "pick",
+        "pursuit"
+      ],
+      "dossier": {
+        "call_priority": "Second-wave diligence",
+        "likely_trade_lane": "Use pick mechanics and swap/second-round cleanup as the low-friction opener.",
+        "opening_question": "Given your retool posture and moderate spend profile, what kind of Washington structure would you actually take seriously before the market forms?",
+        "leverage_notes": [
+          "Relationship signal: geographic",
+          "Pick linkage: 2026 R1",
+          "Posture fit: retool",
+          "Counterparty posture: retool",
+          "Counterparty spend: moderate"
+        ],
+        "risks": []
+      },
+      "validation": {
+        "status": "pass",
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "has_overrides": false,
+      "override_updated_at": null,
+      "posture": "retool",
+      "spending_posture": "moderate",
+      "trade_count_recent": 0,
+      "last_trade_date": null
+    }
+  ],
+  "roster_pressure": [
+    {
+      "player_id": "anthony_davis",
+      "name": "Anthony Davis",
+      "tier": "star",
+      "movement_status": "shopped",
+      "availability_status": "injured_long_term",
+      "trajectory": "declining_peak",
+      "years_remaining": 2,
+      "contract_leverage": "Player option for 2028 provides Davis exit strategy if health or competitiveness declines.",
+      "pressure_score": 83,
+      "action": "market",
+      "rationale": [
+        "Movement status: shopped",
+        "Availability: injured_long_term",
+        "Trajectory: declining_peak",
+        "Not homegrown; weaker institutional attachment"
+      ]
+    },
+    {
+      "player_id": "trae_young",
+      "name": "Trae Young",
+      "tier": "star",
+      "movement_status": "shopped",
+      "availability_status": "injured_long_term",
+      "trajectory": "declining",
+      "years_remaining": 2,
+      "contract_leverage": "Player option for 2027 creates mutual exit potential if health concerns persist.",
+      "pressure_score": 83,
+      "action": "market",
+      "rationale": [
+        "Movement status: shopped",
+        "Availability: injured_long_term",
+        "Trajectory: declining",
+        "Not homegrown; weaker institutional attachment"
+      ]
+    },
+    {
+      "player_id": "jaden_hardy",
+      "name": "Jaden Hardy",
+      "tier": "rotation",
+      "movement_status": "available",
+      "availability_status": "healthy",
+      "trajectory": "peak",
+      "years_remaining": 1,
+      "contract_leverage": "Unrestricted free agent after 2025-26; Wizards no cap flexibility to retain if market offers more.",
+      "pressure_score": 53,
+      "action": "decision",
+      "rationale": [
+        "Movement status: available",
+        "Contract decision window within one season",
+        "Not homegrown; weaker institutional attachment",
+        "expiring_contract_value"
+      ]
+    },
+    {
+      "player_id": "jamir_watson",
+      "name": "Jamir Watson",
+      "tier": "fringe",
+      "movement_status": "available",
+      "availability_status": "healthy",
+      "trajectory": "unknown",
+      "years_remaining": 1,
+      "contract_leverage": "Expiring contract; UFA after 2025-26 unless extended.",
+      "pressure_score": 53,
+      "action": "decision",
+      "rationale": [
+        "Movement status: available",
+        "Contract decision window within one season",
+        "Not homegrown; weaker institutional attachment",
+        "contract_expiring"
+      ]
+    },
+    {
+      "player_id": "kyshawn_george",
+      "name": "Kyshawn George",
+      "tier": "starter",
+      "movement_status": "unlikely",
+      "availability_status": "injured_season_ending",
+      "trajectory": "ascending",
+      "years_remaining": 2,
+      "contract_leverage": "Team option for 2028 protects organization; young player under contract control.",
+      "pressure_score": 25,
+      "action": "monitor",
+      "rationale": [
+        "Availability: injured_season_ending",
+        "young_core_centerpiece",
+        "injury_recovery_uncertain"
+      ]
+    },
+    {
+      "player_id": "jamir_watkins",
+      "name": "Jamir Watkins",
+      "tier": "rotation",
+      "movement_status": "unlikely",
+      "availability_status": "healthy",
+      "trajectory": "ascending",
+      "years_remaining": 2,
+      "contract_leverage": "Team option for 2028 provides control; young player on affordable deal.",
+      "pressure_score": 8,
+      "action": "monitor",
+      "rationale": [
+        "Not homegrown; weaker institutional attachment",
+        "young_core_centerpiece"
+      ]
+    },
+    {
+      "player_id": "julian_reese",
+      "name": "Julian Reese",
+      "tier": "two_way",
+      "movement_status": "unlikely",
+      "availability_status": "healthy",
+      "trajectory": "ascending",
+      "years_remaining": 2,
+      "contract_leverage": "Two-way deal provides minimal leverage; team can assign freely.",
+      "pressure_score": 8,
+      "action": "monitor",
+      "rationale": [
+        "Not homegrown; weaker institutional attachment",
+        "young_core_centerpiece"
+      ]
+    },
+    {
+      "player_id": "alex_sarr",
+      "name": "Alex Sarr",
+      "tier": "star",
+      "movement_status": "untouchable",
+      "availability_status": "healthy",
+      "trajectory": "ascending",
+      "years_remaining": 2,
+      "contract_leverage": "Rookie scale contract; team controls 2027 team option.",
+      "pressure_score": 0,
+      "action": "protect",
+      "rationale": [
+        "Protected by current movement constraints",
+        "generational_talent",
+        "young_core_centerpiece"
+      ]
+    },
+    {
+      "player_id": "bilal_coulibaly",
+      "name": "Bilal Coulibaly",
+      "tier": "starter",
+      "movement_status": "untouchable",
+      "availability_status": "healthy",
+      "trajectory": "ascending",
+      "years_remaining": 2,
+      "contract_leverage": "Team option for 2027 gives organization control.",
+      "pressure_score": 0,
+      "action": "protect",
+      "rationale": [
+        "Protected by current movement constraints",
+        "young_core_centerpiece",
+        "homegrown_loyalty"
+      ]
+    },
+    {
+      "player_id": "bub_carrington",
+      "name": "Bub Carrington",
+      "tier": "starter",
+      "movement_status": "untouchable",
+      "availability_status": "healthy",
+      "trajectory": "ascending",
+      "years_remaining": 2,
+      "contract_leverage": "Rookie scale; team controls through 2027.",
+      "pressure_score": 0,
+      "action": "protect",
+      "rationale": [
+        "Protected by current movement constraints",
+        "young_core_centerpiece",
+        "primary_initiator_scarcity"
+      ]
+    }
+  ],
+  "strategic_tensions": [
+    {
+      "title": "Rebuild posture vs acceleration behavior",
+      "severity": "high",
+      "signal": "rebuild posture, aggressive risk tolerance, star-chasing trait",
+      "why_it_matters": "The organization can either preserve a youth-development timeline or use veteran star recovery as an acceleration bet, but the middle path is where asset leakage happens.",
+      "winger_question": "What result would make us stop behaving like a rebuilding team before the deadline?"
+    },
+    {
+      "title": "Star health and option-risk concentration",
+      "severity": "high",
+      "signal": "Anthony Davis: injured_long_term, 2 years · Trae Young: injured_long_term, 2 years",
+      "why_it_matters": "The highest-ceiling version of the team depends on players who also carry the clearest decision pressure.",
+      "winger_question": "What is the earliest health signal that changes our trade-call posture?"
+    },
+    {
+      "title": "Decision windows are already forming",
+      "severity": "medium",
+      "signal": "Jaden Hardy: available · Jamir Watson: available",
+      "why_it_matters": "Waiting for certainty may cost optionality if counterparties understand Washington has unresolved contract and role pressure.",
+      "winger_question": "Which player decision needs an answer before the market answers it for us?"
+    }
+  ],
+  "scenario_lenses": [
+    {
+      "id": "patient-core",
+      "label": "Protect the core",
+      "stance": "Hold Sarr/Carrington/Coulibaly/Tre as the center of gravity; use veteran calls to create optionality, not urgency.",
+      "focus": [
+        "Youth-control preservation",
+        "Low-regret pick mechanics",
+        "Health patience"
+      ],
+      "prompt": "For WAS, build a patient-core offseason plan using the context graph. Which calls preserve optionality without forcing a veteran-star conclusion?",
+      "team_ids": [
+        "ATL",
+        "POR",
+        "NYK",
+        "CHA"
+      ]
+    },
+    {
+      "id": "accelerate",
+      "label": "Accelerate if health clears",
+      "stance": "Treat Young/Davis recovery as a real option and pressure-test known trade channels before the rest of the league catches up.",
+      "focus": [
+        "Known counterparties",
+        "Veteran-salary structure",
+        "Rotation depth"
+      ],
+      "prompt": "For WAS, assume the health signals are positive. Which counterparties should Winger call first and what should he ask for?",
+      "team_ids": [
+        "ATL",
+        "DAL",
+        "NOP",
+        "POR"
+      ]
+    },
+    {
+      "id": "health-fail",
+      "label": "Health fail-safe",
+      "stance": "Prepare the reset branch now so the team is not negotiating from disappointment at the deadline.",
+      "focus": [
+        "Exit ramps",
+        "Asset recovery",
+        "Contract pressure"
+      ],
+      "prompt": "For WAS, assume Young and Davis health does not normalize. What is the cleanest reset branch and which teams are likeliest to engage?",
+      "team_ids": [
+        "DAL",
+        "NOP",
+        "MIL",
+        "CHA"
+      ]
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "team_id": "WAS",
+        "name": "Washington Wizards",
+        "kind": "subject",
+        "tier": "subject",
+        "validation_status": "pass",
+        "has_overrides": true
+      },
+      {
+        "team_id": "ATL",
+        "name": "Atlanta Hawks",
+        "kind": "counterparty",
+        "tier": "hot",
+        "validation_status": "pass",
+        "has_overrides": false
+      },
+      {
+        "team_id": "DAL",
+        "name": "Dallas Mavericks",
+        "kind": "counterparty",
+        "tier": "hot",
+        "validation_status": "pass",
+        "has_overrides": false
+      },
+      {
+        "team_id": "NOP",
+        "name": "New Orleans Pelicans",
+        "kind": "counterparty",
+        "tier": "hot",
+        "validation_status": "pass",
+        "has_overrides": false
+      },
+      {
+        "team_id": "POR",
+        "name": "Portland Trail Blazers",
+        "kind": "counterparty",
+        "tier": "hot",
+        "validation_status": "pass",
+        "has_overrides": false
+      },
+      {
+        "team_id": "MIL",
+        "name": "Milwaukee Bucks",
+        "kind": "counterparty",
+        "tier": "hot",
+        "validation_status": "pass",
+        "has_overrides": false
+      },
+      {
+        "team_id": "HOU",
+        "name": "Houston Rockets",
+        "kind": "counterparty",
+        "tier": "hot",
+        "validation_status": "pass",
+        "has_overrides": false
+      },
+      {
+        "team_id": "NYK",
+        "name": "New York Knicks",
+        "kind": "counterparty",
+        "tier": "warm",
+        "validation_status": "pass",
+        "has_overrides": false
+      },
+      {
+        "team_id": "CHA",
+        "name": "Charlotte Hornets",
+        "kind": "counterparty",
+        "tier": "warm",
+        "validation_status": "pass",
+        "has_overrides": false
+      }
+    ],
+    "edges": [
+      {
+        "id": "trade_partner:WAS:ATL:Trade partner",
+        "type": "trade_partner",
+        "from_team_id": "WAS",
+        "to_team_id": "ATL",
+        "label": "Trade partner",
+        "detail": "2026-01-09"
+      },
+      {
+        "id": "trade_partner:WAS:DAL:Trade partner",
+        "type": "trade_partner",
+        "from_team_id": "WAS",
+        "to_team_id": "DAL",
+        "label": "Trade partner",
+        "detail": "2026-02-06"
+      },
+      {
+        "id": "trade_partner:WAS:HOU:Trade partner",
+        "type": "trade_partner",
+        "from_team_id": "WAS",
+        "to_team_id": "HOU",
+        "label": "Trade partner",
+        "detail": "2025-07-06"
+      },
+      {
+        "id": "trade_partner:WAS:MIL:Trade partner",
+        "type": "trade_partner",
+        "from_team_id": "WAS",
+        "to_team_id": "MIL",
+        "label": "Trade partner",
+        "detail": "2025-02"
+      },
+      {
+        "id": "trade_partner:WAS:NOP:Trade partner",
+        "type": "trade_partner",
+        "from_team_id": "WAS",
+        "to_team_id": "NOP",
+        "label": "Trade partner",
+        "detail": "2025-07"
+      },
+      {
+        "id": "trade_partner:WAS:POR:Trade partner",
+        "type": "trade_partner",
+        "from_team_id": "WAS",
+        "to_team_id": "POR",
+        "label": "Trade partner",
+        "detail": "recent trade link"
+      },
+      {
+        "id": "personnel:WAS:NYK:Brian Keefe",
+        "type": "personnel",
+        "from_team_id": "WAS",
+        "to_team_id": "NYK",
+        "label": "Brian Keefe",
+        "detail": "former_assistant"
+      },
+      {
+        "id": "rivalry:WAS:CHA:Rivalry",
+        "type": "rivalry",
+        "from_team_id": "WAS",
+        "to_team_id": "CHA",
+        "label": "Rivalry",
+        "detail": "Southeast division; pick swap entanglements"
+      },
+      {
+        "id": "rivalry:WAS:ATL:Rivalry",
+        "type": "rivalry",
+        "from_team_id": "WAS",
+        "to_team_id": "ATL",
+        "label": "Rivalry",
+        "detail": "Traded Trae Young mid-season (Jan 2026); expected ongoing negotiation over rotational fit and draft capital."
+      },
+      {
+        "id": "pick:WAS:CHA:2026 R1",
+        "type": "pick",
+        "from_team_id": "WAS",
+        "to_team_id": "CHA",
+        "label": "2026 R1",
+        "detail": "Swap rights routing"
+      },
+      {
+        "id": "pick:WAS:NYK:2026 R2",
+        "type": "pick",
+        "from_team_id": "WAS",
+        "to_team_id": "NYK",
+        "label": "2026 R2",
+        "detail": "As compensation (Wizards did not convey unprotected 2026 first-round pick; top-8 protection expired)."
+      },
+      {
+        "id": "pick:WAS:POR:2027 R2",
+        "type": "pick",
+        "from_team_id": "WAS",
+        "to_team_id": "POR",
+        "label": "2027 R2",
+        "detail": "unknown"
+      }
+    ]
+  },
+  "demo_prompts": [
+    {
+      "title": "Offseason posture",
+      "angle": "Brief",
+      "prompt": "For the Washington Wizards, how should we think about the offseason trade posture given their context graph priorities, culture, and relationship map?"
+    },
+    {
+      "title": "Counterparty calls",
+      "angle": "Brief",
+      "prompt": "For WAS, identify the three most productive trade-counterparty conversations to start this week and explain the context-graph evidence for each."
+    },
+    {
+      "title": "Override proof",
+      "angle": "Chat",
+      "prompt": "Use the context graph for WAS. What changed if Settings overrides are present, and what caveats should we show Michael Winger?"
+    }
+  ]
+}

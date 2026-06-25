@@ -1,0 +1,1140 @@
+team_id: OKC
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Oklahoma City Thunder
+  conference: Western
+  division: Southwest
+  market_tier: tier_2
+  market_tier_rationale: Mid-size Sunbelt market with championship-driven demographics and strong local ownership commitment reflected in new arena investment.
+ownership:
+  primary_owner:
+    name: Clay Bennett
+    type: individual
+    tenure_years: 18.3
+    source: https://en.wikipedia.org/wiki/Clay_Bennett_(businessman)
+    confidence: high
+  governance_notes: Bennett chairs Professional Basketball Club LLC ownership group. No reported co-ownership conflicts; unified direction from ownership.
+  recent_transitions: none
+  spending_posture: aggressive_spender
+  spending_posture_evidence:
+    - $900M arena construction commitment announced June 2025; opening 2028
+    - Supermax extensions approved for SGA (2027-31), Jalen Williams (5-year max), Chet Holmgren (core-extension eligible)
+    - "Tax apron acceptance: 2026-27 projected $246M payroll across 15+ roster spots"
+    - Aggressive trade deadline activity (Jared McCain acquisition cost 1st + 3 seconds)
+front_office:
+  president_basketball_ops:
+    name: Sam Presti
+    tenure_start: 2007-06
+    prior_stops:
+      - San Antonio Spurs (1999-2007, scout/front office)
+    public_philosophy_signals:
+      - Process-driven, 'turn every page' philosophy; cited Robert Caro's methodology as organizational north star
+      - Long-term asset accumulation via draft capital (10+ first-round picks through 2032)
+      - "Mandatory community integration: all new players visit Oklahoma City National Memorial & Museum"
+      - Character and fit prioritized over celebrity superstar acquisitions
+    confidence: high
+    source: https://www.nba.com/news/sam-presti-10-things-know
+  general_manager:
+    name: Sam Presti
+    tenure_start: 2007-06
+    prior_stops:
+      - San Antonio Spurs (1999-2007)
+    public_philosophy_signals:
+      - 2025 NBA Executive of the Year (May 2025); third-longest tenured GM in league
+      - Draft-centric reconstruction post-rebuild; developed homegrown core
+    confidence: high
+    source: https://www.hoopsrumors.com/2025/05/thunders-sam-presti-named-executive-of-year
+  head_coach:
+    name: Mark Daigneault
+    tenure_start: 2020-07
+    contract_through: 2028
+    style_notes: High-pace, switch-heavy defense; process-focused culture emphasizing fundamentals. 2024-25 Coach of the Year (68 wins, 1st seed). Developed OKC Blue (G League) 2014-2019 before HC appointment.
+    coaching_tree: unknown
+    confidence: high
+    source: https://www.nba.com/news/thunder-sign-mark-daigneault-extension
+  assistant_coaches_notable:
+    - Turiaf (player development)
+  notable_advisors_or_consultants:
+    - Robert Caro (historian; strategic philosophy inspiration, informal advisory)
+strategic_posture:
+  timeframe: contend_now
+  confidence: high
+  derived_from:
+    - Defending 2024-25 NBA champions (defeated IND in 7); 2025-26 start 24-1 (tied GS 2016 for best 25-game start)
+    - "Core three-headed monster: SGA (27, MVP/Finals MVP), Chet Holmgren (23), Jalen Williams (24) all under max extensions through 2030-31"
+    - "Regular-season 64-18 finish (1st West); limited roster age: only 2 players >27 (Caruso, K.Williams)"
+    - War chest of 10+ first-round picks through 2032 for mid-season depth upgrades
+    - New $900M arena (2028) signals long-term ownership stability
+  constraints:
+    - reason_code: max_contract_lockup
+      detail: SGA, Jalen Williams, Chet Holmgren locked long-term; limited cap flexibility for stars beyond core three
+      weight: high
+    - reason_code: ownership_directive
+      detail: "Bennett mandate: maximize contention window while young core peaks (next 5-7 years)"
+      weight: high
+    - reason_code: recent_playoff_success
+      detail: Championship expectations create no-rebuild luxury; all moves must address title-year marginal gains
+      weight: high
+  trigger_events:
+    - Chet Holmgren recurring hip/back injuries; if season-ending, contend_now → retool
+    - SGA injury or trade request would force strategic pivot
+    - Loss of Hartenstein in free agency (2026-27) or other key rim-protector
+    - Multiple playoff exits in 2026, 2027 could trigger patient accumulation phase
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: above_first_apron
+  current_payroll_estimate: 188772810
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Above second apron (~$246M); Hartenstein club option ($28.5M) key decision lever
+    - season: 2027-28
+      projected_status: Decreases post-SGA extension year-2; moderate flexibility if non-core exits
+  exceptions_available:
+    - Mid-level exception available (limited by apron); bi-annual exception
+  source: https://www.spotrac.com/nba/oklahoma-city-thunder/overview/_/year/2025
+  source_fallbacks_used: []
+  confidence: high
+trade_dna:
+  frequent_partners:
+    - DEN
+    - MEM
+    - PHI
+    - NYK
+    - GSW
+  preferred_deal_archetypes:
+    - Draft capital swaps for proven role players (Caruso, Hartenstein acquisitions)
+    - "Salary relief trades paired with second-round assets (McCain deal: 1st + 3 seconds for depth/positional fit)"
+    - "Mid-season bench rotations via deadline trades (2025-26: multiple 2nd-round moves)"
+  recent_significant_trades:
+    - date: 2026-02-04
+      summary: Acquired Jared McCain from Philadelphia for 2026 1st + 3 second-round picks.
+      counterparties:
+        - PHI
+    - date: 2024-07
+      summary: Signed Isaiah Hartenstein (3-yr, $87M, free agent from NYK) to fill center backup/flexibility role.
+      counterparties:
+        - NYK
+    - date: 2025-02
+      summary: Traded Ousmane Dieng to Charlotte (who flipped to Chicago).
+      counterparties:
+        - CHA
+        - CHI
+  confidence: high
+cultural_signals:
+  stability:
+    value: high
+    detail: Sam Presti (19 years), Mark Daigneault (6 years), Clay Bennett (18 years) form stable triumvirate. Long-term ownership arena investment. Org-wide process doctrine.
+  player_friendly:
+    value: yes
+    detail: Supermax extension approval signals player trust. Development-first culture; mandatory community integration reflects respect for personhood beyond basketball.
+  analytics_orientation:
+    value: heavy
+    detail: Draft capital accumulation, advanced metrics integration, role-player optimization. Presti cites research methodologies (Caro). Process-driven rather than gut-feel.
+  risk_tolerance:
+    value: aggressive
+    detail: Defended title with 95% of 2024-25 minutes rather than chasing marginal upgrades; aggressive cap positioning (above apron); mid-season trades to improve for now.
+  notable_traits:
+    - process_driven
+    - homegrown_priority
+    - developmental_org
+    - family_culture
+  rationale: Organization prioritizes character fit, long-term player development, and community integration over celebrity. Presti's 'turn every page' philosophy emphasizes research rigor and process over narrative. Daigneault's coaching tree emphasis on fundamentals over flash creates stability. Ownership actively invests in infrastructure (arena, market relationships).
+  confidence: high
+roster:
+  - player_id: shai_gilgeous-alexander
+    name: Shai Gilgeous-Alexander
+    age: 27
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary: []
+      defensive_role: point_of_attack
+      shooting_profile: elite
+      special_traits:
+        - elite_passer
+        - elite_athlete
+        - playoff_riser
+        - transition_threat
+        - iso_creator
+    tier: superstar
+    trajectory: peak
+    contract:
+      years_remaining: 5
+      total_value_remaining: 357500000
+      annual_value_current_season: 38330000
+      annual_value_next_season: 71250000
+      no_trade_clause: full
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2031
+      source: https://www.nba.com/news/shai-gilgeous-alexander-contract-extension-2025
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: generational_talent
+          weight: high
+        - reason_code: full_no_trade_clause
+          weight: high
+      falsification_conditions:
+        - SGA publicly requests trade or opts out (impossible under current NTC + extension)
+        - Severe injury ending prime years (>12 months recovery)
+    team_relationship:
+      tenure_with_team: 7.2
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Full no-trade clause; supermax through 2031; can block any trade indefinitely
+    confidence: high
+    source: https://www.nba.com/thunder/news/shai-extension-250708
+  - player_id: chet_holmgren
+    name: Chet Holmgren
+    age: 23
+    position_listed: PF
+    contract_type: standard
+    availability_status: injured_short_term
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: rim_protector
+        secondary:
+          - spacer
+          - post_hub
+      defensive_role: rim_protector
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+        - switchable
+    tier: star
+    trajectory: ascending
+    contract:
+      years_remaining: 5
+      total_value_remaining: 200000000
+      annual_value_current_season: 16000000
+      annual_value_next_season: 16800000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2030
+      source: https://www.spotrac.com/nba/player/chet-holmgren/
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: high
+      falsification_conditions:
+        - Long-term health cleared (>6 months post-injury without recurrence)
+        - SGA remains under contract and prioritized for max extensions
+    team_relationship:
+      tenure_with_team: 3.2
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: No-trade clause absent; team retains full control; rookie extension through 2030 at below-market rates
+    confidence: high
+    source: https://www.si.com/nba/thunder/onsi/news/chet-holmgren-injury-update-betting-impact-for-thunder-vs-clippers
+  - player_id: jalen_williams
+    name: Jalen Williams
+    age: 24
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - finisher
+          - connector
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: star
+    trajectory: ascending
+    contract:
+      years_remaining: 5
+      total_value_remaining: 287000000
+      annual_value_current_season: 28700000
+      annual_value_next_season: 57400000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2030
+      source: https://www.nba.com/news/jalen-williams-contract-extension-2025
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: recent_extension_poison_pill
+          weight: high
+      falsification_conditions:
+        - Trade formally offered and accepted by ownership (unprecedented for max-extended core)
+        - Performance decline or injury >18 months affecting All-Star tier
+    team_relationship:
+      tenure_with_team: 2.2
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie max extension; team controls all leverage; no NTC; extension through 2030
+    confidence: high
+    source: https://www.nba.com/thunder/news/release-williams-250713
+  - player_id: alex_caruso
+    name: Alex Caruso
+    age: 32
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - vet_leadership
+    tier: starter
+    trajectory: declining_peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 61674480
+      annual_value_current_season: 18102000
+      annual_value_next_season: 19550160
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.nba.com/news/alex-caruso-thunder-extension
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: declining_role
+          weight: medium
+        - reason_code: expiring_contract_value
+          weight: medium
+      falsification_conditions:
+        - Multi-year extension signed mid-2026
+        - Increased playoff rotation minutes (currently bench) sustained through finals
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 2
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: 8% annual raises locked through 2028; mid-tier salary; valuable depth but not core
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/21076/alex-caruso
+  - player_id: luguentz_dort
+    name: Luguentz Dort
+    age: 26
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: finisher
+        secondary:
+          - connector
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits:
+        - playoff_riser
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 35223222
+      annual_value_current_season: 17723611
+      annual_value_next_season: 17723611
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/19903/luguentz-dort
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: medium
+      falsification_conditions:
+        - Extension signed summer 2026 (club option currently controls)
+        - Increased All-NBA voting or Finals MVP-level performance
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 6.2
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: All-Defensive talent with one-year option remaining; UFA 2027; Thunder control extension timing
+    confidence: high
+    source: https://www.spotrac.com/nba/player/luguentz-dort/
+  - player_id: isaiah_hartenstein
+    name: Isaiah Hartenstein
+    age: 27
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: post_hub
+        secondary:
+          - connector
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: functional
+      special_traits:
+        - elite_rebounder
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 57000000
+      annual_value_current_season: 28500000
+      annual_value_next_season: 28500000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2027
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/23644/isaiah-hartenstein
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: cap_relief_target
+          weight: high
+      falsification_conditions:
+        - Club option exercised by Thunder (June 2026 decision point)
+        - Long-term contract extension signed (unlikely without expansion of cap)
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 1.8
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Signed as free agent to 3-yr deal with club option in Y2; team controls future; market value ~$28.5M
+    confidence: high
+    source: https://www.espn.com/nba/story/_/id/40473432/isaiah-hartenstein-agrees-87m-deal-thunder
+  - player_id: jared_mccain
+    name: Jared McCain
+    age: 21
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 15227228
+      annual_value_current_season: 4221360
+      annual_value_next_season: 4862147
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.nba.com/thunder/news/release-mccain-260204
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: recently_acquired
+          weight: high
+      falsification_conditions:
+        - Acquisition immediately called mistake by FO or beat reporters
+        - Benched for extended stretch (>5 games)
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Rookie deal through 2027-28; RFA in 2028-29; Thunder own full control
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/78268/jared-mccain
+  - player_id: jaylin_williams
+    name: Jaylin Williams
+    age: 24
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - connector
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits:
+        - elite_rebounder
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: 3500000
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.nba.com/player/1631119/jaylin-williams
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: behind_younger_player
+          weight: medium
+      falsification_conditions:
+        - Holmgren injury >8 weeks; Williams plays >25 min/game consecutively
+        - Trade deadline acquisition of another backup big
+    team_relationship:
+      tenure_with_team: 2.2
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Second-round pick on team-friendly deal; limited trade market for backup centers
+    confidence: medium
+    source: https://www.spotrac.com/nba/team/oklahoma-city-thunder
+  - player_id: isaiah_joe
+    name: Isaiah Joe
+    age: 26
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: spacer
+        secondary:
+          - finisher
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: 2000000
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/team/oklahoma-city-thunder
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: positional_redundancy
+          weight: low
+      falsification_conditions:
+        - Dort traded or exits; Isaiah Joe moved into heavier rotation
+    team_relationship:
+      tenure_with_team: 5
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Vet minimum contract; 12-year pro; deep bench role
+    confidence: medium
+    source: https://www.espn.com/nba/team/roster/_/name/okc/oklahoma-city-thunder
+  - player_id: aaron_wiggins
+    name: Aaron Wiggins
+    age: 26
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: finisher
+        secondary: []
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits: []
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 4
+      total_value_remaining: 34900000
+      annual_value_current_season: 9600000
+      annual_value_next_season: 9900000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2028
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.spotrac.com/nba/player/aaron-wiggins/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: positional_redundancy
+          weight: low
+      falsification_conditions:
+        - Traded mid-season for cap relief or future asset
+    team_relationship:
+      tenure_with_team: 4.5
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Team controls option in 2028; depth wing on modest salary
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/aaron-wiggins/
+  - player_id: kenrich_williams
+    name: Kenrich Williams
+    age: 31
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: connector
+        secondary:
+          - screen_setter
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 2
+      total_value_remaining: 14677500
+      annual_value_current_season: 7163000
+      annual_value_next_season: 7514500
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2027
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/27758/kenrich-williams
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: contract_expiring
+          weight: low
+      falsification_conditions:
+        - Increased rotation role (>20 min/game) sustained through playoffs
+    team_relationship:
+      tenure_with_team: 6.2
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Vet-minimum friendly deal; one of two oldest players on roster; limited trade value
+    confidence: high
+    source: https://www.si.com/nba/thunder/onsi/news/kenrich-williams-set-the-okc-thunder-standard-for-team-friendly-contracts-01k05aj9ceze
+  - player_id: nikola_topic
+    name: Nikola Topic
+    age: 21
+    position_listed: SG
+    contract_type: standard
+    availability_status: injured_long_term
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits: []
+    tier: fringe
+    trajectory: unknown
+    contract:
+      years_remaining: 1
+      total_value_remaining: 3000000
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.espn.com/nba/story/_/id/47914037/nikola-topic-makes-thunder-debut-testicular-cancer
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: injury_recovery_uncertain
+          weight: high
+      falsification_conditions:
+        - G League stint completed without setback; return to NBA rotation
+        - Cancer remission confirmed; training camp cleared for 2026-27
+    team_relationship:
+      tenure_with_team: 1.3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: 2023 first-round pick; missed 2024-25 with knee injury; testicular cancer diagnosis Oct 2025; returned G League Feb 2026
+    confidence: medium
+    source: https://www.espn.com/nba/story/_/id/47914037/nikola-topic-makes-thunder-debut-testicular-cancer
+  - player_id: cason_wallace
+    name: Cason Wallace
+    age: 20
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: connector
+        secondary: []
+      defensive_role: point_of_attack
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: 2600000
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/team/oklahoma-city-thunder
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: behind_younger_player
+          weight: low
+      falsification_conditions:
+        - Backup PG role secured with consistent >10 min/game run
+    team_relationship:
+      tenure_with_team: 1.2
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: 2023 first-round pick; rookie deal; defensive-first, limited offensive role
+    confidence: medium
+    source: https://www.espn.com/nba/team/roster/_/name/okc/oklahoma-city-thunder
+  - player_id: ajay_mitchell
+    name: Ajay Mitchell
+    age: 21
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - connector
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - transition_threat
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: 2000000
+      annual_value_current_season: 2000000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/team/oklahoma-city-thunder
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Multi-year extension signed before deadline
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Acquired from NYK mid-season; minimum salary; low trade value
+    confidence: medium
+    source: https://www.espn.com/nba/team/roster/_/name/okc/oklahoma-city-thunder
+  - player_id: branden_carlson
+    name: Branden Carlson
+    age: 22
+    position_listed: C
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary: []
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits: []
+    tier: two_way
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2026
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/team/oklahoma-city-thunder
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: recently_acquired
+          weight: low
+      falsification_conditions: []
+    team_relationship:
+      tenure_with_team: 0.4
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way contract; G League development focus; minimal NBA rotation minutes
+    confidence: low
+    source: https://www.spotrac.com/nba/team/oklahoma-city-thunder
+  - player_id: brooks_barnhizer
+    name: Brooks Barnhizer
+    age: 22
+    position_listed: PF
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: finisher
+        secondary: []
+      defensive_role: helper
+      shooting_profile: non_shooter
+      special_traits: []
+    tier: two_way
+    trajectory: unknown
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/team/oklahoma-city-thunder
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions: []
+    team_relationship:
+      tenure_with_team: 0.4
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way contract; G League affiliate development
+    confidence: low
+    source: https://www.spotrac.com/nba/team/oklahoma-city-thunder
+  - player_id: chris_youngblood
+    name: Chris Youngblood
+    age: 20
+    position_listed: SF
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: finisher
+        secondary: []
+      defensive_role: wing_stopper
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+    tier: two_way
+    trajectory: unknown
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/team/oklahoma-city-thunder
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions: []
+    team_relationship:
+      tenure_with_team: 0.4
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way contract; G League focus
+    confidence: low
+    source: https://www.spotrac.com/nba/team/oklahoma-city-thunder
+pending_free_agents: []
+known_target_history:
+  - target: Shai Gilgeous-Alexander
+    year: 2025
+    outcome: acquired
+    detail: Extended with supermax (4-yr, $285M) in July 2025; franchise centerpiece locked through 2030-31.
+    source: https://www.nba.com/thunder/news/shai-extension-250708
+  - target: Jalen Williams
+    year: 2025
+    outcome: acquired
+    detail: Extended with rookie max (5-yr, $287M) in July 2025; core member through 2030.
+    source: https://www.nba.com/thunder/news/release-williams-250713
+  - target: Isaiah Hartenstein
+    year: 2024
+    outcome: acquired
+    detail: Signed as free agent to 3-yr, $87M deal (July 2024); versatile backup center.
+    source: https://www.espn.com/nba/story/_/id/40473432/isaiah-hartenstein-agrees-87m-deal-thunder
+  - target: Alex Caruso
+    year: 2024
+    outcome: acquired
+    detail: Signed to 4-yr, $81M extension (Dec 2024); elite defensive complement to SGA.
+    source: https://www.nba.com/news/alex-caruso-thunder-extension
+  - target: Jared McCain
+    year: 2026
+    outcome: acquired
+    detail: Traded 2026 1st + 3 second-round picks to Philadelphia for young scorer (Feb 2026).
+    source: https://www.nba.com/thunder/news/release-mccain-260204
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "Oklahoma City Thunder hold No. 12 from LAC, No. 17 from PHI, No. 37 from DAL in the official post-lottery order. Mock-source layer: No. 12: Yaxel Lendeborg; No. 17: Morez Johnson Jr.; treat prospect names as low-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: low
+  - priority: Manage Hartenstein club option decision and free agency
+    timeline: by_trade_deadline
+    type: free_agency
+    detail: June 2026 decision on $28.5M option for 2026-27; market value assessment critical to cap planning.
+    confidence: high
+  - priority: Maintain contending health for Chet Holmgren
+    timeline: this_season
+    type: roster
+    detail: Right hip/back recurring issues; load management and recovery timelines essential for Finals run.
+    confidence: high
+  - priority: Integrate Jared McCain into playoff rotation
+    timeline: this_season
+    type: roster
+    detail: Trade deadline acquisition needs minutes and integration; value return on 2026 first-round capital.
+    confidence: high
+  - priority: Preserve draft capital war chest
+    timeline: next_season
+    type: structural
+    detail: 10+ first-round picks through 2032; resist mid-season trades away from core unless critical need.
+    confidence: medium
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 12 overall; from LAC.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: LAC
+    - year: 2026
+      round: 1
+      protections: 2026 No. 17 overall; from PHI.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: PHI
+    - year: 2026
+      round: 2
+      protections: 2026 No. 37 overall; from DAL.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: DAL
+    - year: 2025
+      round: 1
+      protections: Can swap with LAC or acquire top-10 protected from HOU
+      source: https://www.si.com/nba/draft/draft-pick-tracker/a-comprehensive-guide-to-the-thunders--future-draft-picks
+    - year: 2027
+      round: 1
+      protections: Own; via swap with LAC; via DEN (top-5 protected); via SAS (top-16 protected)
+      source: https://www.si.com/nba/draft/draft-pick-tracker/a-comprehensive-guide-to-the-thunders--future-draft-picks
+    - year: 2028
+      round: 1
+      protections: Own; via swap with DAL
+      source: https://www.si.com/nba/draft/draft-pick-tracker/a-comprehensive-guide-to-the-thunders--future-draft-picks
+    - year: 2029
+      round: 1
+      protections: Own; via DEN (conditional)
+      source: https://www.si.com/nba/draft/draft-pick-tracker/a-comprehensive-guide-to-the-thunders--future-draft-picks
+    - year: 2030
+      round: 1
+      protections: Own
+      source: https://www.si.com/nba/draft/draft-pick-tracker/a-comprehensive-guide-to-the-thunders--future-draft-picks
+    - year: 2031
+      round: 1
+      protections: Own
+      source: https://www.si.com/nba/draft/draft-pick-tracker/a-comprehensive-guide-to-the-thunders--future-draft-picks
+    - year: 2027
+      round: 1
+      from_team: LAC
+      protections: Swap rights (OKC can swap)
+      source: https://www.si.com/nba/clippers/onsi/breaking-down-clippers-draft-picks-protections-lottery-odds-01kpdmcqxe07
+    - year: 2028
+      round: 2
+      from_team: MIL
+      protections: None; owed to Oklahoma City Thunder (via Brooklyn).
+      source: https://fansided.com/bucks-draft-picks-every-selection-2025-2026-and-beyond
+    - year: 2027
+      round: 1
+      from_team: SAC
+      protections: Unknown
+      source: https://fanspo.com/nba/teams/Kings/26/draft-picks
+  draft_picks_owed:
+    - year: 2026
+      round: 1
+      to_team: DAL
+      protections: 2026 No. 30 overall; from OKC via WAS and PHI.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 2
+      to_team: WAS
+      protections: 2026 No. 60 overall; from OKC via SAS and MIA.
+      source: https://www.nba.com/news/2026-nba-draft-order
+  trade_exceptions: []
+team_team_relationships:
+  rivalries:
+    - team_id: DEN
+      type: competitive_recent
+      basis: 2025 West Semis (OKC won 4-3); shared Western Conference contention; emerging young vs. aging star dynamic.
+    - team_id: MEM
+      type: competitive_recent
+      basis: 2025 West Finals (OKC won 4-0); first-round exit in 2026 playoffs; frequent regular-season matchups.
+    - team_id: HOU
+      type: competitive_recent
+      basis: Rising Western Conference contender with Kevin Durant addition (2026); potential Finals matchup scenarios.
+    - team_id: PHX
+      type: competitive_recent
+      basis: 2026 West First Round (OKC swept PHX 4-0); Shai Gilgeous-Alexander dominant; emerging rivalry with Phoenix's reset core.
+  notable_personnel_connections:
+    - person: Sam Presti
+      connected_team: SAS
+      connection_type: former_executive
+      detail: Seven years with Spurs front office (1999-2007) before Thunder hire; organizational mentorship from Gregg Popovich and front office.
+    - person: Mark Daigneault
+      connected_team: unknown
+      connection_type: former_head_coach
+      detail: OKC Blue head coach (2014-2019, G League) before promoted to NBA; developed under Thunder development system.
+g_league_and_stash:
+  affiliate_team: Oklahoma City Blue
+  notable_affiliate_players:
+    - Nikola Topic (2026 development after testicular cancer recovery; G League debut Feb 2026)
+    - Branden Carlson (two-way assignment; rim protection development)
+    - Chris Youngblood (two-way assignment; wing development)
+    - Brooks Barnhizer (two-way assignment; forward development)
+  international_stash: []
+narrative_summary:
+  one_paragraph: The Oklahoma City Thunder enter 2025-26 as the defending NBA champions with an historically great roster construction and culture. Led by reigning MVP Shai Gilgeous-Alexander (supermax through 2030-31) and two ascending stars in Chet Holmgren and Jalen Williams (both max-extended through 2030), the Thunder secured a 24-1 start and finished 64-18 (1st West) with an elite defensive and pace-controlled offensive identity. Sam Presti's process-driven front office (19 years tenured) has locked the core while maintaining a war chest of 10+ first-round picks through 2032, enabling mid-season depth additions (Jared McCain trade) without sacrificing long-term flexibility. Mark Daigneault's coaching tree emphasizes fundamentals over flash, creating organizational stability across ownership (Clay Bennett, 18 years), coaching, and player development. Chet Holmgren's recurring hip/back injury is the primary health concern entering the latter half of the season and potential Finals run.
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 12 from LAC, No. 17 from PHI, No. 37 from DAL; The Athletic mock-source layer lists No. 12: Yaxel Lendeborg; No. 17: Morez Johnson Jr. as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - "Chet Holmgren hip/back injury progression: recurring soreness (right hip contusion, Nov 2025) could escalate to season-ending concern if not load-managed; critical to Finals contention."
+    - "Hartenstein club option leverage (June 2026): $28.5M decision point for 2026-27 cap planning; market value assessment will drive Thunder's mid-tier salary flexibility going forward."
+    - "Draft capital deployment: Presti's 10+ first-round picks through 2032 are primary mid-season trade chip; resist asset depletion unless Finals run demands it."
+sources_used:
+  - https://www.nba.com/news/sam-presti-10-things-know
+  - https://www.nba.com/thunder/news/shai-extension-250708
+  - https://www.nba.com/news/jalen-williams-contract-extension-2025
+  - https://www.nba.com/news/alex-caruso-thunder-extension
+  - https://www.nba.com/news/thunder-sign-mark-daigneault-extension
+  - https://www.hoopsrumors.com/2025/05/thunders-sam-presti-named-executive-of-year
+  - https://www.spotrac.com/nba/oklahoma-city-thunder/overview/_/year/2025
+  - https://www.spotrac.com/nba/player/_/id/26977/shai-gilgeous-alexander
+  - https://www.spotrac.com/nba/player/_/id/23644/isaiah-hartenstein
+  - https://www.spotrac.com/nba/player/_/id/21076/alex-caruso
+  - https://www.spotrac.com/nba/player/_/id/19903/luguentz-dort
+  - https://www.spotrac.com/nba/player/_/id/27758/kenrich-williams
+  - https://www.espn.com/nba/story/_/id/40473432/isaiah-hartenstein-agrees-87m-deal-thunder
+  - https://www.espn.com/nba/story/_/id/47914037/nikola-topic-makes-thunder-debut-testicular-cancer
+  - https://www.si.com/nba/draft/draft-pick-tracker/a-comprehensive-guide-to-the-thunders--future-draft-picks
+  - https://www.nba.com/thunder/news/release-mccain-260204
+  - https://en.wikipedia.org/wiki/Clay_Bennett_(businessman)
+  - https://en.wikipedia.org/wiki/Sam_Presti
+  - https://www.nba.com/team/roster/_/name/okc/oklahoma-city-thunder
+  - https://www.basketball-reference.com/teams/OKC/2026.html
+  - https://www.espn.com/nba/team/depth/_/name/okc/oklahoma-city-thunder
+  - https://www.si.com/nba/thunder/onsi/news/sam-presti-foundation-mark-daigneault-success-okc-thunder
+  - https://www.si.com/nba/thunder/onsi/news/kenrich-williams-set-the-okc-thunder-standard-for-team-friendly-contracts-01k05aj9ceze
+  - https://www.si.com/nba/thunder/news/okc-thunder-making-mockery-new-cba-with-jalen-williams-max-extension
+  - https://www.fadeawayworld.net/nba/oklahoma-city-thunder/how-sam-presti-really-constructed-2025-oklahoma-city-thunder
+  - https://www.espn.com/nba/story/_/id/47095675/how-legendary-presidential-historian-robert-caro-quietly-fueling-sam-presti-okc-championship-rise
+  - https://www.si.com/nba/thunder/onsi/news/chet-holmgren-injury-update-betting-impact-for-thunder-vs-clippers
+  - https://www.si.com/nba/thunder/news/okc-thunder-keep-mark-daigneault-long-term
+  - https://oklahomacity.gleague.nba.com/
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - player.archetype.special_traits for most rotation players (limited media coverage of specific skill descriptors)
+  - total_value_remaining for several fringe/rotation players (Isaiah Joe, Cason Wallace, Ajay Mitchell, two-way players)
+  - annual_value_next_season for expiring contracts (Nikola Topic, Ajay Mitchell, Aaron Wiggins next-year void)
+  - cap_hold_amounts for pending free agents (none currently pending; all core signed)
+  - trading_exceptions.expires for team (no exceptions publicly reported)
+  - Bennedict Mathurin roster status (search results indicated traded away; not confirmed on 2025-26 roster)
+  - Davon Reed, Elijah Dotson full contract details (may be on Two-Way or G League affiliate only)
+  - Peyton Watson roster status (not confirmed on 2025-26 OKC roster)
+vocabulary_flags:
+  - "PHX rivalry added: PHX.yaml listed OKC as rival but OKC did not reciprocate. Added PHX entry to OKC rivalries based on 2026 West First Round matchup (OKC swept 4-0 in Apr 2026). Two-way rivalry now symmetrical."
+  - "availability_status: Chet Holmgren marked 'injured_short_term' (right hip contusion as of late March 2026) rather than 'healthy' despite playing in regular season games with load management; borderline between short-term and ongoing maintenance"
+  - "Hartenstein club_option notation: contract.team_option listed as '2027' (year exercisable) rather than 'none' to indicate decision point; template does not explicitly cover decision-point years"
+  - Nikola Topic marked 'injured_long_term' post-chemotherapy (Oct 2025-Feb 2026 away from basketball); returned to G League mid-season but full NBA readiness unknown as of cutoff date
+  - "Two-way players (Carlson, Barnhizer, Youngblood): marked as tier='two_way' and contract_type='two_way' per template; minimal NBA minutes expected; contract term ambiguous (typically 2-way seasonal with G League flexibility)"
+  - Mark Daigneault coaching_tree marked 'unknown' (no explicit connection to known tree; self-developed via OKC Blue system); template does not capture internal org development pathway
+  - "Chris Youngblood two-way player entry: age (20) and position (SF) inferred from limited public data; confidence low"

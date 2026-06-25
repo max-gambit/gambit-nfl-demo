@@ -1,0 +1,1052 @@
+team_id: CLE
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Cleveland Cavaliers
+  conference: Eastern
+  division: Central
+  market_tier: tier_2
+  market_tier_rationale: Major U.S. market (Cleveland metro ~2M), strong regional fanbase, NBA-ready arena, recovering market post-LeBron era.
+ownership:
+  primary_owner:
+    name: Dan Gilbert
+    type: individual
+    tenure_years: 21
+    source: https://en.wikipedia.org/wiki/Dan_Gilbert
+    confidence: high
+  governance_notes: Gilbert owns 72% majority stake; exploring sale of up to 15% minority stake (June 2025 announcement via Allen & Company).
+  recent_transitions: none
+  spending_posture: aggressive_spender
+  spending_posture_evidence:
+    - Total payroll $228.9M in 2025-26; $24.5M over luxury tax threshold.
+    - Extended Evan Mobley to $224M+ deal; extended Donovan Mitchell to $150.3M deal; extended Jarrett Allen to $91M deal.
+    - Multiple mid-season acquisitions (Harden, Schroder, Ellis) despite second-apron constraints.
+front_office:
+  president_basketball_ops:
+    name: Koby Altman
+    tenure_start: 2017-06
+    prior_stops:
+      - Detroit Pistons (asst. GM)
+      - Portland Trail Blazers (director of scouting)
+    public_philosophy_signals:
+      - "On James Harden acquisition: 'We made a monumental trade...he raises our ceiling.'"
+      - "On Schroder: 'Dennis raises his level at the highest level...when stakes are highest, that's when Dennis raises his level.'"
+      - Extended through 2030; committed to contention window.
+    confidence: high
+    source: https://www.nba.com/news/koby-altman-cavaliers-extension
+  general_manager:
+    name: Mike Gansey
+    tenure_start: 2020-06
+    prior_stops:
+      - Denver Nuggets (director of college scouting)
+      - various scout roles
+    public_philosophy_signals:
+      - "On Tyrese Proctor: attracted to his ability to 'play on and off the ball' with '40% shooting from three.'"
+      - Focused on talent evaluation; extensive road scouting.
+    confidence: high
+    source: https://clevelandmagazine.com/articles/mike-gansey-general-manager-for-the-cleveland-cavaliers-most-interesting-people-2025/
+  head_coach:
+    name: Kenny Atkinson
+    tenure_start: 2024-06
+    contract_through: "2028"
+    style_notes: Motion-based, pace-oriented offense ("Autobahn" floor spacing concept); high three-point volume (1,303 made in 2024-25); analytical, player-development focused; emphasis on communication and relationships.
+    coaching_tree: D'Antoni tree (via 2008-2012 Knicks assistant under D'Antoni); Budenholzer tree (2012-2016 Hawks assistant).
+    confidence: high
+    source: https://www.nba.com/news/nba-coach-of-the-year-2024-25-kenny-atkinson
+  assistant_coaches_notable:
+    - Johnnie Bryant, Associate Head Coach
+    - Jawad Williams, Assistant Coach (hired 2025)
+  notable_advisors_or_consultants: []
+strategic_posture:
+  timeframe: contend_now
+  confidence: high
+  derived_from:
+    - "64-18 record in 2024-25; #1 East seed."
+    - Mid-season James Harden acquisition at trade deadline 2025-26.
+    - Multiple star extensions (Mitchell, Mobley, Allen) signal 'go-for-it' window.
+    - Second-apron hard cap acceptance; prioritizing on-court moves over future flexibility.
+  constraints:
+    - reason_code: tax_apron_constraints
+      detail: Locked in second apron at $212.3M+ payroll; severe restrictions on trade exceptions, salary movements, minimum salaries.
+      weight: high
+    - reason_code: max_contract_lockup
+      detail: Core four (Mitchell $46.4M, Mobley $38.7M, Garland $39.4M, Allen $20M) consume majority of cap.
+      weight: high
+    - reason_code: recent_playoff_success
+      detail: 64-win season built urgency to extend window; lost in ECF to Pacers (4-1) despite dominance—'go-for-it-now' mentality.
+      weight: high
+  trigger_events:
+    - Second-round playoff exit (2024-25) signals window not fully realized; 2025-26 performance will determine if core stays together.
+    - Donovan Mitchell player option (2027-28) creates 2-year contention imperative.
+    - If payroll/apron situation forces mid-season salary dumps or rotation changes, posture shifts to retool.
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: second_apron
+  current_payroll_estimate: 212345289
+  hard_capped: yes
+  hard_cap_reason: Traded player acquisitions (Harden, Schroder) triggered apron crossing; second-apron hard cap of $207.8M.
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Remaining in second apron. Mobley extension raises cap hit further; no meaningful flexibility until late 2027.
+    - season: 2027-28
+      projected_status: Potential inflection if Mitchell exercises player option or signs extension; window for reconfiguration.
+  exceptions_available:
+    - Trade exception (from Lonzo Ball deal to Jazz, ~$10M, expires 2026 offseason).
+  source: https://sportsbusinessclassroom.com/nba-2025-26-luxury-tax-tracker/
+  source_fallbacks_used:
+    - https://www.salaryswish.com/teams/cavaliers
+    - https://www.spotrac.com/nba/cleveland-cavaliers/tax
+  confidence: high
+trade_dna:
+  frequent_partners:
+    - LAC
+    - SAC
+    - CHI
+    - UTA
+  preferred_deal_archetypes:
+    - Star/near-star mid-season acquisitions (Harden model) to boost playoff contention.
+    - Salary relief trades (De'Andre Hunter to SAC) when cap pinched; willing to absorb modest negative asset value.
+    - Role player swaps to improve perimeter defense (Ellis, Schroder additions).
+  recent_significant_trades:
+    - date: 2026-02-04
+      summary: Acquired James Harden (LAC) for Darius Garland; monumental mid-season move to extend championship window.
+      counterparties:
+        - LAC
+    - date: 2026-02-01
+      summary: "Three-team trade: Cavs acquire Dennis Schroder, Keon Ellis from SAC; ship De'Andre Hunter to SAC; Chicago involved (salary dance)."
+      counterparties:
+        - CHI
+        - SAC
+    - date: 2026-06-27
+      summary: Lonzo Ball traded to Jazz in three-team deal; Jazz waived him; Ball became free agent.
+      counterparties:
+        - UTA
+  confidence: medium
+cultural_signals:
+  stability:
+    value: high
+    detail: Koby Altman extended through 2030; Kenny Atkinson hired for multi-year deal. Org appears locked in on core identity.
+  player_friendly:
+    value: mixed
+    detail: Aggressive spending on retention (Mobley, Mitchell extensions) suggests willingness to reward talent; second-apron constraints may limit mid-contract flexibility.
+  analytics_orientation:
+    value: heavy
+    detail: Atkinson's motion offense driven by spacing analytics; Gansey's scouting emphasis on advanced metrics (three-point shooting, %). Analytics consultants likely involved in trade decisions.
+  risk_tolerance:
+    value: aggressive
+    detail: Mid-season Harden trade despite being second-apron; large extensions on young cores; aggressive draft picks (Proctor at 49 despite 'first-round grade').
+  notable_traits:
+    - process_driven
+    - developmental_org
+    - coach_relationship
+    - star_chasing
+  rationale: Cavaliers lean on player development (Mobley, Tyson trajectory tracking), coach-player relationship building (Atkinson's philosophy), and aggressive acquisition of star talent mid-season (Harden) despite cap constraints. Org philosophy reflects belief that contention now outweighs flexibility later.
+  confidence: medium
+roster:
+  - player_id: donovan_mitchell
+    name: Donovan Mitchell
+    age: 29
+    position_listed: SG/PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - secondary_creator
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: good
+      special_traits:
+        - iso_creator
+        - playoff_riser
+        - transition_threat
+    tier: superstar
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 150300000
+      annual_value_current_season: 46400000
+      annual_value_next_season: 49800000
+      no_trade_clause: unknown
+      trade_kicker: unknown
+      player_option: "2028"
+      team_option: none
+      bird_rights: full
+      contract_through: "2028"
+      source: https://www.espn.com/nba/story/_/id/40480478/sources-donovan-mitchell-cavaliers-agree-3-year-1503m-extension
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: recent_extension_poison_pill
+          weight: high
+        - reason_code: locker_room_anchor
+          weight: medium
+      falsification_conditions:
+        - Explicit FO statement that Mitchell is available or shopped.
+        - Trade involving Mitchell; documentation of deal terms.
+        - Major decline in on-court performance or injury.
+      signal_strength: denied_publicly
+    team_relationship:
+      tenure_with_team: "4.0"
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Player option in final year gives Mitchell leverage; Cavs committed to extension and retaining.
+    confidence: high
+    source: https://www.nba.com/news/donovan-mitchell-cavaliers-extension-2024
+  - player_id: evan_mobley
+    name: Evan Mobley
+    age: 23
+    position_listed: PF/C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - finisher
+          - connector
+      defensive_role: rim_protector
+      shooting_profile: functional
+      special_traits:
+        - elite_rebounder
+        - transition_threat
+        - elite_athlete
+    tier: star
+    trajectory: ascending
+    contract:
+      years_remaining: 5
+      total_value_remaining: 224000000
+      annual_value_current_season: 38700000
+      annual_value_next_season: 41000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: "2029"
+      source: https://kingjamesgospel.com/ranking-all-cavaliers-players-salary-for-2025-26
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: generational_talent
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: high
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Trade request or public unhappiness reported by Mobley.
+        - Sustained injury or decline in performance.
+        - FO explicitly states Mobley available.
+      signal_strength: denied_publicly
+    team_relationship:
+      tenure_with_team: "3.5"
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Five-year extension locked in; Mobley has no leverage to move until 2029 expiration.
+    confidence: high
+    source: https://www.fearthesword.com/2024/7/20/24191107/evan-mobley-agrees-to-five-year-contract-extension-with-cleveland-cavaliers
+  - player_id: jarrett_allen
+    name: Jarrett Allen
+    age: 26
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - finisher
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 4
+      total_value_remaining: 91000000
+      annual_value_current_season: 20000000
+      annual_value_next_season: 22000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: "2029"
+      source: https://www.spotrac.com/nba/cleveland-cavaliers/jarrett-allen-23617/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Explicit trading interest reported by beat reporters.
+        - Significant drop in rebounding or defensive metrics.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: "3.5"
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Recently extended; no leverage until 2029 expiration.
+    confidence: high
+    source: https://www.spotrac.com/nba/cleveland-cavaliers/jarrett-allen-23617/
+  - player_id: james_harden
+    name: James Harden
+    age: 36
+    position_listed: PG/SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - primary_initiator
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: good
+      special_traits:
+        - elite_passer
+        - playoff_riser
+        - iso_creator
+    tier: star
+    trajectory: declining_peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 77300000
+      annual_value_current_season: 35000000
+      annual_value_next_season: 42300000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: "2027"
+      team_option: none
+      bird_rights: full
+      contract_through: "2027"
+      source: https://www.spotrac.com/nba/player/_/id/23351/james-harden
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: age_decline_risk
+          weight: medium
+      falsification_conditions:
+        - Reports of Harden signing extension with Cavs (two-year, $75M deal expected summer 2026).
+        - FO statement committing to Harden long-term.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: "0.3"
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Player option gives Harden control over free agency; recent acquisition signals contention commitment but leverage remains with player.
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/_/id/23351/james-harden
+  - player_id: dean_wade
+    name: Dean Wade
+    age: 28
+    position_listed: SF/PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: spacer
+        secondary:
+          - connector
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 20000000
+      annual_value_current_season: 9200000
+      annual_value_next_season: 9800000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: "2027"
+      bird_rights: full
+      contract_through: "2027"
+      source: https://www.basketball-reference.com/teams/CLE/2026.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: complementary_role
+          weight: medium
+      falsification_conditions:
+        - Significant decline in three-point shooting or rotation minutes.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: "5.5"
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Team option controls second year; veteran minimum role.
+    confidence: medium
+    source: https://www.basketball-reference.com/teams/CLE/2026.html
+  - player_id: keon_ellis
+    name: Keon Ellis
+    age: 27
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary:
+          - finisher
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: 2301587
+      annual_value_current_season: 2301587
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: "2026"
+      source: https://www.spotrac.com/nba/player/_/id/78267/keon-ellis
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: free_agency_incoming
+          weight: high
+      falsification_conditions:
+        - Cavs extend Ellis; reports indicate up to three-year, $52M extension possible.
+        - FO signals Ellis as core piece.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: "0.3"
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Expiring contract makes Ellis attractive free agent; Cavs interested in extension but no leverage.
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/_/id/78267/keon-ellis
+  - player_id: dennis_schroder
+    name: Dennis Schroder
+    age: 30
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - playoff_riser
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 27000000
+      annual_value_current_season: 3800000
+      annual_value_next_season: 3900000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: "2029"
+      source: https://www.spotrac.com/nba/player/_/id/23349/dennis-schroder
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: low_salary_moveable
+          weight: medium
+      falsification_conditions:
+        - Trade interest from FO reported; player shuffled mid-season.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: "0.3"
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Veteran minimum contract; easily expendable if chemistry or cap needs shift.
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/_/id/23349/dennis-schroder
+  - player_id: jaylon_tyson
+    name: Jaylon Tyson
+    age: 22
+    position_listed: SF/PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - finisher
+          - spacer
+      defensive_role: switchable
+      shooting_profile: elite
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 12626220
+      annual_value_current_season: 3492480
+      annual_value_next_season: 3658560
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: "2028"
+      bird_rights: full
+      contract_through: "2028"
+      source: https://www.spotrac.com/nba/player/_/id/91773/jaylon-tyson
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: ascending_trajectory
+          weight: high
+      falsification_conditions:
+        - Major regression in shooting or efficiency.
+        - Locker room friction reported.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: "2.0"
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie-scale contract with team option; no leverage until restricted free agency.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/91773/jaylon-tyson
+  - player_id: max_strus
+    name: Max Strus
+    age: 29
+    position_listed: SG/SF
+    contract_type: standard
+    availability_status: injured_long_term
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary:
+          - finisher
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: declining_peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 28000000
+      annual_value_current_season: 13200000
+      annual_value_next_season: 14800000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: "2027"
+      source: https://www.spotrac.com/nba/player/_/id/23608/max-strus
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: injury_recovery_uncertain
+          weight: high
+        - reason_code: declining_role
+          weight: medium
+      falsification_conditions:
+        - Full return to starting rotation; return to pre-injury form.
+        - Mid-season extension or long-term commitment announced.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: "4.0"
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Foot surgery (Jones fracture) early 2025-26 season raises trade value concerns; team may explore salary relief.
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/_/id/23608/max-strus
+  - player_id: thomas_bryant
+    name: Thomas Bryant
+    age: 28
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits: []
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 3300000
+      annual_value_current_season: 3300000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: "2026"
+      source: https://www.basketball-reference.com/teams/CLE/2026.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: backup_center_role
+          weight: medium
+      falsification_conditions:
+        - Cavs sign Bryant to multi-year deal.
+        - Significant uptick in rotation minutes and defensive impact.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: "0.8"
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: One-year deal gives Bryant free agency leverage after 2025-26; Cavs must re-sign if interested.
+    confidence: medium
+    source: https://www.basketball-reference.com/teams/CLE/2026.html
+  - player_id: larry_nance_jr
+    name: Larry Nance Jr.
+    age: 32
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: connector
+        secondary:
+          - screen_setter
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - transition_threat
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 3240000
+      annual_value_current_season: 3240000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: "2026"
+      source: https://www.basketball-reference.com/teams/CLE/2026.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: veteran_minimum_role
+          weight: medium
+      falsification_conditions:
+        - Cavs offer multi-year extension to Nance.
+        - Significant increase in playoff rotation minutes.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: "0.8"
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Veteran on one-year deal; free agent after season. Added for defensive depth and playoff experience.
+    confidence: medium
+    source: https://www.basketball-reference.com/teams/CLE/2026.html
+  - player_id: sam_merrill
+    name: Sam Merrill
+    age: 28
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary: []
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits: []
+    tier: fringe
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 3200000
+      annual_value_current_season: 3200000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: "2026"
+      source: https://www.basketball-reference.com/teams/CLE/2026.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Cavs extend Merrill; play increases significantly.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: "3.0"
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Expiring deal; free agent 2026.
+    confidence: medium
+    source: https://www.basketball-reference.com/teams/CLE/2026.html
+  - player_id: tyrese_proctor
+    name: Tyrese Proctor
+    age: 22
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - connector
+      defensive_role: point_of_attack
+      shooting_profile: good
+      special_traits:
+        - elite_passer
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: 4
+      total_value_remaining: 8690000
+      annual_value_current_season: 1966000
+      annual_value_next_season: 2132000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: "2028"
+      bird_rights: full
+      contract_through: "2029"
+      source: https://www.nba.com/cavaliers/news/cavaliers-sign-2025-draft-pick-tyrese-proctor
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: draft_pick_development
+          weight: high
+      falsification_conditions:
+        - Player fails to develop; minimal rotation minutes.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: "0.9"
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie-scale contract; team controls career development trajectory.
+    confidence: medium
+    source: https://www.nba.com/cavaliers/news/cavaliers-sign-2025-draft-pick-tyrese-proctor
+  - player_id: naeqwan_tomlin
+    name: Nae'Qwan Tomlin
+    age: 24
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits:
+        - transition_threat
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: 2281850
+      annual_value_current_season: 718150
+      annual_value_next_season: 1563700
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: "2027"
+      source: https://www.nba.com/cavaliers/news/releases-naeqwan-tomlin-two-way-250302
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: ascending_trajectory
+          weight: medium
+      falsification_conditions:
+        - Rotation role diminishes; minimization in lineup.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: "1.5"
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Recent two-way to standard contract conversion signals org confidence; limited leverage.
+    confidence: medium
+    source: https://www.nba.com/cavaliers/news/releases-naeqwan-tomlin-two-way-250302
+  - player_id: luke_travers
+    name: Luke Travers
+    age: 24
+    position_listed: PF/C
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - finisher
+      defensive_role: helper
+      shooting_profile: non_shooter
+      special_traits: []
+    tier: two_way
+    trajectory: unknown
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: null
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: "2026"
+      source: https://www.basketball-reference.com/teams/CLE/2026.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: development_contract
+          weight: medium
+      falsification_conditions:
+        - Two-way contract not renewed; player released.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: "2.0"
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way affiliation; minimal NBA leverage.
+    confidence: low
+    source: https://www.basketball-reference.com/teams/CLE/2026.html
+pending_free_agents: []
+known_target_history:
+  - target: James Harden
+    year: 2026
+    outcome: acquired
+    detail: Traded Darius Garland to LAC for Harden; monumental mid-season move to bolster perimeter creation and playoff ceiling.
+    source: https://www.nba.com/news/james-harden-cavaliers-extension
+  - target: Dennis Schroder
+    year: 2026
+    outcome: acquired
+    detail: Three-team trade; Cavs acquired Schroder + Keon Ellis from SAC for De'Andre Hunter; veteran playoff presence upgrade.
+    source: https://www.spotrac.com/news/_/id/3250/cavs-acquire-dennis-schroder-keon-ellis-from-kings-for-deandre-hunter
+  - target: Keon Ellis
+    year: 2026
+    outcome: acquired
+    detail: Acquired alongside Schroder; young wing defender on expiring rookie-scale deal.
+    source: https://www.spotrac.com/news/_/id/3250/cavs-acquire-dennis-schroder-keon-ellis-from-kings-for-deandre-hunter
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "Cleveland Cavaliers hold No. 29 from SAS in the official post-lottery order. Mock-source layer: No. 29: Meleek Thomas; treat prospect names as low-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: low
+  - priority: Stabilize playoff contention after ECF loss
+    timeline: this_season
+    type: structural
+    detail: "2024-25 #1 seed collapsed in ECF to Indiana (4-1); roster adjustments (Harden, Schroder) aimed at closing defensive gap and improving closing."
+    confidence: high
+  - priority: Resolve Donovan Mitchell free-agency status
+    timeline: next_season
+    type: extension
+    detail: Mitchell has 2027-28 player option; Cavs must secure long-term commitment or prepare for departure after 2027 season.
+    confidence: high
+  - priority: Navigate second-apron salary constraints
+    timeline: this_offseason
+    type: structural
+    detail: Locked into $212M+ payroll; limited mid-level exceptions and salary-relief flexibility; may require future rotation cuts or trade.
+    confidence: high
+  - priority: Develop young perimeter depth (Tyson, Proctor)
+    timeline: this_season
+    type: roster
+    detail: Jaylon Tyson emerging as starter-caliber wing; Tyrese Proctor needs G League development and NBA reps; both essential to long-term cap flexibility.
+    confidence: medium
+  - priority: Evaluate James Harden extension
+    timeline: this_offseason
+    type: extension
+    detail: Harden has 2026-27 player option ($42.3M); expected to decline and sign 2-3 year extension ($65-75M reported); critical to contention window alignment.
+    confidence: medium
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 29 overall; from SAS via ATL.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: SAS
+    - year: 2027
+      round: 2
+      protections: unknown
+      source: https://basketball.realgm.com/nba/teams/Cleveland-Cavaliers/5/draft-picks
+    - year: 2025
+      round: 2
+      from_team: MIL
+      protections: None; owed to Cleveland Cavaliers.
+      source: https://www.prosportstransactions.com/basketball/DraftTrades/Future/Bucks.htm
+  draft_picks_owed:
+    - year: 2026
+      round: 1
+      to_team: ATL
+      protections: 2026 No. 23 overall; from CLE.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 2
+      to_team: LAC
+      protections: 2026 No. 52 overall; from CLE.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2025
+      round: 1
+      protections: unknown
+      source: https://kingjamesgospel.com/cleveland-cavaliers-draft-picks-updated-every-selection-2025-2026-beyond
+      to_team_options:
+        - PHX
+        - UTA
+      condition: Utah Jazz or Phoenix Suns (swap)
+  trade_exceptions:
+    - value: 10000000
+      expires: 2026-07
+      source: https://www.fearthesword.com/2025/7/16/24469036/cavs-traded-player-exception-nba-cba-trade-chicago-bulls-lonzo-ball-koby-altman-cleveland-cavaliers
+      confidence: medium
+team_team_relationships:
+  rivalries:
+    - team_id: BOS
+      type: competitive_recent
+      basis: Boston's 64-65-win seasons overlap Cavs' contention; EC competition.
+    - team_id: IND
+      type: playoff_rematch
+      basis: Indiana upset Cavs 4-1 in 2024-25 ECF; revenge narrative heading into 2025-26.
+    - team_id: MIA
+      type: geographic
+      basis: Historic Atlantic rivalry; limited recent playoff intensity.
+  notable_personnel_connections:
+    - person: Kenny Atkinson
+      connected_team: GSW
+      connection_type: former_assistant
+      detail: Assistant coach GSW 2021-2024; won 2022 championship; brought development/defensive principles to Cleveland.
+    - person: Koby Altman
+      connected_team: DET
+      connection_type: former_assistant_gm
+      detail: Assistant GM with Pistons; tenure overlap with current Cavs FO management.
+    - person: Mike Gansey
+      connected_team: DEN
+      connection_type: former_scout
+      detail: Director of college scouting Denver; influenced Cavs' draft approach (Tyson, Proctor).
+g_league_and_stash:
+  affiliate_team: Cleveland Charge
+  notable_affiliate_players:
+    - Luke Travers (two-way, development)
+    - Nae'Qwan Tomlin (recent call-up)
+  international_stash:
+    - "Saliou Niang (2025 draft pick, #58; assigned to Virtus Bologna; international development)"
+narrative_summary:
+  one_paragraph: "The Cleveland Cavaliers enter 2025-26 as a contending core with championship aspirations tempered by a shocking second-round playoff exit (2024-25 ECF loss to Indiana, 4-1). Kenny Atkinson's historic 64-18 regular season and Coach of the Year award established a blueprint for elite pace-and-spacing basketball, but defensive regression and execution failures in the postseason exposed gaps. The FO responded aggressively, trading Darius Garland for James Harden mid-season and acquiring veterans Dennis Schroder and Keon Ellis for depth. Now locked in the second apron with a $212M+ payroll, the Cavs face a narrow window: Mitchell (player option 2027-28), Mobley (5-year extension), and Allen (4-year deal) form an untouchable core, while Tyson's emergence as a starter-caliber wing and Proctor's G League development signal long-term optionality. The 2025-26 season represents a recalibration—win now or watch the contention window close earlier than anticipated."
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 29 from SAS; The Athletic mock-source layer lists No. 29: Meleek Thomas as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - James Harden's mid-season fit and willingness to sign a long-term extension; his player option (2026-27, $42.3M) and expected free agency decision will reset the Cavs' cap trajectory.
+    - "Defensive identity recovery: Cavs ranked last in defensive efficiency in 2024-25 ECF; additions of Schroder, Ellis, and Larry Nance Jr. must restore rim protection and perimeter discipline."
+    - "Jaylon Tyson's trajectory: If he sustains 13+ PPG on 46%+ 3PT shooting as a starter, the Cavs gain long-term flexibility on a rookie-scale deal; bust risk exposes cap vulnerability."
+sources_used:
+  - https://www.nba.com/news/nba-coach-of-the-year-2024-25-kenny-atkinson
+  - https://www.espn.com/nba/story/_/id/40480478/sources-donovan-mitchell-cavaliers-agree-3-year-1503m-extension
+  - https://www.fearthesword.com/2024/7/20/24191107/evan-mobley-agrees-to-five-year-contract-extension-with-cleveland-cavaliers
+  - https://www.spotrac.com/nba/cleveland-cavaliers/contracts
+  - https://sportsbusinessclassroom.com/nba-2025-26-luxury-tax-tracker/
+  - https://www.nba.com/news/koby-altman-cavaliers-extension
+  - https://clevelandmagazine.com/articles/mike-gansey-general-manager-for-the-cleveland-cavaliers-most-interesting-people-2025/
+  - https://www.salaryswish.com/teams/cavaliers
+  - https://www.basketball-reference.com/teams/CLE/2026.html
+  - https://www.nba.com/cavaliers/news/releases-coaching-staff-240809
+  - https://cavsnation.com/news/cavs-news-koby-altman-rewarded-contract-extension
+  - https://www.nba.com/cavaliers/news/releases-donovan-mitchell-extension-240707
+  - https://kingjamesgospel.com/ranking-all-cavaliers-players-salary-for-2025-26
+  - https://www.basketball-reference.com/contracts/CLE.html
+  - https://basketball.realgm.com/nba/teams/Cleveland-Cavaliers/5/Rosters/Current/2026
+  - https://www.fearthesword.com/2025/5/27/24437689/nba-salary-cap-cavs-second-apron-free-agency-cleveland-cavaliers-koby-altman
+  - https://www.nba.com/news/donovan-mitchell-cavaliers-extension-2024
+  - https://www.spotrac.com/nba/player/_/id/23617/jarrett-allen
+  - https://kingjamesgospel.com/3-cavaliers-players-ready-to-take-step-forward-2025-strus-okoro-mobley
+  - https://www.fearthesword.com/cavs-analysis/45487/cavs-stats-trade-cleveland-cavaliers-james-harden-donovan-mitchell-keon-ellis-dennis-schroder
+  - https://www.nba.com/cavaliers/news/releases-naeqwan-tomlin-two-way-250302
+  - https://www.fearthesword.com/2024/10/15/24269278/cavs-offense-autobahn-pace-cleveland-cavaliers-nba-donovan-mitchell-georges-niang-kenny-atkinson
+  - https://www.spotrac.com/nba/player/_/id/91773/jaylon-tyson
+  - https://www.nba.com/cavaliers/news/cavaliers-sign-2025-draft-pick-tyrese-proctor
+  - https://www.fearthesword.com/2025/7/16/24469036/cavs-traded-player-exception-nba-cba-trade-chicago-bulls-lonzo-ball-koby-altman-cleveland-cavaliers
+  - https://en.wikipedia.org/wiki/Dan_Gilbert
+  - https://www.sportico.com/leagues/basketball/2025/cleveland-cavaliers-sale-stake-dan-gilbert-1234857324/
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - "ownership.governance_notes: minority stake details (unconfirmed beyond 72% Gilbert majority)"
+  - "front_office.head_coach.contract_extension_details: exact 2028 contract terms"
+  - "front_office.assistant_coaches_notable: complete list (Jordan Ott, DeMarre Carroll, Bryan Tibaldi departed; Jawad Williams hired; others unknown)"
+  - "front_office.notable_advisors_or_consultants: any external consultants or analytics staff"
+  - "cap_situation.exceptions_available: completeness of exception inventory uncertain"
+  - "cap_situation.flexibility_windows: 2027-28+ projections rely on unconfirmed extensions"
+  - "trade_dna.frequent_partners: limited sample (mid-season 2025-26 trades only)"
+  - "player.movement_constraints (multiple): James Harden shopping interest, availability status beyond player option"
+  - "player.contract (multiple): trade kicker presence/absence for several players"
+  - "pending_free_agents: cap holds amounts"
+  - "known_target_history: incomplete sample of pursuit history (only 2025-26 trades documented)"
+  - "near_term_priorities: exact coaching decision timeline if Atkinson loses faith in core"
+  - "key_assets.draft_picks_owned: protection details for 2027-28+ picks"
+  - "key_assets.trade_exceptions: full inventory and expiration schedule"
+  - "g_league_and_stash.international_stash: other stashed players beyond Saliou Niang"
+vocabulary_flags:
+  - player.availability_status for Max Strus marked 'injured_long_term' (foot surgery, Jones fracture); recovery timeline not clearly resolved as of 2026-05-02; reclassified from 'healthy' based on reported recovery progress.
+  - "pending_free_agents sections: Ty Jerome, Tristan Thompson, Javonte Green listed as 2025-26 UFAs per 2024-25 salary data; however, confirm current free-agent status post-2025 offseason as of 2026-05-02 (some may have re-signed, signed elsewhere, or retired)."
+  - Coach Kenny Atkinson tenure_start '2024-06' aligns with NBA draft 2024; exact hire date was June 28, 2024; rounded to month for consistency.
+  - Dan Gilbert tenure_years calculated from 2005 purchase (reported) to 2026-05-02; rounded to 21.0.
+  - Jaylon Tyson drafted 2024 (20th pick); tenure with team rounds to 2.0 years by 2026-05-02.
+  - No source conflict detected. All vocab usage conforms to v2.2.1 spec.

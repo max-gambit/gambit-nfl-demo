@@ -1,0 +1,199 @@
+team_id: BOS
+as_of_date: "2026-05-02"
+last_updated: "2026-05-02"
+
+identity:
+  name: Boston Celtics
+  conference: Eastern
+  division: Atlantic
+  market_tier: tier_1
+  market_tier_rationale: Test fixture market rationale.
+
+ownership:
+  primary_owner:
+    name: Owner B
+    type: individual
+    tenure_years: 2.0
+    source: https://example.com/owner-b
+    confidence: high
+  governance_notes: none
+  recent_transitions: none
+  spending_posture: aggressive_spender
+  spending_posture_evidence:
+    - Test evidence.
+
+front_office:
+  president_basketball_ops:
+    name: President B
+    tenure_start: "2025-01"
+    prior_stops: []
+    public_philosophy_signals: []
+    confidence: high
+    source: https://example.com/president-b
+  general_manager:
+    name: GM B
+    tenure_start: "2025-01"
+    prior_stops: []
+    public_philosophy_signals: []
+    confidence: high
+    source: https://example.com/gm-b
+  head_coach:
+    name: Coach B
+    tenure_start: "2025-01"
+    contract_through: "2027"
+    style_notes: Test style.
+    coaching_tree: mazzulla_tree
+    confidence: high
+    source: https://example.com/coach-b
+  assistant_coaches_notable: []
+  notable_advisors_or_consultants: []
+
+strategic_posture:
+  timeframe: contend_now
+  confidence: high
+  derived_from:
+    - Test posture.
+  constraints:
+    - reason_code: recent_playoff_success
+      detail: Test detail.
+      weight: high
+  trigger_events:
+    - Test trigger.
+  last_reviewed: "2026-05-02"
+
+cap_situation:
+  current_status: above_first_apron
+  current_payroll_estimate: 150000000
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: "2026-27"
+      projected_status: Test status.
+  exceptions_available: []
+  source: https://example.com/cap-b
+  source_fallbacks_used: []
+  confidence: high
+
+trade_dna:
+  frequent_partners: [ATL]
+  preferred_deal_archetypes:
+    - Test deals.
+  recent_significant_trades:
+    - date: "2026-02-01"
+      summary: Boston acquired Player Alpha from Atlanta Hawks in a pick deal.
+  confidence: high
+
+cultural_signals:
+  stability:
+    value: high
+    detail: Test detail.
+  player_friendly:
+    value: mixed
+    detail: Test detail.
+  analytics_orientation:
+    value: heavy
+    detail: Test detail.
+  risk_tolerance:
+    value: aggressive
+    detail: Test detail.
+  notable_traits: [process_driven, mazzulla_tree]
+  rationale: Test rationale.
+  confidence: high
+
+roster:
+  - player_id: player_beta
+    name: Player Beta
+    age: 26
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary: [spacer]
+      defensive_role: wing_stopper
+      shooting_profile: elite
+      special_traits: [playoff_riser]
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 2000000
+      annual_value_current_season: 1000000
+      annual_value_next_season: 1000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: "2027"
+      source: https://example.com/player-beta-contract
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: recently_acquired
+          weight: medium
+      falsification_conditions:
+        - Trade request.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.0
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Test leverage.
+    confidence: high
+    source: https://example.com/player-beta
+
+pending_free_agents: []
+
+known_target_history:
+  - target: Player Alpha
+    year: 2026
+    outcome: declined
+    detail: Test target detail.
+    source: https://example.com/target-alpha
+
+near_term_priorities:
+  - priority: Test priority
+    timeline: this_season
+    type: trade
+    detail: Test priority detail.
+    confidence: medium
+
+key_assets:
+  draft_picks_owned: []
+  draft_picks_owed:
+    - year: 2027
+      round: 1
+      to_team: ATL
+      protections: none
+      source: https://example.com/pick-b
+  trade_exceptions: []
+
+team_team_relationships:
+  rivalries:
+    - team_id: ATL
+      type: competitive_recent
+      basis: Test rivalry.
+  notable_personnel_connections:
+    - person: Coach Link
+      connected_team: ATL
+      connection_type: former_coach
+      detail: Test connection.
+
+g_league_and_stash:
+  affiliate_team: Maine Celtics
+  notable_affiliate_players: []
+  international_stash: []
+
+narrative_summary:
+  one_paragraph: Test narrative paragraph.
+  three_things_to_watch:
+    - Test watch item.
+
+sources_used:
+  - https://example.com/source-b
+fields_marked_unknown: []
+vocabulary_flags: []

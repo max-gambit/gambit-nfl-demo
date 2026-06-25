@@ -1,0 +1,24 @@
+node_modules
+dist
+.DS_Store
+
+# env
+.env
+.env.local
+.env.*.local
+
+# build artifacts
+*.tsbuildinfo
+test-results/
+
+# Runtime context graph preference overrides
+data/nba-context-graph/overrides/*.local.json
+
+# Supabase CLI scratch
+supabase/.temp
+supabase/.branches
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+.idea

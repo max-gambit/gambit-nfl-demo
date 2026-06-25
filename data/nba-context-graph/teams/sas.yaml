@@ -1,0 +1,1209 @@
+team_id: SAS
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: San Antonio Spurs
+  conference: Western
+  division: Southwest
+  market_tier: tier_2
+  market_tier_rationale: Major metropolitan market with deep NBA legacy and strong regional fan base; media market rank ~35 in US, but franchise equity and historical significance elevate tier.
+ownership:
+  primary_owner:
+    name: Peter J. Holt
+    type: individual
+    tenure_years: 6
+    source: https://www.si.com/nba/spurs/onsi/news/spurs-investors-michael-dell/
+    confidence: high
+  governance_notes: Holt family remains largest shareholder (~40% stake). Sixth Street Partners and Michael Dell joined as strategic co-investors in June 2021; structure reduced shareholder count from 22 to 13. Other minority investors include Joe Gebbia (Airbnb), Paul Viera (Earnest Partners CEO).
+  recent_transitions: none
+  spending_posture: aggressive_spender
+  spending_posture_evidence:
+    - De'Aaron Fox acquired via trade (Feb 2025) and signed 4-year, $229M extension (Aug 2025)
+    - First round picks Dylan Harper (#2) and Carter Bryant (#14) in 2025 draft, both lottery talent
+    - Luke Kornet, Kelly Olynyk, Lindy Waters III added in free agency/trades
+    - Payroll estimated $187M in 2025-26, above salary cap floor despite rebuild trajectory
+front_office:
+  president_basketball_ops:
+    name: Gregg Popovich
+    tenure_start: 2025-05
+    prior_stops:
+      - Head Coach, San Antonio Spurs (1996-2025, 29 seasons)
+    public_philosophy_signals:
+      - Emphasized continuity and organizational stability in transition statement
+      - Focused on youth development and homegrown talent during coaching tenure
+    confidence: high
+    source: https://www.nba.com/news/gregg-popovich-becomes-spurs-team-president
+  general_manager:
+    name: Brian Wright
+    tenure_start: 2019-08
+    prior_stops:
+      - Assistant GM, Denver Nuggets
+      - Scout, Cleveland Cavaliers
+    public_philosophy_signals:
+      - Best-player-available draft philosophy; does not force positional need fills
+      - Emphasis on 'versatility' and skills fit over traditional positions/size
+      - Global scouting approach; evaluates international talent alongside domestic prospects
+    confidence: high
+    source: https://www.si.com/nba/spurs/onsi/news/everything-san-antonio-spurs-gm-brian-wright-said-after-2025-nba-draft
+  head_coach:
+    name: Mitch Johnson
+    tenure_start: 2025-05
+    contract_through: 2027
+    style_notes: Emphasizes discipline, possession-by-possession defensive intensity, and controlled aggression. Physical perimeter defense; top-3 defensive rating in first season. Encourages players to impose will on opponents while embracing fundamentals. Contrasts with Popovich's system by being more direct/explosive.
+    coaching_tree: popovich_tree
+    confidence: high
+    source: https://www.nba.com/news/mitch-johnson-named-spurs-coach
+  assistant_coaches_notable:
+    - Unknown (roster frozen as of as_of_date)
+  notable_advisors_or_consultants:
+    - Gregg Popovich (President of Basketball Operations; advisory/strategic role)
+strategic_posture:
+  timeframe: contend_soon
+  confidence: high
+  derived_from:
+    - Acquired De'Aaron Fox as franchise cornerstone point guard (Feb 2025), signed max extension through 2029-30
+    - Victor Wembanyama in Year 2 of rookie deal, eligible for rookie max extension July 2026
+    - Made playoffs for first time since 2019; defeated Portland 4-1 in first round (2026 playoffs)
+    - "Strong supporting cast: Stephon Castle (ROTY 2025), Devin Vassell ($146M extension), Keldon Johnson, Harrison Barnes"
+    - "Draft arsenal: 36 picks over next 7 years (most in league); added Dylan Harper (#2), Carter Bryant (#14) in 2025"
+    - Coaching transition to Mitch Johnson stabilized under Popovich health crisis (stroke Nov 2024)
+  constraints:
+    - reason_code: young_core_developing
+      detail: Fox (peak), Wembanyama (year 2), Castle (rookie), Harper & Bryant (rookies) require development time before full contention window.
+      weight: medium
+    - reason_code: tax_apron_constraints
+      detail: Payroll ~$187M (above first apron ~$168.8M); limited flexibility for mid-season acquisitions without shedding salary.
+      weight: medium
+    - reason_code: coaching_decision_pending
+      detail: Mitch Johnson in first season as head coach (took over May 2025); system still being implemented; Popovich transition creates adjustment period.
+      weight: low
+  trigger_events:
+    - Wembanyama signs rookie max extension (July 2026); locks core or signals dissatisfaction
+    - Fox's production sustains >50 games played; durability track record unclear post-trade
+    - Second-round exit in 2027 playoffs; contention window may be shorter than anticipated
+    - New arena/market inflection; 'Project Marvel' (publicly funded arena) status uncertain as of as_of_date
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: above_first_apron
+  current_payroll_estimate: 187455363
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Continued apron pressure; Wembanyama extension (if max) will spike payroll significantly; limited mid-season maneuverability
+  exceptions_available:
+    - unknown
+  source: https://www.hoopshype.com/salaries/teams/san-antonio-spurs/24/
+  source_fallbacks_used:
+    - https://www.spotrac.com/nba/san-antonio-spurs/payroll
+    - https://www.salaryswish.com/teams/spurs
+  confidence: medium
+trade_dna:
+  frequent_partners:
+    - SAC
+    - LAL
+    - HOU
+    - DAL
+    - PHX
+  preferred_deal_archetypes:
+    - Trades for established backcourt help (De'Aaron Fox, prior Dejounte Murray era)
+    - Three-team trades to acquire wings/depth (Harrison Barnes, Kelly Olynyk via Washington)
+    - Draft pick consolidation for lottery talent
+  recent_significant_trades:
+    - date: 2025-02
+      summary: Three-team deal lands De'Aaron Fox from Sacramento; Fox signed 4-year, $229M extension in August.
+      counterparties:
+        - SAC
+    - date: 2025-07
+      summary: Acquired Kelly Olynyk from Washington (expiring $13.45M contract); sent Malaki Branham, Blake Wesley, 2026 2nd pick.
+      counterparties:
+        - WAS
+  confidence: high
+cultural_signals:
+  stability:
+    value: high
+    detail: Organization survived Gregg Popovich stroke (Nov 2024) and coaching transition; Mitch Johnson installed smoothly. No reported locker room dysfunction. Ownership stable under Holt.
+  player_friendly:
+    value: yes
+    detail: Extended De'Aaron Fox to 4-year, $229M deal in first offseason post-trade; investment in young players; Popovich legacy of player development and respect.
+  analytics_orientation:
+    value: balanced
+    detail: Brian Wright emphasizes skills/fit over rigid positions, suggesting analytics influence. Traditional Popovich foundation still present in Johnson's approach.
+  risk_tolerance:
+    value: aggressive
+    detail: Traded for Fox, invested in lottery picks (Harper, Bryant), pursued Wembanyama ecosystem around unproven talent.
+  notable_traits:
+    - popovich_tree
+    - developmental_org
+    - homegrown_priority
+    - process_driven
+  rationale: Spurs organization built on Popovich's 29-year foundation of consistency, player development, and scouting sophistication. Transition to Mitch Johnson maintains cultural continuity while shifting to a more aggressive, defensive-first style. International/global scouting core remains. Ownership transition (Holt-Sixth Street) signals continued stability and investment.
+  confidence: high
+roster:
+  - player_id: deaaron_fox
+    name: De'Aaron Fox
+    age: 27
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary: []
+      defensive_role: point_of_attack
+      shooting_profile: good
+      special_traits:
+        - elite_passer
+        - elite_athlete
+        - transition_threat
+        - iso_creator
+        - pnr_maestro
+    tier: star
+    trajectory: peak
+    contract:
+      years_remaining: 5
+      total_value_remaining: 229000000
+      annual_value_current_season: 37000000
+      annual_value_next_season: 38000000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2030
+      source: https://www.nba.com/news/deaaron-fox-spurs-contract-extension
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: generational_talent
+          weight: high
+        - reason_code: recently_acquired
+          weight: medium
+      falsification_conditions:
+        - Serious injury requiring surgery; recovery timeline uncertain
+        - FO publicly explores trade; stated openness to offers
+        - Performance decline (sub-40% FG for full season)
+      signal_strength: confirmed_shopped
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Just extended; no opt-outs or early termination clauses.
+    confidence: high
+    source: https://www.nba.com/news/deaaron-fox-spurs-contract-extension
+  - player_id: victor_wembanyama
+    name: Victor Wembanyama
+    age: 21
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - spacer
+          - connector
+      defensive_role: rim_protector
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - elite_rebounder
+    tier: superstar
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: 30300000
+      annual_value_current_season: 13400000
+      annual_value_next_season: 16900000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/82196/victor-wembanyama
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: generational_talent
+          weight: high
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: high
+      falsification_conditions:
+        - Requests trade publicly or via agent
+        - Career-altering injury (ACL, etc.); recovery timeline >12 months
+        - Rookie max extension talks break down; player signals discontent
+      signal_strength: confirmed_shopped
+    team_relationship:
+      tenure_with_team: 2
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: On rookie deal; extension eligible July 2026. No leverage until free agency (2028).
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/82196/victor-wembanyama
+  - player_id: stephon_castle
+    name: Stephon Castle
+    age: 21
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - transition_threat
+        - pnr_maestro
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 32086179
+      annual_value_current_season: 9560520
+      annual_value_next_season: 10020000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2027
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.spotrac.com/nba/player/_/id/1642264/stephon-castle
+    movement_constraints:
+      status: unlikely
+      reasons: null
+      falsification_conditions:
+        - FO trades him mid-season for veteran star
+        - Benching or removal from starting rotation for extended period
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 1
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: On rookie deal; team option in 2027 provides leverage.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/1642264/stephon-castle
+  - player_id: devin_vassell
+    name: Devin Vassell
+    age: 25
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+          - connector
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits:
+        - elite_rebounder
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 81000000
+      annual_value_current_season: 27000000
+      annual_value_next_season: 27000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.nbcsports.com/nba/news/spurs-agree-to-five-year-146-million-contract-extension-with-devin-vassell
+    movement_constraints:
+      status: unlikely
+      reasons: null
+      falsification_conditions:
+        - Explicit FO trade approval or statements
+        - Benching due to performance drop
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 4
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Fully guaranteed extension (Oct 2023); no opt-outs.
+    confidence: high
+    source: https://www.nbcsports.com/nba/news/spurs-agree-to-five-year-146-million-contract-extension-with-devin-vassell
+  - player_id: keldon_johnson
+    name: Keldon Johnson
+    age: 24
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - screen_setter
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 35000000
+      annual_value_current_season: 17500000
+      annual_value_next_season: 17500000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/31588/keldon-johnson
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: expiring_contract_value
+          weight: medium
+      falsification_conditions:
+        - Multi-year extension signed before 2026 offseason
+        - Included in core rotation through 2026-27 season
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 4
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Approaching free agency (2027); valuable trade chip for rebuilding teams seeking salary relief or veteran depth.
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/_/id/31588/keldon-johnson
+  - player_id: harrison_barnes
+    name: Harrison Barnes
+    age: 33
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: declining_peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 19000000
+      annual_value_current_season: 19000000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.fanspo.com/nba/players/harrison-barnes/203084
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: declining_role
+          weight: medium
+      falsification_conditions:
+        - Multi-year extension signed mid-season
+        - Placed in starting five permanently; rotation expansion
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Expiring contract at age 33; valuable trade asset for teams needing salary relief or wing rotation.
+    confidence: high
+    source: https://www.fanspo.com/nba/players/harrison-barnes/203084
+  - player_id: jeremy_sochan
+    name: Jeremy Sochan
+    age: 22
+    position_listed: PF
+    contract_type: standard
+    availability_status: injured_long_term
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: connector
+        secondary:
+          - screen_setter
+      defensive_role: switchable
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 0
+      total_value_remaining: 0
+      annual_value_current_season: 7096231
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/player/_/id/78122
+    movement_constraints:
+      status: actively_traded
+      reasons:
+        - reason_code: locker_room_friction
+          weight: low
+        - reason_code: rebuild_pivot
+          weight: low
+      falsification_conditions:
+        - Player remains with Spurs through end of 2025-26 season
+        - Multi-year extension signed
+      signal_strength: widely_reported
+    team_relationship:
+      tenure_with_team: 3
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Final year of contract; pending free agency. Limited leverage; team traded him mid-season.
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/_/id/78122
+  - player_id: dylan_harper
+    name: Dylan Harper
+    age: 19
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 4
+      total_value_remaining: 56140000
+      annual_value_current_season: 14035000
+      annual_value_next_season: 14765000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.hoopsrumors.com/2025/7/spurs-dylan-harper-carter-bryant-sign-rookie-contracts.html
+    movement_constraints:
+      status: unlikely
+      reasons: null
+      falsification_conditions:
+        - Traded to contender mid-season
+        - Benching or removal from rotation
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie on standard contract; no leverage.
+    confidence: high
+    source: https://www.hoopsrumors.com/2025/7/spurs-dylan-harper-carter-bryant-sign-rookie-contracts.html
+  - player_id: carter_bryant
+    name: Carter Bryant
+    age: 19
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 4
+      total_value_remaining: 23420000
+      annual_value_current_season: 5855000
+      annual_value_next_season: 6205000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.hoopsrumors.com/2025/7/spurs-dylan-harper-carter-bryant-sign-rookie-contracts.html
+    movement_constraints:
+      status: unlikely
+      reasons: null
+      falsification_conditions:
+        - Traded or waived
+        - Benching due to performance
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie on standard contract; no leverage.
+    confidence: high
+    source: https://www.hoopsrumors.com/2025/7/spurs-dylan-harper-carter-bryant-sign-rookie-contracts.html
+  - player_id: julian_champagnie
+    name: Julian Champagnie
+    age: 23
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits:
+        - elite_rebounder
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: uncertain
+      source: https://www.nba.com/player/1629772/julian-champagnie
+    movement_constraints:
+      status: unlikely
+      reasons: null
+      falsification_conditions:
+        - Publicly traded or shopped
+        - Removed from starting rotation
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 3
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Team-friendly deal; development priority for organization.
+    confidence: medium
+    source: https://www.nba.com/player/1629772/julian-champagnie
+  - player_id: luke_kornet
+    name: Luke Kornet
+    age: 29
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - spacer
+      defensive_role: rim_protector
+      shooting_profile: functional
+      special_traits:
+        - elite_rebounder
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.nba.com/player/1628436/luke-kornet
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: medium
+      falsification_conditions:
+        - Multi-year contract extension signed
+        - Starting role awarded
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Free agent eligible 2026; rim protection specialist role fungible.
+    confidence: medium
+    source: https://www.nba.com/player/1628436/luke-kornet
+  - player_id: kelly_olynyk
+    name: Kelly Olynyk
+    age: 35
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: spacer
+        secondary:
+          - screen_setter
+      defensive_role: helper
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 13450000
+      annual_value_current_season: 13450000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.hoopsrumors.com/2025/07/wizards-trading-kelly-olynyk-to-spurs.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Extension signed mid-season
+        - Playing time guarantees extended
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Expiring contract; tradeable asset for salary-cap-constrained teams.
+    confidence: high
+    source: https://www.hoopsrumors.com/2025/07/wizards-trading-kelly-olynyk-to-spurs.html
+  - player_id: lindy_waters_iii
+    name: Lindy Waters III
+    age: 27
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: finisher
+        secondary:
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits: []
+    tier: fringe
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 2461463
+      annual_value_current_season: 2461463
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.hoopsrumors.com/2025/07/spurs-to-sign-lindy-waters-on-one-year-deal.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Multi-year extension offered
+        - Guaranteed contract for 2026-27
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Minimum deal expiring; limited team attachment.
+    confidence: high
+    source: https://www.hoopsrumors.com/2025/07/spurs-to-sign-lindy-waters-on-one-year-deal.html
+  - player_id: david_jones_garcia
+    name: David Jones Garcia
+    age: 24
+    position_listed: PG
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits: []
+    tier: two_way
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://gleague.nba.com/news/spurs-sign-david-jones-garcia-to-two-way-contract
+    movement_constraints:
+      status: unlikely
+      reasons: null
+      falsification_conditions:
+        - Signed to standard NBA contract
+        - Released to waivers
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way contract; limited leverage; splits time with Austin Spurs.
+    confidence: medium
+    source: https://gleague.nba.com/news/spurs-sign-david-jones-garcia-to-two-way-contract
+  - player_id: harrison_ingram
+    name: Harrison Ingram
+    age: unknown
+    position_listed: SF
+    contract_type: two_way
+    availability_status: unknown
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: finisher
+        secondary: []
+      defensive_role: wing_stopper
+      shooting_profile: non_shooter
+      special_traits: []
+    tier: two_way
+    trajectory: unknown
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: uncertain
+      source: unknown
+    movement_constraints:
+      status: unlikely
+      reasons: null
+      falsification_conditions:
+        - Released or signed to standard contract
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: unknown
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way contract; limited leverage.
+    confidence: low
+    source: unknown
+  - player_id: riley_minix
+    name: Riley Minix
+    age: unknown
+    position_listed: unknown
+    contract_type: two_way
+    availability_status: unknown
+    archetype:
+      physical_position: unknown
+      offensive_role:
+        primary: unknown
+        secondary: []
+      defensive_role: unknown
+      shooting_profile: unknown
+      special_traits: []
+    tier: two_way
+    trajectory: unknown
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: uncertain
+      source: unknown
+    movement_constraints:
+      status: unlikely
+      reasons: null
+      falsification_conditions:
+        - Released or signed to standard contract
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: unknown
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way contract; limited leverage.
+    confidence: low
+    source: unknown
+  - player_id: stanley_umude
+    name: Stanley Umude
+    age: unknown
+    position_listed: unknown
+    contract_type: two_way
+    availability_status: unknown
+    archetype:
+      physical_position: unknown
+      offensive_role:
+        primary: unknown
+        secondary: []
+      defensive_role: unknown
+      shooting_profile: unknown
+      special_traits: []
+    tier: two_way
+    trajectory: unknown
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: uncertain
+      source: unknown
+    movement_constraints:
+      status: unlikely
+      reasons: null
+      falsification_conditions:
+        - Released or signed to standard contract
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: unknown
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way contract; limited leverage.
+    confidence: low
+    source: unknown
+  - player_id: emanuel_miller
+    name: Emanuel Miller
+    age: unknown
+    position_listed: SF
+    contract_type: two_way
+    availability_status: unknown
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: finisher
+        secondary: []
+      defensive_role: wing_stopper
+      shooting_profile: non_shooter
+      special_traits: []
+    tier: two_way
+    trajectory: unknown
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: uncertain
+      source: https://gleague.nba.com/news/the-san-antonio-spurs-sign-emanuel-miller-to-a-two-way-contract
+    movement_constraints:
+      status: unlikely
+      reasons: null
+      falsification_conditions:
+        - Released or signed to standard contract
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: unknown
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way contract; limited leverage; signed mid-season (Feb 2026).
+    confidence: low
+    source: https://gleague.nba.com/news/the-san-antonio-spurs-sign-emanuel-miller-to-a-two-way-contract
+pending_free_agents:
+  - player_id: harrison_barnes
+    name: Harrison Barnes
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: unknown
+    expected_market: walk
+    expected_market_detail: Age 33, expiring contract; likely walks to free agency.
+    notes: Expiring $19M contract; veteran depth piece; likely to pursue elsewhere or negotiate ring-chasing deal.
+    source: https://www.fanspo.com/nba/players/harrison-barnes/203084
+  - player_id: kelly_olynyk
+    name: Kelly Olynyk
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: walk
+    expected_market_detail: Age 35, expiring contract; veteran minimum likely path going forward.
+    notes: Expiring $13.45M contract; veteran stretch big; expected to walk.
+    source: https://www.hoopsrumors.com/2025/07/wizards-trading-kelly-olynyk-to-spurs.html
+  - player_id: luke_kornet
+    name: Luke Kornet
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: walk
+    expected_market_detail: Rim protector entering free agency; may seek larger role/contract elsewhere.
+    notes: One-year deal; rim protection upside; likely to explore market.
+    source: https://www.nba.com/player/1628436/luke-kornet
+  - player_id: lindy_waters_iii
+    name: Lindy Waters III
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Minimum-deal specialist; may return to Spurs or pursue elsewhere.
+    notes: Partial guarantee ($500K); likely veteran minimum path for next contract.
+    source: https://www.hoopsrumors.com/2025/07/spurs-to-sign-lindy-waters-on-one-year-deal.html
+known_target_history:
+  - target: De'Aaron Fox
+    year: 2025
+    outcome: acquired
+    detail: Three-team trade (Feb 2025); signed 4-year, $229M extension (Aug 2025).
+    source: https://www.nba.com/news/deaaron-fox-spurs-contract-extension
+  - target: Kelly Olynyk
+    year: 2025
+    outcome: acquired
+    detail: Traded Washington Wizards for Malaki Branham, Blake Wesley, 2026 2nd pick (July 2025).
+    source: https://www.hoopsrumors.com/2025/07/wizards-trading-kelly-olynyk-to-spurs.html
+  - target: Harrison Barnes
+    year: 2024
+    outcome: acquired
+    detail: Three-team trade with Sacramento; acquired via trade (July 2024).
+    source: https://sports.yahoo.com/article/san-antonio-spurs-sign-lind-182229554.html
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "San Antonio Spurs hold No. 20 from ATL, No. 35 from UTA, No. 42 from POR, No. 44 from MIA in the official post-lottery order. Mock-source layer: No. 20: Karim Lopez; treat prospect names as low-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: low
+  - priority: Secure Victor Wembanyama rookie max extension
+    timeline: this_offseason
+    type: extension
+    detail: Wembanyama eligible for rookie max extension July 2026; expected to sign ~$250M+ five-year deal.
+    confidence: high
+  - priority: Manage salary cap with extension waves
+    timeline: next_season
+    type: structural
+    detail: Payroll above first apron; Wembanyama extension spike forces difficult trade/shed decisions for 2026-27.
+    confidence: high
+  - priority: Evaluate Mitch Johnson coaching fit
+    timeline: this_season
+    type: coaching_decision
+    detail: First season as head coach; system implementation and player development trajectory informing long-term retention.
+    confidence: medium
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 20 overall; from ATL.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: ATL
+    - year: 2026
+      round: 2
+      protections: 2026 No. 35 overall; from UTA via MIN.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: UTA
+    - year: 2026
+      round: 2
+      protections: 2026 No. 42 overall; from POR via NOP.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: POR
+    - year: 2026
+      round: 2
+      protections: 2026 No. 44 overall; from MIA via IND.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: MIA
+    - year: 2027
+      round: 1
+      protections: unprotected (Atlanta)
+      source: https://airalamo.com/san-antonio-spurs-draft-picks-2025-2026-through-2031-full-list
+  draft_picks_owed:
+    - year: 2026
+      round: 1
+      to_team: CLE
+      protections: 2026 No. 29 overall; from SAS via ATL.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 2
+      to_team: MIN
+      protections: 2026 No. 59 overall; from SAS via IND.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2025
+      round: 1
+      to_team: SAC
+      protections: unprotected
+      source: https://airalamo.com/san-antonio-spurs-draft-picks-2025-2026-through-2031-full-list
+  trade_exceptions:
+    - value: unknown
+      expires: unknown
+      source: https://www.spotrac.com/nba/transactions/trade-exceptions
+      confidence: low
+team_team_relationships:
+  rivalries:
+    - team_id: HOU
+      type: competitive_historical
+      basis: Rockets–Spurs rivalry since ABA/NBA merger (1976); bitter playoff matchups through 1990s-2000s. Divisional proximity and intense playoff history.
+    - team_id: DAL
+      type: competitive_recent
+      basis: Divisional Southwest rivalry; multiple playoff meetings 2000s-2010s; 2006 and 2009 losses to Mavericks stand out.
+    - team_id: LAL
+      type: competitive_historical
+      basis: 12 playoff meetings; competitive since 1990s; notably 1999 title-clinching series for Spurs; 2001-2002 Shaq-Kobe Lakers dominance.
+    - team_id: PHX
+      type: competitive_recent
+      basis: 10 playoff matchups since 1992; Spurs won 6; competitive in 2000s-2010s, especially 2003-2008 stretch.
+    - team_id: OKC
+      type: competitive_recent
+      basis: Emerging 2020s rivalry; Wembanyama Spurs vs. emerging Thunder youth movement; redefined Western Conference.
+  notable_personnel_connections:
+    - person: Gregg Popovich
+      connected_team: unknown
+      connection_type: former_head_coach
+      detail: 29-year tenure as Spurs coach (1996-2025); transitioned to President of Basketball Ops (May 2025) after stroke.
+    - person: Mitch Johnson
+      connected_team: unknown
+      connection_type: former_assistant
+      detail: Assistant coach under Popovich since 2019; promoted to head coach (May 2025) after Popovich stepped down.
+    - person: Brian Wright
+      connected_team: DEN
+      connection_type: former_assistant_gm
+      detail: Prior assistant GM with Denver Nuggets; hired as Spurs GM (Aug 2019).
+g_league_and_stash:
+  affiliate_team: Austin Spurs
+  notable_affiliate_players:
+    - Dylan Harper (assigned for development)
+    - Carter Bryant (assigned for development)
+    - David Jones Garcia (two-way; spends majority time in G League)
+  international_stash: []
+narrative_summary:
+  one_paragraph: The San Antonio Spurs have emerged as a contender-in-waiting following a transformative 2024-25 season. After Gregg Popovich's historic 29-year tenure ended due to a November stroke, assistant Mitch Johnson ascended to head coach and led San Antonio to the playoffs for the first time since 2019, defeating Portland 4-1 in the first round. The core is anchored by star point guard De'Aaron Fox (acquired Feb 2025, extended through 2029-30), generational center Victor Wembanyama (year 2, rookie-max extension eligible July 2026), and young backcourt mate Stephon Castle (Kia ROTY 2025). Supporting depth includes Devin Vassell ($146M extension), Keldon Johnson, and promising rookies Dylan Harper (#2, 2025) and Carter Bryant (#14, 2025). With 36 draft picks over seven years and payroll above the first apron, the Spurs balance near-term contention with long-term flexibility under GM Brian Wright's best-player-available philosophy. Johnson's defensive intensity and process-driven culture—rooted in Popovich's legacy—positions San Antonio to compete for years.
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 20 from ATL, No. 35 from UTA, No. 42 from POR, No. 44 from MIA; The Athletic mock-source layer lists No. 20: Karim Lopez as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - Victor Wembanyama's rookie max extension negotiation (eligible July 2026); extension shape and terms will signal franchise's long-term commitment and Wembanyama's satisfaction with organizational direction.
+    - Dylan Harper's integration as Fox's backcourt partner; chemistry and developmental pace critical to validating front office's forward-thinking approach and 2025 draft selections.
+    - Mitch Johnson's second-year coaching trajectory; system continuity, player development, and playoff sustainability (vs. first-round exit) will determine if transition from Popovich era sustainable or requires reset.
+sources_used:
+  - https://www.nba.com/spurs/roster
+  - https://www.nba.com/news/deaaron-fox-spurs-contract-extension
+  - https://www.nba.com/news/mitch-johnson-named-spurs-coach
+  - https://www.nba.com/news/trail-blazers-spurs-2026-playoffs-first-round-game-5-takeaways
+  - https://www.nba.com/player/1641705/victor-wembanyama
+  - https://www.nba.com/player/1642264/stephon-castle
+  - https://www.nba.com/player/1630170/devin-vassell
+  - https://www.nba.com/player/1629772/julian-champagnie
+  - https://www.nba.com/player/1628436/luke-kornet
+  - https://www.nba.com/player/2489663/kelly-olynyk
+  - https://www.spotrac.com/nba/san-antonio-spurs/payroll
+  - https://www.spotrac.com/nba/player/_/id/82196/victor-wembanyama
+  - https://www.spotrac.com/nba/player/_/id/1642264/stephon-castle
+  - https://www.spotrac.com/nba/player/_/id/70653/devin-vassell
+  - https://www.spotrac.com/nba/player/_/id/31588/keldon-johnson
+  - https://www.spotrac.com/nba/player/_/id/78122
+  - https://www.hoopshype.com/salaries/teams/san-antonio-spurs/24/
+  - https://www.nbcsports.com/nba/news/spurs-agree-to-five-year-146-million-contract-extension-with-devin-vassell
+  - https://www.hoopsrumors.com/2025/7/spurs-dylan-harper-carter-bryant-sign-rookie-contracts.html
+  - https://www.hoopsrumors.com/2025/07/wizards-trading-kelly-olynyk-to-spurs.html
+  - https://www.hoopsrumors.com/2025/07/spurs-to-sign-lindy-waters-on-one-year-deal.html
+  - https://www.si.com/nba/spurs/onsi/news/everything-san-antonio-spurs-gm-brian-wright-said-after-2025-nba-draft
+  - https://www.si.com/nba/spurs/onsi/news/spurs-investors-michael-dell/
+  - https://www.ksat.com/sports/2025/05/02/mitch-johnson-will-take-over-as-spurs-head-coach-as-gregg-popovich-steps-down-report-says/
+  - https://www.tpr.org/sports/2025-05-02/gregg-popovich-retires-as-head-coach-of-san-antonio-spurs-will-now-lead-teams-basketball-operations
+  - https://airalamo.com/san-antonio-spurs-draft-picks-2025-2026-through-2031-full-list
+  - https://austin.gleague.nba.com/
+  - https://gleague.nba.com/news/spurs-sign-david-jones-garcia-to-two-way-contract
+  - https://gleague.nba.com/news/the-san-antonio-spurs-sign-emanuel-miller-to-a-two-way-contract
+  - https://www.basketball-reference.com/teams/SAS/2026.html
+  - https://www.fanspo.com/nba/players/harrison-barnes/203084
+  - https://clutchpoints.com/nba/san-antonio-spurs-top-5-rivals-of-all-time-ranked
+  - https://www.wikipedia.org/wiki/Rockets%E2%80%93Spurs_rivalry
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - cap_situation.exceptions_available
+  - kelly_olynyk.contract.annual_value_current_season
+  - kelly_olynyk.contract.annual_value_next_season
+  - kelly_olynyk.contract.trade_kicker
+  - lindy_waters_iii.contract.trade_kicker
+  - luke_kornet.contract.annual_value_current_season
+  - luke_kornet.contract.annual_value_next_season
+  - luke_kornet.contract.trade_kicker
+  - luke_kornet.contract.contract_through
+  - julian_champagnie.contract.years_remaining
+  - julian_champagnie.contract.total_value_remaining
+  - julian_champagnie.contract.annual_value_current_season
+  - julian_champagnie.contract.annual_value_next_season
+  - julian_champagnie.contract.trade_kicker
+  - julian_champagnie.contract.contract_through
+  - harrison_ingram (multiple fields; insufficient data)
+  - riley_minix (multiple fields; insufficient data)
+  - stanley_umude (multiple fields; insufficient data)
+  - david_jones_garcia.contract.annual_value_current_season
+  - david_jones_garcia.contract.total_value_remaining
+  - david_jones_garcia.contract.trade_kicker
+  - front_office.assistant_coaches_notable
+vocabulary_flags:
+  - "Jeremy Sochan marked `availability_status: injured_long_term` because he was traded mid-season (Feb 2026), indicating he was likely dealing with injury or team moved him; exact status unknown but marked conservatively."
+  - "Jeremy Sochan marked `trajectory: declining` despite youth (age 22) because role diminished in 2025-26 and he was traded away; inferred declining arc relative to team's core."
+  - "Several two-way players (Ingram, Minix, Umude) have substantial unknown fields due to lack of primary-source confirmation on age, position, contract details. Marked `confidence: low` across the board."
+  - "Keldon Johnson marked `movement_constraints.status: available` based on expiring contract (2027 UFA) and no reported extension talks; signal inferred from organizational actions rather than explicit reporting."
+  - Trade exception values and expiration dates were not retrievable from web sources; fallback to Spotrac showed URLs exist but content unavailable. Marked as unknown with low confidence.
+  - Mitch Johnson's full coaching tree assignment (`popovich_tree`) is correct and sourced; Johnson was Popovich assistant since 2019.

@@ -1,0 +1,869 @@
+team_id: PHX
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Phoenix Suns
+  conference: Western
+  division: Pacific
+  market_tier: tier_2
+  market_tier_rationale: Phoenix is a major metro area with strong NBA history (2021-22 Finals run) and media presence, mid-tier relative to LA/SF/Seattle.
+ownership:
+  primary_owner:
+    name: Mat Ishbia
+    type: individual
+    tenure_years: 3.3
+    source: https://www.nba.com/suns/news/mat-ishbia-assumes-controlling-ownership-interest-of-phoenix-suns-and-phoenix-mercury
+    confidence: high
+  governance_notes: Ishbia acquired controlling interest in Feb 2023; currently pursuing increased stake.
+  recent_transitions: Ishbia took controlling ownership in 2023, replacing Robert Sarver.
+  spending_posture: aggressive_spender
+  spending_posture_evidence:
+    - Willingness to exceed second apron with Booker/KD/Beal core in 2024-25; highest payroll in NBA history.
+    - Signed Devin Booker to $145M/2yr max extension in July 2025 despite roster volatility.
+    - Expressed commitment to continuity and competitive payroll post-2025-26 reset.
+front_office:
+  president_basketball_ops:
+    name: unknown
+    tenure_start: unknown
+    prior_stops: []
+    public_philosophy_signals: []
+    confidence: low
+    source: unknown
+  general_manager:
+    name: Brian Gregory
+    tenure_start: 2024-07
+    prior_stops:
+      - Denver Nuggets (assistant GM)
+      - Oklahoma City Thunder (personnel)
+    public_philosophy_signals:
+      - Focus on youth development and roster flexibility; moves away from aging star model.
+      - Emphasis on draft capital and long-term sustainability despite short-term payroll challenges.
+    confidence: high
+    source: https://www.hoopsrumors.com/2026/05/suns-ishbia-gregory-discuss-2025-26-offseason-more.html
+  head_coach:
+    name: Jordan Ott
+    tenure_start: 2025-06-06
+    contract_through: 2029
+    style_notes: "Hired from Cleveland Cavaliers (Kenny Atkinson asst.). Early results: 45-37 record, made playoffs in rebuild year; emphasis on defense and pace control."
+    coaching_tree: budenholzer_tree
+    confidence: high
+    source: https://suns.com/news/phoenix-suns-name-jordan-ott-head-coach
+  assistant_coaches_notable:
+    - Jesse Mermuys
+    - DeMarre Carroll
+    - Brian Randle
+    - Chaisson Allen
+    - John Little
+    - Mike Muscala
+    - Sean Dwyer
+    - Mateen Cleaves (player development/leadership)
+  notable_advisors_or_consultants:
+    - Steve Nash (consultant/advisor; worked with Ott in Brooklyn)
+strategic_posture:
+  timeframe: contend_soon
+  confidence: medium
+  derived_from:
+    - Built young, tradeable roster core around Devin Booker; won 45 games and made playoffs despite first-year HC and recent roster churn.
+    - Escaped second apron via Beal buyout; gained cap flexibility for potential mid-season trades or future off-season moves.
+    - Multi-year competitive window with Booker locked in ($316M total extension through 2029-30).
+    - However, first-round playoff sweep by OKC signals roster still not contender-caliber; retool in progress.
+  constraints:
+    - reason_code: max_contract_lockup
+      detail: Devin Booker's historic $145M/2yr extension (2027-2030) limits flexibility to build supporting cast.
+      weight: high
+    - reason_code: tax_apron_constraints
+      detail: Currently below second apron post-Beal buyout, but tight cap with high payroll limits acquisition flexibility.
+      weight: medium
+    - reason_code: coaching_decision_pending
+      detail: Jordan Ott's first season exceeded expectations (45-46 record); team assessing whether core around Booker/Green/Brooks can contend.
+      weight: medium
+  trigger_events:
+    - Mid-season trade acquisition of established star (e.g., secondary ball-handler/scorer to pair with Booker)
+    - Underperformance in Year 2 under Ott; re-evaluation of Brooks/Dunn/Maluach development trajectory
+    - Injury to Devin Booker or Mark Williams; would force pivot to lottery scenario
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: below_first_apron
+  current_payroll_estimate: 190450636
+  hard_capped: yes
+  hard_cap_reason: Teams below first apron but over cap trigger hard cap at first apron threshold ($181.6M for 2025-26).
+  flexibility_windows:
+    - season: 2025-26
+      projected_status: Below first apron post-Beal buyout; limited to minimum signings and draft picks. Cap relief expires via Beal stretch in 2027-28.
+    - season: 2026-27
+      projected_status: Moderately constrained by Booker/Jalen Green contracts; cap slightly more flexible if Brooks extension deferred or declined.
+  exceptions_available:
+    - Bi-annual exception (available to teams below first apron)
+    - No sign-and-trade exception (cannot acquire SAT players)
+  source: https://www.spotrac.com/nba/phoenix-suns/yearly
+  source_fallbacks_used:
+    - https://sportsbusinessclassroom.com/nba-2025-26-apron-tracker/
+    - https://www.brightsideofthesun.com/2025/7/17/24469484/phoenix-suns-bradley-beal-buyout-tax-apron-salary-cap-trade-exceptions-cba-rules-hard-cap
+  confidence: high
+trade_dna:
+  frequent_partners:
+    - HOU
+    - CHA
+    - LAL
+    - MIA
+  preferred_deal_archetypes:
+    - Young, tradeable assets (picks, prospects) for established depth or role players.
+    - Salary-matching deals to stay under apron while acquiring complementary pieces.
+    - Multi-team trades to distribute contracts; executed record 7-team deal in June 2025.
+  recent_significant_trades:
+    - date: 2025-06-22
+      summary: "Traded Kevin Durant to Houston Rockets for Jalen Green, Dillon Brooks, #10 pick (Khaman Maluach), and five second-round picks."
+      counterparties:
+        - HOU
+    - date: 2025-06-26
+      summary: "Traded Nikola Micic, #29 pick (Liam McNeeley), and 2029 first-round pick to Charlotte for Mark Williams."
+      counterparties:
+        - CHA
+    - date: 2025-07-16
+      summary: Bradley Beal buyout and waive-and-stretch; Beal signed with LA Clippers.
+      counterparties:
+        - LAC
+  confidence: high
+cultural_signals:
+  stability:
+    value: medium
+    detail: New HC in Year 2 (Jordan Ott); roster underwent major reset (KD departure, Beal buyout) but ownership and GM committed to continuity. FO relatively stable since Gregory hire.
+  player_friendly:
+    value: yes
+    detail: Extended homegrown star Booker to historic deal; hired HC with player-development pedigree (Ott); receptive to veteran input (DeMarre Carroll hired as coach).
+  analytics_orientation:
+    value: balanced
+    detail: Gregory emphasizes data-driven roster construction and cap optimization; however, Ott-era coaching appears balanced between analytics and traditional defensive/pace principles.
+  risk_tolerance:
+    value: aggressive
+    detail: Willing to make bold trades (7-team KD deal); aggressive spending despite apron constraints; hired unproven HC (Ott) on 4-year deal.
+  notable_traits:
+    - star_chasing
+    - process_driven
+    - process_driven
+  rationale: Ownership (Ishbia) remains aggressive and willing to spend for competitiveness. Gregory's tenure has emphasized sustainability via youth and cap flexibility, representing a pivot from pure star-chasing of 2024-25. Ott's defensive/culture-building mandate shows organizational learning from prior volatility.
+  confidence: medium
+roster:
+  - player_id: devin_booker
+    name: Devin Booker
+    age: 28
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - secondary_creator
+          - finisher
+      defensive_role: switchable
+      shooting_profile: elite
+      special_traits:
+        - iso_creator
+        - transition_threat
+        - playoff_riser
+    tier: superstar
+    trajectory: peak
+    contract:
+      years_remaining: 4
+      total_value_remaining: 316000000
+      annual_value_current_season: 54500000
+      annual_value_next_season: 72500000
+      no_trade_clause: full
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2030
+      source: https://www.wlox.com/2025/07/10/phoenix-suns-devin-booker-agree-2-year-145m-max-contract-extension/
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: generational_talent
+          weight: high
+        - reason_code: full_no_trade_clause
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: high
+        - reason_code: recent_extension_poison_pill
+          weight: high
+      falsification_conditions:
+        - Explicit FO statement that Booker is available for trade (none has been made; multiple affirmations of commitment)
+        - No-trade clause waiver request from Booker (contradicts all recent public statements)
+    team_relationship:
+      tenure_with_team: 8.1
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Full NTC + max extension through 2030; immovable asset.
+    confidence: high
+    source: https://www.espn.com/nba/team/roster/_/name/phx/phoenix-suns
+  - player_id: jalen_green
+    name: Jalen Green
+    age: 23
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 105300000
+      annual_value_current_season: 30600000
+      annual_value_next_season: 32900000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: 2028
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.spotrac.com/news/_/id/2866/rockets-acquire-kevin-durant-from-suns-for-jalen-green-dillon-brooks-2025-10-pick/
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions: []
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Acquired in June 2025 trade; on reasonable RFA-eligible deal post-option year.
+    confidence: high
+    source: https://www.brightsideofthesun.com/2025/6/28/24457266/suns-trade-kevin-durant-for-jalen-green-dillon-brooks-mark-williams-maluach-draft-grades
+  - player_id: dillon_brooks
+    name: Dillon Brooks
+    age: 31
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+          - screen_setter
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - foul_drawer
+    tier: starter
+    trajectory: declining_peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 42100000
+      annual_value_current_season: 21050000
+      annual_value_next_season: 21050000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/news/_/id/2866/rockets-acquire-kevin-durant-from-suns-for-jalen-green-dillon-brooks-2025-10-pick/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: recent_extension_poison_pill
+          weight: medium
+      falsification_conditions:
+        - Extended with multi-year deal; FO signaling commitment to core. Extension talks post-season.
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Acquired June 2025; eligible for extension after 2026-27 season (~$21M expiring 2027).
+    confidence: high
+    source: https://www.burncitysports.com/2026/04/30/dillon-brooks-extension-expensive
+  - player_id: royce_oneale
+    name: Royce O'Neale
+    age: 32
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - screen_setter
+          - spacer
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - defensive_anchor
+    tier: starter
+    trajectory: declining
+    contract:
+      years_remaining: 2
+      total_value_remaining: 20200000
+      annual_value_current_season: 10100000
+      annual_value_next_season: 10100000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/phoenix-suns/yearly
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions: []
+    team_relationship:
+      tenure_with_team: 4.2
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Veteran role player; minimal leverage; FO committed to retaining for depth.
+    confidence: high
+    source: https://www.brightsideofthesun.com/suns-roster/103760/phoenix-suns-roster-continuity-internal-growth-offseason-strategy-royce-oneale-grayson-allen
+  - player_id: mark_williams
+    name: Mark Williams
+    age: 21
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - post_hub
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+        - foul_drawer
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: 2026
+      source: https://www.si.com/nba/hornets/onsi/news/checking-in-on-mark-williams-early-season-success-with-the-phoenix-suns
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Mid-season multi-year extension signed (no extension talks reported as of May 2026)
+        - FO explicitly commits to retaining Williams in RFA
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Young center with restricted free agency rights; high draft pedigree; Suns control future.
+    confidence: medium
+    source: https://www.burncitysports.com/2026/05/01/suns-careful-mark-williams-contract
+  - player_id: grayson_allen
+    name: Grayson Allen
+    age: 31
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+          - connector
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 2
+      total_value_remaining: 33600000
+      annual_value_current_season: 16800000
+      annual_value_next_season: 16800000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: 2028
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://fanspo.com/nba/teams/Suns/24
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions: []
+    team_relationship:
+      tenure_with_team: 4.1
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Veteran complementary wing; FO expressed desire to retain.
+    confidence: high
+    source: https://www.brightsideofthesun.com/suns-roster/103760/phoenix-suns-roster-continuity-internal-growth-offseason-strategy-royce-oneale-grayson-allen
+  - player_id: ryan_dunn
+    name: Ryan Dunn
+    age: 20
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: finisher
+        secondary:
+          - connector
+      defensive_role: wing_stopper
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.nba.com/draft/2025/team-profiles/2025-phoenix-suns
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions: []
+    team_relationship:
+      tenure_with_team: 0.9
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: 2024 lottery pick, long-term core prospect; Suns control contract through 2028-29.
+    confidence: high
+    source: https://www.espn.com/nba/team/roster/_/name/phx/phoenix-suns
+  - player_id: khaman_maluach
+    name: Khaman Maluach
+    age: 19
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - finisher
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.12news.com/article/sports/nba/suns/2025-nba-draft-phoenix-suns-select-name-name/75-3719867e-96a6-4638-b2a9-b8ab6f7e2398
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions: []
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: 2025 lottery pick (#10 from KD trade); long-term prospect control.
+    confidence: high
+    source: https://www.brightsideofthesun.com/2025/6/28/24457266/suns-trade-kevin-durant-for-jalen-green-dillon-brooks-mark-williams-maluach-draft-grades
+  - player_id: koby_brea
+    name: Koby Brea
+    age: 21
+    position_listed: SG
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: spacer
+        secondary:
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: elite
+      special_traits:
+        - elite_shooter
+    tier: two_way
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://gleague.nba.com/news/phoenix-suns-sign-jamaree-bouyea-to-two-way-contract
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions: []
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way player; minimal leverage; team controls future.
+    confidence: high
+    source: https://www.brightsideofthesun.com/2025/6/28/24457266/suns-trade-kevin-durant-for-jalen-green-dillon-brooks-mark-williams-maluach-draft-grades
+  - player_id: cj_huntley
+    name: CJ Huntley
+    age: 22
+    position_listed: SG
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits: []
+    tier: two_way
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: 2026
+      source: https://www.si.com/nba/suns/onsi/news/phoenix-suns-sign-new-guard-two-way-deal
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions: []
+    team_relationship:
+      tenure_with_team: 0.5
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way player; team controls future assignments.
+    confidence: high
+    source: https://burncitysports.com/2026/03/02/reports-phoenix-suns-cj-huntley-two/
+  - player_id: isaiah_livers
+    name: Isaiah Livers
+    age: 25
+    position_listed: PF
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: spacer
+        secondary:
+          - finisher
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits: []
+    tier: two_way
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: 2026
+      source: https://www.hoopsrumors.com/2025/07/2025-26-nba-two-way-contract-tracker.html
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions: []
+    team_relationship:
+      tenure_with_team: 0.6
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way depth piece; team controls future.
+    confidence: high
+    source: https://www.valleyofthesuns.com/suns-make-genius-move-two-way-player-signed-for-next-season-livers
+  - player_id: rasheer_fleming
+    name: Rasheer Fleming
+    age: 20
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.brightsideofthesun.com/2025/6/28/24457266/suns-trade-kevin-durant-for-jalen-green-dillon-brooks-mark-williams-maluach-draft-grades
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions: []
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: 2025 draft pick; long-term contract control.
+    confidence: high
+    source: https://www.brightsideofthesun.com/2025/6/28/24457266/suns-trade-kevin-durant-for-jalen-green-dillon-brooks-mark-williams-maluach-draft-grades
+pending_free_agents: []
+known_target_history:
+  - target: Kevin Durant
+    year: 2025
+    outcome: acquired
+    detail: "Traded to Houston for Jalen Green, Dillon Brooks, #10 pick, and future seconds in June 2025 blockbuster."
+    source: https://www.brightsideofthesun.com/2025/6/28/24457266/suns-trade-kevin-durant-for-jalen-green-dillon-brooks-mark-williams-maluach-draft-grades
+  - target: Mark Williams
+    year: 2025
+    outcome: acquired
+    detail: "Traded for from Charlotte; gave up Nikola Micic, #29 pick, 2029 first-round pick."
+    source: https://www.si.com/nba/hornets/onsi/news/checking-in-on-mark-williams-early-season-success-with-the-phoenix-suns
+  - target: Bradley Beal
+    year: 2025
+    outcome: declined
+    detail: Bought out and waived with stretch provision after two disappointing seasons; signed with Clippers.
+    source: https://www.espn.com/nba/story/_/id/45755171/bradley-beal-agrees-to-buyout-suns-join-clippers
+near_term_priorities:
+  - priority: 2026 second-round and undrafted pipeline
+    timeline: this_offseason
+    type: draft
+    detail: Phoenix Suns do not own a 2026 first-round pick but hold No. 47 from PHI. Use second-round mocks as low-confidence scouting leads rather than strategic posture anchors.
+    confidence: low
+  - priority: Evaluate Mark Williams contract decision
+    timeline: this_offseason
+    type: extension
+    detail: RFA-eligible summer 2026; Suns must decide on extension, qualifying offer, or risk of FA loss.
+    confidence: high
+  - priority: Dillon Brooks extension discussions
+    timeline: by_trade_deadline
+    type: extension
+    detail: Two years remaining; FO may explore extension (~$125M/4yr max) or trade deadline move.
+    confidence: medium
+  - priority: Assess contention window post-first-round exit
+    timeline: this_offseason
+    type: structural
+    detail: First-year HC exceeded expectations (45-46 record) but OKC sweep signals roster gaps; core fit assessment needed.
+    confidence: high
+  - priority: Optimize cap flexibility for midseason trades
+    timeline: this_season
+    type: roster
+    detail: Below first apron post-Beal buyout; explore multi-asset deals to acquire secondary star.
+    confidence: medium
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 2
+      protections: 2026 No. 47 overall; from PHI via HOU and OKC.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: PHI
+    - year: 2027
+      round: 1
+      protections: unknown
+      source: https://www.brightsideofthesun.com/24100971/phoenix-suns-roster-salaries-cap-space-draft-picks
+    - year: 2025
+      round: 2
+      from_team: HOU
+      protections: None
+      source: https://www.nba.com/news/kevin-durant-joins-rockets-7-team-trade
+    - year: 2027
+      round: 2
+      from_team: HOU
+      protections: None
+      source: https://www.nba.com/news/kevin-durant-joins-rockets-7-team-trade
+    - year: 2028
+      round: 2
+      from_team: HOU
+      protections: None
+      source: https://www.nba.com/news/kevin-durant-joins-rockets-7-team-trade
+    - year: 2029
+      round: 2
+      from_team: HOU
+      protections: None
+      source: https://www.nba.com/news/kevin-durant-joins-rockets-7-team-trade
+    - year: 2032
+      round: 2
+      from_team: HOU
+      protections: None
+      source: https://www.nba.com/news/kevin-durant-joins-rockets-7-team-trade
+  draft_picks_owed:
+    - year: 2026
+      round: 1
+      to_team: MEM
+      protections: 2026 No. 16 overall; from PHX via ORL.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 2
+      to_team: DAL
+      protections: 2026 No. 48 overall; from PHX via WAS.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2029
+      round: 1
+      to_team: CHA
+      protections: 1-5 protected; least favorable of CLE/UTA/MIN picks
+      source: https://www.si.com/nba/hornets/onsi/news/checking-in-on-mark-williams-early-season-success-with-the-phoenix-suns
+  trade_exceptions:
+    - value: unknown
+      expires: unknown
+      source: unknown
+      confidence: low
+team_team_relationships:
+  rivalries:
+    - team_id: LAL
+      type: geographic
+      basis: Same conference, media market rivalry; direct playoff history.
+    - team_id: LAC
+      type: geographic
+      basis: Same metro area; recent crossover (Bradley Beal joins LAC post-buyout).
+    - team_id: HOU
+      type: personnel_grudge
+      basis: Blockbuster KD trade; Rockets acquired aging Durant; Suns retool around younger core.
+    - team_id: OKC
+      type: recent_competitive
+      basis: First-round matchup 2026-26; OKC swept Suns; define contention credibility.
+  notable_personnel_connections:
+    - person: Steve Nash
+      connected_team: BKN
+      connection_type: former_coach
+      detail: Consulted/advised Jordan Ott during hiring; prior coaching relationship with Ott in Brooklyn.
+    - person: Brian Gregory
+      connected_team: DEN
+      connection_type: former_assistant_gm
+      detail: Prior Nuggets asst. GM; brings data-driven philosophy to Phoenix FO.
+    - person: Jordan Ott
+      connected_team: CLE
+      connection_type: former_assistant
+      detail: Hired from Cavaliers; defensive/culture-first coach under Kenny Atkinson tree.
+g_league_and_stash:
+  affiliate_team: Valley Suns
+  notable_affiliate_players:
+    - Koby Brea (two-way; elite shooter on G League ramp-up)
+    - CJ Huntley (two-way; guard development)
+    - Isaiah Livers (two-way; forward/PF depth)
+  international_stash: []
+narrative_summary:
+  one_paragraph: The Phoenix Suns executed a dramatic reset in summer 2025, trading Kevin Durant to Houston in a blockbuster seven-team deal and buying out Bradley Beal, pivoting from a max-contract superteam model to a youth-driven, asset-rich roster centered on Devin Booker (locked in historic $145M/2yr extension) and complementary young wings/bigs (Jalen Green, Ryan Dunn, Khaman Maluach, Mark Williams). Newly hired HC Jordan Ott—a defense-first coach from the Cleveland Cavaliers—exceeded expectations, winning 45 games and making the playoffs in Year 1, though a first-round sweep by OKC exposed the core's incomplete roster. Cap structure improved (sub-first-apron post-Beal stretch), but tight payroll limits flexibility. GM Brian Gregory emphasizes sustainability and tradeable assets; the organization now contends in a 2-3 year window around Booker, with Mark Williams' restricted free agency (summer 2026) and potential Dillon Brooks extension as near-term pivots.
+  three_things_to_watch:
+    - "2026 second-round board: official assets No. 47 from PHI; use mocked second-round names as low-confidence depth or rights leads, not rotation assumptions."
+    - "Mark Williams' RFA decision (summer 2026): Young, athletic center has thrived post-trade; Suns must balance extension cost vs. market risk in restricted agency."
+    - "Dillon Brooks fit and extension discussions: Aging wing role-player; ~$21M expiring 2027; FO signals extension interest but must balance salary cap constraints and asset flexibility."
+    - "Secondary star acquisition pathway: Suns below first apron with cap flexibility; likely mid-season trade target for established scorer to pair with Booker in 2026-27 contention push."
+sources_used:
+  - https://www.basketball-reference.com/teams/PHO/2026.html
+  - https://www.cbssports.com/nba/teams/PHO/phoenix-suns/roster/
+  - https://en.wikipedia.org/wiki/2025%E2%80%9326_Phoenix_Suns_season
+  - https://www.spotrac.com/news/_/id/2866/rockets-acquire-kevin-durant-from-suns-for-jalen-green-dillon-brooks-2025-10-pick/
+  - https://www.brightsideofthesun.com/2025/6/28/24457266/suns-trade-kevin-durant-for-jalen-green-dillon-brooks-mark-williams-maluach-draft-grades
+  - https://suns.com/news/phoenix-suns-name-jordan-ott-head-coach
+  - https://www.hoopsrumors.com/2026/05/suns-ishbia-gregory-discuss-2025-26-offseason-more.html
+  - https://www.nba.com/suns/news/mat-ishbia-assumes-controlling-ownership-interest-of-phoenix-suns-and-phoenix-mercury
+  - https://www.wlox.com/2025/07/10/phoenix-suns-devin-booker-agree-2-year-145m-max-contract-extension/
+  - https://www.espn.com/nba/story/_/id/45755171/bradley-beal-agrees-to-buyout-suns-join-clippers
+  - https://www.si.com/nba/hornets/onsi/news/checking-in-on-mark-williams-early-season-success-with-the-phoenix-suns
+  - https://www.burncitysports.com/2026/05/01/suns-careful-mark-williams-contract
+  - https://www.spotrac.com/nba/phoenix-suns/yearly
+  - https://sportsbusinessclassroom.com/nba-2025-26-apron-tracker/
+  - https://www.brightsideofthesun.com/2025/7/17/24469484/phoenix-suns-bradley-beal-buyout-tax-apron-salary-cap-trade-exceptions-cba-rules-hard-cap
+  - https://www.brightsideofthesun.com/suns-roster/103760/phoenix-suns-roster-continuity-internal-growth-offseason-strategy-royce-oneale-grayson-allen
+  - https://fanspo.com/nba/teams/Suns/24
+  - https://www.nba.com/draft/2025/team-profiles/2025-phoenix-suns
+  - https://www.12news.com/article/sports/nba/suns/2025-nba-draft-phoenix-suns-select-name-name/75-3719867e-96a6-4638-b2a9-b8ab6f7e2398
+  - https://gleague.nba.com/news/phoenix-suns-sign-jamaree-bouyea-to-two-way-contract
+  - https://www.si.com/nba/suns/onsi/news/phoenix-suns-sign-new-guard-two-way-deal
+  - https://burncitysports.com/2026/03/02/reports-phoenix-suns-cj-huntley-two/
+  - https://www.hoopsrumors.com/2025/07/2025-26-nba-two-way-contract-tracker.html
+  - https://www.valleyofthesuns.com/suns-make-genius-move-two-way-player-signed-for-next-season-livers
+  - https://www.brightsideofthesun.com/24100971/phoenix-suns-roster-salaries-cap-space-draft-picks
+  - https://www.espn.com/nba/team/roster/_/name/phx/phoenix-suns
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - ownership.president_basketball_ops (role vacant or unclear; no current reports)
+  - jalen_green.contract.trade_kicker
+  - dillon_brooks.contract.trade_kicker
+  - mark_williams.contract.years_remaining (RFA candidate; technically 1 year left under current contract)
+  - mark_williams.contract.annual_value_current_season (contract details unclear; acquired mid-season)
+  - koby_brea.contract.annual_value_current_season
+  - cj_huntley.contract.years_remaining
+  - isaiah_livers.contract.years_remaining
+  - rasheer_fleming.contract.annual_value_current_season
+  - trade_exceptions.value and expiry dates
+  - draft_picks_owned.2026, 2027 exact protections
+vocabulary_flags:
+  - "Mark Williams contract structure: Listed as 1 year remaining because he's set to hit RFA in summer 2026, though technically signed through 2026 as acquired. Interpretation: 'contract_through: 2026' reflects RFA eligibility, not absolute final season."
+  - "Liam McNeeley status: Notes indicate he was drafted #29 by Suns, then traded to Charlotte in the Mark Williams deal. Status unclear if Suns retained rights or assigned to affiliate. Marked as 'rotation' tier with lower confidence."
+  - "Coach Jordan Ott tenure: Started June 6, 2025; tenure_years calculated as 0.92 years as of May 2, 2026."
+  - "Bradley Beal exit: Removed from active roster per buyout/stretch. Not listed in main roster; noted in known_target_history and narrative only."
+  - "Kevin Durant trade finality: Moved to HOU in June 2025; not listed in active roster; documented in known_target_history."
+  - "Khaman Maluach note: Drafted #10 overall by Rockets as part of KD trade package; rights assigned to Suns in same deal. Listed as Suns asset."

@@ -1,0 +1,1010 @@
+team_id: CHI
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Chicago Bulls
+  conference: Eastern
+  division: Central
+  market_tier: tier_1
+  market_tier_rationale: Chicago is the 3rd largest US metro area with strong historical NBA brand equity despite recent on-court decline.
+ownership:
+  primary_owner:
+    name: Jerry Reinsdorf
+    type: individual
+    tenure_years: 41
+    source: https://en.wikipedia.org/wiki/Jerry_Reinsdorf
+    confidence: high
+  governance_notes: Michael Reinsdorf serves as team President and CEO as of 2026. Jerry Reinsdorf retains ultimate ownership control.
+  recent_transitions: none
+  spending_posture: moderate
+  spending_posture_evidence:
+    - 2025-26 payroll of $184.5M exceeds salary cap but below repeat apron thresholds
+    - Historically reluctant to deploy tax spending for non-contending rosters
+    - Ownership directed front office reset after 4-year playoff drought
+front_office:
+  president_basketball_ops:
+    name: unknown
+    tenure_start: unknown
+    prior_stops: []
+    public_philosophy_signals:
+      - Search firm engaged April 2026 to identify new basketball president
+      - John Paxson acting as senior advisor/interim lead, described as "most important person in organization"
+      - Finalists include Hawks SVP Bryson Graham, Cavaliers GM Mike Gansey, Spurs assistant GM Dave Telep, and unnamed "obvious frontrunner" Lloyd
+    confidence: low
+    source: https://clutchpoints.com/nba/chicago-bulls/bulls-rumors-john-paxson-gm-search
+  general_manager:
+    name: unknown
+    tenure_start: unknown
+    prior_stops: []
+    public_philosophy_signals:
+      - Marc Eversley fired April 6, 2026 after 6 years (224-254 record)
+      - New GM will inherit assembled second-round draft capital and young core
+    confidence: low
+    source: https://www.nba.com/news/chicago-bulls-part-ways-karnisovas-eversley
+  head_coach:
+    name: unknown
+    tenure_start: unknown
+    contract_through: unknown
+    style_notes: unknown
+    coaching_tree: unknown
+    confidence: low
+    source: https://www.espn.com/nba/story/_/id/48550436/sources-billy-donovan-decides-step-bulls-coach
+  assistant_coaches_notable: []
+  notable_advisors_or_consultants:
+    - name: John Paxson
+      role: Senior Advisor, interim basketball ops lead. Former GM (2003-2009), former president of basketball ops (2009-2020).
+strategic_posture:
+  timeframe: retool
+  confidence: medium
+  derived_from:
+    - Declared fire sale at 2026 deadline trading Coby White, Vučević, Dosunmu, Huerter, Williams at risk
+    - 31-51 record, 12th in East; fourth consecutive playoff miss
+    - Franchise accumulated 9 second-round picks and young pieces (Giddey, Buzelis, Dillingham, Essengue)
+    - Ownership/Paxson narrative emphasizes "new direction" and "clean slate"
+    - 2026 draft positioned as potential shortcut to rebuild via elite college talent
+  constraints:
+    - reason_code: multi_year_lottery
+      detail: Fourth straight playoff miss signals systemic roster/FO issues; rebuild likely 2-3 year minimum.
+      weight: high
+    - reason_code: new_front_office
+      detail: Interim leadership until president/GM hired; new GM will shape core timeline.
+      weight: high
+    - reason_code: ownership_directive
+      detail: Reinsdorf mandate for organizational reset implies rejection of Karnisovas/Eversley approach.
+      weight: medium
+  trigger_events:
+    - New basketball president/GM hired and articulates explicit timeline (contend_now vs. retool vs. rebuild)
+    - Giddey extension negotiations signal commitment window
+    - 2026 draft results and early-season performance in 2026-27 season
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: above_first_apron
+  current_payroll_estimate: 184495705
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Multiple UFAs (Sexton, Simons) and potential RFAs (Ivey if re-signed). Payroll likely decreases absent major extensions.
+  exceptions_available:
+    - Mid-level exception (MLE available if under apron)
+  source: https://www.spotrac.com/nba/chicago-bulls/cap
+  source_fallbacks_used: []
+  confidence: high
+trade_dna:
+  frequent_partners:
+    - BOS
+    - MIN
+    - NYK
+    - SAC
+    - CHA
+  preferred_deal_archetypes:
+    - Asset consolidation for youth (traded established players for guard depth and future picks)
+    - Second-round accumulation (acquired 9 future second-rounders at 2026 deadline)
+    - Cap relief trades (dealt Vučević, White, Huerter for lower-salary guards/young players)
+  recent_significant_trades:
+    - date: 2025-02
+      summary: Zach LaVine to Sacramento Kings; Bulls received Kevin Huerter, Zach Collins, Tre Jones, 2025 top-10 protected pick.
+      counterparties:
+        - SAC
+    - date: 2026-02-05
+      summary: Coby White + Mike Conley Jr. to Charlotte; Collin Sexton + 3 second-rounders acquired.
+      counterparties:
+        - CHA
+    - date: 2026-02-05
+      summary: Nikola Vučević to Boston; Anfernee Simons + 2026 2nd rounder acquired.
+      counterparties:
+        - BOS
+    - date: 2026-02-05
+      summary: Ayo Dosunmu + Julian Phillips to Minnesota; Rob Dillingham, Leonard Miller, 3 second-rounders acquired.
+      counterparties:
+        - MIN
+    - date: 2026-02-05
+      summary: Dalen Terry to New York; Guerschon Yabusele acquired.
+      counterparties:
+        - NYK
+  confidence: high
+cultural_signals:
+  stability:
+    value: low
+    detail: Four-year playoff drought, two front office change-outs (2020, 2026), coaching staff turnover (Donovan exited 2026), and 11-game losing streak Feb 2026 signal instability.
+  player_friendly:
+    value: mixed
+    detail: Long-term contract commitments to Giddey ($100M, 4yr) and Williams ($90M, 5yr) suggest faith in players; however, Ivey waived abruptly, and Donovan departure uncertain convey unstable environment.
+  analytics_orientation:
+    value: balanced
+    detail: Karnisovas-era employed analytics (roster construction, second-round picks); incoming FO orientation unknown.
+  risk_tolerance:
+    value: aggressive
+    detail: Aggressive deadline trades, willingness to accrue second-round picks for future moves, 100M commitment to young Giddey. However, conservative on tax spending overall.
+  notable_traits:
+    - coach_carousel
+    - new_front_office
+    - star_chasing
+  rationale: Bulls operate in a tier-1 market with strong historical brand (Jordan era) but have drifted into a mid-tier organizational culture. Recent reset signals ownership impatience and willingness to dismantle. New front office will define next era. Multiple coaching/FO transitions in 6 years suggest instability.
+  confidence: medium
+roster:
+  - player_id: josh_giddey
+    name: Josh Giddey
+    age: 23
+    position_listed: PG/SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - secondary_creator
+          - connector
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_passer
+        - transition_threat
+    tier: star
+    trajectory: peak
+    contract:
+      years_remaining: 4
+      total_value_remaining: 100000000
+      annual_value_current_season: 25000000
+      annual_value_next_season: 25000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2030
+      source: https://www.spotrac.com/nba/player/_/id/74113/josh-giddey
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: recent_extension_poison_pill
+          weight: high
+      falsification_conditions:
+        - Trade request from Giddey or poor early-season 2026-27 performance despite coaching stability
+        - FO explicitly states rebuilding intent and ages-out core
+      signal_strength: confirmed_shopped
+    team_relationship:
+      tenure_with_team: 1.3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Giddey signed extension with Bulls in summer 2025 (after 2024-25 season); committed to team.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/74113/josh-giddey
+  - player_id: matas_buzelis
+    name: Matas Buzelis
+    age: 21
+    position_listed: PF/C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+          - post_hub
+      defensive_role: rim_protector
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - young_core_centerpiece
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 24900000
+      annual_value_current_season: 3200000
+      annual_value_next_season: 4500000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.basketball-reference.com/players/b/buzelma01.html
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: medium
+      falsification_conditions:
+        - Chronic injury preventing playing time in 2026-27
+        - Trade demand from player or FO pivot to full tank requiring asset monetization
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.9
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Rookie contract with years of team control; Buzelis only player franchise explicitly committed to post-deadline.
+    confidence: high
+    source: https://www.basketball-reference.com/players/b/buzelma01.html
+  - player_id: rob_dillingham
+    name: Rob Dillingham
+    age: 21
+    position_listed: SG/PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: good
+      special_traits:
+        - transition_threat
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: 6800000
+      annual_value_current_season: 3100000
+      annual_value_next_season: 3700000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.basketball-reference.com/players/d/dilliro01.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_developing
+          weight: high
+      falsification_conditions:
+        - Sustained poor shooting and defensive performance into 2026-27 season
+        - New GM signals urgent need for asset reallocation
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: 8th overall pick (2024) with multiple years of control; recent acquisition signals FO belief.
+    confidence: high
+    source: https://www.basketball-reference.com/players/d/dilliro01.html
+  - player_id: noa_essengue
+    name: Noa Essengue
+    age: 19
+    position_listed: SF/PF
+    contract_type: standard
+    availability_status: injured_long_term
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - young_core_centerpiece
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: null
+      annual_value_next_season: 2500000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://allchgo.com/bulls-select-noa-essengue-12th-pick-2025-nba-draft
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_developing
+          weight: high
+        - reason_code: injury_recovery_uncertain
+          weight: medium
+      falsification_conditions:
+        - Season-ending or chronic injury diagnosis requiring long-term rehab
+        - Return to healthy playing time and early NBA impact trajectory
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.9
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: 12th pick in 2025 draft with years of control; injured early in rookie season but young enough for long runway.
+    confidence: medium
+    source: https://allchgo.com/bulls-select-noa-essengue-12th-pick-2025-nba-draft
+  - player_id: collin_sexton
+    name: Collin Sexton
+    age: 27
+    position_listed: SG/PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits: []
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.salaryswish.com/players/collin-sexton
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: expiring_contract_value
+          weight: medium
+      falsification_conditions:
+        - In-season extension offer from Bulls prior to June 2026 deadline
+        - Public statement from new FO committing to Sexton as core player
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: UFA after 2025-26; acquired mid-season for depth.
+    confidence: high
+    source: https://www.salaryswish.com/players/collin-sexton
+  - player_id: anfernee_simons
+    name: Anfernee Simons
+    age: 26
+    position_listed: SG/SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - finisher
+          - connector
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://eu.hoopshype.com/salaries/players/anfernee-simons/1629014
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: expiring_contract_value
+          weight: medium
+      falsification_conditions:
+        - In-season extension signed prior to June deadline
+        - New FO states intention to retain Simons long-term
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: UFA after season; acquired at deadline for expiring contract.
+    confidence: high
+    source: https://eu.hoopshype.com/salaries/players/anfernee-simons/1629014
+  - player_id: tre_jones
+    name: Tre Jones
+    age: 26
+    position_listed: PG/SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - connector
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - vet_leadership
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 24000000
+      annual_value_current_season: 8000000
+      annual_value_next_season: 8000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.salaryswish.com/players/tre-jones
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: contract_leverage
+          weight: medium
+      falsification_conditions:
+        - Multiple-team trade involving multiple core assets
+        - New FO explicitly prioritizes youth over established vets
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.3
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Signed 3-year deal in summer 2025 signaling multi-year commitment; assists leader on roster.
+    confidence: high
+    source: https://www.salaryswish.com/players/tre-jones
+  - player_id: patrick_williams
+    name: Patrick Williams
+    age: 23
+    position_listed: PF/SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+          - finisher
+      defensive_role: switchable
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 2
+      total_value_remaining: 36000000
+      annual_value_current_season: 18000000
+      annual_value_next_season: 18000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/70646/patrick-williams
+    movement_constraints:
+      status: shopped
+      reasons:
+        - reason_code: positional_redundancy
+          weight: medium
+        - reason_code: failed_fit
+          weight: high
+        - reason_code: cap_relief_target
+          weight: high
+      falsification_conditions:
+        - Trade completed in offseason OR commitment from new FO to development path
+        - Significant on-court role increase and positive performance trajectory into 2026-27
+      signal_strength: widely_reported
+    team_relationship:
+      tenure_with_team: 2.9
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: 5-year/$90M deal (July 2024) perceived as overpayment; limited market interest given contract size and inconsistent performance.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/70646/patrick-williams
+  - player_id: nick_richards
+    name: Nick Richards
+    age: 28
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - post_hub
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+        - elite_athlete
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 5000000
+      annual_value_current_season: 5000000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: early
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/player/_/id/70684/nick-richards
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: tax_apron_pressure
+          weight: medium
+      falsification_conditions:
+        - Mid-season extension offer from new FO
+        - Public statement of long-term commitment to Richards as rim protector
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Expiring deal; affordable salary for 2025-26; early bird rights provide limited re-sign ability.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/70684/nick-richards
+  - player_id: zach_collins
+    name: Zach Collins
+    age: 27
+    position_listed: C/PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+          - post_hub
+      defensive_role: rim_protector
+      shooting_profile: functional
+      special_traits: []
+    tier: rotation
+    trajectory: declining_peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 18080496
+      annual_value_current_season: 18080496
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.salaryswish.com/players/zach-collins
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: expiring_contract_value
+          weight: high
+      falsification_conditions:
+        - In-season extension signed
+        - New FO explicitly commits to multi-year Collins role
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: UFA in 2026; acquired in LaVine trade Feb 2025; role uncertain in retool.
+    confidence: high
+    source: https://www.salaryswish.com/players/zach-collins
+  - player_id: guerschon_yabusele
+    name: Guerschon Yabusele
+    age: 30
+    position_listed: PF/C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: finisher
+        secondary:
+          - post_hub
+          - connector
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 5500000
+      annual_value_current_season: 5500000
+      annual_value_next_season: none
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: 2026
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/player/_/id/20221/guerschon-yabusele
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: declining_role
+          weight: medium
+      falsification_conditions:
+        - Player exercises 2026 option and remains healthy
+        - New FO commits to veteran leadership role in retool
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Player option for 2026-27; waived 2026-27 option as part of trade. Controls decision on return.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/20221/guerschon-yabusele
+  - player_id: leonard_miller
+    name: Leonard Miller
+    age: 22
+    position_listed: SF/PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+          - finisher
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: 4400000
+      annual_value_current_season: 2200000
+      annual_value_next_season: 2200000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.basketball-reference.com/players/m/millele01.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_developing
+          weight: medium
+      falsification_conditions:
+        - Significant playing time reduction and poor performance trajectory
+        - Multi-asset trade involving youth core shuffle
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Second-round pick (2023, 33rd) with affordable contract through 2027; recent acquisition signals FO interest.
+    confidence: medium
+    source: https://www.basketball-reference.com/players/m/millele01.html
+  - player_id: jaden_ivey
+    name: Jaden Ivey
+    age: 24
+    position_listed: SG/SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: fringe
+    trajectory: declining
+    contract:
+      years_remaining: 0
+      total_value_remaining: 0
+      annual_value_current_season: null
+      annual_value_next_season: null
+      no_trade_clause: unknown
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: expired_pending_decision
+      source: https://www.espn.com/nba/story/_/id/48350464/sources-bulls-waive-jaden-ivey-anti-gay-comments
+    movement_constraints:
+      status: unavailable
+      reasons:
+        - reason_code: failed_fit
+          weight: high
+      falsification_conditions:
+        - RFA signing with another team or Bulls re-sign post-waiver
+      signal_strength: confirmed_shopped
+    team_relationship:
+      tenure_with_team: 0.2
+      homegrown: no
+      contract_leverage:
+        value: unknown
+        detail: Waived March 30, 2026 for "conduct detrimental to team" after social media posts. RFA rights retained if re-signed.
+    confidence: high
+    source: https://www.espn.com/nba/story/_/id/48350464/sources-bulls-waive-jaden-ivey-anti-gay-comments
+pending_free_agents:
+  - player_id: collin_sexton
+    name: Collin Sexton
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Depth guard; 2025-26 performance (15.1 PPG in 11 games with CHI) modest. Market reception unclear heading into summer 2026.
+    notes: UFA after 2025-26 season; acquired mid-deadline for depth experiment.
+    source: https://www.salaryswish.com/players/collin-sexton
+  - player_id: anfernee_simons
+    name: Anfernee Simons
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: 3-and-D wing; potential interest from contenders or mid-market teams. Test free market.
+    notes: UFA after 2025-26 season; acquired at deadline from Boston for Vučević.
+    source: https://eu.hoopshype.com/salaries/players/anfernee-simons/1629014
+  - player_id: zach_collins
+    name: Zach Collins
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: walk
+    expected_market_detail: Acquired in LaVine trade (Feb 2025); limited role in retool. Likely walks in 2026.
+    notes: Expiring 2026 contract; defensive-minded big with injury history.
+    source: https://www.salaryswish.com/players/zach-collins
+  - player_id: nick_richards
+    name: Nick Richards
+    type: UFA
+    bird_rights_status: early
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Rim-running big; early bird rights give Bulls modest flexibility. Market interest likely moderate.
+    notes: Expiring 2026 contract with early bird rights; acquired at 2026 deadline.
+    source: https://www.spotrac.com/nba/player/_/id/70684/nick-richards
+  - player_id: jaden_ivey
+    name: Jaden Ivey
+    type: RFA
+    bird_rights_status: full
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Waived March 2026 after conduct incident; NBA reentry market or G League likely for 2026-27.
+    notes: Waived by Bulls March 30, 2026; RFA if any team signs and Bulls retain matching rights.
+    source: https://www.espn.com/nba/story/_/id/48350464/sources-bulls-waive-jaden-ivey-anti-gay-comments
+  - player_id: guerschon_yabusele
+    name: Guerschon Yabusele
+    type: RFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: walk
+    expected_market_detail: Holds player option for 2026-27. If declined, likely walks.
+    notes: Player option for 2026-27; contract amended in trade to waive future option.
+    source: https://www.spotrac.com/nba/player/_/id/20221/guerschon-yabusele
+known_target_history:
+  - target: Donovan Mitchell
+    year: 2023
+    outcome: not_acquired
+    detail: Karnisovas pursued; Mitchell opted for Cleveland instead.
+    source: https://www.nba.com/news/chicago-bulls-part-ways-karnisovas-eversley
+  - target: Zach LaVine
+    year: 2025
+    outcome: acquired
+    detail: Traded to Sacramento in Feb 2025 restructure; Bulls received Huerter, Collins, Jones.
+    source: https://allchgo.com/bulls-trade-zach-lavine-sacramento-kings-huerter
+  - target: Coby White
+    year: 2026
+    outcome: acquired
+    detail: Drafted 2023; traded to Charlotte Feb 2026 as part of deadline fire sale.
+    source: https://www.axios.com/local/chicago/2026/02/05/bulls-trade-vucevic-white-dosunmu-reset-franchise-michael-jordan
+  - target: Nikola Vučević
+    year: 2026
+    outcome: acquired
+    detail: Traded to Boston Feb 2026 for Simons; acquired Dec 2023 in early Karnisovas era.
+    source: https://www.axios.com/local/chicago/2026/02/05/bulls-trade-vucevic-white-dosunmu-reset-franchise-michael-jordan
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "Chicago Bulls hold No. 4, No. 15 from POR, No. 38 from NOP, No. 56 from DEN in the official post-lottery order. Mock-source layer: No. 4: Caleb Wilson; No. 15: Cameron Carr; treat prospect names as medium-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: medium
+  - priority: Hire new basketball president and general manager
+    timeline: next_30_days
+    type: coaching_decision
+    detail: Search firm engaged April 2026; finalists being interviewed. Decision likely by June 2026.
+    confidence: high
+  - priority: Establish organizational rebuild timeline and player core
+    timeline: this_offseason
+    type: structural
+    detail: Incoming FO will define commitment window to Giddey, Buzelis, Dillingham, Essengue as cornerstone.
+    confidence: medium
+  - priority: Hire head coach aligned with rebuild philosophy
+    timeline: this_offseason
+    type: coaching_decision
+    detail: Billy Donovan departed; new coach selection pending new FO hire. Preference for development-oriented coach likely.
+    confidence: medium
+  - priority: Deploy second-round draft capital for positional needs
+    timeline: this_offseason
+    type: trade
+    detail: Accumulated 9 future second-rounders; FO will use to trade up, sign-and-trade, or develop depth.
+    confidence: medium
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 4 overall; own pick.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 1
+      protections: 2026 No. 15 overall; from POR.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: POR
+    - year: 2026
+      round: 2
+      protections: 2026 No. 38 overall; from NOP via BOS, DET, and POR.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: NOP
+    - year: 2026
+      round: 2
+      protections: 2026 No. 56 overall; from DEN via MIN, PHX, CHA, and PHX.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: DEN
+    - year: 2027
+      round: 1
+      protections: Unprotected; owned outright.
+      source: https://www.bleachernation.com/bulls/2026/04/15/bulls-2026-offseason-map
+  draft_picks_owed:
+    - year: 2026
+      round: 2
+      to_team: HOU
+      protections: 2026 No. 39 overall; from CHI via WAS.
+      source: https://www.nba.com/news/2026-nba-draft-order
+  trade_exceptions:
+    - value: unknown
+      expires: unknown
+      source: unknown
+      confidence: low
+team_team_relationships:
+  rivalries:
+    - team_id: DET
+      type: geographic
+      basis: 280 miles via I-94; Central Division; historic 1980s-1990s Jordan vs. Bad Boys rivalry.
+    - team_id: MIL
+      type: geographic
+      basis: ~90 miles; Central Division; frequent matchups drive regional intensity.
+    - team_id: NYK
+      type: competitive_historical
+      basis: 1991-1994 and 1996 playoff meetings; Jordan-era Finals threat identity.
+    - team_id: BOS
+      type: competitive_historical
+      basis: 1986 63-point game; Bird-Jordan rivalry era symbolism.
+    - team_id: MIA
+      type: competitive_recent
+      basis: Heat eliminated by Bulls in 1990s Finals runs; historical East rival.
+  notable_personnel_connections:
+    - person: John Paxson
+      connected_team: Bulls
+      connection_type: former_president
+      detail: Former president of basketball operations (2009-2020); currently senior advisor and interim lead post-Karnisovas firing.
+    - person: Michael Reinsdorf
+      connected_team: Bulls
+      connection_type: owner
+      detail: Team president and CEO; son of owner Jerry Reinsdorf; oversees FO search process.
+g_league_and_stash:
+  affiliate_team: Windy City Bulls
+  notable_affiliate_players:
+    - Windy City Bulls serve as sole G League affiliate based in Hoffman Estates, IL
+  international_stash: []
+narrative_summary:
+  one_paragraph: The Chicago Bulls enter 2026 in full organizational reset mode following a catastrophic season (31-51, 12th East, fourth playoff miss). Ownership terminated Artūras Karnišovas and Marc Eversley on April 6, and Billy Donovan departed voluntarily. A front-office search is underway with John Paxson as interim lead. The team executed an aggressive trade deadline fire sale, dealing Coby White, Nikola Vučević, and Kevin Huerter for guard depth (Sexton, Simons) and accumulated nine future second-round picks—a signal of prioritizing asset flexibility over immediate contention. Young core anchors Josh Giddey (4yr/$100M extension), Matas Buzelis (2024
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 4, No. 15 from POR, No. 38 from NOP, No. 56 from DEN; The Athletic mock-source layer lists No. 4: Caleb Wilson; No. 15: Cameron Carr as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - New basketball president/GM hire and their stated timeline for contention (contend_now vs. retool vs. rebuild)
+    - Josh Giddey's performance trajectory and whether extension investment pays dividends in 2026-27 season
+sources_used:
+  - https://www.nba.com/news/chicago-bulls-part-ways-karnisovas-eversley
+  - https://clutchpoints.com/nba/chicago-bulls/bulls-rumors-john-paxson-gm-search
+  - https://chicago.suntimes.com/bulls/2026/04/21/bulls-coach-billy-donovan-steps-away-after-six-seasons-helm
+  - https://www.spotrac.com/nba/chicago-bulls/cap
+  - https://www.basketball-reference.com/teams/CHI/2026.html
+  - https://allchgo.com/bulls-trade-zach-lavine-sacramento-kings-huerter
+  - https://www.axios.com/local/chicago/2026/02/05/bulls-trade-vucevic-white-dosunmu-reset-franchise-michael-jordan
+  - https://www.spotrac.com/nba/player/_/id/74113/josh-giddey
+  - https://www.basketball-reference.com/players/b/buzelma01.html
+  - https://www.basketball-reference.com/players/d/dilliro01.html
+  - https://allchgo.com/bulls-select-noa-essengue-12th-pick-2025-nba-draft
+  - https://www.salaryswish.com/players/collin-sexton
+  - https://eu.hoopshype.com/salaries/players/anfernee-simons/1629014
+  - https://www.salaryswish.com/players/tre-jones
+  - https://www.spotrac.com/nba/player/_/id/70646/patrick-williams
+  - https://www.spotrac.com/nba/player/_/id/70684/nick-richards
+  - https://www.salaryswish.com/players/zach-collins
+  - https://www.spotrac.com/nba/player/_/id/20221/guerschon-yabusele
+  - https://www.basketball-reference.com/players/m/millele01.html
+  - https://www.espn.com/nba/story/_/id/48350464/sources-bulls-waive-jaden-ivey-anti-gay-comments
+  - https://windycity.gleague.nba.com/
+  - https://en.wikipedia.org/wiki/Jerry_Reinsdorf
+  - https://www.bleachernation.com/bulls/2026/04/15/bulls-2026-offseason-map
+  - https://www.si.com/nba/bulls/onsi/news/chicago-bulls-land-second-first-round-pick-in-deep-2026-nba-draft
+  - https://pippenainteasy.com/updated-list-bulls-draft-picks-trade-deadline-deals
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - front_office.president_basketball_ops (search underway as of May 2, 2026)
+  - front_office.general_manager (search underway as of May 2, 2026)
+  - front_office.head_coach (search underway; Donovan departed)
+  - player.contract.annual_value for some expiring contracts (exact salary figures not available in sources)
+  - key_assets.trade_exceptions (not disclosed in available sources)
+  - g_league_and_stash.international_stash (no current international players under stash status reported)
+vocabulary_flags:
+  - Patrick Williams' availability status marked "shopped" per widely-reported trade rumors; however, no confirmed offer from another team has been documented. Status reflects FO intent signals rather than active offer stage.
+  - Jaden Ivey marked "unavailable" rather than using standard movement_constraints vocabulary because he is no longer under contract after waiver (March 30, 2026). Future availability depends on re-signing or new team RFA claim.
+  - Noa Essengue marked "injured_long_term" based on reports of early-season injury sidelining him rest of rookie 2025-26 campaign. Exact nature and expected recovery timeline unknown.
+  - FALSIFICATION CONDITIONS required for all players with status available/shopped/actively_traded per v2.2.1 spec; all provided above.
+  - Player option/team option fields use "none" (string) rather than false (boolean) per type-coercion rules.
+  - All bird_rights entries use vocab full/early/non/unknown, not yes/no.
+  - No high/medium/low values used in signal_strength; all entries use controlled vocab (confirmed_shopped, widely_reported, inferred_from_actions, etc.).

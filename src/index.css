@@ -1,0 +1,342 @@
+/* ==========================================================================
+   Gambit Design System — Colors & Type
+   Ported from ds/colors_and_type.css (handoff bundle).
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+@font-face {
+  font-family: 'Chakra Petch';
+  src: url('/fonts/ChakraPetch-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Chakra Petch';
+  src: url('/fonts/ChakraPetch-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Chakra Petch';
+  src: url('/fonts/ChakraPetch-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Chakra Petch';
+  src: url('/fonts/ChakraPetch-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Chakra Petch';
+  src: url('/fonts/ChakraPetch-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --cream-50:  #FBF4E6;
+  --cream-100: #F5ECD8;
+  --cream-200: #EFE3C8;
+  --cream-300: #E5D6B3;
+  --cream-400: #D4C29A;
+
+  --ink-950: #0E0F12;
+  --ink-900: #161820;
+  --ink-800: #2A2D36;
+  --ink-700: #3F434E;
+  --ink-600: #555A66;
+  --ink-500: #777C87;
+  --ink-400: #9A9EA8;
+  --ink-300: #BFC2C9;
+  --ink-200: #DDDFE3;
+
+  --seasoned-50:  #FCF3E5;
+  --seasoned-100: #F7E4C2;
+  --seasoned-200: #ECC889;
+  --seasoned-300: #DAA85A;
+  --seasoned-500: #B08040;
+  --seasoned-600: #9A7038;
+  --seasoned-700: #7E5A2C;
+  --seasoned-900: #4A3416;
+
+  --fenway-50:  #EAF2EC;
+  --fenway-100: #C9DFCF;
+  --fenway-300: #6FA582;
+  --fenway-500: #2D6A4F;
+  --fenway-600: #245A42;
+  --fenway-700: #1B4732;
+  --fenway-900: #0F2A1C;
+
+  --status-positive:    #2D6A4F;
+  --status-positive-bg: #EAF2EC;
+  --status-warning:     #B5781A;
+  --status-warning-bg:  #FBF1DE;
+  --status-negative:    #B8392E;
+  --status-negative-bg: #F8E5E1;
+  --status-neutral:     #777C87;
+
+  --bg-app:        var(--cream-100);
+  --bg-surface:    #FFFFFF;
+  --bg-sunken:     var(--cream-50);
+  --bg-hover:      var(--cream-200);
+  --bg-row-alt:    var(--cream-50);
+
+  --fg-primary:    var(--ink-900);
+  --fg-secondary:  var(--ink-700);
+  --fg-muted:      var(--ink-500);
+  --fg-faint:      var(--ink-400);
+  --fg-on-dark:    var(--cream-50);
+  --fg-on-accent:  var(--cream-50);
+
+  --accent:        var(--fenway-500);
+  --accent-hover:  var(--fenway-600);
+  --accent-soft:   var(--fenway-50);
+  --link:          var(--fenway-500);
+
+  --institutional: var(--fenway-500);
+  --institutional-hover: var(--fenway-600);
+
+  --border-default: var(--ink-200);
+  --border-strong:  var(--ink-300);
+  --border-faint:   var(--cream-300);
+  --border-ink:     var(--ink-900);
+
+  --focus-ring:     var(--fenway-500);
+
+  --font-display: 'Chakra Petch', 'Helvetica Neue', sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-sans:    'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #f0eee9;
+}
+body {
+  font-family: var(--font-sans);
+  color: var(--ink-900);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+#root { height: 100vh; }
+
+* {
+  box-sizing: border-box;
+}
+
+button {
+  font-family: inherit;
+}
+
+input {
+  font-family: inherit;
+}
+
+/* Slim, ink-tinted scrollbars */
+.gd-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--ink-900) 18%, transparent) transparent;
+}
+.gd-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+.gd-scroll::-webkit-scrollbar-track { background: transparent; }
+.gd-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--ink-900) 18%, transparent);
+}
+.gd-scroll::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--ink-900) 32%, transparent);
+}
+
+.dashboard-feed-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 280px);
+  gap: 24px;
+  align-items: start;
+}
+
+.dashboard-feed-grid--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.dashboard-feed-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dashboard-feed-item {
+  padding: 22px 24px;
+}
+
+.dashboard-feed-tabs {
+  max-width: 100%;
+}
+
+.dashboard-feed-rail {
+  margin-top: 36.5px;
+}
+
+@media (max-width: 720px) {
+  .fenway-app-dashboard > div > nav {
+    display: none !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .dashboard-feed-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-feed-rail {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-feed-shell {
+    padding: 24px 16px 80px !important;
+  }
+
+  .dashboard-feed-header {
+    flex-direction: column;
+  }
+
+  .dashboard-feed-tabs {
+    width: 100%;
+  }
+
+  .dashboard-feed-tabs > button {
+    flex: 1 1 0;
+    min-width: 0 !important;
+  }
+
+  .dashboard-feed-item {
+    padding: 18px 12px;
+  }
+
+  .dashboard-feed-actions {
+    width: 100%;
+  }
+
+  .dashboard-feed-actions > button {
+    flex: 1 1 140px;
+    justify-content: center;
+  }
+}
+
+@keyframes finish-pulse {
+  0%   { background: var(--cream-50); }
+  35%  { background: var(--fenway-100); }
+  100% { background: var(--cream-50); }
+}
+
+@keyframes help-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes palette-fade {
+  from { opacity: 0; transform: translateY(-4px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+
+@keyframes chevron-pulse {
+  0%, 100% { opacity: 1; transform: translateX(0); }
+  50%      { opacity: 0.45; transform: translateX(-1px); }
+}
+
+@keyframes thinking-slide {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(450%); }
+}
+
+@keyframes dot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(0.9); }
+}
+
+@keyframes skeleton-shimmer {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+
+.projects-edit-surface .projects-section-actions {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.projects-edit-surface:hover .projects-section-actions,
+.projects-edit-surface:focus-within .projects-section-actions,
+.projects-edit-surface[data-editing="true"] .projects-section-actions,
+.projects-section-actions[data-force-visible="true"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (hover: none), (max-width: 900px) {
+  .projects-edit-surface .projects-section-actions {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+@media print {
+  @page {
+    margin: 0.55in;
+  }
+
+  body.gambit-printing {
+    background: #ffffff !important;
+  }
+
+  body.gambit-printing * {
+    visibility: hidden !important;
+  }
+
+  body.gambit-printing [data-print-target="true"],
+  body.gambit-printing [data-print-target="true"] * {
+    visibility: visible !important;
+  }
+
+  body.gambit-printing [data-print-target="true"] {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+  }
+
+  body.gambit-printing [data-print-target="true"] [data-print-hide="true"],
+  body.gambit-printing [data-print-target="true"] button,
+  body.gambit-printing [data-print-target="true"] input,
+  body.gambit-printing [data-print-target="true"] textarea,
+  body.gambit-printing [data-print-target="true"] select {
+    display: none !important;
+  }
+
+  body.gambit-printing [data-print-target="true"] * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}

@@ -1,0 +1,1179 @@
+team_id: HOU
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Houston Rockets
+  conference: Western
+  division: Southwest
+  market_tier: tier_2
+  market_tier_rationale: Major US metropolitan market (4th largest city) with significant media presence and franchise value (~$4.9B), but lower media market primacy than LA, NYC, or Chicago tier_1 markets.
+ownership:
+  primary_owner:
+    name: Tilman Fertitta
+    type: individual
+    tenure_years: 9.5
+    source: https://www.nba.com/rockets/news/tilman-j-fertitta-new-owner-houston-rockets
+    confidence: high
+  governance_notes: Fertitta confirmed as US Ambassador to Italy in April 2025 but retained full ownership; announced inactive day-to-day role to avoid conflicts with ambassadorial duties.
+  recent_transitions: None since acquisition in Sept 2017.
+  spending_posture: aggressive_spender
+  spending_posture_evidence:
+    - $199.8M payroll 2025-26, above cap with multiple star contracts
+    - Approved aggressive multiyear extensions for Sengun ($185M/5yr), Smith Jr. ($122M/5yr), Thompson ($252M/5yr target), Durant ($90M/2yr)
+    - Blockbuster trade for Kevin Durant (summer 2025) prioritized win-now over asset preservation
+    - Signed multiple free agents (Finney-Smith $53M/4yr, Capela $21.5M/3yr, VanVleet $50M/2yr) simultaneously
+front_office:
+  president_basketball_ops:
+    name: unknown
+    tenure_start: unknown
+    prior_stops: []
+    public_philosophy_signals: []
+    confidence: low
+    source: unknown
+  general_manager:
+    name: Rafael Stone
+    tenure_start: 2020-10
+    prior_stops:
+      - Houston Rockets General Counsel (14 seasons prior to GM role, under Daryl Morey era)
+      - Dewey Ballantine LLP (law firm, M&A and capital markets)
+    public_philosophy_signals:
+      - No longer a developmental team; ready to contend now (public statement, 2025-26 season)
+      - Aggressive trade negotiator; identified as NBA's 'toughest negotiators'
+      - Valued analytics blend with star acquisition; pivoted from youth development to win-now trades
+      - Prioritized core retention (Sengun, Smith Jr., Thompson long-term deals) while aggressively trading for proven talent (Durant)
+    confidence: high
+    source: https://www.si.com/nba/rockets/onsi/news/houston-rockets-general-manager-rafael-stone-talks-kevin-durant-and-offseason
+  head_coach:
+    name: Ime Udoka
+    tenure_start: 2023-04
+    contract_through: 2027
+    style_notes: High-intensity defensive scheme with emphasis on 1v1 defense and switchability; dynamic scheme variation (multiple defensive looks per quarter); elevated team defense from 29th to 2nd in league efficiency under his tenure. Fast-paced ball movement on offense; accountability-driven culture emphasizing effort and poise.
+    coaching_tree: popovich_tree
+    confidence: high
+    source: https://www.nba.com/news/ime-udoka-introduced-rockets
+  assistant_coaches_notable:
+    - Tony Delk (associate head coach, former player)
+  notable_advisors_or_consultants: []
+strategic_posture:
+  timeframe: contend_now
+  confidence: high
+  derived_from:
+    - Blockbuster Kevin Durant trade (summer 2025) signals immediate contention bid with aging superstar
+    - 52-30 record 2025-26 season but lost to Lakers 4-2 in first-round playoffs
+    - Young core (Thompson, Smith Jr., Sengun all <25) supplemented with aging star (Durant, age 37)
+    - "Rafael Stone public statements: no longer developmental, ready to take next step"
+    - Major free agent spending on veterans (Finney-Smith, Capela) to fill playoff rotation
+  constraints:
+    - reason_code: max_contract_lockup
+      detail: Sengun ($185M through 2030), Smith Jr. ($122M through 2031), Durant ($90M through 2027-28 with PO) constrain flexibility.
+      weight: high
+    - reason_code: ownership_directive
+      detail: Fertitta's ambassadorial role (effective April 2025) may limit day-to-day personnel involvement; stated commitment to keeping core intact.
+      weight: medium
+    - reason_code: aging_core
+      detail: Durant (37yo) on limited shelf life; must compete within 2-3 year window or risk sunk value.
+      weight: high
+    - reason_code: tax_apron_constraints
+      detail: Hard-capped at first apron ($195.945M); limited flexibility for mid-season moves.
+      weight: medium
+  trigger_events:
+    - Second-round NBA Finals appearance would validate contend_now posture; first-round loss in 2026 tests commitment
+    - Durant injury recovery and availability; bone bruises in 2026 playoffs raised durability questions
+    - Amen Thompson extension signed (expected summer 2026, ~$252M/5yr) signals long-term commitment vs. pivot
+    - Any sub-.500 season or back-to-back playoff exits would trigger rebuild evaluation
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: above_first_apron
+  current_payroll_estimate: 199783669
+  hard_capped: yes
+  hard_cap_reason: Kevin Durant, Sengun, Smith Jr., Finney-Smith, Capela multi-year deals pushed team over first apron.
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Likely still above first apron; Sengun extension kicks in fully (raised cap hit); Durant PO decision pending
+    - season: 2027-28
+      projected_status: Durant player option ($46.1M) expires; potential cap relief if declined; new CBA terms uncertain
+  exceptions_available:
+    - Limited; hard-capped at first apron restricts exception usage
+  source: https://www.spotrac.com/nba/houston-rockets/cap/_/year/2025/sort/cap_total
+  source_fallbacks_used: []
+  confidence: medium
+trade_dna:
+  frequent_partners:
+    - PHX
+    - ATL
+    - MEM
+    - WAS
+    - OKC
+  preferred_deal_archetypes:
+    - Star-for-multiple-assets swaps (Durant for Green + Brooks + picks; Oladipo for Steven Adams)
+    - Young player + picks for proven vets (Whitmore to WSH for 2nd-rd picks)
+    - Multi-team orchestrations to clear cap/match salaries (7-team Durant deal, 3-team Whitmore trade)
+    - Analytics-driven roster optimization; willing to move young assets if fit uncertain
+  recent_significant_trades:
+    - date: 2025-07-06
+      summary: "Acquired Kevin Durant from PHX; traded Jalen Green, Dillon Brooks, 2025 #10 pick, five 2nd-rd picks (7-team deal)"
+      counterparties:
+        - PHX
+    - date: 2025-07-06
+      summary: Acquired Clint Capela from ATL (3-year, $21.5M); reacquired former Rocket
+      counterparties:
+        - ATL
+    - date: 2025-07-07
+      summary: Acquired Dorian Finney-Smith from LAL (4-year, $53M free agency signing)
+      counterparties:
+        - LAL
+    - date: 2025-07-06
+      summary: Traded Cam Whitmore to WSH for 2026 and 2029 2nd-rd picks
+      counterparties:
+        - WAS
+    - date: 2024-02-01
+      summary: Traded Victor Oladipo + picks to MEM for Steven Adams
+      counterparties:
+        - MEM
+    - date: 2023-09-15
+      summary: "Multi-team trade: traded Patty Mills, Josh Christopher, Kenyon Martin Jr. for Dillon Brooks + picks"
+  confidence: high
+cultural_signals:
+  stability:
+    value: high
+    detail: Ime Udoka in place since April 2023 with extension through 2027; Rafael Stone stable GM since Oct 2020; ownership committed despite ambassadorial role. Consistent organizational direction post-Morey era.
+  player_friendly:
+    value: yes
+    detail: Multi-year extensions offered to young core (Sengun, Smith Jr., Thompson); accommodated Thompson's development timeline; signed experienced mentors (Adams, Finney-Smith, VanVleet) to support young players. Ownership allows aggressive spending.
+  analytics_orientation:
+    value: balanced
+    detail: "Stone era emphasizes balanced approach: analytics-informed trades (Oladipo for Adams fit analysis) but also star-chasing pragmatism (Durant trade). Defensive philosophy relies on film/principles but supported by efficiency metrics."
+  risk_tolerance:
+    value: aggressive
+    detail: Blockbuster Durant trade without proven fit; aggressive extensions for unproven extensions (Thompson, Smith Jr.); willingness to sacrifice future assets for present contention.
+  notable_traits:
+    - star_chasing
+    - homegrown_priority
+    - process_driven
+    - popovich_tree
+  rationale: Rockets transitioned under Stone from lottery-stage development to star-acquisition mode. Udoka's Popovich lineage drives defensive identity and player development emphasis. Ownership support enables aggressive spending to supplement young core with veteran talent. Organization is process-driven in trades and contract management but willing to take large swings.
+  confidence: high
+roster:
+  - player_id: reed_sheppard
+    name: Reed Sheppard
+    age: 20
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - spacer
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: 3110640
+      annual_value_next_season: 3277440
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.basketball-reference.com/teams/HOU/2026.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: medium
+      falsification_conditions:
+        - Major multi-team trade involving Sheppard would signal shift in core philosophy
+        - Explicit FO statement that Sheppard is available
+        - Repeated benching or demotion in playoff rotations
+    team_relationship:
+      tenure_with_team: 1.3
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie contract; team holds all leverage
+    confidence: high
+    source: https://www.basketball-reference.com/teams/HOU/2026.html
+  - player_id: amen_thompson
+    name: Amen Thompson
+    age: 23
+    position_listed: SG/PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+          - screen_setter
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - transition_threat
+        - foul_drawer
+    tier: star
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: 8260000
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/player/_/id/82199/amen-thompson
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: generational_talent
+          weight: high
+      falsification_conditions:
+        - Public FO statement that Thompson is tradeable
+        - Thompson extended multiple years beyond 2026; failure to sign major extension would contradict posture
+        - Trade reported with credible sources citing team initiation
+    team_relationship:
+      tenure_with_team: 1.3
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Restricted free agency pending; $252M/5yr extension expected summer 2026
+    confidence: high
+    source: https://fadeawayworld.net/nba/houston-rockets/rockets-fans-divided-over-amen-thompsons-expected-252-million-contract-extension
+  - player_id: kevin_durant
+    name: Kevin Durant
+    age: 37
+    position_listed: SF
+    contract_type: standard
+    availability_status: injured_long_term
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - tertiary_scorer
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: elite
+      special_traits:
+        - elite_passer
+        - iso_creator
+        - declining_peak
+    tier: superstar
+    trajectory: declining_peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 179100000
+      annual_value_current_season: 43900000
+      annual_value_next_season: 45000000
+      no_trade_clause: full
+      trade_kicker: unknown
+      player_option: 2027
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.nba.com/news/kevin-durant-rockets-extension
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: full_no_trade_clause
+          weight: high
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: recently_acquired
+          weight: high
+      falsification_conditions:
+        - Durant requests trade in writing
+        - Mutual agreement between Durant and FO to facilitate deal
+        - Health trajectory deteriorates irreversibly
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Full NTC; signed $90M/2yr extension in Oct 2025; $46.1M PO for 2027-28
+    confidence: high
+    source: https://www.nba.com/news/kevin-durant-rockets-extension
+  - player_id: alperen_sengun
+    name: Alperen Sengun
+    age: 23
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: post_hub
+        secondary:
+          - secondary_creator
+          - connector
+          - spacer
+      defensive_role: rim_protector
+      shooting_profile: good
+      special_traits:
+        - elite_passer
+        - elite_rebounder
+        - playoff_riser
+    tier: star
+    trajectory: ascending
+    contract:
+      years_remaining: 5
+      total_value_remaining: 185000000
+      annual_value_current_season: 33944954
+      annual_value_next_season: 34641000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: 2030
+      team_option: none
+      bird_rights: full
+      contract_through: 2030
+      source: https://www.nba.com/news/rockets-sign-alperen-sengun-to-contract-extension
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: generational_talent
+          weight: high
+      falsification_conditions:
+        - Trade involving Sengun reported by credible sources
+        - Public FO statement explicitly stating availability
+        - Player requests trade
+    team_relationship:
+      tenure_with_team: 3.8
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: 5-year extension signed Oct 2024; player option in year 5 provides moderate leverage
+    confidence: high
+    source: https://www.nba.com/news/rockets-sign-alperen-sengun-to-contract-extension
+  - player_id: jabari_smith_jr
+    name: Jabari Smith Jr.
+    age: 22
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+          - connector
+          - screen_setter
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits: []
+    tier: star
+    trajectory: ascending
+    contract:
+      years_remaining: 5
+      total_value_remaining: 122000000
+      annual_value_current_season: 11348000
+      annual_value_next_season: 24400000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2031
+      source: https://www.nba.com/news/jabari-smith-jr-rockets-contract-extension
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: high
+      falsification_conditions:
+        - Trade reported by credible sources
+        - Public FO statement of availability
+        - Major rift with coaching staff or locker room
+    team_relationship:
+      tenure_with_team: 2.8
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: 5-year fully guaranteed extension through 2031 signed June 2025
+    confidence: high
+    source: https://www.nba.com/news/jabari-smith-jr-rockets-contract-extension
+  - player_id: dorian_finney_smith
+    name: Dorian Finney-Smith
+    age: 32
+    position_listed: SF/PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - tertiary_scorer
+          - spacer
+          - screen_setter
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits:
+        - vet_leadership
+    tier: starter
+    trajectory: declining
+    contract:
+      years_remaining: 4
+      total_value_remaining: 53000000
+      annual_value_current_season: 13250000
+      annual_value_next_season: 13250000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.nba.com/news/rockets-sign-dorian-finney-smith-lakers-2025-free-agency
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: low
+        - reason_code: aging_core
+          weight: medium
+      falsification_conditions:
+        - Rockets extend contract to 2030+ or offer multi-year renegotiation
+        - Finney-Smith publicly commits to Rockets and locker room after 2025-26
+        - Rockets use Finney-Smith in core rotation deep into playoffs
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: 4-year deal signed July 2025; veteran depth piece with moveable contract
+    confidence: medium
+    source: https://www.si.com/nba/rockets/onsi/news/houston-rockets-capela-dorian-finney-smith-contract-details
+  - player_id: clint_capela
+    name: Clint Capela
+    age: 31
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - connector
+          - finisher
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 3
+      total_value_remaining: 21500000
+      annual_value_current_season: 7166667
+      annual_value_next_season: 7166667
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.si.com/nba/rockets/onsi/news/houston-rockets-capela-dorian-finney-smith-contract-details
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: aging_core
+          weight: medium
+        - reason_code: behind_younger_player
+          weight: medium
+      falsification_conditions:
+        - Rockets extend Capela or offer multi-year renegotiation
+        - Capela becomes primary rotation center over Sengun backup
+        - Explicit FO statement of core retention
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Veteran backup center; reasonable contract for depth
+    confidence: medium
+    source: https://www.si.com/nba/rockets/onsi/news/houston-rockets-capela-dorian-finney-smith-contract-details
+  - player_id: fred_vanvleet
+    name: Fred VanVleet
+    age: 31
+    position_listed: SG
+    contract_type: standard
+    availability_status: season_ending
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - vet_leadership
+    tier: starter
+    trajectory: declining_peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 50000000
+      annual_value_current_season: null
+      annual_value_next_season: 25000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: 2027
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.nba.com/news/fred-vanvleet-rockets-contract-extension-2025
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: injury_recovery_uncertain
+          weight: high
+      falsification_conditions:
+        - VanVleet cleared medically and returns to competition
+        - Season-ending ACL injury does not require multi-year rehabilitation
+        - Reports of active physical therapy and recovery progress
+    team_relationship:
+      tenure_with_team: 1
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Sidelined with torn ACL; 2-year, $50M deal signed July 2025
+    confidence: medium
+    source: https://www.nba.com/news/fred-vanvleet-rockets-contract-extension-2025
+  - player_id: steven_adams
+    name: Steven Adams
+    age: 31
+    position_listed: C
+    contract_type: standard
+    availability_status: season_ending
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - connector
+          - finisher
+      defensive_role: helper
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 3
+      total_value_remaining: 39000000
+      annual_value_current_season: 14100000
+      annual_value_next_season: 13000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.si.com/nba/rockets/onsi/news/re-signing-veteran-center-considered-top-priority-houston-rockets
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: injury_recovery_uncertain
+          weight: high
+        - reason_code: aging_core
+          weight: low
+      falsification_conditions:
+        - Adams medically cleared to return to competition
+        - FO explicitly states Adams is part of core going forward
+        - Contract extended or renegotiated
+    team_relationship:
+      tenure_with_team: 2.3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Veteran depth; Grade 3 ankle sprain rules out remainder of 2025-26 season
+    confidence: high
+    source: https://www.si.com/nba/rockets/onsi/news/re-signing-veteran-center-considered-top-priority-houston-rockets
+  - player_id: tari_eason
+    name: Tari Eason
+    age: 23
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: finisher
+        secondary:
+          - tertiary_scorer
+          - screen_setter
+      defensive_role: wing_stopper
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 0
+      total_value_remaining: unknown
+      annual_value_current_season: 5680000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/player/_/id/78123/tari-eason
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: restricted_via_qualifying_offer
+          weight: high
+      falsification_conditions:
+        - Rockets extend Eason to multi-year deal before June 2026
+        - In-season extension reported by credible sources
+        - Eason featured prominently in playoff rotation through Finals
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 2.8
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: RFA in 2026; Rockets declined $100M offer; job interview season for Eason
+    confidence: high
+    source: https://www.thedreamshake.com/rockets-analysis/38812/houston-rockets-did-tari-eason-lose-his-bet-on-himself
+  - player_id: aaron_holiday
+    name: Aaron Holiday
+    age: 29
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: connector
+        secondary:
+          - tertiary_scorer
+          - screen_setter
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: uncertain
+      source: https://www.nba.com/player/1628988/aaron-holiday
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: aging_core
+          weight: low
+      falsification_conditions:
+        - Holiday traded mid-season to contender
+        - FO statement that Holiday is available
+        - Holiday receives significant playoff minutes
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Veteran backup guard
+    confidence: low
+    source: https://www.nba.com/player/1628988/aaron-holiday
+  - player_id: josh_okogie
+    name: Josh Okogie
+    age: 27
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - tertiary_scorer
+          - finisher
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - vet_leadership
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: 3000000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: uncertain
+      source: https://www.basketball-reference.com/teams/HOU/2026.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: aging_core
+          weight: low
+      falsification_conditions:
+        - Okogie traded mid-season
+        - FO statement of availability
+        - Okogie included in playoff rotation
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Veteran minimum depth piece
+    confidence: low
+    source: https://www.basketball-reference.com/teams/HOU/2026.html
+  - player_id: jaesean_tate
+    name: Jae'Sean Tate
+    age: 27
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: finisher
+        secondary:
+          - connector
+          - screen_setter
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits: []
+    tier: rotation
+    trajectory: declining_peak
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: 2600000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: uncertain
+      source: https://www.basketball-reference.com/teams/HOU/2026.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: aging_core
+          weight: low
+      falsification_conditions:
+        - Tate traded or waived
+        - FO statement of change in status
+        - Tate receives significant playoff minutes
+    team_relationship:
+      tenure_with_team: 1.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Assigned to G League (RGV Vipers) for playing time mid-season; sparse rotation role
+    confidence: low
+    source: https://www.hoopsrumors.com/2025/11/jaesean-tate-assigned-to-rockets-g-league-affiliate
+  - player_id: jeff_green
+    name: Jeff Green
+    age: 37
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: connector
+        secondary:
+          - tertiary_scorer
+          - spacer
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits:
+        - vet_leadership
+    tier: fringe
+    trajectory: declining
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: 3600000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: uncertain
+      source: https://www.basketball-reference.com/teams/HOU/2026.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: aging_core
+          weight: low
+      falsification_conditions:
+        - Green traded or waived
+        - FO publicly states Green is available
+        - Green sees significant playoff minutes
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Veteran veteran minimum depth
+    confidence: low
+    source: https://www.basketball-reference.com/teams/HOU/2026.html
+  - player_id: jd_davison
+    name: JD Davison
+    age: 22
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: connector
+        secondary:
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: two_way
+    trajectory: ascending
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: uncertain
+      source: https://www.basketball-reference.com/teams/HOU/2026.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_developing
+          weight: medium
+      falsification_conditions:
+        - Davison waived or sent to G League indefinitely
+        - Trade reported credibly
+        - FO explicit statement of availability
+    team_relationship:
+      tenure_with_team: 1.3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way contract; deep end of bench
+    confidence: low
+    source: https://www.basketball-reference.com/teams/HOU/2026.html
+  - player_id: isaiah_crawford
+    name: Isaiah Crawford
+    age: 21
+    position_listed: SF
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+          - finisher
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+    tier: two_way
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2027
+      source: https://www.hoopsrumors.com/2025/07/isaiah-crawford-joining-rockets-on-two-way-deal
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_developing
+          weight: medium
+      falsification_conditions:
+        - Two-way contract waived
+        - FO statement of change in status
+        - Regular season NBA playing time
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way contract with Rio Grande Valley Vipers G League affiliate
+    confidence: low
+    source: https://www.hoopsrumors.com/2025/07/isaiah-crawford-joining-rockets-on-two-way-deal
+pending_free_agents:
+  - player_id: amen_thompson
+    name: Amen Thompson
+    type: RFA
+    bird_rights_status: full
+    cap_hold_amount: unknown
+    expected_market: bidding_war
+    expected_market_detail: Expected to sign massive 5-year, $252M+ extension; ownership approved aggressive spending; multiple teams interested.
+    notes: Star caliber offer expected; Rockets have full bird rights; extension talks ongoing as of May 2026.
+    source: https://fadeawayworld.net/nba/houston-rockets/rockets-fans-divided-over-amen-thompsons-expected-252-million-contract-extension
+  - player_id: tari_eason
+    name: Tari Eason
+    type: RFA
+    bird_rights_status: full
+    cap_hold_amount: unknown
+    expected_market: bidding_war
+    expected_market_detail: RFA; declined $100M offer summer 2025; market expected to value 2-way wing highly post-2026 playoffs.
+    notes: Rockets can match any offer; trade deadline quiet signals potential summer extension or walk scenario.
+    source: https://www.thedreamshake.com/rockets-analysis/38812/houston-rockets-did-tari-eason-lose-his-bet-on-himself
+  - player_id: aaron_holiday
+    name: Aaron Holiday
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Veteran backup guard; market dependent on playoff performance and cap space around league.
+    notes: Limited playing time 2025-26; likely to seek new team or veteran minimum role.
+    source: https://www.nba.com/player/1628988/aaron-holiday
+known_target_history:
+  - target: Kevin Durant
+    year: 2025
+    outcome: acquired
+    detail: "Blockbuster 7-team trade; Rockets sent Jalen Green, Dillon Brooks, 2025 #10 pick, five 2nd-rd picks to Phoenix."
+    source: https://www.nba.com/news/kevin-durant-joins-rockets-7-team-trade
+  - target: Dorian Finney-Smith
+    year: 2025
+    outcome: acquired
+    detail: Free agency signing; Rockets signed Finney-Smith to 4-year, $53M deal from Lakers.
+    source: https://www.nba.com/news/rockets-sign-dorian-finney-smith-lakers-2025-free-agency
+  - target: Clint Capela
+    year: 2025
+    outcome: acquired
+    detail: Free agency signing; Rockets re-signed Capela to 3-year, $21.5M deal from Hawks.
+    source: https://www.nba.com/news/rockets-sign-dorian-finney-smith-lakers-2025-free-agency
+  - target: Fred VanVleet
+    year: 2025
+    outcome: acquired
+    detail: Extension signing; Rockets agreed to 2-year, $50M extension after declining prior team option.
+    source: https://www.nba.com/news/fred-vanvleet-rockets-contract-extension-2025
+near_term_priorities:
+  - priority: 2026 second-round and undrafted pipeline
+    timeline: this_offseason
+    type: draft
+    detail: Houston Rockets do not own a 2026 first-round pick but hold No. 39 from CHI, No. 53. Use second-round mocks as low-confidence scouting leads rather than strategic posture anchors.
+    confidence: low
+  - priority: Amen Thompson long-term extension
+    timeline: this_offseason
+    type: extension
+    detail: Expected $252M/5yr deal; ownership has approved aggressive spending; critical to maintain core
+    confidence: high
+  - priority: Tari Eason RFA decision
+    timeline: this_offseason
+    type: free_agency
+    detail: RFA who declined $100M offer; market will test value after 2026 playoff run; Rockets can match
+    confidence: high
+  - priority: Kevin Durant health recovery and 2027-28 player option planning
+    timeline: this_season
+    type: structural
+    detail: Bone bruise injuries in playoffs; durability critical to contention window; PO decision expected 2027
+    confidence: high
+  - priority: Assess rotation depth and trade deadline moves for 2026-27
+    timeline: next_season
+    type: roster
+    detail: First-round exit to Lakers suggests depth gaps; may reassess trade deadline strategy
+    confidence: medium
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 2
+      protections: 2026 No. 39 overall; from CHI via WAS.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: CHI
+    - year: 2026
+      round: 2
+      protections: 2026 No. 53 overall; own pick.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2028
+      round: 2
+      protections: None
+      source: unknown
+    - year: 2029
+      round: 2
+      protections: None; acquired from Washington in Cam Whitmore trade
+      source: https://www.si.com/nba/rockets/onsi/news/rockets-trade-whitmore-impact-salary-cap-rotation-more-wizards
+    - year: 2028
+      round: 2
+      from_team: LAC
+      protections: Unknown protections
+      source: https://www.si.com/nba/clippers/onsi/breaking-down-clippers-draft-picks-protections-lottery-odds-01kpdmcqxe07
+  draft_picks_owed:
+    - year: 2026
+      round: 1
+      to_team: PHI
+      protections: 2026 No. 22 overall; from HOU via OKC.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2025
+      round: 2
+      to_team: PHX
+      protections: None
+      source: https://www.nba.com/news/kevin-durant-joins-rockets-7-team-trade
+    - year: 2027
+      round: 2
+      to_team: PHX
+      protections: None
+      source: https://www.nba.com/news/kevin-durant-joins-rockets-7-team-trade
+    - year: 2028
+      round: 2
+      to_team: PHX
+      protections: None
+      source: https://www.nba.com/news/kevin-durant-joins-rockets-7-team-trade
+    - year: 2029
+      round: 2
+      to_team: PHX
+      protections: None
+      source: https://www.nba.com/news/kevin-durant-joins-rockets-7-team-trade
+    - year: 2032
+      round: 2
+      to_team: PHX
+      protections: None
+      source: https://www.nba.com/news/kevin-durant-joins-rockets-7-team-trade
+  trade_exceptions: []
+team_team_relationships:
+  rivalries:
+    - team_id: LAL
+      type: playoff_rematch
+      basis: First-round loss to Lakers 4-2 in 2026 playoffs (Lakers 4th seed, Rockets 5th seed); Lakers advanced to face Thunder in second round
+    - team_id: GSW
+      type: competitive_recent
+      basis: First-round loss to Warriors 4-3 in 2025 playoffs after 3-1 series lead (Game 7 loss); recent playoff history
+    - team_id: DEN
+      type: geographic
+      basis: Southwest division rival; Western Conference contender
+    - team_id: SAS
+      type: geographic
+      basis: Southwest division rival; historical Texas rivalry
+  notable_personnel_connections:
+    - person: Ime Udoka
+      connected_team: SAS
+      connection_type: former_assistant
+      detail: Udoka served as assistant coach under Gregg Popovich 2012-2019, including 2014 championship; played for Popovich 2007-2009
+    - person: Rafael Stone
+      connected_team: HOU
+      connection_type: former_executive
+      detail: Stone served as General Counsel for Rockets for 14 years (2006-2020) under Daryl Morey before becoming GM in Oct 2020
+    - person: Steven Adams
+      connected_team: MEM
+      connection_type: former_player
+      detail: Rockets acquired Adams from Grizzlies in Feb 2024; previously played 2023-24 season with Memphis
+g_league_and_stash:
+  affiliate_team: Rio Grande Valley Vipers
+  notable_affiliate_players:
+    - Jae'Sean Tate (assigned mid-season for playing time; NBA contract)
+    - Isaiah Crawford (two-way player; averaging 18.3 pts, 7.2 reb in G League)
+    - JD Davison (two-way player; deep rotation)
+  international_stash: []
+narrative_summary:
+  one_paragraph: The Houston Rockets emerged from 2025-26 as contenders with a 52-30 regular-season record and Western Conference 5th seed, driven by GM Rafael Stone's blockbuster Kevin Durant acquisition and a young core of stars (Alperen Sengun, Amen Thompson, Jabari Smith Jr., Reed Sheppard). Under Ime Udoka's Popovich-tree defensive scheme, the team finished with the 2nd-ranked defense. However, a first-round loss to the Los Angeles Lakers (4-2) exposed roster depth gaps and dependency on aging Durant (37, injured with ankle/bone bruise in playoffs). The organization remains in contend-now mode with hard-cap constraints, though near-term priorities—Amen Thompson's $252M extension, Tari Eason's RFA status, and Durant's durability—will define the next 2-3 years of organizational direction.
+  three_things_to_watch:
+    - "2026 second-round board: official assets No. 39 from CHI, No. 53; use mocked second-round names as low-confidence depth or rights leads, not rotation assumptions."
+    - Kevin Durant's health trajectory and 2027-28 player option decision; bone bruises in 2026 playoffs raised durability questions critical to contention window
+    - Amen Thompson $252M extension negotiation and locker room fit; star-caliber deal reflects confidence but constraints flexibility further
+    - Trade deadline / free agency depth upgrades needed post-Lakers loss; Tari Eason RFA decision and potential mid-season roster adjustments for 2026-27
+sources_used:
+  - https://www.nba.com/team/1610612745/rockets
+  - https://www.nba.com/news/ime-udoka-introduced-rockets
+  - https://www.si.com/nba/rockets/onsi/news/houston-rockets-general-manager-rafael-stone-talks-kevin-durant-and-offseason
+  - https://www.nba.com/news/kevin-durant-joins-rockets-7-team-trade
+  - https://www.basketball-reference.com/teams/HOU/2026.html
+  - https://www.spotrac.com/nba/houston-rockets/cap/_/year/2025/sort/cap_total
+  - https://www.nba.com/rockets/news/tilman-j-fertitta-new-owner-houston-rockets
+  - https://www.nba.com/news/rockets-sign-alperen-sengun-to-contract-extension
+  - https://www.nba.com/news/jabari-smith-jr-rockets-contract-extension
+  - https://fadeawayworld.net/nba/houston-rockets/rockets-fans-divided-over-amen-thompsons-expected-252-million-contract-extension
+  - https://www.nba.com/news/fred-vanvleet-rockets-contract-extension-2025
+  - https://www.nba.com/news/rockets-sign-dorian-finney-smith-lakers-2025-free-agency
+  - https://www.si.com/nba/rockets/onsi/news/houston-rockets-capela-dorian-finney-smith-contract-details
+  - https://www.si.com/nba/rockets/onsi/news/re-signing-veteran-center-considered-top-priority-houston-rockets
+  - https://www.spotrac.com/nba/player/_/id/82199/amen-thompson
+  - https://www.nba.com/news/kevin-durant-rockets-extension
+  - https://www.thedreamshake.com/rockets-analysis/38812/houston-rockets-did-tari-eason-lose-his-bet-on-himself
+  - https://www.hoopsrumors.com/2025/11/jaesean-tate-assigned-to-rockets-g-league-affiliate
+  - https://www.hoopsrumors.com/2025/07/isaiah-crawford-joining-rockets-on-two-way-deal
+  - https://riograndevalley.gleague.nba.com/news/vipers-announce-2025-26-training-camp-roster
+  - https://www.thedreamshake.com/2025/4/9/24402613/houston-rockets-case-ime-udoka-coach-of-the-year-nba-awards-alperen-sengun-amen-thompson-jalen-green
+  - https://www.si.com/nba/rockets/onsi/trade-rumors
+  - https://www.nba.com/player/1628988/aaron-holiday
+  - https://www.si.com/nba/rockets/onsi/news/rockets-trade-whitmore-impact-salary-cap-rotation-more-wizards
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - "president_basketball_ops: name, tenure_start, prior_stops, public_philosophy_signals, source"
+  - "fred_vanvleet: annual_value_current_season (injured, out for season)"
+  - "aaron_holiday: years_remaining, total_value_remaining, annual_value_current_season, contract_through, bird_rights"
+  - "josh_okogie: years_remaining, total_value_remaining, annual_value_next_season, contract_through, bird_rights"
+  - "jaesean_tate: years_remaining, total_value_remaining, annual_value_next_season, contract_through, bird_rights"
+  - "jeff_green: years_remaining, total_value_remaining, annual_value_next_season, contract_through, bird_rights"
+  - "jd_davison: years_remaining, total_value_remaining, annual_value_current_season, contract_through, bird_rights"
+  - "isaiah_crawford: annual_value_current_season"
+  - "tari_eason: years_remaining, total_value_remaining, contract_through"
+  - "amen_thompson: years_remaining, total_value_remaining, annual_value_next_season"
+  - "trade_exceptions: all fields (none identified)"
+vocabulary_flags:
+  - "steven_adams: marked as 'season_ending' (Grade 3 ankle sprain, ruled out for rest of 2025-26). Not 'injured_long_term' since specific end date is season end."
+  - "fred_vanvleet: marked as 'season_ending' (torn ACL). Contract extension signed but player unavailable for 2025-26."
+  - Market tier classification as 'tier_2' reflects Houston's status as major market but below NYC, LA, Chicago tier_1 tier. No official NBA tier classification found; inference based on metropolitan population, franchise value, media market rankings.
+  - "Ime Udoka coaching tree: tagged 'popovich_tree' based on extensive assistant tenure (2012-2019) and playing experience (2007-2009) under Popovich; popovich_tree is primary lineage."
+  - "cap_situation.current_status: marked 'above_first_apron' based on $199.8M payroll vs $195.945M first apron threshold for 2025-26; hard-capped at first apron per trade deadline reporting."

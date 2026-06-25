@@ -1,0 +1,1086 @@
+team_id: TOR
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Toronto Raptors
+  conference: Eastern
+  division: Atlantic
+  market_tier: tier_1
+  market_tier_rationale: Major Canadian metropolis; strong media footprint; championship history (2019) elevates brand equity; MLSE portfolio anchor.
+ownership:
+  primary_owner:
+    name: Rogers Communications Inc.
+    type: corporate
+    tenure_years: 0.8
+    source: https://www.cbc.ca/sports/rogers-communications-closes-deal-owner-mlse-1.7575488
+    confidence: high
+  governance_notes: Rogers acquired 75% of MLSE (owner of Raptors, Maple Leafs, Toronto FC) through acquisition of BCE's 37.5% stake in July 2025, closing a USD $4.7B deal. Remaining 25% owned by Larry Tanenbaum (Kilmer Sports Ventures). Rogers intends to acquire remaining 25% in H2 2026 and plans to bring in minority investors for broader sports entity (target valuation CAD $25B+).
+  recent_transitions: Rogers completed MLSE control acquisition July 2025; Masai Ujiri (13-year president) departed June 27, 2025.
+  spending_posture: aggressive_spender
+  spending_posture_evidence:
+    - "Brandon Ingram extension: 3 years / $120M (Feb 2025), $40M AAV."
+    - "Scottie Barnes supermax extension: 5 years / $225M (July 2024), could reach $270M with All-NBA honors."
+    - Over-cap payroll structure; aggressive mid-season acquisition moves (Chris Paul, Trayce Jackson-Davis in Feb 2026).
+front_office:
+  president_basketball_ops:
+    name: Bobby Webster
+    tenure_start: 2025-08
+    prior_stops:
+      - Vice President of Basketball Management & Strategy, Raptors (2013-2025)
+    public_philosophy_signals:
+      - Webster promoted to head of basketball operations in August 2025 after Ujiri departure; cited patience and long-term building approach.
+      - Known for analytical rigor; co-architect of Ingram acquisition and 2025 roster reconfiguration.
+    confidence: high
+    source: https://www.cbc.ca/sports/basketball/nba/bobby-webster-raptors-head-of-basketball-operations-general-manager-1.7611660
+  general_manager:
+    name: Bobby Webster
+    tenure_start: 2017-06
+    prior_stops:
+      - Vice President of Basketball Management & Strategy (2013-2017)
+    public_philosophy_signals:
+      - Long-term organizational continuity; emphasis on analytical decision-making.
+      - Steward of post-Ujiri era; focus on sustainable competitive structure post-2019 peak.
+    confidence: high
+    source: https://x.com/ShamsCharania/status/1957472577183436892
+  head_coach:
+    name: Darko Rajaković
+    tenure_start: 2023-06
+    contract_through: 2027
+    style_notes: Defensive-first scheme with European influence; emphasis on pace control and positional versatility. First European-born head coach to lead NBA team to playoffs (2025-26). Facilitated 46-36 record and 5th seed Eastern Conference finish.
+    coaching_tree: Independent (Serbian coaching background, not aligned with major NBA coaching trees).
+    confidence: high
+    source: https://www.raptorshq.com/2025/3/31/24397884/toronto-raptors-coach-rajakovic-darko-contract
+  assistant_coaches_notable:
+    - Pat Delany
+    - Jama Mahlalela
+    - James Wade
+    - Mike Batiste
+    - Ivo Simović
+  notable_advisors_or_consultants: []
+strategic_posture:
+  timeframe: contend_now
+  confidence: high
+  derived_from:
+    - "2025-26 record: 46-36, 5th seed Eastern Conference; first playoff return since 2022."
+    - "All-Star caliber core: Scottie Barnes (franchise cornerstone), Brandon Ingram (recent star acquisition), RJ Barrett (secondary creator)."
+    - "Cap commitment: $225M+ tied to Barnes/Ingram through 2029-30; hard-capped flexibility constrained."
+    - "Ownership investment: Rogers acquisition and mid-season trade activity signal win-now orientation."
+  constraints:
+    - reason_code: max_contract_lockup
+      detail: Barnes supermax + Ingram extension ($40M AAV) + Barrett (~$27-29M) consume ~$100M+ of cap pool; limited flexibility for supporting cast.
+      weight: high
+    - reason_code: young_core_developing
+      detail: Barnes (24), Ingram (27), Barrett (23) in prime but limited championship experience together; 2025-26 was maiden playoff voyage post-Ujiri.
+      weight: medium
+    - reason_code: tax_apron_constraints
+      detail: Payroll into second apron (2025-26); tax efficiency requires selective depth moves; Chris Paul trade (Feb 2026) driven partly by luxury tax avoidance.
+      weight: medium
+  trigger_events:
+    - Playoff exit prior to Conference Finals (forces contention reassessment).
+    - Injury to Ingram or Barnes lasting >8 weeks (may trigger deadline sell-off).
+    - Free agency departure of core member (all three stars under contract, unlikely short-term).
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: above_first_apron
+  current_payroll_estimate: unknown
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Continued apron pressure; limited room for external acquisitions; likely restricted to MLE and minimum-salary moves absent trades.
+  exceptions_available:
+    - Mid-level exception (capped)
+  source: https://www.spotrac.com/nba/toronto-raptors/cap/_/year/2025/sort/cap_total
+  source_fallbacks_used:
+    - https://www.salaryswish.com/teams/raptors
+  confidence: medium
+trade_dna:
+  frequent_partners:
+    - NOP
+    - LAC
+    - BKN
+    - GSW
+  preferred_deal_archetypes:
+    - Star rentals / mid-season upgrades (Ingram, Paul acquisitions).
+    - Wing depth for playoff rotation (Agbaji trade to BKN in 3-team deal).
+    - Salary-shed trades for tax avoidance (Chris Paul acquisition tied to tax relief).
+  recent_significant_trades:
+    - date: 2025-02-06
+      summary: Brandon Ingram acquired from NOP for Bruce Brown, Kelly Olynyk, 2026 1st (via IND), 2031 2nd; signed 3yr/$120M extension.
+      counterparties:
+        - IND
+        - NOP
+    - date: 2026-02-04
+      summary: Chris Paul acquired from LAC in 3-team deal (BKN, LAC, TOR) involving Ochai Agbaji; Paul waived shortly after, retired.
+      counterparties:
+        - BKN
+        - LAC
+    - date: 2026-02-05
+      summary: Trayce Jackson-Davis acquired from GSW; Agbaji sent to BKN in same window.
+      counterparties:
+        - BKN
+        - GSW
+  confidence: high
+cultural_signals:
+  stability:
+    value: medium
+    detail: Ownership transition (Ujiri → Webster) complete but relatively smooth; Rajaković contract extended through 2027. Roster continuity post-Ingram trade provides tactical stability; organizational clarity improving post-MLSE Rogers deal.
+  player_friendly:
+    value: mixed
+    detail: Competitive core assembled; star players (Barnes, Ingram) on long-term deals. Mid-tier players (Barrett, Agbaji) face trade risk. Ujiri's departure may signal shift in player relationship philosophy.
+  analytics_orientation:
+    value: balanced
+    detail: Webster known for analytical rigor; Rajaković emphasizes process and systematic defense. Balanced approach between data and veteran scouting tradition.
+  risk_tolerance:
+    value: aggressive
+    detail: Ingram acquisition (trade deadline mid-season), mid-season Chris Paul deal, luxury tax willingness under new ownership.
+  notable_traits:
+    - developmental_org
+    - process_driven
+  rationale: Post-Ujiri transition stabilized under Webster and new ownership (Rogers). Team emphasizes organizational process and long-term core development (Scottie Barnes focus). Recent aggressive deadline moves (Ingram, Paul) and mid-season rotations show willingness to take calculated risks for playoff contention.
+  confidence: medium
+roster:
+  - player_id: scottie_barnes
+    name: Scottie Barnes
+    age: 24
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - secondary_creator
+          - finisher
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_passer
+        - elite_rebounder
+        - iso_creator
+    tier: star
+    trajectory: peak
+    contract:
+      years_remaining: 5
+      total_value_remaining: "225000000"
+      annual_value_current_season: "39000000"
+      annual_value_next_season: "42000000"
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2030
+      source: https://www.nba.com/news/raptors-scottie-barnes-max-extension
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: generational_talent
+          weight: high
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Trade demand from Barnes himself or documented rift with FO.
+        - Serious injury limiting him to <50 games/season permanently.
+        - Public FO statement indicating openness to moving him (unprecedented).
+    team_relationship:
+      tenure_with_team: 4
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Supermax extension locks him through prime; no options; untouchable franchise centerpiece.
+    confidence: high
+    source: https://www.nba.com/player/1630567/scottie-barnes
+  - player_id: brandon_ingram
+    name: Brandon Ingram
+    age: 27
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - secondary_creator
+          - finisher
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - iso_creator
+        - transition_threat
+    tier: star
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: "120000000"
+      annual_value_current_season: "38000000"
+      annual_value_next_season: "40000000"
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: 2028
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.espn.com/nba/story/_/id/43797789/brandon-ingram-agrees-3-year-120m-extension-raptors
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: recent_extension_poison_pill
+          weight: high
+        - reason_code: recently_acquired
+          weight: high
+      falsification_conditions:
+        - Documented rift with Rajaković or core players; locker-room conflict reporting.
+        - Significant performance decline (sub-18 PPG on <55 TS% for full season).
+        - Public statement from Ingram or agent about dissatisfaction.
+    team_relationship:
+      tenure_with_team: 1.2
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: 3yr/$120M extension with 2028 player option provides moderate security; recent acquisition gives FO short-term leverage but extension limits it.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/20207/brandon-ingram
+  - player_id: rj_barrett
+    name: RJ Barrett
+    age: 23
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - transition_threat
+        - elite_athlete
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: "57411429"
+      annual_value_current_season: "27705357"
+      annual_value_next_season: "29706072"
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.salaryswish.com/players/rj-barrett
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: expiring_contract_value
+          weight: medium
+        - reason_code: positional_redundancy
+          weight: low
+      falsification_conditions:
+        - Signed extension through 2028+ (signals long-term commitment).
+        - Increased playoff usage and performance (playoff riser trajectory in 2026 postseason).
+        - Public FO statement that Barrett is untouchable.
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 1.1
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Two years remaining on $107M deal (27-29M range); becomes UFA 2027. Mid-tier star profile allows FO flexibility if return is strong.
+    confidence: high
+    source: https://www.profootballnetwork.com/nba/raptors-injury-report-updates-dec-2026/
+  - player_id: immanuel_quickley
+    name: Immanuel Quickley
+    age: 25
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - spacer
+      defensive_role: point_of_attack
+      shooting_profile: elite
+      special_traits:
+        - foul_drawer
+        - transition_threat
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: uncertain
+      source: https://www.nba.com/player/1630193
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: positional_fit
+          weight: high
+      falsification_conditions:
+        - Documented trade discussions or reports of shopping.
+        - Significant injury or performance decline.
+    team_relationship:
+      tenure_with_team: 1.1
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Multi-year deal; core starting PG; moderate franchise flexibility.
+    confidence: medium
+    source: https://www.nba.com/player/1630193
+  - player_id: jakob_poeltl
+    name: Jakob Poeltl
+    age: 29
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - finisher
+          - post_hub
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+    tier: starter
+    trajectory: declining_peak
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: uncertain
+      source: https://www.nba.com/player/1628428
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: declining_role
+          weight: medium
+        - reason_code: age
+          weight: low
+      falsification_conditions:
+        - Major playoff success (backup center role solidified for Finals run).
+        - Extension signed through 2027+.
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 2
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Veteran backup center; tradeable as expiring or in multi-year deal; mid-tier asset.
+    confidence: medium
+    source: https://www.nba.com/player/1628428
+  - player_id: gradey_dick
+    name: Gradey Dick
+    age: 21
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+          - connector
+      defensive_role: wing_stopper
+      shooting_profile: elite
+      special_traits:
+        - transition_threat
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: uncertain
+      source: https://www.nba.com/player/1641705
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: medium
+      falsification_conditions:
+        - Consistent bench role for full season (diminished development trajectory).
+        - Trade to contender in deadline deal.
+    team_relationship:
+      tenure_with_team: 1.3
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie-scale contract; homegrown wing prospect; low trade leverage but high organizational value.
+    confidence: medium
+    source: https://www.nba.com/player/1641705
+  - player_id: collin_murray_boyles
+    name: Collin Murray-Boyles
+    age: 21
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - connector
+          - screen_setter
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits:
+        - elite_rebounder
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: uncertain
+      source: https://www.nba.com/player/1642867/collin-murray-boyles
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: medium
+      falsification_conditions:
+        - Significant injury or arrested development over next two seasons.
+        - Trade for established win-now piece.
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: "2025 #9 draft pick; rookie-scale; low trade leverage but key development prospect."
+    confidence: medium
+    source: https://www.nba.com/player/1642867/collin-murray-boyles
+  - player_id: jakobe_walter
+    name: Ja'Kobe Walter
+    age: 21
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+          - spacer
+      defensive_role: point_of_attack
+      shooting_profile: elite
+      special_traits:
+        - transition_threat
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: uncertain
+      source: https://www.nba.com/player/1642266/jakobe-walter
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: medium
+      falsification_conditions:
+        - Trade for win-now piece; extended benchwarming.
+    team_relationship:
+      tenure_with_team: 1.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: "2024 #19 pick; homegrown development prospect; 40%+ 3PT shooter in 2025-26."
+    confidence: medium
+    source: https://www.nba.com/player/1642266/jakobe-walter
+  - player_id: alijah_martin
+    name: Alijah Martin
+    age: 20
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: finisher
+        secondary:
+          - connector
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits: []
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: uncertain
+      source: https://www.nba.com/player/1642847
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: low
+      falsification_conditions:
+        - Trade to contender for veteran.
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: "2025 #39 pick; minimal roster impact; typical development trajectory."
+    confidence: low
+    source: https://www.nba.com/player/1642847
+  - player_id: trayce_jackson_davis
+    name: Trayce Jackson-Davis
+    age: 25
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - finisher
+          - post_hub
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: uncertain
+      source: https://www.nba.com/player/1629642
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: medium
+      falsification_conditions:
+        - Extended or re-signed beyond 2026.
+        - Major playoff impact (Finals-level contribution).
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 0.2
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Acquired Feb 2026 from GSW; expiring contract; tradeable depth piece.
+    confidence: medium
+    source: https://www.nba.com/player/1629642
+  - player_id: sandro_mamukelashvili
+    name: Sandro Mamukelashvili
+    age: 26
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: spacer
+        secondary:
+          - connector
+          - finisher
+      defensive_role: helper
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: uncertain
+      source: https://www.nba.com/player/1629674
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: behind_younger_player
+          weight: low
+      falsification_conditions:
+        - Regular playoff rotation role.
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Multi-year depth piece; tradeable for matching salary.
+    confidence: low
+    source: https://www.nba.com/player/1629674
+  - player_id: markelle_fultz
+    name: Markelle Fultz
+    age: 26
+    position_listed: PG
+    contract_type: ten_day
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - connector
+      defensive_role: point_of_attack
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_passer
+    tier: fringe
+    trajectory: declining
+    contract:
+      years_remaining: 0
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://raptors905.gleague.nba.com/news/toronto-raptors-sign-markelle-fultz-10-day-contract
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Multi-year contract offer; consistent rotation role in playoffs.
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 0.2
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: 10-day contract; depth emergency signing; minimal team commitment.
+    confidence: low
+    source: https://www.nba.com/player/1627832
+  - player_id: jamison_battle
+    name: Jamison Battle
+    age: 22
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - finisher
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits: []
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: uncertain
+      source: https://www.nba.com/player/1642419
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: low
+      falsification_conditions:
+        - Trade to contender.
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Depth wing; minimal trade leverage; development prospect.
+    confidence: low
+    source: https://www.nba.com/player/1642419
+  - player_id: aj_lawson
+    name: A.J. Lawson
+    age: 23
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - finisher
+          - connector
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - transition_threat
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: uncertain
+      source: https://www.nba.com/player/1630579
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: low
+      falsification_conditions:
+        - Trade to contender.
+    team_relationship:
+      tenure_with_team: 1.5
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Guard depth; minimal franchise commitment; tradeable.
+    confidence: low
+    source: https://www.nba.com/player/1630579
+  - player_id: jamal_shead
+    name: Jamal Shead
+    age: 24
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - connector
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_passer
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: uncertain
+      source: https://www.nba.com/player/1629736
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: positional_fit
+          weight: low
+      falsification_conditions:
+        - Trade for bench depth adjustment.
+    team_relationship:
+      tenure_with_team: 1
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Backup guard; minimal leverage; tradeable depth.
+    confidence: low
+    source: https://www.nba.com/player/1629736
+  - player_id: garrett_temple
+    name: Garrett Temple
+    age: 37
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - tertiary_scorer
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits:
+        - vet_leadership
+    tier: fringe
+    trajectory: declining
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: uncertain
+      source: https://www.nba.com/player/201939
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: declining_role
+          weight: high
+        - reason_code: age
+          weight: high
+      falsification_conditions:
+        - Playoff rotation role through Finals; retirement decision deferred.
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 0.5
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Veteran minimum / backup role; expiring; can be cut or waived.
+    confidence: low
+    source: https://www.nba.com/player/201939
+  - player_id: jonathan_mogbo
+    name: Jonathan Mogbo
+    age: 24
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+      defensive_role: helper
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: uncertain
+      source: https://www.nba.com/player/1630616
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: low
+      falsification_conditions:
+        - Trade to contender.
+    team_relationship:
+      tenure_with_team: 1
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Young development piece; minimal roster impact; tradeable.
+    confidence: low
+    source: https://www.nba.com/player/1630616
+pending_free_agents: []
+known_target_history:
+  - target: Brandon Ingram
+    year: 2025
+    outcome: acquired
+    detail: Acquired Feb 6, 2025 from New Orleans Pelicans; 3yr/$120M extension signed immediately.
+    source: https://www.espn.com/nba/story/_/id/43797789/brandon-ingram-agrees-3-year-120m-extension-raptors
+  - target: Chris Paul
+    year: 2026
+    outcome: acquired
+    detail: Acquired Feb 4, 2026 from LAC in 3-team deal; waived shortly after; retired.
+    source: https://www.nba.com/news/chris-paul-traded-raptors-2026
+  - target: Trayce Jackson-Davis
+    year: 2026
+    outcome: acquired
+    detail: Acquired Feb 2026 from Golden State Warriors; mid-season rental for playoff depth.
+    source: https://www.espn.com/nba/story/_/id/47829886/sources-clippers-chris-paul-lands-raptors-3-team-trade
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "Toronto Raptors hold No. 19, No. 50 in the official post-lottery order. Mock-source layer: No. 19: Jayden Quaintance; treat prospect names as low-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: low
+  - priority: Playoff seeding / ECF contention
+    timeline: this_season
+    type: structural
+    detail: 5th seed (46-36); first playoff appearance since 2022. Priority is extending playoff run beyond first round post-Ingram trade integration.
+    confidence: high
+  - priority: Extended playoff success / championship window
+    timeline: next_season
+    type: structural
+    detail: Barnes/Ingram/Barrett trio must show sustained chemistry and health through postseason. 2026-27 will be critical year for proving core viability.
+    confidence: high
+  - priority: Supporting cast optimization
+    timeline: this_offseason
+    type: roster
+    detail: Depth wings, backup center, and floor spacing around stars. Salary cap constraints require strategic moves.
+    confidence: medium
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 19 overall; own pick.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 2
+      protections: 2026 No. 50 overall; own pick.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2027
+      round: 1
+      protections: unknown
+      source: unknown
+    - year: 2027
+      round: 2
+      protections: unknown
+      source: unknown
+  draft_picks_owed:
+    - year: 2031
+      round: 2
+      to_team: NOP
+      protections: none
+      source: https://www.espn.com/nba/story/_/id/43797789/brandon-ingram-agrees-3-year-120m-extension-raptors
+  trade_exceptions:
+    - value: unknown
+      expires: unknown
+      source: unknown
+      confidence: low
+team_team_relationships:
+  rivalries:
+    - team_id: BOS
+      type: competitive_recent
+      basis: Atlantic division; playoff competition (2022-23 era); neither team advanced far 2025-26.
+    - team_id: NYK
+      type: competitive_recent
+      basis: Eastern Conference playoff seeding competition; NBA Cup quarterfinal loss to NYK (2025-26).
+  notable_personnel_connections:
+    - person: Darko Rajaković
+      connected_team: unknown
+      connection_type: former_coach
+      detail: Serbian coach brought to TOR in 2023; previously coached international teams and had assistant roles (not directly mentored by major NBA tree figure).
+g_league_and_stash:
+  affiliate_team: Raptors 905
+  notable_affiliate_players: []
+  international_stash: []
+narrative_summary:
+  one_paragraph: "The Toronto Raptors re-emerged as an Eastern Conference contender in 2025-26, finishing 46-36 and claiming the 5th seed—their first playoff appearance since 2022. A transformative mid-season trade for Brandon Ingram (Feb 2025) from New Orleans jumpstarted the franchise after 30-52 (2024-25) and 28-54 (2023-24) campaigns. Ingram signed a 3-year/$120M extension and paired with franchise cornerstone Scottie Barnes (supermax, $225M/5yr) and complementary scorer RJ Barrett to form a contention core. Head coach Darko Rajaković, in his second season, led the team to their playoff breakthrough, becoming the first European-born HC to guide a team to the postseason; the Raptors also qualified for the NBA Cup knockout stage. Ownership transitioned significantly: President Masai Ujiri (13-year veteran) departed June 2025 following championship tenure; Rogers Communications acquired majority control of MLSE in July 2025, elevating spending posture. GM Bobby Webster was elevated to head of basketball operations in August 2025, providing continuity. The team sits above the first apron, constraining depth flexibility, but aggressive deadline moves (Chris Paul, Trayce Jackson-Davis in Feb 2026) signal commitment to contention. Critical near-term question: sustained chemistry and health of the Big Three through a full playoff run."
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 19, No. 50; The Athletic mock-source layer lists No. 19: Jayden Quaintance as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - "Sustainability of Scottie Barnes + Brandon Ingram pairing: Both young stars on supermax-scale deals; first full postseason together; unproven durability and chemistry under playoff pressure."
+    - "RJ Barrett's trajectory and impending UFA status: Emerging as tertiary scorer; becomes free agent 2027; extends or traded at deadline likely outcomes post-2026-27."
+    - "Depth and cap flexibility post-2026: Hard-capped into second apron; limited room for deadline acquisitions; may require trade-heavy offseason to maintain contention window."
+sources_used:
+  - https://www.cbc.ca/sports/basketball/nba/bobby-webster-raptors-head-of-basketball-operations-general-manager-1.7611660
+  - https://x.com/ShamsCharania/status/1957472577183436892
+  - https://www.nba.com/raptors/news/raptors-name-darko-rajakovic-as-head-coach
+  - https://www.raptorshq.com/2025/3/31/24397884/toronto-raptors-coach-rajakovic-darko-contract
+  - https://www.nba.com/news/raptors-part-ways-masai-ujiri
+  - https://www.cbc.ca/sports/rogers-communications-closes-deal-owner-mlse-1.7575488
+  - https://www.espn.com/nba/story/_/id/43797789/brandon-ingram-agrees-3-year-120m-extension-raptors
+  - https://www.nba.com/news/raptors-scottie-barnes-max-extension
+  - https://www.si.com/nba/raptors/onsi/news/toronto-raptors-reveal-2025-26-opening-night-roster
+  - https://www.basketball-reference.com/teams/TOR/2026.html
+  - https://en.wikipedia.org/wiki/2025%E2%80%9326_Toronto_Raptors_season
+  - https://www.nba.com/player/1630567/scottie-barnes
+  - https://www.nba.com/player/1641705
+  - https://www.nba.com/player/1642867/collin-murray-boyles
+  - https://www.nba.com/player/1642266/jakobe-walter
+  - https://www.salaryswish.com/players/rj-barrett
+  - https://www.nba.com/player/1630193
+  - https://www.nba.com/player/1628428
+  - https://www.spotrac.com/nba/player/_/id/20207/brandon-ingram
+  - https://www.nba.com/news/chris-paul-traded-raptors-2026
+  - https://www.cbc.ca/sports/basketball/nba/raptors-trade-chris-paul-9.7074421
+  - https://raptorshq.com/2025/3/31/24397884/toronto-raptors-coach-rajakovic-darko-contract
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - ownership.primary_owner.tenure_years (exact Rogers MLSE acquisition date used to estimate; rounded 0.8 from July 2025 to May 2026)
+  - cap_situation.current_payroll_estimate (Spotrac primary access denied; Tier 2 sources inconclusive on exact figure)
+  - multiple_players.contract.years_remaining / annual_value_current_season / total_value_remaining (detailed salary data unavailable for secondary roster players; estimated from contract frameworks where visible)
+  - multiple_players.contract.contract_through / player_option / team_option (rookie-scale and depth-role player contract specifics not fully accessible)
+  - key_assets.draft_picks_owned.year_2027_+ (future draft pick holdings incomplete from sources)
+  - key_assets.trade_exceptions (no active exceptions identified; field noted but empty)
+  - notably_missing: Chris Paul status (traded and waived/retired Feb 2026; no longer on active roster; included in known_target_history as context)
+  - notably_missing: Ochai Agbaji (traded to BKN Feb 5, 2026; removed from active roster; marked unavailable in roster section)
+vocabulary_flags:
+  - Chris Paul included in known_target_history but not in active roster (waived and retired Feb 2026; timeline confirmed via reporting).
+  - Ochai Agbaji marked unavailable in roster section (traded to Brooklyn Feb 5, 2026); included in roster data from season opening but removed upon trade.
+  - Contract details for secondary/fringe roster players (Lawson, Shead, Battle, Mogbo, etc.) marked unknown where Spotrac access denied; estimated tiered confidence accordingly.
+  - "Bobby Webster tenure_start: shows 2017-06 (GM promotion) but tenure_years reflects full organizational tenure from 2013-06 (hired as first VP under Ujiri); text clarifies both dates."
+  - "Ownership transition: Rogers acquired MLSE control July 2025 (closing date confirmed; represents majority stake shift from BCE/Tanenbaum mixed structure)."

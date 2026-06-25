@@ -1,0 +1,1082 @@
+team_id: SAC
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Sacramento Kings
+  conference: Western
+  division: Pacific
+  market_tier: tier_3
+  market_tier_rationale: Sacramento metro ~2.45M population, TV market rank ~19th in US; classified as small-market NBA city with structural constraints on free agent recruitment.
+ownership:
+  primary_owner:
+    name: Vivek Yeshwant Ranadivé
+    type: individual
+    tenure_years: 13
+    source: https://en.wikipedia.org/wiki/Vivek_Ranadiv%C3%A9
+    confidence: high
+  governance_notes: Ranadivé is majority owner holding ~65% stake as of 2021 buyout of minority shares with Arctos Sports Partners. Known to engage in franchise decisions but defers final authority to GM.
+  recent_transitions: None in past 3 years.
+  spending_posture: aggressive_spender
+  spending_posture_evidence:
+    - Committed >$1B to Golden 1 Center construction and surrounding development (opened 2016).
+    - "Payroll 2025-26: $193.3M vs $154.6M salary cap; chose to enter first apron."
+    - Signed marquee veterans (DeRozan, LaVine, Schröder, Westbrook) in 2025 offseason.
+front_office:
+  president_basketball_ops:
+    name: unknown
+    tenure_start: unknown
+    prior_stops: []
+    public_philosophy_signals: []
+    confidence: low
+    source: unknown
+  general_manager:
+    name: Scott Perry
+    tenure_start: 2025-04
+    prior_stops:
+      - New York Knicks (2017-2023, 6 seasons)
+      - Detroit Pistons
+      - Sacramento Kings (previous role, 2017)
+    public_philosophy_signals:
+      - "Emphasized six core tenets on media day 2025-26: 'competitive, tough, team oriented, accountable, disciplined and professional.'"
+      - Preached patience in rough start despite 22-60 record in inaugural season.
+      - Focused on organizational identity over roster shortcuts.
+    confidence: high
+    source: https://www.nbcsportsbayarea.com/nba/sacramento-kings/scott-perry-six-tenets-2025-26-season/1877931/
+  head_coach:
+    name: Doug Christie
+    tenure_start: 2024-12
+    contract_through: "2027"
+    style_notes: Defensive-minded, high-energy approach emphasizing communication, player empowerment, and simplified offensive execution. Focuses on toughness, discipline, and team-oriented play. Encourages less arguing with officials and player development through experience.
+    coaching_tree: Rick Adelman tree (played under Adelman 2000-05 during Sacramento's peak years)
+    confidence: high
+    source: https://kings.com/news/kings-name-doug-christie-as-head-coach
+  assistant_coaches_notable:
+    - Bobby Jackson (defensive coach, Rick Adelman-era teammate)
+    - Mike Miller (Washington Wizards 2021-24, 30+ years coaching experience)
+    - Chris Darnell (Canton Charge HC 2024-25, G League affiliate)
+    - Leandro Barbosa (player development, 4th season with Kings)
+    - Mike Woodson (associate head coach)
+  notable_advisors_or_consultants:
+    - Dipesh Mistry (assistant coach/player development, 3rd season)
+    - Paul Jesperson (head of player development)
+strategic_posture:
+  timeframe: retool
+  confidence: medium
+  derived_from:
+    - 22-60 record in 2025-26; worst in Western Conference and franchise's first 60-loss season since 2008-09.
+    - Core group (Sabonis, LaVine, DeRozan) assembled via Feb 2025 3-team trade; roster blending veterans with young talent (Clifford, Raynaud, Carter, Murray).
+    - GM Perry stated patience needed; implied timeline of 2-3 years to playoff contention with draft lottery support.
+    - Payroll $193M vs $187.9M luxury tax; team signaled no plans to exceed penalty line in 2026-27.
+  constraints:
+    - reason_code: max_contract_lockup
+      detail: Sabonis ($42.3M), LaVine ($45.9M), DeRozan ($24.5M) locked through 2026-27; limited cap flexibility.
+      weight: high
+    - reason_code: recent_playoff_success
+      detail: 2023 playoff appearance (48-34, 3rd West) created urgency to maintain contention that backfired; led to reactionary trades (Fox to SAS Feb 2025).
+      weight: medium
+    - reason_code: market_pressure
+      detail: Small-market status limits free agent appeal; draft and development are primary paths to sustained success.
+      weight: medium
+    - reason_code: hard_cap_acceptance
+      detail: First apron status in 2025-26 ($195.9M); ownership historically tax-averse; structural constraint on roster additions.
+      weight: high
+  trigger_events:
+    - 2026 lottery result left Sacramento at No. 7, keeping the retool path active but below the top-four prospect tier.
+    - Unexpectedly strong 2026-27 season could pivot toward 'contend_soon' if core players elevate.
+    - Trade of Sabonis or LaVine would signal shift to 'rebuild'.
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: above_first_apron
+  current_payroll_estimate: 193326868
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Payroll projected $225M (~$24M over luxury tax, $3M over 2nd apron); significant reductions likely needed.
+    - season: 2027-28
+      projected_status: Major salary relief expected as Sabonis 2-year deals and LaVine/DeRozan contracts naturally expire.
+  exceptions_available:
+    - Mid-level exception (limited availability; team above apron)
+    - Minimum salary slots
+  source: https://www.spotrac.com/nba/sacramento-kings/cap/2025/
+  source_fallbacks_used:
+    - https://www.salaryswish.com/teams/kings
+    - https://fanspo.com/nba/teams/Kings/26
+  confidence: high
+trade_dna:
+  frequent_partners:
+    - SAS
+    - CHI
+    - CLE
+  preferred_deal_archetypes:
+    - Star-for-star swaps in response to playoff frustration (Fox → SAS; acquired LaVine/DeRozan/Hunter in returns).
+    - Salary matching deals to navigate luxury tax constraints.
+    - Young talent for veterans or vice versa (Clifford acquisition via draft; Schröder/Westbrook for age/experience).
+  recent_significant_trades:
+    - date: 2025-02
+      summary: "3-team trade: Fox to SAS; LaVine, Saric acquired; Kings received draft picks as sweetener."
+      counterparties:
+        - SAS
+    - date: 2025-10
+      summary: "Acquired De'Andre Hunter (3-team: CLE-Kings-CHI); dealt Schröder/Ellis; $25M 1-year expiring asset."
+      counterparties:
+        - CHI
+        - CLE
+    - date: 2025-07
+      summary: Dennis Schröder signed 3-year, $45M FA deal; veteran point guard addition.
+    - date: 2025-07
+      summary: Russell Westbrook signed 1-year, $3.6M minimum deal; final depth addition.
+  confidence: high
+cultural_signals:
+  stability:
+    value: low
+    detail: Doug Christie interim to permanent (Dec 2024 → May 2025); Monte McNair replaced by Scott Perry after 22-60 season; roster turnover after 2024-25 play-in loss; coaching changes under both Brown and now Christie indicate instability.
+  player_friendly:
+    value: mixed
+    detail: Christie emphasizes communication and player empowerment; recent moves (Fox trade) signal willingness to move disgruntled stars. Arena (Golden 1) is world-class. But frequent roster churn and front-office volatility complicate the message.
+  analytics_orientation:
+    value: balanced
+    detail: Perry (Knicks analytics-forward background) balanced with Ranadivé's ownership influence and Christie's player-development focus; no clear dominant signal from available statements.
+  risk_tolerance:
+    value: aggressive
+    detail: Fox trade mid-season for uncertain return; heavy luxury tax spending; aggressive mid-market signings (LaVine, DeRozan, Schröder, Westbrook).
+  notable_traits:
+    - process_driven
+    - star_chasing
+    - coaching_decision_pending
+  rationale: Kings history shows cycles of hope (2023 playoff run) followed by reactionary desperation (Fox trade, aggressive veteran signings, 22-60 collapse). Ranadivé engaged but sometimes overextends; Perry brings discipline but faces unstable roster. Christie's steady defensive philosophy offers stability, but organizational pattern suggests churn.
+  confidence: medium
+roster:
+  - player_id: domantas_sabonis
+    name: Domantas Sabonis
+    age: 29
+    position_listed: C/PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: post_hub
+        secondary:
+          - secondary_creator
+          - connector
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits:
+        - elite_rebounder
+        - elite_passer
+        - pnr_maestro
+    tier: star
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 84600000
+      annual_value_current_season: 42300000
+      annual_value_next_season: 42300000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.spotrac.com/nba/sacramento-kings/cap/2025/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: generational_talent
+          weight: high
+      falsification_conditions:
+        - Public FO statement that Sabonis is available for trade.
+        - Sabonis requests trade; media reports of unhappiness.
+        - Signs extension with reduced salary/control.
+      signal_strength: rumor_only
+    team_relationship:
+      tenure_with_team: 3.3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Multi-year deal with full no-trade clause not applicable; Sabonis is franchise anchor with minimal leverage pressure.
+    confidence: high
+    source: https://www.nba.com/player/1627734/domantas-sabonis/
+  - player_id: zach_lavine
+    name: Zach LaVine
+    age: 30
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+        - transition_threat
+        - iso_creator
+    tier: star
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 137700000
+      annual_value_current_season: 45900000
+      annual_value_next_season: 45900000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: 2027
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.spotrac.com/nba/sacramento-kings/cap/2025/
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: cap_relief_target
+          weight: high
+        - reason_code: expiring_contract_value
+          weight: high
+      falsification_conditions:
+        - LaVine signs extension beyond 2027 player option.
+        - Kings exclude LaVine from trade discussions in public FO statements.
+        - LaVine All-Star season with +5 wins in 2026-27.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Player option in 2027; team desperate to offload salary; LaVine can opt in and force team into luxury tax penalty zone.
+    confidence: high
+    source: https://www.nba.com/player/203897/zach-lavine/
+  - player_id: demar_derozan
+    name: DeMar DeRozan
+    age: 36
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - finisher
+      defensive_role: switchable
+      shooting_profile: non_shooter
+      special_traits:
+        - vet_leadership
+        - playoff_riser
+        - iso_creator
+    tier: starter
+    trajectory: declining_peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 50200000
+      annual_value_current_season: 24500000
+      annual_value_next_season: 25700000
+      no_trade_clause: unknown
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.spotrac.com/nba/sacramento-kings/cap/2025/
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: declining_role
+          weight: medium
+        - reason_code: cap_relief_target
+          weight: medium
+      falsification_conditions:
+        - DeRozan leads team to 50+ wins in 2026-27.
+        - FO publicly commits to extension beyond 2028.
+        - Named to All-Star team in 2026-27.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Aging star (36) with contract-guaranteed structure; team may seek to convert to expiring asset or move for picks.
+    confidence: high
+    source: https://www.nba.com/player/201942/demar-derozan/
+  - player_id: keegan_murray
+    name: Keegan Murray
+    age: 23
+    position_listed: PF/SF
+    contract_type: standard
+    availability_status: injured_short_term
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: 11144093
+      annual_value_current_season: 11144093
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://fanspo.com/nba/teams/Kings/26
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: medium
+        - reason_code: homegrown_loyalty
+          weight: medium
+      falsification_conditions:
+        - Murray restricted free agency not matched by Kings.
+        - Extended injury or regression through 2026-27.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2.3
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie-scale contract; RFA looming; Kings have restricted bird rights but injury history (thumb surgery, various ailments) adds uncertainty.
+    confidence: high
+    source: https://www.basketball-reference.com/teams/SAC/2026.html
+  - player_id: malik_monk
+    name: Malik Monk
+    age: 27
+    position_listed: PG/SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - spacer
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: good
+      special_traits:
+        - transition_threat
+        - foul_drawer
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 56391000
+      annual_value_current_season: 18797619
+      annual_value_next_season: 18797619
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://fanspo.com/nba/teams/Kings/26
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: locker_room_anchor
+          weight: medium
+      falsification_conditions:
+        - Significant role reduction or benchmarking for full season.
+        - Team publicly explores trades involving Monk.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2.5
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: 3-year deal at $18.8M; valuable sixth-man role; 5th and 2nd-place Sixth Man voting finishes prior 2 seasons.
+    confidence: high
+    source: https://fanspo.com/nba/teams/Kings/26
+  - player_id: devin_carter
+    name: Devin Carter
+    age: 21
+    position_listed: PG/SG
+    contract_type: standard
+    availability_status: injured_long_term
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 14771160
+      annual_value_current_season: 4923720
+      annual_value_next_season: 5223720
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://fanspo.com/nba/teams/Kings/26
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: medium
+        - reason_code: behind_younger_player
+          weight: low
+      falsification_conditions:
+        - Full recovery from labrum surgery with strong 2026-27 showing.
+        - Injury recurrence or chronic issues limit role.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.3
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: 13th overall 2024 pick on rookie-scale deal; missed most of season with torn labrum; defensive potential remains but development timeline uncertain.
+    confidence: high
+    source: https://www.basketball-reference.com/teams/SAC/2026.html
+  - player_id: dennis_schroeder
+    name: Dennis Schröder
+    age: 31
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - secondary_creator
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - foul_drawer
+    tier: rotation
+    trajectory: declining_peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 30320000
+      annual_value_current_season: 14100000
+      annual_value_next_season: 14700000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.spotrac.com/nba/sacramento-kings/cap/2025/
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: cap_relief_target
+          weight: medium
+        - reason_code: positional_redundancy
+          weight: medium
+      falsification_conditions:
+        - Traded to CLE in Jan 2026 (already occurred as of as_of_date).
+      signal_strength: widely_reported
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: 3-year, $45M deal signed July 2025; already traded away Jan 2026, so this is historical context by as_of_date.
+    confidence: high
+    source: https://www.spotrac.com/nba/sacramento-kings/cap/2025/
+  - player_id: russell_westbrook
+    name: Russell Westbrook
+    age: 36
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - connector
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+        - playoff_riser
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 3634153
+      annual_value_current_season: 3634153
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.salaryswish.com/players/russell-westbrook
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Multi-year extension signed (unlikely given age/salary cap constraints).
+        - Westbrook leads team to 50+ wins in 2026-27.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.6
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Veteran minimum deal; expiring contract; limited guaranteed money; likely UAF after 2025-26.
+    confidence: high
+    source: https://sports.yahoo.com/nba/breaking-news/article/russell-westbrook-reportedly-agrees-to-contract-with-sacramento-kings-ahead-of-2025-26-nba-season-161418515.html
+  - player_id: precious_achiuwa
+    name: Precious Achiuwa
+    age: 26
+    position_listed: PF/C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+          - connector
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+        - elite_athlete
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 2400000
+      annual_value_current_season: 2400000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://fanspo.com/nba/teams/Kings/26
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Extended or re-signed before free agency.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: UFA 2026; minimal guaranteed money; depth piece.
+    confidence: medium
+    source: https://fanspo.com/nba/teams/Kings/26
+  - player_id: nique_clifford
+    name: Nique Clifford
+    age: 23
+    position_listed: SG/SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 4
+      total_value_remaining: 12400000
+      annual_value_current_season: 3100000
+      annual_value_next_season: 3100000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://fanspo.com/nba/teams/Kings/26
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: medium
+      falsification_conditions:
+        - Extended injury or year-long benching.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: 2025 draft pick (24th overall, traded up via 2027 1st-rounder to OKC); qualifying offer, RFA 2029.
+    confidence: medium
+    source: https://fanspo.com/nba/teams/Kings/26
+  - player_id: maxime_raynaud
+    name: Maxime Raynaud
+    age: 22
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: 1200000
+      annual_value_current_season: 1200000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: "2027"
+      bird_rights: full
+      contract_through: 2027
+      source: https://fanspo.com/nba/teams/Kings/26
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: medium
+      falsification_conditions:
+        - Team declines club option and lets walk.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: 2025 draft pick (42nd overall); rookie on minimal deal; club option in 2027.
+    confidence: high
+    source: https://www.basketball-reference.com/teams/SAC/2026.html
+  - player_id: doug_mcdermott
+    name: Doug McDermott
+    age: 34
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary:
+          - tertiary_scorer
+      defensive_role: wing_stopper
+      shooting_profile: elite
+      special_traits: []
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 2900000
+      annual_value_current_season: 2900000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://fanspo.com/nba/teams/Kings/26
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Extended by Kings in 2026 offseason.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: UFA 2026; veteran minimum; floor spacing depth piece.
+    confidence: medium
+    source: https://fanspo.com/nba/teams/Kings/26
+  - player_id: deandre_hunter
+    name: De'Andre Hunter
+    age: 27
+    position_listed: SF/PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits:
+        - switchable
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 25000000
+      annual_value_current_season: 25000000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://kings.com/news/kings-acquire-deandre-hunter-in-three-team-trade
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: expiring_contract_value
+          weight: high
+      falsification_conditions:
+        - Extended or re-signed during 2026 offseason.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Expiring $25M contract; valuable trade asset; 3&D forward in demand at deadline.
+    confidence: high
+    source: https://kings.com/news/kings-acquire-deandre-hunter-in-three-team-trade
+  - player_id: drew_eubanks
+    name: Drew Eubanks
+    age: 27
+    position_listed: PF/C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+          - connector
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+    tier: rotation
+    trajectory: declining_peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 2500000
+      annual_value_current_season: 2500000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://fanspo.com/nba/teams/Kings/26
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Extended by Kings.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: UFA 2026; minimum deal; depth center.
+    confidence: medium
+    source: https://fanspo.com/nba/teams/Kings/26
+pending_free_agents:
+  - player_id: domantas_sabonis
+    name: Domantas Sabonis
+    type: RFA
+    bird_rights_status: full
+    cap_hold_amount: unknown
+    expected_market: retain
+    expected_market_detail: Franchise anchor; multi-year deal in place through 2028.
+    notes: Restricted free agent in summer 2028; Kings will retain with bird rights.
+    source: https://www.spotrac.com/nba/sacramento-kings/cap/2025/
+  - player_id: zach_lavine
+    name: Zach LaVine
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Player option in 2027; if exercised, becomes UFA in 2028. Team may seek trade before option date.
+    notes: Player option provides leverage; cap situation may force Kings to move him.
+    source: https://www.spotrac.com/nba/sacramento-kings/cap/2025/
+  - player_id: keegan_murray
+    name: Keegan Murray
+    type: RFA
+    bird_rights_status: full
+    cap_hold_amount: unknown
+    expected_market: re_sign_likely
+    expected_market_detail: Rookie-scale contract through 2027; RFA in 2027. Kings control via restricted rights; injury history may moderate market.
+    notes: 4th overall 2022 pick; thumb surgery and recurring ailments; development trajectory critical.
+    source: https://www.basketball-reference.com/teams/SAC/2026.html
+  - player_id: precious_achiuwa
+    name: Precious Achiuwa
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: walk
+    expected_market_detail: Expiring 1-year, $2.4M deal; unrestricted free agent after 2025-26. Limited playing time suggests Kings will let walk.
+    notes: Depth piece; no bird rights.
+    source: https://fanspo.com/nba/teams/Kings/26
+  - player_id: russell_westbrook
+    name: Russell Westbrook
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: walk
+    expected_market_detail: Expiring $3.6M minimum deal; UFA after 2025-26; age 36 with limited salary cap appeal.
+    notes: Veteran minimum signing; unlikely to be retained.
+    source: https://www.salaryswish.com/players/russell-westbrook
+  - player_id: doug_mcdermott
+    name: Doug McDermott
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: walk
+    expected_market_detail: Expiring $2.9M deal; age 34; non-Bird. Depth piece; unlikely Kings retain.
+    notes: 3&D veteran; unrestricted free agent.
+    source: https://fanspo.com/nba/teams/Kings/26
+  - player_id: deandre_hunter
+    name: De'Andre Hunter
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Expiring $25M deal (acquired Jan 2026 for cap relief). May be traded before deadline or extended if strong fit. Non-Bird rights.
+    notes: Valuable 3&D forward; expiring contract is premium asset.
+    source: https://kings.com/news/kings-acquire-deandre-hunter-in-three-team-trade
+  - player_id: drew_eubanks
+    name: Drew Eubanks
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: walk
+    expected_market_detail: Expiring $2.5M deal; UFA; depth center likely to walk.
+    notes: Minimal contract; no bird rights.
+    source: https://fanspo.com/nba/teams/Kings/26
+known_target_history:
+  - target: De'Aaron Fox
+    year: 2025
+    outcome: traded
+    detail: "3-team trade (Feb 2025): Fox sent to San Antonio Spurs; Kings acquired Zach LaVine, Sidy Cissoko, draft picks in return."
+    source: https://www.nba.com/news/deaaron-fox-trade-kings-spurs-bulls-zach-lavine-3-team-deal
+  - target: DeMar DeRozan
+    year: 2025
+    outcome: acquired
+    detail: Acquired via 3-team Fox trade (Feb 2025) from Chicago Bulls alongside LaVine.
+    source: https://www.nba.com/news/deaaron-fox-trade-kings-spurs-bulls-zach-lavine-3-team-deal
+  - target: Dennis Schröder
+    year: 2025
+    outcome: acquired
+    detail: Signed 3-year, $45M deal in free agency (July 2025); later traded to CLE in Jan 2026 De'Andre Hunter deal.
+    source: https://www.hoopsrumors.com/2025/05/kings-hiring-mike-miller-chris-darnell-as-assistant-coaches.html
+  - target: Russell Westbrook
+    year: 2025
+    outcome: acquired
+    detail: Signed 1-year, $3.6M minimum deal (Oct 2025) for opening night.
+    source: https://sports.yahoo.com/nba/breaking-news/article/russell-westbrook-reportedly-agrees-to-contract-with-sacramento-kings-ahead-of-2025-26-nba-season-161418515.html
+  - target: De'Andre Hunter
+    year: 2026
+    outcome: acquired
+    detail: "3-team trade (Jan 2026): CLE→SAC; Kings sent Schröder/Ellis; acquired Hunter on expiring $25M deal for cap relief."
+    source: https://kings.com/news/kings-acquire-deandre-hunter-in-three-team-trade
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "Sacramento Kings hold No. 7, No. 34, No. 45 from CHA in the official post-lottery order. Mock-source layer: No. 7: Kingston Flemings; treat prospect names as low-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: low
+  - priority: Stabilize front office and coaching staff
+    timeline: this_season
+    type: coaching_decision
+    detail: Doug Christie hired permanently (May 2025); Perry in inaugural season as GM; priority is establishing organizational consistency and communication patterns.
+    confidence: high
+  - priority: Navigate 2026-27 salary cap penalty
+    timeline: this_offseason
+    type: structural
+    detail: Projected payroll $225M (~$24M over tax, $3M over 2nd apron); must reduce salary significantly to stay under penalty line or commit to aggressive tax spending.
+    confidence: high
+  - priority: Evaluate trade market for expiring contracts and overlapping roles
+    timeline: by_trade_deadline
+    type: trade
+    detail: De'Andre Hunter ($25M), LaVine (player option), and other pieces may be shopped before Feb 2027 deadline for picks or younger talent.
+    confidence: high
+  - priority: Extend or move Keegan Murray before RFA
+    timeline: by_trade_deadline
+    type: extension
+    detail: Murray enters restricted free agency in summer 2027; injury history and draft pedigree complicate extension talks; team may shop before deadline.
+    confidence: medium
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 7 overall; own pick.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 2
+      protections: 2026 No. 34 overall; own pick.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 2
+      protections: 2026 No. 45 overall; from CHA via SAS, ATL, and NYK.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: CHA
+    - year: 2027
+      round: 1
+      protections: Unknown
+      source: https://fanspo.com/nba/teams/Kings/26/draft-picks
+    - year: 2027
+      round: 2
+      from_team: CHA
+      protections: none
+      source: unknown
+    - year: 2025
+      round: 1
+      from_team: SAS
+      protections: unprotected
+      source: https://airalamo.com/san-antonio-spurs-draft-picks-2025-2026-through-2031-full-list
+  draft_picks_owed:
+    - year: 2027
+      round: 1
+      to_team: OKC
+      protections: Unknown
+      source: https://fanspo.com/nba/teams/Kings/26/draft-picks
+  trade_exceptions:
+    - value: unknown
+      expires: unknown
+      source: https://www.salaryswish.com/teams/kings
+      confidence: low
+team_team_relationships:
+  rivalries:
+    - team_id: LAL
+      type: geographic
+      basis: Pacific Division rivals; historical playoff matchups; media market proximity.
+    - team_id: GSW
+      type: geographic
+      basis: Pacific Division rivals; shared West Coast market dynamics.
+    - team_id: SAS
+      type: personnel_grudge
+      basis: De'Aaron Fox trade to SAS (Feb 2025) created asymmetric relationship; Spurs acquired star at apparent steal; Popovich-vs-Kings coaching philosophies divergent.
+    - team_id: CHI
+      type: personnel_grudge
+      basis: 3-team Fox/LaVine trade (Feb 2025); ongoing salary cap entanglement with CHI via Saric/Hunter trades.
+  notable_personnel_connections:
+    - person: Scott Perry
+      connected_team: NYK
+      connection_type: former_GM
+      detail: Knicks GM 2017-2023 (6 seasons); parted ways after 2022-23; hired by Kings April 2025.
+    - person: Doug Christie
+      connected_team: SAC
+      connection_type: former_player
+      detail: Kings player 2000-2005 under Rick Adelman; part of peak franchise era (2001-04 playoff runs); now head coach as of May 2025.
+    - person: Bobby Jackson
+      connected_team: PHI
+      connection_type: former_assistant
+      detail: Assistant with 76ers 2023-25; rejoined Kings under Christie after two-year absence; Adelman-era teammate.
+    - person: Mike Miller
+      connected_team: WAS
+      connection_type: former_assistant
+      detail: Washington Wizards assistant 2021-24; 30+ years coaching experience; joined Kings in 2025.
+    - person: Leandro Barbosa
+      connected_team: SAC
+      connection_type: former_player
+      detail: Barbosa played for Kings; now assistant coach in 4th season under Kings organization.
+g_league_and_stash:
+  affiliate_team: Stockton Kings
+  notable_affiliate_players:
+    - Maxime Raynaud assignment/recalls
+    - Nique Clifford development assignment
+    - Devin Carter rehab assignment (as needed)
+  international_stash: []
+narrative_summary:
+  one_paragraph: The Sacramento Kings entered 2026 in crisis after a devastating 22-60 season marked by failed star-chasing experiments and front-office turnover. General manager Scott Perry (hired April 2025 to replace Monte McNair) and newly permanent head coach Doug Christie attempt to stabilize an organization with a $193M payroll in crisis. The core of Domantas Sabonis (29, $42.3M), Zach LaVine (30, $45.9M, player option 2027), and DeMar DeRozan (36) proved incompatible, yet trading stars (Fox to SAS in Feb 2025) yielded uncertain returns. Ranadivé's willingness to spend ($225M projected 2026-27 payroll) collided with tax-averse structural preferences. Young talent (Keegan Murray, Devin Carter, Nique Clifford, Maxime Raynaud) plus the 2026 No. 7 pick offer developmental hope. Perry's six-point organizational identity (competitive, tough, team-oriented, accountable, disciplined, professional) represents a reset, but the team faces imminent cap decisions and trades to navigate the luxury tax penalty zone while balancing win-now urgency against rebuild necessity.
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 7, No. 34, No. 45 from CHA; The Athletic mock-source layer lists No. 7: Kingston Flemings as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - "Zach LaVine's 2027 player option decision: if exercised, locks Kings into $45.9M; if declined, opens 2028 free agency and cap flexibility."
+    - "Trade deadline 2027 activity: DeRozan's partially guaranteed contract, Hunter's $25M expiring deal, and LaVine's optionality make Kings active sellers if 2026-27 development stalls."
+sources_used:
+  - https://www.nbcsportsbayarea.com/nba/sacramento-kings/scott-perry-six-tenets-2025-26-season/1877931/
+  - https://www.nba.com/news/deaaron-fox-trade-kings-spurs-bulls-zach-lavine-3-team-deal
+  - https://www.wikipedia.org/wiki/2024%E2%80%9325_Sacramento_Kings_season
+  - https://kings.com/news/kings-name-doug-christie-as-head-coach
+  - https://en.wikipedia.org/wiki/Vivek_Ranadiv%C3%A9
+  - https://www.spotrac.com/nba/sacramento-kings/cap/2025/
+  - https://www.salaryswish.com/teams/kings
+  - https://fanspo.com/nba/teams/Kings/26
+  - https://www.basketball-reference.com/teams/SAC/2026.html
+  - https://www.nba.com/player/1627734/domantas-sabonis/
+  - https://www.nba.com/player/203897/zach-lavine/
+  - https://www.nba.com/player/201942/demar-derozan/
+  - https://en.wikipedia.org/wiki/Doug_Christie
+  - https://kings.com/news/kings-acquire-deandre-hunter-in-three-team-trade
+  - https://stockton.gleague.nba.com/
+  - https://www.hoopsrumors.com/2025/05/kings-hiring-mike-miller-chris-darnell-as-assistant-coaches.html
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - front_office.president_basketball_ops (role appears vacant or not publicly defined)
+  - player.contract.trade_kicker for most roster players (not publicly disclosed)
+  - player.contract.no_trade_clause for DeRozan (assumed none but unconfirmed)
+  - team_relationship.contract_leverage.detail (some players' exact leverage scenarios not publicly documented)
+  - trade_exceptions (current status unknown; likely none given cap constraints)
+  - g_league_and_stash.international_stash (no known stashes as of as_of_date)
+vocabulary_flags:
+  - Strategic posture marked 'retool' rather than 'rebuild' or 'tank' because core stars (Sabonis, LaVine, DeRozan) remain; team is not fully dismantling but rather recalibrating.
+  - Keegan Murray's availability_status 'injured_short_term' reflects thumb surgery recovery; classification depends on 2026-27 preseason status (may upgrade to 'healthy').
+  - Devin Carter's availability_status 'injured_long_term' reflects torn labrum recovery; status uncertain as of as_of_date; may be updated once return timeline confirmed.
+  - Domantas Sabonis and Zach LaVine flagged as 'unlikely' to move, but 'available' readings may shift mid-2026-27 season if Sabonis requests trade or LaVine option decisions emerge.
+  - Doug Christie's coaching_tree mapped to Adelman (player under him 2000-05); no direct Popovich or other named-coach-tree affiliation found in public sources.
+  - "Ownership spending_posture: 'aggressive_spender' inferred from >$1B arena investment, current $193M payroll, and willingness to exceed luxury tax; but sources sometimes describe Ranadivé as 'sometimes cautious' on player personnel. Classified as aggressive based on payroll action vs. conservative historical precedent."

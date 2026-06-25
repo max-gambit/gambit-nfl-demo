@@ -1,0 +1,1048 @@
+team_id: MEM
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Memphis Grizzlies
+  conference: Western
+  division: Southwest
+  market_tier: tier_2
+  market_tier_rationale: Mid-size Southern market with strong regional basketball interest but limited national appeal; FedExForum attendance traditionally strong under winning conditions.
+ownership:
+  primary_owner:
+    name: Robert Pera
+    type: individual
+    tenure_years: 13.5
+    source: https://www.bloomberg.com/billionaires/profiles/robert-j-pera/
+    confidence: high
+  governance_notes: Pera acquired controlling stake in 2012, subsequently acquired additional equity. CEO of Ubiquiti Networks. No minority ownership structures publicly disclosed.
+  recent_transitions: none
+  spending_posture: moderate
+  spending_posture_evidence:
+    - Stayed below luxury tax threshold in 2025-26 ($156.9M payroll vs $187.9M luxury line)
+    - Willing to invest in young talent (five-year extensions for core players like Santi Aldama)
+    - Has not pursued star free agents aggressively in recent years
+    - "Supports high draft pick investment (2025 #11 draft pick with Cedric Coward)"
+front_office:
+  president_basketball_ops:
+    name: Zach Kleiman
+    tenure_start: 2017-06
+    prior_stops:
+      - Memphis Grizzlies Director of Scouting (2012-2017)
+      - San Antonio Spurs Assistant Scouting Director
+    public_philosophy_signals:
+      - Emphasis on size, speed, and athleticism in roster construction
+      - Values first-round draft assets and young player development
+      - Postseason comments highlight confidence in young foundation despite 25-57 season
+    confidence: high
+    source: https://www.nba.com/grizzlies/videos/zach-kleiman-2025-26-grizzlies-exit-interviews
+  general_manager:
+    name: Zach Kleiman
+    tenure_start: 2017-06
+    prior_stops:
+      - Memphis Grizzlies Director of Scouting (2012-2017)
+      - San Antonio Spurs Assistant Scouting Director
+    public_philosophy_signals:
+      - Emphasis on size, speed, and athleticism in roster construction
+      - Values first-round draft assets and young player development
+      - Postseason comments highlight confidence in young foundation despite 25-57 season
+    confidence: high
+    source: https://www.nba.com/grizzlies/videos/zach-kleiman-2025-26-grizzlies-exit-interviews
+  head_coach:
+    name: Tuomas Iisalo
+    tenure_start: 2025-04
+    contract_through: 2027
+    style_notes: High-pace, three-point heavy offense with emphasis on offensive rebounding. Demanding coaching style using short rotations and mass substitutions to maintain intensity. Europe-influenced system emphasizing spacing and rapid transitions. First Finnish-born NBA head coach.
+    coaching_tree: unknown
+    confidence: high
+    source: https://www.nba.com/news/grizzlies-name-tuomas-iisalo-head-coach
+  assistant_coaches_notable: []
+  notable_advisors_or_consultants: []
+strategic_posture:
+  timeframe: rebuild
+  confidence: high
+  derived_from:
+    - 25-57 regular season record in 2025-26, missed playoffs entirely
+    - Two core players traded mid-season/pre-offseason (Desmond Bane to Orlando, Jaren Jackson Jr. to Utah)
+    - Ja Morant expected to be traded this offseason per NBA reporting
+    - Emphasis on acquiring future draft picks (4 from Bane trade, 3 from JJJ trade)
+    - FO publicly stated focus on young roster with many first-round assets as future centerpiece
+  constraints:
+    - reason_code: max_contract_lockup
+      detail: Ja Morant locked in through 2027-28 with $42M+ remaining; significant negative asset if trade market diminished
+      weight: high
+    - reason_code: recent_playoff_success
+      detail: 2024-25 made play-in (48-34); cliff-like decline signals organizational dysfunction affecting morale and roster cohesion
+      weight: high
+    - reason_code: coaching_decision_pending
+      detail: Tuomas Iisalo's system generated friction with Ja Morant (team suspension); cultural fit uncertain
+      weight: medium
+    - reason_code: tax_apron_constraints
+      detail: Remain $30M below luxury tax but rebuilds typically avoid tax payroll commitments
+      weight: medium
+  trigger_events:
+    - Ja Morant successfully traded with positive return (moves to contender)
+    - Young cohort (Cedric Coward, Jaylen Wells, Scotty Pippen Jr.) shows 2027+ viability in extended mins
+    - Draft capital deployed effectively in 2026-27 draft (own picks + Utah/Orlando assets)
+    - Coaching chemistry with remaining core improves; Iisalo retention justified
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: below_cap
+  current_payroll_estimate: 156966505
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Payroll expected to increase with minimum signings and potential free agent acquisitions; still expect room below luxury tax unless major trades reversed
+    - season: 2027-28
+      projected_status: Ja Morant ($44.9M) final contract year, potential extension or trade window before UFA in 2028
+  exceptions_available:
+    - Traded player exception from Desmond Bane trade (likely used or expired)
+    - Mid-level exception available for 2026 free agency
+  source: https://www.spotrac.com/nba/memphis-grizzlies/cap
+  source_fallbacks_used: []
+  confidence: high
+trade_dna:
+  frequent_partners:
+    - ORL
+    - UTA
+  preferred_deal_archetypes:
+    - Future draft capital accumulation (willing to shed salaries/players for picks)
+    - Youth/athleticism trades (acquiring younger players with upside over aging veterans)
+    - Multi-year depth swaps (trading core players for role players + picks)
+  recent_significant_trades:
+    - date: 2025-06-15
+      summary: Traded Desmond Bane to Orlando Magic for Kentavious Caldwell-Pope, Cole Anthony, and four first-round picks (2025, 2026, 2028, 2030 + 2029 swap option)
+      counterparties:
+        - ORL
+    - date: 2026-02-03
+      summary: Traded Jaren Jackson Jr., John Konchar, Jock Landale, Vince Williams Jr. to Utah Jazz for Walter Clayton Jr., Kyle Anderson, Taylor Hendricks, Georges Niang, and three first-round picks
+      counterparties:
+        - UTA
+  confidence: high
+cultural_signals:
+  stability:
+    value: low
+    detail: Mid-season coach firing (Taylor Jenkins), rapid core player departures, player-coach friction (Ja Morant suspension), and full rebuild signal dysfunction
+  player_friendly:
+    value: mixed
+    detail: Robert Pera publicly committed to Memphis (no relocation interest); front office granted contract extensions but demanding new coach may have deterred veteran interest
+  analytics_orientation:
+    value: balanced
+    detail: Emphasis on measurable athleticism (size, speed) and draft asset accumulation suggests data-informed decisions, but traditional scouting culture present
+  risk_tolerance:
+    value: aggressive
+    detail: Mid-season coaching change, rapid dismantling of core, hiring unproven European coach, wholesale roster turnover
+  notable_traits:
+    - coach_carousel
+    - new_front_office
+    - tanking_for_pick
+    - developmental_org
+  rationale: "The 2025-26 season revealed a franchise in crisis: after surprising 2024-25 playoff run, catastrophic 25-57 collapse forced coaching decision mid-season and rapid trade of two All-Star-level players. New coach Iisalo and GM Kleiman entering rebuild with emphasis on young talent development and draft capital. Organization now focused on building through 2027-28, not contending short-term."
+  confidence: high
+roster:
+  - player_id: ja_morant
+    name: Ja Morant
+    age: 24
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary: []
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - iso_creator
+        - transition_threat
+        - foul_drawer
+    tier: superstar
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 127320500
+      annual_value_current_season: 39446090
+      annual_value_next_season: 42200000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.salaryswish.com/players/ja-morant
+    movement_constraints:
+      status: actively_traded
+      reasons:
+        - reason_code: rebuild_pivot
+          weight: high
+        - reason_code: coach_player_conflict
+          weight: high
+        - reason_code: expiring_contract_value
+          weight: medium
+      falsification_conditions:
+        - Grizzlies formally state Morant is core untouchable and sign contract extension
+        - Morant included in playoff rotation through Finals; public reconciliation with Iisalo
+        - Trade to contender falls through and Morant demonstrates acceptance of rebuild timeline
+      signal_strength: widely_reported
+    team_relationship:
+      tenure_with_team: 5.5
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: $39M salary commands most teams' assets; known friction limits bidding war
+    confidence: high
+    source: https://www.nba.com/news/jaren-jackson-jr-trade-jazz-2026
+  - player_id: ty_jerome
+    name: Ty Jerome
+    age: 27
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - secondary_creator
+          - spacer
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits:
+        - elite_passer
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 18000000
+      annual_value_current_season: 9200000
+      annual_value_next_season: 9200000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://fanspo.com/nba/teams/memphis-grizzlies/15
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: connector
+          weight: low
+      falsification_conditions:
+        - Concrete trade rumors; team explicitly offered in discussions
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.5
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Moderate salary, role player on rebuilding team
+    confidence: medium
+    source: https://fanspo.com/nba/teams/memphis-grizzlies/15
+  - player_id: cedric_coward
+    name: Cedric Coward
+    age: 22
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+          - finisher
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 7500000
+      annual_value_current_season: 2500000
+      annual_value_next_season: 2500000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: early
+      contract_through: 2028
+      source: https://www.cbssports.com/nba/players/28955726/cedric-coward/
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Rookie struggles; significant decline in per-minute efficiency into Year 2
+        - Multiple competitive offers from contenders; Kleiman voluntarily trades
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie minimum contract; team controls decision-making
+    confidence: high
+    source: https://www.cbssports.com/nba/players/28955726/cedric-coward/
+  - player_id: jaylen_wells
+    name: Jaylen Wells
+    age: 21
+    position_listed: SF
+    contract_type: standard
+    availability_status: season_ending
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: finisher
+        secondary:
+          - connector
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 8000000
+      annual_value_current_season: null
+      annual_value_next_season: 2666667
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: early
+      contract_through: 2028
+      source: https://www.nba.com/player/1642377/jaylen-wells
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Full recovery from toe surgery; demonstrable long-term value upon return
+        - Extended roster veto; Kleiman voluntarily moves player
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie contract; extensive injury recovery ahead
+    confidence: medium
+    source: https://www.nba.com/player/1642377/jaylen-wells
+  - player_id: scotty_pippen_jr
+    name: Scotty Pippen Jr.
+    age: 22
+    position_listed: PG
+    contract_type: standard
+    availability_status: injured_long_term
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - connector
+      defensive_role: point_of_attack
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 7500000
+      annual_value_current_season: null
+      annual_value_next_season: 2500000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: early
+      contract_through: 2028
+      source: https://www.nba.com/player/1641772/scotty-pippen-jr
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Recovery stalls; significant long-term athletic decline evident
+        - Competitive bid from contender; Kleiman elects to trade
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.5
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie contract; injured status limits trade market
+    confidence: medium
+    source: https://www.nba.com/player/1641772/scotty-pippen-jr
+  - player_id: zach_edey
+    name: Zach Edey
+    age: 22
+    position_listed: C
+    contract_type: standard
+    availability_status: injured_long_term
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: post_hub
+        secondary:
+          - finisher
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+        - elite_rebounder
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 7500000
+      annual_value_current_season: null
+      annual_value_next_season: 2500000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: early
+      contract_through: 2028
+      source: https://www.nba.com/player/1641744/zach-edey
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Ankle surgery complications; extended recovery or chronic issues emerge
+        - Contender submits multi-year deal; FO voluntarily trades
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: 2024 lottery pick, 2025-26 season-ending injury; limited trade appeal
+    confidence: medium
+    source: https://www.nba.com/player/1641744/zach-edey
+  - player_id: santi_aldama
+    name: Santi Aldama
+    age: 23
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - spacer
+          - finisher
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 52500000
+      annual_value_current_season: 17500000
+      annual_value_next_season: 17500000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2028
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.thirdapron.com/p/memphis-grizzlies-2025-offseason-656
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: medium
+      falsification_conditions:
+        - Aldama explicitly requests trade; Kleiman honors request
+        - Significant statistical decline; efficiency metrics deteriorate by 15+ percentile
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 3
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: Three-year extension signed 2025; team's multi-year commitment clear
+    confidence: high
+    source: https://www.thirdapron.com/p/memphis-grizzlies-2025-offseason-656
+  - player_id: gg_jackson
+    name: GG Jackson
+    age: 20
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - finisher
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 7500000
+      annual_value_current_season: 2500000
+      annual_value_next_season: 2500000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: early
+      contract_through: 2028
+      source: https://www.nba.com/player/1641751/greg-jackson-ii
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Significant regression in efficiency; reevaluation of prospect value
+        - Multi-year trade package from contender; Kleiman accepts
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Rookie-scale contract; young age limits trade market
+    confidence: medium
+    source: https://www.nba.com/player/1641751/greg-jackson-ii
+  - player_id: walter_clayton_jr
+    name: Walter Clayton Jr.
+    age: 23
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+          - finisher
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits: []
+    tier: fringe
+    trajectory: uncertain
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: uncertain
+      source: https://247sports.com/college/florida/article/florida-basketball-guard-walter-clayton-jr-traded-utah-jazz-memphis-grizzlies-273086283/
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: expiring_contract_value
+          weight: low
+        - reason_code: failed_fit
+          weight: low
+      falsification_conditions:
+        - Clayton produces at efficient level; minutes increase significantly
+        - Extension signed mid-season; front office commits to long-term
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.2
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Recent acquisition from Jazz trade; role player on rebuilding team
+    confidence: low
+    source: https://247sports.com/college/florida/article/florida-basketball-guard-walter-clayton-jr-traded-utah-jazz-memphis-grizzlies-273086283/
+  - player_id: kyle_anderson
+    name: Kyle Anderson
+    age: 31
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - spacer
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: uncertain
+      source: https://www.nba.com/grizzlies/news/grizzlies-acquire-walter-clayton-jr-taylor-hendricks-kyle-anderson-georges-niang-and-three-future-first-round-draft-picks-jazz
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: declining_role
+          weight: medium
+        - reason_code: aging_core
+          weight: low
+      falsification_conditions:
+        - Anderson emerges as rotation player with 20+ minutes; retention through season
+        - Explicit extension or re-signing announcement mid-season
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.2
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Veteran minimum likely; potential expiring contract asset
+    confidence: low
+    source: https://www.nba.com/grizzlies/news/grizzlies-acquire-walter-clayton-jr-taylor-hendricks-kyle-anderson-georges-niang-and-three-future-first-round-draft-picks-jazz
+  - player_id: taylor_hendricks
+    name: Taylor Hendricks
+    age: 21
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: uncertain
+      source: https://www.nba.com/grizzlies/news/grizzlies-acquire-walter-clayton-jr-taylor-hendricks-kyle-anderson-georges-niang-and-three-future-first-round-draft-picks-jazz
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Limited potential shown; development stalls significantly
+        - Multi-year trade package from contender; Kleiman accepts
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.2
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Recent acquisition; young prospect on likely rookie-scale contract
+    confidence: low
+    source: https://www.nba.com/grizzlies/news/grizzlies-acquire-walter-clayton-jr-taylor-hendricks-kyle-anderson-georges-niang-and-three-future-first-round-draft-picks-jazz
+  - player_id: georges_niang
+    name: Georges Niang
+    age: 32
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+      defensive_role: helper
+      shooting_profile: good
+      special_traits:
+        - vet_leadership
+    tier: fringe
+    trajectory: declining
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: uncertain
+      source: https://www.nba.com/grizzlies/news/grizzlies-acquire-walter-clayton-jr-taylor-hendricks-kyle-anderson-georges-niang-and-three-future-first-round-draft-picks-jazz
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: declining_role
+          weight: medium
+      falsification_conditions:
+        - Niang signs mid-season extension; Kleiman explicitly commits
+        - Rotation minutes increase to 25+ per game; offensive role expands
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.2
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Aging veteran on likely expiring or short-term contract
+    confidence: low
+    source: https://www.nba.com/grizzlies/news/grizzlies-acquire-walter-clayton-jr-taylor-hendricks-kyle-anderson-georges-niang-and-three-future-first-round-draft-picks-jazz
+  - player_id: brandon_clarke
+    name: Brandon Clarke
+    age: 27
+    position_listed: PF
+    contract_type: standard
+    availability_status: season_ending
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+      defensive_role: helper
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: uncertain
+      source: https://www.nba.com/player/1629634/brandon-clarke
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: injury_recovery_uncertain
+          weight: high
+        - reason_code: positional_redundancy
+          weight: low
+      falsification_conditions:
+        - Full recovery from calf; medical clearance for offseason training
+        - Multi-year extension signed; front office commits despite age
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 5
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: Veteran on roster; unclear contract status post-injury
+    confidence: medium
+    source: https://www.nba.com/player/1629634/brandon-clarke
+  - player_id: kentavious_caldwell_pope
+    name: Kentavious Caldwell-Pope
+    age: 31
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 2
+      total_value_remaining: 14500000
+      annual_value_current_season: 7250000
+      annual_value_next_season: 7250000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2027
+      source: https://www.nba.com/news/magic-grizzlies-trade-bane-caldwell-pope
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: positional_redundancy
+          weight: low
+        - reason_code: expiring_contract_value
+          weight: medium
+      falsification_conditions:
+        - Caldwell-Pope signed extension mid-season; team commits through 2028+
+        - Minutes increase; emerges as core bench piece in rotation
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Aging veteran glue guy on moderate contract
+    confidence: high
+    source: https://www.nba.com/news/magic-grizzlies-trade-bane-caldwell-pope
+  - player_id: cole_anthony
+    name: Cole Anthony
+    age: 24
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - spacer
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits: []
+    tier: fringe
+    trajectory: declining
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: uncertain
+      source: https://www.nba.com/news/magic-grizzlies-trade-bane-caldwell-pope
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: failed_fit
+          weight: low
+        - reason_code: positional_redundancy
+          weight: medium
+      falsification_conditions:
+        - Anthony emerges as rotation staple; 20+ minutes per game consistently
+        - Contract extension signed mid-season; team commits to role
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Acquired in Bane trade; unclear long-term role
+    confidence: low
+    source: https://www.nba.com/news/magic-grizzlies-trade-bane-caldwell-pope
+pending_free_agents: []
+known_target_history:
+  - target: Jaren Jackson Jr.
+    year: 2026
+    outcome: acquired
+    detail: Traded out (dealt to Utah Jazz Feb 3, 2026 mid-season for Clayton, Anderson, Hendricks, Niang, 3 picks)
+    source: https://www.nba.com/news/jaren-jackson-jr-trade-jazz-2026
+  - target: Desmond Bane
+    year: 2025
+    outcome: acquired
+    detail: Traded out (dealt to Orlando June 15, 2025 offseason for KCP, Cole Anthony, 4 picks + swap)
+    source: https://www.nba.com/news/magic-grizzlies-trade-bane-caldwell-pope
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "Memphis Grizzlies hold No. 3, No. 16 from PHX, No. 32 from IND in the official post-lottery order. Mock-source layer: No. 3: Cameron Boozer; No. 16: Koa Peat; treat prospect names as medium-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: medium
+  - priority: Ja Morant trade
+    timeline: this_offseason
+    type: trade
+    detail: Expected to move star point guard to contender; market diminished due to known friction with coach and recent dysfunction
+    confidence: high
+  - priority: Finalize coaching staff under Iisalo
+    timeline: this_offseason
+    type: coaching_decision
+    detail: New HC hired mid-season; full staff installation and roster integration ahead
+    confidence: high
+  - priority: Develop young core (Aldama, Coward, Jackson, Wells, Edey, Pippen)
+    timeline: next_season
+    type: structural
+    detail: Focus on 2027-28 contention window; prioritize health recovery for Edey, Wells, Pippen
+    confidence: high
+  - priority: Free agent roster building
+    timeline: this_offseason
+    type: free_agency
+    detail: Post-Morant trade, use cap space and MLE to surround young core with role players and veterans
+    confidence: medium
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 3 overall; own pick.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 1
+      protections: 2026 No. 16 overall; from PHX via ORL.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: PHX
+    - year: 2026
+      round: 2
+      protections: 2026 No. 32 overall; from IND via MIL.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: IND
+    - year: 2027
+      round: 1
+      protections: Lakers 2027 1st (top-four protected)
+      source: unknown
+    - year: 2027
+      round: 1
+      protections: Either Cavaliers, Timberwolves, or Jazz 2027 1st (whichever is most favorable)
+      source: unknown
+    - year: 2028
+      round: 1
+      protections: none
+      source: unknown
+    - year: 2030
+      round: 1
+      protections: none
+      source: unknown
+    - year: 2025
+      round: 1
+      protections: none
+      source: unknown
+    - year: 2031
+      round: 1
+      protections: none
+      source: unknown
+    - year: 2032
+      round: 2
+      from_team: GSW
+      protections: protected (traded for Will Richard)
+      source: https://www.si.com/nba/golden-state-warriors-updated-draft-picks-following-trade-for-jimmy-butler
+    - year: 2028
+      round: 1
+      from_team: ORL
+      protections: None (Unprotected; traded to Memphis in Bane deal)
+      source: https://www.nba.com/news/magic-grizzlies-trade-bane-caldwell-pope
+    - year: 2030
+      round: 1
+      from_team: ORL
+      protections: None (Unprotected; traded to Memphis in Bane deal)
+      source: https://www.nba.com/news/magic-grizzlies-trade-bane-caldwell-pope
+    - year: 2029
+      round: 1
+      from_team: ORL
+      protections: Lightly protected pick swap (traded to Memphis in Bane deal)
+      source: https://www.nba.com/news/magic-grizzlies-trade-bane-caldwell-pope
+  draft_picks_owed:
+    - year: 2026
+      round: 2
+      to_team: LAC
+      protections: 2026 No. 36 overall; from MEM via ATL and UTA.
+      source: https://www.nba.com/news/2026-nba-draft-order
+  trade_exceptions: []
+team_team_relationships:
+  rivalries:
+    - team_id: GSW
+      type: geographic
+      basis: Western Conference Western Division play; no recent playoff history driving animosity
+  notable_personnel_connections:
+    - person: Zach Kleiman
+      connected_team: SAS
+      connection_type: former_scout
+      detail: Director of Scouting under Spurs organization; developed front-office expertise in San Antonio system
+g_league_and_stash:
+  affiliate_team: Memphis Hustle
+  notable_affiliate_players: []
+  international_stash: []
+narrative_summary:
+  one_paragraph: "The Memphis Grizzlies entered 2025-26 as defending play-in participants following a surprise 48-34 season and first-round exit to Oklahoma City. However, dysfunction rapidly unfolded: Taylor Jenkins was fired nine games into the season despite prior success, replaced mid-stream by Finnish coach Tuomas Iisalo. The team collapsed to 25-57, the worst record since 2017-18, missing the playoffs entirely. GM Zach Kleiman executed a full reset, trading All-Star Jaren Jackson Jr. to Utah and previously dealing Desmond Bane to Orlando, acquiring draft capital instead. Ja Morant—homegrown superstar and organizational cornerstone—became trade bait amid public friction with the new coaching system and coaching-generated team suspensions. With Iisalo's system emphasizing pace, spacing, and discipline, the rebuild now prioritizes developing a young cohort (Cedric Coward, Santi Aldama, GG Jackson, Jaylen Wells, Zach Edey, Scotty Pippen Jr.) with 2027-28 contention target and accumulated first-round picks to reshape the roster."
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 3, No. 16 from PHX, No. 32 from IND; The Athletic mock-source layer lists No. 3: Cameron Boozer; No. 16: Koa Peat as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - "Ja Morant trade market closure: which contender acquires him, at what price, and whether diminished bidding confirms organizational dysfunction"
+    - "Tuomas Iisalo's coaching continuity and system adoption: whether young core embraces demanding pace-and-space style or exhibits continued friction"
+sources_used:
+  - https://www.nba.com/grizzlies/roster
+  - https://www.nba.com/news/grizzlies-part-ways-taylor-jenkins
+  - https://www.nba.com/news/new-coach-tuomas-iisalo-takes-control-of-grizzlies
+  - https://www.nba.com/news/grizzlies-name-tuomas-iisalo-head-coach
+  - https://www.nba.com/news/magic-grizzlies-trade-bane-caldwell-pope
+  - https://www.nba.com/news/jaren-jackson-jr-trade-jazz-2026
+  - https://www.espn.com/nba/team/depth/_/name/mem
+  - https://www.espn.com/nba/story/_/id/45517668/sources-grizzlies-trade-desmond-bane-magic-blockbuster-deal
+  - https://www.basketball-reference.com/teams/MEM/2026.html
+  - https://www.spotrac.com/nba/memphis-grizzlies/cap
+  - https://www.spotrac.com/nba/memphis-grizzlies/contracts
+  - https://www.salaryswish.com/teams/grizzlies
+  - https://www.salaryswish.com/players/ja-morant
+  - https://www.bloomberg.com/billionaires/profiles/robert-j-pera/
+  - https://www.thirdapron.com/p/memphis-grizzlies-2025-offseason-656
+  - https://fanspo.com/nba/teams/memphis-grizzlies/15
+  - https://www.nba.com/player/1642377/jaylen-wells
+  - https://www.nba.com/player/1641772/scotty-pippen-jr
+  - https://www.nba.com/player/1641744/zach-edey
+  - https://www.nba.com/player/1629634/brandon-clarke
+  - https://www.nba.com/player/1641751/greg-jackson-ii
+  - https://www.cbssports.com/nba/players/28955726/cedric-coward/
+  - https://www.grizzlies.com/news/grizzlies-acquire-walter-clayton-jr-taylor-hendricks-kyle-anderson-georges-niang-and-three-future-first-round-draft-picks-from-jazz
+  - https://www.nba.com/grizzlies/videos/zach-kleiman-2025-26-grizzlies-exit-interviews
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - Walter Clayton Jr. contract details (years remaining, total value, options)
+  - Kyle Anderson contract details (years remaining, total value, options)
+  - Taylor Hendricks contract details (years remaining, total value, options)
+  - Georges Niang contract details (years remaining, total value, options)
+  - Brandon Clarke contract status and terms (post-injury contract status unclear)
+  - Cole Anthony contract details (years remaining, total value, options)
+  - Ja Morant trade_kicker (none publicly disclosed)
+  - Notable assistant coaches under Tuomas Iisalo (staff composition not fully available)
+  - International stash players (no known draft picks not yet stateside)
+  - Trade exceptions available (expired or unclear status post-trades)
+  - Exact current salary of multiple role players acquired in mid-season trade
+vocabulary_flags:
+  - "Jaren Jackson Jr. status complex: traded mid-season (Feb 3, 2026) but listed on opening-day roster; marked as 'tier: star' for his tenure value, but moved before as_of_date"
+  - Ja Morant 'actively_traded' status inferred from multiple widely-reported sources (Miami, Minnesota monitoring; diminished market noted); no explicit team statement confirming shopping but market signals overwhelming
+  - "Brandon Clarke and Jaylen Wells season-ending injuries occurred early in 2025-26 season; both projected to return 2026-27; 'availability_status: season_ending' reflects 2025-26 status"
+  - Scotty Pippen Jr. toe surgery recovery timeline extends into 2026; marked 'injured_long_term' and 'availability_status' reflects expected return in 2026 offseason
+  - Multiple role players from Utah Jazz trade (Clayton, Anderson, Hendricks, Niang) have minimal contract information available; marked 'unknown' where Spotrac/cap sites do not publish details
+  - "Ja Morant contract extension window post-2025-26 season worth estimated $178M over three years not yet formalized; left as 'contract_through: 2028' with existing deal details"
+  - Tuomas Iisalo coaching tree attribution unclear; European basketball system emphasis noted but 'tree' lineage to major NBA coach family unknown

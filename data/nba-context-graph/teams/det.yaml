@@ -1,0 +1,1129 @@
+team_id: DET
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Detroit Pistons
+  conference: Eastern
+  division: Central
+  market_tier: tier_2
+  market_tier_rationale: Major media market (Detroit metro area), historical franchise, recent resurgence in 2024-25 season, but smaller total regional population compared to tier_1 hubs.
+ownership:
+  primary_owner:
+    name: Tom Gores
+    type: individual
+    tenure_years: 15
+    source: https://www.nba.com/pistons/history/ownership-tom-gores
+    confidence: high
+  governance_notes: Gores owns 100% of Pistons since acquiring remaining 49% stake in 2015. Net worth ~$10.1B as of March 2026.
+  recent_transitions: none
+  spending_posture: aggressive_spender
+  spending_posture_evidence:
+    - Cade Cunningham signed to rookie max extension escalating to $269M over five years following All-NBA selection
+    - Duncan Robinson signed to three-year $48M deal (fully guaranteed first year)
+    - Caris LeVert signed to two-year $29M deal
+    - Javonte Green signed to $2.87M deal as depth piece
+    - Overall willingness to pay luxury tax to support competitive roster
+front_office:
+  president_basketball_ops:
+    name: Trajan Langdon
+    tenure_start: 2024-05
+    prior_stops:
+      - New Orleans Pelicans (General Manager, 2019-2024)
+      - San Antonio Spurs (Pro Scout, 2012-2015)
+      - Duke University (Player, 1995-1999)
+    public_philosophy_signals:
+      - '"Control every variable that we possibly can" (philosophy learned from David Griffin at Pelicans)'
+      - Emphasis on character and alignment across locker room
+      - Scout-heavy evaluation; seeks high-character players with longevity potential
+    confidence: high
+    source: https://www.nba.com/news/pistons-name-trajan-langdon-president-of-basketball-operations
+  general_manager:
+    name: unknown
+    tenure_start: unknown
+    prior_stops: []
+    public_philosophy_signals: []
+    confidence: low
+    source: https://www.nba.com/pistons/news/detroit-pistons-finalize-basketball-operations-leadership
+  head_coach:
+    name: J.B. Bickerstaff
+    tenure_start: 2024-07
+    contract_through: 2028
+    style_notes: Defense-first philosophy. Emphasizes five core principles- Details, Toughness, Together, Compete, 1 More. Process-driven rather than results-driven. Press heavy, transition defense, switchable schemes.
+    coaching_tree: Bickerstaff tree (son of Bernie Bickerstaff; previously mentored under father with Bobcats)
+    confidence: high
+    source: https://www.nba.com/news/pistons-jb-bickerstaff-next-coach
+  assistant_coaches_notable:
+    - name: unknown
+      role: unknown
+  notable_advisors_or_consultants:
+    - Michael Blackstone (Executive Vice President of Basketball Operations)
+    - Dennie Lindsey (Senior Vice President of Basketball Operations)
+    - George David (Senior Vice President of Basketball Administration)
+strategic_posture:
+  timeframe: contend_now
+  confidence: high
+  derived_from:
+    - 60-22 regular season record (2025-26), East's top seed with 1st playoff seed since 2007
+    - 44-38 record in 2024-25 marked first playoff appearance since 2019 after 14-win 2023-24 season (largest one-year turnaround in NBA history)
+    - Cade Cunningham All-NBA third team selection; emerging as franchise cornerstone
+    - Supporting cast includes All-Star/Star-caliber players in Jalen Duren, Ausar Thompson, Tobias Harris
+    - Currently in Game 7 vs Orlando Magic (#8 seed) as top seed, demonstrating playoff viability
+  constraints:
+    - reason_code: young_core_developing
+      detail: Cunningham (22), Duren (21), Thompson (21) still ascending; core durability unproven over long playoff runs.
+      weight: medium
+    - reason_code: max_contract_lockup
+      detail: Cunningham's $269M extension through 2029 (escalated by All-NBA) constrains cap flexibility long-term.
+      weight: high
+    - reason_code: recent_playoff_success
+      detail: Two consecutive playoff runs (2024-25, 2025-26) demonstrate progress but no Finals experience yet; sustainability uncertain.
+      weight: medium
+  trigger_events:
+    - Cunningham or core players develop significant injury
+    - Championship-window miss in next 2-3 years prompts retool pivot
+    - Trade deadline acquisitions in next 2-3 years reflect shift to depth/veteran additions vs. youth development
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: above_first_apron
+  current_payroll_estimate: 187970424
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Constrained by Cunningham extension and limited movable salary; Ivey/Duren RFA negotiations pending, potentially absorbing cap space
+  exceptions_available:
+    - unknown
+  source: https://www.spotrac.com/nba/detroit-pistons/cap/_/year/2025/sort/cap_total
+  source_fallbacks_used: []
+  confidence: medium
+trade_dna:
+  frequent_partners:
+    - CHI
+    - MIN
+    - PHI
+  preferred_deal_archetypes:
+    - Three-team swaps to acquire depth without losing premium young assets
+    - Trades targeting veteran wings/guards to complement core youth (Huerter acquisition, Feb 2026)
+    - Deadline acquisitions for defensive depth and perimeter spacing
+  recent_significant_trades:
+    - date: 2026-02
+      summary: Traded Jaden Ivey to Bulls; acquired Kevin Huerter and Dario Saric from Chicago; received 2026 protected swap from Timberwolves.
+      counterparties:
+        - CHI
+        - MIN
+    - date: 2025-07
+      summary: Traded Quentin Grimes to Mavericks for Tim Hardaway Jr. (who later left in FA to Nuggets).
+      counterparties:
+        - DAL
+        - DEN
+  confidence: high
+cultural_signals:
+  stability:
+    value: high
+    detail: Langdon's 2024-25 turnaround (14 wins to 44 wins) signaled organizational reset. 2025-26 success validates approach. Ownership committed to long-term core.
+  player_friendly:
+    value: mixed
+    detail: Aggressive contract extensions (Cunningham, Robinson) signal willingness to invest in retained talent. However, Ivey/Duren not extended pre-deadline (cap flexibility prioritized). Malik Beasley situation (gambling investigation) unresolved.
+  analytics_orientation:
+    value: balanced
+    detail: Langdon from Spurs (analytics-heavy); hired analytical staff. Balanced with veteran wisdom (Bickerstaff's hands-on defensive coaching, scout-centric player evaluation).
+  risk_tolerance:
+    value: aggressive
+    detail: Bold hire of Bickerstaff post-Cavaliers exit. Aggressive extension for Cunningham despite young age. Mid-season trade of Ivey (core asset) for depth.
+  notable_traits:
+    - developmental_org
+    - process_driven
+    - homegrown_priority
+  rationale: The Pistons' 2024-2025 rebuild under Langdon transformed a 14-win basement team into a playoff contender, establishing a culture of accountability and structure. Bickerstaff's emphasis on "Process" and defensive fundamentals defines the current playing identity. Homegrown core (Cunningham draft pick 2021, Duren acquired via pick swap, Thompson draft pick 2022) forms the franchise centerpiece.
+  confidence: high
+roster:
+  - player_id: cade_cunningham
+    name: Cade Cunningham
+    age: 22
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - secondary_creator
+          - spacer
+      defensive_role: point_of_attack
+      shooting_profile: good
+      special_traits:
+        - elite_passer
+        - iso_creator
+        - playoff_riser
+    tier: superstar
+    trajectory: ascending
+    contract:
+      years_remaining: 4
+      total_value_remaining: 210000000
+      annual_value_current_season: 52000000
+      annual_value_next_season: 56000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.nba.com/news/pistons-cunningham-5-year-extension
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: generational_talent
+          weight: high
+        - reason_code: recent_extension_poison_pill
+          weight: high
+      falsification_conditions:
+        - Catastrophic injury lasting >1 year
+        - Cunningham publicly requests trade
+        - Dramatic performance decline (sub-15 PPG season)
+      signal_strength: confirmed_shopped
+    team_relationship:
+      tenure_with_team: 3.5
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: All-NBA escalator to $269M; poison pill for any trade.
+    confidence: high
+    source: https://www.nba.com/news/pistons-cunningham-5-year-extension
+  - player_id: jalen_duren
+    name: Jalen Duren
+    age: 21
+    position_listed: C
+    contract_type: standard
+    availability_status: injured_short_term
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - rim_protector
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+        - elite_rebounder
+    tier: star
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: 6483144
+      annual_value_current_season: 6483144
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.nba.com/news/pistons-jalen-duren-no-extension
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: positional_scarcity
+          weight: medium
+      falsification_conditions:
+        - Mid-season extension offer signed
+        - Explicit FO statement renewing commitment to core
+        - Playoff success reinforcing partnership signal
+      signal_strength: single_source_reported
+    team_relationship:
+      tenure_with_team: 3
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: Restricted free agent in 2026; Pistons retain bird rights but RFA status invites competition.
+    confidence: high
+    source: https://www.nba.com/news/pistons-jalen-duren-no-extension
+  - player_id: ausar_thompson
+    name: Ausar Thompson
+    age: 21
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - transition_threat
+        - defensive_versatility
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: 10000000
+      annual_value_current_season: 4000000
+      annual_value_next_season: 4500000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: 2026
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/detroit-pistons/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: draft_pick_equity
+          weight: medium
+      falsification_conditions:
+        - Reported trade interest from FO
+        - Poor 2026-27 performance
+        - Injury setback limiting minutes
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Team controls option; cost-controlled deal enables future moves.
+    confidence: high
+    source: https://www.spotrac.com/nba/detroit-pistons/
+  - player_id: tobias_harris
+    name: Tobias Harris
+    age: 32
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - finisher
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - vet_leadership
+        - playoff_riser
+    tier: starter
+    trajectory: declining_peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 27300000
+      annual_value_current_season: 13000000
+      annual_value_next_season: 14300000
+      no_trade_clause: partial
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/detroit-pistons/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: locker_room_anchor
+          weight: high
+        - reason_code: recent_extension_poison_pill
+          weight: medium
+      falsification_conditions:
+        - Team announces youth-centric pivot
+        - Partial NTC waived by player
+        - Poor playoff performance in 2026 playoffs
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 3.5
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Partial NTC and veteran status limit team's unilateral options.
+    confidence: medium
+    source: https://www.spotrac.com/nba/detroit-pistons/
+  - player_id: kevin_huerter
+    name: Kevin Huerter
+    age: 27
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: spacer
+        secondary:
+          - secondary_creator
+          - connector
+      defensive_role: switchable
+      shooting_profile: elite
+      special_traits:
+        - elite_shooter
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 20000000
+      annual_value_current_season: 10000000
+      annual_value_next_season: 10000000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2027
+      source: https://www.nba.com/news/kevin-huerter-jaden-ivey-trade-2026
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: expiring_contract_value
+          weight: medium
+        - reason_code: positional_redundancy
+          weight: low
+      falsification_conditions:
+        - Multi-year extension signed
+        - Team publicly commits to Huerter as core rotation piece
+        - Consistent 30+ minute usage in playoffs
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Mid-season acquisition; moderate expiring salary provides some flexibility.
+    confidence: medium
+    source: https://www.nba.com/news/kevin-huerter-jaden-ivey-trade-2026
+  - player_id: dario_saric
+    name: Dario Saric
+    age: 31
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: spacer
+        secondary:
+          - secondary_creator
+          - connector
+      defensive_role: helper
+      shooting_profile: good
+      special_traits:
+        - pnr_maestro
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 3500000
+      annual_value_current_season: 3500000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.nba.com/news/kevin-huerter-jaden-ivey-trade-2026
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: declining_role
+          weight: medium
+      falsification_conditions:
+        - Extension offer signed
+        - Increased playoff minutes suggesting rotation lock
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.2
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Expiring veteran minimum; limited leverage.
+    confidence: medium
+    source: https://www.nba.com/news/kevin-huerter-jaden-ivey-trade-2026
+  - player_id: caris_levert
+    name: Caris LeVert
+    age: 31
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - finisher
+          - connector
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - vet_leadership
+        - transition_threat
+    tier: rotation
+    trajectory: declining_peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 14000000
+      annual_value_current_season: 14000000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.si.com/nba/pistons/onsi/news/why-detroit-piston-s-dario-saric-acquisition-shouldn-t-go-under-the-radar-01kgms8fyh3j
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: locker_room_anchor
+          weight: medium
+        - reason_code: playoff_riser
+          weight: medium
+      falsification_conditions:
+        - Explicit trade rumors from beat reporters
+        - Poor playoff performance continuing into 2026-27 season
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Veteran presence; expiring deal provides team optionality.
+    confidence: medium
+    source: https://www.si.com/nba/pistons/onsi/news/why-detroit-piston-s-dario-saric-acquisition-shouldn-t-go-under-the-radar-01kgms8fyh3j
+  - player_id: malik_beasley
+    name: Malik Beasley
+    age: 29
+    position_listed: SG
+    contract_type: standard
+    availability_status: unknown
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: spacer
+        secondary:
+          - tertiary_scorer
+      defensive_role: switchable
+      shooting_profile: elite
+      special_traits:
+        - elite_shooter
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 14000000
+      annual_value_current_season: 14000000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/detroit-pistons/
+    movement_constraints:
+      status: shopped
+      reasons:
+        - reason_code: cap_relief_target
+          weight: high
+        - reason_code: player_unhappy
+          weight: medium
+      falsification_conditions:
+        - Extended roster role in Finals run
+        - Public statement from FO reaffirming commitment
+        - Multi-year extension signed
+      signal_strength: widely_reported
+    team_relationship:
+      tenure_with_team: 1.5
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Federal gambling investigation created uncertainty; contract discussions stalled. Expiring deal limits retention leverage.
+    confidence: medium
+    source: https://www.spotrac.com/nba/detroit-pistons/
+  - player_id: duncan_robinson
+    name: Duncan Robinson
+    age: 29
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: spacer
+        secondary:
+          - tertiary_scorer
+      defensive_role: wing_stopper
+      shooting_profile: elite
+      special_traits:
+        - elite_shooter
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 32800000
+      annual_value_current_season: 16800000
+      annual_value_next_season: 16000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2027
+      source: https://www.si.com/nba/pistons/onsi/news/key-details-of-duncan-robinson-detroit-pistons-contract-revealed-01jzm2rq9bc7
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: failed_fit
+          weight: low
+        - reason_code: recent_extension_poison_pill
+          weight: low
+      falsification_conditions:
+        - Significant role reduction in playoffs
+        - Trade rumors mid-season
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.7
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Multi-year commitment; moderate salary limits optionality.
+    confidence: medium
+    source: https://www.si.com/nba/pistons/onsi/news/key-details-of-duncan-robinson-detroit-pistons-contract-revealed-01jzm2rq9bc7
+  - player_id: isaiah_stewart
+    name: Isaiah Stewart
+    age: 24
+    position_listed: PF
+    contract_type: standard
+    availability_status: injured_short_term
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 24000000
+      annual_value_current_season: 12000000
+      annual_value_next_season: 12000000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/detroit-pistons/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: medium
+        - reason_code: homegrown_loyalty
+          weight: medium
+      falsification_conditions:
+        - Suspension extended for repeated incident
+        - Multiple off-court issues surfacing
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 4
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: Extended through 2027; core piece but younger alternatives (Thompson) limit leverage.
+    confidence: medium
+    source: https://www.spotrac.com/nba/detroit-pistons/
+  - player_id: ron_holland
+    name: Ron Holland
+    age: 20
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: finisher
+        secondary: []
+      defensive_role: switchable
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 9000000
+      annual_value_current_season: 2500000
+      annual_value_next_season: 3000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2026
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/detroit-pistons/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: draft_pick_equity
+          weight: high
+      falsification_conditions:
+        - Major injury derailing athleticism
+        - Plateau in development relative to peers
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.5
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Cheap contract with team control option; limited leverage.
+    confidence: high
+    source: https://www.spotrac.com/nba/detroit-pistons/
+  - player_id: bobi_klintman
+    name: Bobi Klintman
+    age: 23
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: finisher
+        secondary:
+          - post_hub
+      defensive_role: helper
+      shooting_profile: non_shooter
+      special_traits: []
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: 2
+      total_value_remaining: 3000000
+      annual_value_current_season: 1400000
+      annual_value_next_season: 1600000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/detroit-pistons/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: draft_pick_equity
+          weight: medium
+      falsification_conditions:
+        - Significant role expansion demonstrating development
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.5
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Cheap deal; limited leverage.
+    confidence: medium
+    source: https://www.spotrac.com/nba/detroit-pistons/
+  - player_id: javonte_green
+    name: Javonte Green
+    age: 28
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits:
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 0
+      total_value_remaining: 0
+      annual_value_current_season: 2874436
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.hoopsrumors.com/2025/08/pistons-javonte-green-finalizing-one-year-deal.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: declining_role
+          weight: medium
+      falsification_conditions:
+        - Extension offer signed
+        - Increased playoff minutes
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Expiring veteran; minimal leverage.
+    confidence: medium
+    source: https://www.hoopsrumors.com/2025/08/pistons-javonte-green-finalizing-one-year-deal.html
+  - player_id: daniss_jenkins
+    name: Daniss Jenkins
+    age: 24
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: connector
+        secondary:
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: non_shooter
+      special_traits: []
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.detroitbadboys.com/detroit-pistons-news/48336/lets-make-a-deal-daniss-jenkins-contract-situation
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: positional_redundancy
+          weight: low
+        - reason_code: failed_fit
+          weight: low
+      falsification_conditions:
+        - Significant reduction in playoff minutes
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.5
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Standard contract; limited leverage.
+    confidence: low
+    source: https://www.detroitbadboys.com/detroit-pistons-news/48336/lets-make-a-deal-daniss-jenkins-contract-situation
+  - player_id: marcus_sasser
+    name: Marcus Sasser
+    age: 23
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits: []
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2027
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/detroit-pistons/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: draft_pick_equity
+          weight: low
+      falsification_conditions:
+        - Significant role reduction
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.5
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Team controls option; minimal leverage.
+    confidence: low
+    source: https://www.spotrac.com/nba/detroit-pistons/
+  - player_id: wendell_moore_jr
+    name: Wendell Moore Jr.
+    age: 24
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - transition_threat
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/detroit-pistons/
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: positional_redundancy
+          weight: medium
+      falsification_conditions:
+        - Extension offer signed
+        - Significantly increased playoff role
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.5
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Expiring deal acquired mid-season; limited leverage.
+    confidence: low
+    source: https://www.spotrac.com/nba/detroit-pistons/
+  - player_id: simone_fontecchio
+    name: Simone Fontecchio
+    age: 28
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary:
+          - tertiary_scorer
+      defensive_role: wing_stopper
+      shooting_profile: elite
+      special_traits:
+        - elite_shooter
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 8000000
+      annual_value_current_season: 8000000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.si.com/nba/pistons/onsi/news/simone-fontecchio-sends-farewell-message-detroit-pistons-01jz5zc84hdm
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: positional_redundancy
+          weight: medium
+      falsification_conditions:
+        - Extension signed (unlikely given move)
+      signal_strength: widely_reported
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Expiring; traded to Miami mid-season.
+    confidence: medium
+    source: https://www.si.com/nba/pistons/onsi/news/simone-fontecchio-sends-farewell-message-detroit-pistons-01jz5zc84hdm
+pending_free_agents: []
+known_target_history:
+  - target: Kevin Huerter
+    year: 2026
+    outcome: acquired
+    detail: Acquired from Bulls in three-team trade (Feb 2026) alongside Dario Saric for Jaden Ivey.
+    source: https://www.nba.com/news/kevin-huerter-jaden-ivey-trade-2026
+  - target: Caris LeVert
+    year: 2025
+    outcome: acquired
+    detail: Signed as free agent to two-year $29M deal in summer 2025.
+    source: https://www.si.com/nba/pistons/onsi/news/why-detroit-piston-s-dario-saric-acquisition-shouldn-t-go-under-the-radar-01kgms8fyh3j
+  - target: Duncan Robinson
+    year: 2025
+    outcome: acquired
+    detail: Acquired from Heat in sign-and-trade (July 2025) for Simone Fontecchio; three-year $48M deal.
+    source: https://www.detroitbadboys.com/2025/7/1/24460051/nba-trade-rumors-detroit-pistons-trade-simone-fontecchio
+  - target: Malik Beasley
+    year: 2025
+    outcome: not_acquired
+    detail: Extension talks failed due to federal gambling investigation; three-year $42M offer withdrawn.
+    source: https://www.spotrac.com/nba/detroit-pistons/
+  - target: Tim Hardaway Jr.
+    year: 2025
+    outcome: pursued_no_deal
+    detail: Acquired from Mavericks in trade (2024-25 season), but left via free agency to Nuggets in 2025 offseason.
+    source: https://www.detroitnews.com/story/sports/nba/pistons/2025/05/04/pistons-offseason-outlook-where-each-player-stands-after-season-of-resurgence/83444579007/
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "Detroit Pistons hold No. 21 from MIN in the official post-lottery order. Mock-source layer: No. 21: Dailyn Swain; treat prospect names as low-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: low
+  - priority: Win Eastern Conference Finals and compete in NBA Finals
+    timeline: this_season
+    type: draft
+    detail: Pistons are
+    confidence: high
+  - priority: Extend Jaden Ivey successor and lock in core
+    timeline: this_offseason
+    type: extension
+    detail: Ivey traded mid-season; address Duren and Jaden Ivey (RFA 2026) extension negotiations or trades to solidify backcourt long-term.
+    confidence: medium
+  - priority: Resolve Malik Beasley situation
+    timeline: this_offseason
+    type: roster
+    detail: Gambling investigation unresolved; determine if retention is viable or seek cap relief trade partner.
+    confidence: low
+  - priority: Evaluate coaching sustainability
+    timeline: next_season
+    type: coaching_decision
+    detail: Bickerstaff's first full season was successful; assess second season and long-term fit with young core.
+    confidence: medium
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 21 overall; from MIN.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: MIN
+    - year: 2025
+      round: 1
+      from_team: MIN
+      protections: Protected first-rounder via Karl-Anthony Towns trade (Sept 2024)
+      source: https://www.nba.com/news/julius-randle-timberwolves-contract-extension-2025
+  draft_picks_owed:
+    - year: 2026
+      round: 1
+      to_team: MIN
+      protections: 2026 No. 28 overall; from DET.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 2
+      to_team: NOP
+      protections: 2026 No. 58 overall; from DET via NYK, BKN, PHX, ORL, and LAC.
+      source: https://www.nba.com/news/2026-nba-draft-order
+  trade_exceptions: []
+team_team_relationships:
+  rivalries:
+    - team_id: CLE
+      type: competitive_recent
+      basis: Bickerstaff departed Cavaliers in May 2024 after playoff runs; Eastern Conference Central division rivalry renewed.
+    - team_id: ORL
+      type: playoff_rematch
+      basis: Facing Magic in 2026 first-round (Game 7 as of May 2) after dominant
+    - team_id: CHI
+      type: personnel_grudge
+      basis: Jaden Ivey traded to Bulls mid-season (Feb 2026); ongoing divisional rivalry in Central.
+  notable_personnel_connections:
+    - person: Trajan Langdon
+      connected_team: NOP
+      connection_type: former_GM
+      detail: Langdon was Pelicans GM 2019-2024 before Pistons hire; may maintain relationships with NOLA staff.
+    - person: J.B. Bickerstaff
+      connected_team: CLE
+      connection_type: former_head_coach
+      detail: Coached Cavaliers 2020-2024, led two consecutive playoff berths; replaced by Kenny Atkinson in 2024.
+g_league_and_stash:
+  affiliate_team: Motor City Cruise
+  notable_affiliate_players: []
+  international_stash: []
+narrative_summary:
+  one_paragraph: The Detroit Pistons have completed the most dramatic franchise turnaround in NBA history, going from 14 wins in 2023-24 to a 60-22 record and the
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 21 from MIN; The Athletic mock-source layer lists No. 21: Dailyn Swain as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - Game 7 vs. Magic outcome determines legitimacy of contention window (Finals momentum vs. early exit)
+    - Ivey and Duren RFA negotiations in summer 2026; ability to retain both or reinvest cap into depth
+    - Malik Beasley gambling investigation resolution and potential roster impact or trade need
+sources_used:
+  - https://www.nba.com/news/pistons-name-trajan-langdon-president-of-basketball-operations
+  - https://www.nba.com/pistons/history/ownership-tom-gores
+  - https://www.nba.com/news/pistons-jb-bickerstaff-next-coach
+  - https://www.nba.com/news/pistons-cunningham-5-year-extension
+  - https://www.basketball-reference.com/teams/DET/2026.html
+  - https://www.spotrac.com/nba/detroit-pistons/cap/_/year/2025/sort/cap_total
+  - https://www.nba.com/news/kevin-huerter-jaden-ivey-trade-2026
+  - https://www.espn.com/nba/story/_/id/40206067/pistons-set-hire-trajan-langdon-new-president-basketball-operations
+  - https://www.nba.com/pistons/news/detroit-pistons-finalize-basketball-operations-leadership
+  - https://www.nba.com/news/nba-suspensions-pistons-hornets-game-altercation
+  - https://www.clickondetroit.com/sports/2026/02/11/detroit-pistons-face-charlotte-hornets-in-first-meeting-since-massive-brawl
+  - https://www.hoopsrumors.com/2025/08/pistons-javonte-green-finalizing-one-year-deal.html
+  - https://www.si.com/nba/pistons/onsi/news/why-detroit-piston-s-dario-saric-acquisition-shouldn-t-go-under-the-radar-01kgms8fyh3j
+  - https://www.detroitbadboys.com/detroit-pistons-news/48336/lets-make-a-deal-daniss-jenkins-contract-situation
+  - https://www.wikipedia.org/wiki/Tom_Gores
+  - https://www.detroitbadboys.com/2025/7/1/24460051/nba-trade-rumors-detroit-pistons-trade-simone-fontecchio
+  - https://www.nba.com/news/nba-announcements-pistons-hornets-penalties-0209
+  - https://detroit.gleague.nba.com/roster
+  - https://www.nba.com/draft/2025/team-profiles/2025-detroit-pistons
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - front_office.general_manager (structure unknown; Langdon as POBO may not have separate GM)
+  - head_coach.assistant_coaches_notable (names and roles not confirmed)
+  - several player contracts annual values (two-way player contracts, minimum deals)
+  - trade_exceptions (no exceptions available at this time)
+  - pending_free_agents (no pending FAs as of May 2, 2026; Ivey/Duren RFA status noted in movement constraints)
+  - g_league_and_stash.notable_affiliate_players (Motor City Cruise roster not detailed)
+  - cap_situation.exceptions_available (specific exceptions unknown)
+vocabulary_flags:
+  - Jalen Duren injury status marked "injured_short_term" as of Game 7 (May 2); suspension impact from Feb 2026 brawl (7 games) resolved by playoff time, but available durability status through Finals uncertain.
+  - Malik Beasley "shopped" status inferred from gambling investigation fallout and failed extension talks; no explicit beat reporting of active trade discussions.
+  - Jeremy note: As-of date is 2026-05-02, meaning Game 7 is May 3, 2026. Series status reflects pre-Game 7 state (3-2 Pistons lead). Outcomes of Game 7 and beyond unknown per research cutoff.
+  - Trajan Langdon may hold role of POBO without separate "General Manager" title; front office structure unclear in public announcements.
+  - Tim Hardaway Jr. departed after 2024-25 season to Denver, NOT on 2025-26 roster.

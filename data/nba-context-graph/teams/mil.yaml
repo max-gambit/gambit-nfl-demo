@@ -1,0 +1,1067 @@
+team_id: MIL
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Milwaukee Bucks
+  conference: Eastern
+  division: Central
+  market_tier: tier_2
+  market_tier_rationale: Ranked 19th among NBA franchises by 2026 valuation; mid-market metro with $4B+ franchise value but smaller than top-10 markets (NYC, LA, Miami, Boston). Strong regional engagement but limited national media footprint vs. tier-1 cities.
+ownership:
+  primary_owner:
+    name: Wesley Edens
+    type: individual
+    tenure_years: 12
+    source: https://www.espn.com/nba/story/_/id/48225217/how-unique-milwaukee-bucks-ownership-structure-impacts-giannis-antetokounmpo-trade-wes-edens-jimmy-haslam-marc-lasry
+    confidence: high
+  governance_notes: "Rotating ownership structure: Wes Edens holds controlling interest through 2028, then transfers to Jimmy Haslam (who also owns Cleveland Browns, Columbus Crew). Marc Lasry sold his 25% stake to Haslams in April 2023; Jamie Dinan is third-largest shareholder. Consensus governance required among principals."
+  recent_transitions: Marc Lasry exited ownership (sold to Haslams, effective April 2023). Haslams gradually assuming operational control ahead of 2028 transition.
+  spending_posture: moderate
+  spending_posture_evidence:
+    - Ownership reluctant to pay luxury tax in 2025-26 ($6.5M below threshold); emphasized when Lillard waived and cap conservatively managed.
+    - Willing to spend on competitive rosters during contention window (2019-2023) but avoiding tax for 2025-26 season despite depth flexibility.
+    - No mega-payroll commitment; strategic mid-market spend approach under Edens stewardship.
+front_office:
+  president_basketball_ops:
+    name: unknown
+    tenure_start: unknown
+    prior_stops: []
+    public_philosophy_signals: []
+    confidence: low
+    source: unknown
+  general_manager:
+    name: Jon Horst
+    tenure_start: 2017-06
+    prior_stops:
+      - San Antonio Spurs (front office)
+      - Chicago Bulls (scout/basketball operations)
+    public_philosophy_signals:
+      - 2021 NBA Executive of the Year for constructing 2020-21 championship roster (Jrue Holiday trade, cap optimization).
+      - Drafted Giannis Antetokounmpo (2013) and built sustained contention around superstar; extended Giannis repeatedly (2017, 2021, 2025).
+      - Recent extension signed April 2025 indicates ownership confidence despite 32-50 season, suggesting multi-year mandate to retool around core asset.
+      - "Analytics-forward approach: hires specialized basketball research personnel; balances data-driven decisions with traditional evaluation."
+    confidence: high
+    source: https://www.brewhoop.com/2025/4/24/24415623/jon-horst-signed-multiyear-extension-milwaukee-bucks-gm-general-manager
+  head_coach:
+    name: Taylor Jenkins
+    tenure_start: 2026-05
+    contract_through: unknown
+    style_notes: Returns to Milwaukee after one season as assistant under Mike Budenholzer (2018-19, 60-win team). Previously led Memphis Grizzlies 2019-25 (250-214 record, 56-win season 2021-22, 4 playoff appearances). Defensive identity, structured offense; experience building young rosters.
+    coaching_tree: budenholzer_tree
+    confidence: high
+    source: https://www.nba.com/news/bucks-name-taylor-jenkins-head-coach
+  assistant_coaches_notable:
+    - unknown
+  notable_advisors_or_consultants:
+    - unknown
+strategic_posture:
+  timeframe: retool
+  confidence: medium
+  derived_from:
+    - 32-50 record in 2025-26; first playoff miss in 10 years; missed playoffs for first time since 2016.
+    - Damian Lillard waived mid-season (Achilles tear, sat entire 2025-26 season); Khris Middleton traded for Kyle Kuzma (February 2025, viewed as Wizards win). Core fit issues evident.
+    - "Ownership willing to spend: signed Myles Turner (4yr/$107M with 15% kicker, player option) and retained Bobby Portis (3yr/$44M), Cole Anthony, Gary Harris. Not full rebuild; still competitive intent around Giannis."
+    - Doc Rivers stepped down post-season; Taylor Jenkins hired as retool-phase coach (proven playoff builder, turnaround experience).
+    - Jon Horst extended mid-April 2025 (before season end) signals long-term mandate; FO stability despite performance decline.
+  constraints:
+    - reason_code: max_contract_lockup
+      detail: Giannis ($54.1M 2025-26, $58.4M 2026-27, $62.7M PO 2027-28) + Myles Turner ($26.75M) + Kyle Kuzma ($21.5M) consumes ~$102M annually; large commitment to 3 players limits bench flexibility.
+      weight: high
+    - reason_code: aging_core
+      detail: Lillard out (injured); Middleton traded at age 33. Giannis at peak age (30); Turner at 29; reliance on health of two max-level players.
+      weight: medium
+    - reason_code: tax_apron_constraints
+      detail: Currently $6.5M below tax line but ownership signaled reluctance to pay; restricts mid-season trades or major additions.
+      weight: medium
+    - reason_code: coaching_decision_pending
+      detail: New HC Jenkins (hired May 2026) will shape roster continuity/trade direction; cultural reset required after Doc Rivers' 32-50 tenure.
+      weight: medium
+  trigger_events:
+    - Giannis explicit commitment or departure demand would reset entire franchise vector.
+    - Mid-season injury to Giannis or Turner; depth tested given bench-heavy roster.
+    - Myles Turner performance/availability; recent trade rumors suggest he may be shopped if roster underperforms early 2026-27.
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: below_apron
+  current_payroll_estimate: 184666265
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Likely above first apron if Giannis, Turner, Kuzma all retained (est. $195M+); no meaningful cap space. Turner (4yr deal, player option yr 4) and Kuzma (UFA 2027) provide 2027-28 exit ramps if retool pivots.
+  exceptions_available:
+    - Non-Taxpayer Mid-Level Exception ($15M), Bi-Annual Exception ($5.478M) for 2026 offseason; Bucks ducked second apron mid-season, recovered flexibility.
+  source: https://www.spotrac.com/nba/milwaukee-bucks/cap
+  source_fallbacks_used: []
+  confidence: high
+trade_dna:
+  frequent_partners:
+    - IND
+    - WAS
+    - BKN
+  preferred_deal_archetypes:
+    - Acquire depth via salary dumps (Brook Lopez, Jericho Sims, Gary Harris low-cost 2-year deals indicate willingness to absorb expiring or team-salary players).
+    - "Star-power pivots: Jrue Holiday (2020), Khris Middleton trades structured as core-building moves; recent Middleton-to-Wizards swap suggests openness to salary relief trades."
+    - "Asset consolidation: Lillard trade (2024), Holiday trade (2020) show willingness to mortgage future draft capital for immediate contention windows."
+  recent_significant_trades:
+    - date: 2025-02
+      summary: Traded Khris Middleton (salary relief) to Washington Wizards for Kyle Kuzma and 2025 2nd-rounder; viewed as Wizards win by season end (Kuzma underperformed).
+      counterparties:
+        - WAS
+    - date: 2025-05
+      summary: Waived Damian Lillard (Achilles tear), stretched salary; Bucks pay ~$20M total over 5 years to recover cap space and sign Myles Turner.
+    - date: 2025-02
+      summary: Acquired Jericho Sims from New York Knicks (via Delon Wright trade) as secondary big; low-cost depth addition.
+      counterparties:
+        - NYK
+  confidence: medium
+cultural_signals:
+  stability:
+    value: medium
+    detail: Doc Rivers departed after 32-50 season (3 years, 97-103 record); Taylor Jenkins hired within weeks. FO stable (Horst extended mid-April 2025), ownership united, but coaching carousel initiated. GM stability supports medium rating.
+  player_friendly:
+    value: yes
+    detail: Giannis extended repeatedly (2017, 2021, 2025); willingness to re-sign vets (Portis, Harris, Trent, Prince at market rates or discounts). Recent trade activity suggests player movement respected (Middleton, Lillard transitions managed). No public locker-room friction reported.
+  analytics_orientation:
+    value: balanced
+    detail: Director of Basketball Research (Seth Partnow legacy) brings baseball analytics perspective; problem-solving emphasizes data + coaching eyes + locker-room ears. Described as pragmatic rather than dogmatic; roster composition mixes advanced metrics with veteran leadership (Portis, Harris, Prince).
+  risk_tolerance:
+    value: moderate
+    detail: Willingness to trade stars (Middleton, Lillard) for cap relief and retool; signed Turner with 15% trade kicker despite roster uncertainty. Balanced between aggressive trades and conservative tax spending; ownership reluctance to pay tax signals moderate rather than aggressive posture.
+  notable_traits:
+    - homegrown_priority
+    - coach_carousel
+    - process_driven
+    - star_chasing
+  rationale: Bucks drafted Giannis in-house and extended him thrice (homegrown centerpiece). Recent coaching turnover (Griffin, Rivers, Jenkins) and front-office reshuffles during retool phase show carousel tendencies. Process-driven via analytics investment and transparent FO communication. Star-chasing evident in Lillard acquisition (2024), Turner signing (2025).
+  confidence: medium
+roster:
+  - player_id: giannis_antetokounmpo
+    name: Giannis Antetokounmpo
+    age: 31
+    position_listed: PF/C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - finisher
+          - post_hub
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits:
+        - generational_talent
+        - elite_athlete
+        - iso_creator
+        - pnr_maestro
+    tier: superstar
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 175369698
+      annual_value_current_season: 54100000
+      annual_value_next_season: 58456566
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: "2027"
+      team_option: none
+      bird_rights: full
+      contract_through: "2027"
+      source: https://www.spotrac.com/nba/player/_/id/13328/giannis-antetokounmpo
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: generational_talent
+          weight: high
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Explicit public trade request from Giannis; ownership agrees to trade negotiations.
+        - 3+ consecutive losing seasons (currently at 1) would shift tenure calculus.
+      signal_strength: denied_publicly
+    team_relationship:
+      tenure_with_team: 13
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Drafted 2013 (pick 15); extension negotiations in Giannis' control; ownership eager to retain (multiple extensions). Giannis holds leverage via Oct. 1 extension eligibility (4yr/$275M possible), player option, and trade-demand threat.
+    confidence: high
+    source: https://www.nba.com/news/bucks-giannis-antetokounmpo-extension
+  - player_id: myles_turner
+    name: Myles Turner
+    age: 29
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: good
+      special_traits:
+        - elite_rebounder
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 4
+      total_value_remaining: 108900000
+      annual_value_current_season: 26750000
+      annual_value_next_season: 27680000
+      no_trade_clause: none
+      trade_kicker: "0.15"
+      player_option: "2029"
+      team_option: none
+      bird_rights: non
+      contract_through: "2029"
+      source: https://www.nba.com/news/bucks-myles-turner-free-agency
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: tax_apron_pressure
+          weight: high
+        - reason_code: expiring_contract_value
+          weight: medium
+      falsification_conditions:
+        - Turner establishes himself as indispensable rim protector; elite rim-protection metrics (>2 BPG, <8 DRPM) mid-season.
+        - Bucks exceed first apron; ownership signals commitment to retain Turner long-term.
+        - Multiple playoff wins in 2026-27; stability + winning shifts calculus from rebuilding to contending.
+      signal_strength: rumor_only
+    team_relationship:
+      tenure_with_team: 0
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: 15% trade kicker non-trivial but manageable; Turner recent free agent signing (July 2025) with low leverage vs. franchise looking to optimize cap flexibility during retool.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/17839/myles-turner
+  - player_id: kevin_porter_jr
+    name: Kevin Porter Jr.
+    age: 26
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - iso_creator
+    tier: starter
+    trajectory: declining
+    contract:
+      years_remaining: 2
+      total_value_remaining: 10500000
+      annual_value_current_season: 5134000
+      annual_value_next_season: 5366000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: "2027"
+      team_option: none
+      bird_rights: non
+      contract_through: "2027"
+      source: https://www.espn.com/nba/story/_/id/45622789/kevin-porter-jr-agrees-two-year-deal-bucks
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: declining_role
+          weight: medium
+        - reason_code: positional_redundancy
+          weight: low
+      falsification_conditions:
+        - Porter Jr. steps into primary playmaking role full-time; mid-season stats show >7 APG with <4 TO.
+        - Bucks re-sign to multi-year extension (signals long-term core commitment).
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Low salary, non-Bird rights; player option Year 2 gives Porter Jr. minor leverage only if he plays well.
+    confidence: medium
+    source: https://www.espn.com/nba/story/_/id/45622789/kevin-porter-jr-agrees-two-year-deal-bucks
+  - player_id: gary_trent_jr
+    name: Gary Trent Jr.
+    age: 29
+    position_listed: SG/SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: elite
+      special_traits:
+        - elite_passer
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 7579065
+      annual_value_current_season: 3803066
+      annual_value_next_season: 3776000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: "2027"
+      team_option: none
+      bird_rights: early
+      contract_through: "2027"
+      source: https://www.brewhoop.com/2025/6/30/24459457/nba-free-agency-milwaukee-bucks-gary-trent-jr-shams-charania
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: recent_extension_poison_pill
+          weight: medium
+      falsification_conditions:
+        - Trent Jr. opt-out of player option; tests free agency mid-way through 2026-27.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Player option Year 2 provides opt-out leverage; broke Ray Allen franchise 3P record in 2025-26 suggesting upside for future negotiation.
+    confidence: high
+    source: https://www.brewhoop.com/2025/6/30/24459457/nba-free-agency-milwaukee-bucks-gary-trent-jr-shams-charania
+  - player_id: myles_turner
+    name: Kyle Kuzma
+    age: 31
+    position_listed: SF/PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+      defensive_role: helper
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 2
+      total_value_remaining: 45100000
+      annual_value_current_season: 21477272
+      annual_value_next_season: 23622728
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: "2027"
+      source: https://www.salaryswish.com/players/kyle-kuzma
+    movement_constraints:
+      status: shopped
+      reasons:
+        - reason_code: failed_fit
+          weight: high
+        - reason_code: positional_redundancy
+          weight: medium
+      falsification_conditions:
+        - Kuzma averages >14 PPG, 45% FG, 37% 3P mid-season 2026-27; Bucks extend beyond current deal.
+        - Bucks explicitly deny trade interest; retain through 2026-27 season without seeking suitors.
+      signal_strength: widely_reported
+    team_relationship:
+      tenure_with_team: 1
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Acquired via mid-season trade (Feb 2025) for salary relief; no leverage as Bucks view as potential expiring contract value.
+    confidence: high
+    source: https://www.salaryswish.com/players/kyle-kuzma
+  - player_id: bobby_portis
+    name: Bobby Portis
+    age: 30
+    position_listed: PF/C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits:
+        - elite_rebounder
+        - vet_leadership
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 44000000
+      annual_value_current_season: 14000000
+      annual_value_next_season: 14000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: "2028"
+      team_option: none
+      bird_rights: full
+      contract_through: "2028"
+      source: https://www.si.com/nba/bucks-agree-to-45-million-contract-extension-bobby-portis
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: recent_extension_poison_pill
+          weight: medium
+      falsification_conditions:
+        - Trade rumors emerge; Horst publicly states Portis is untouchable.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 6
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: 3-year extension (2025) with player option Year 3 shows FO commitment; veteran locker-room presence supports stability.
+    confidence: high
+    source: https://www.si.com/nba/bucks-agree-to-45-million-contract-extension-bobby-portis
+  - player_id: aj_green
+    name: AJ Green
+    age: 27
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: spacer
+        secondary:
+          - tertiary_scorer
+      defensive_role: wing_stopper
+      shooting_profile: elite
+      special_traits:
+        - transition_threat
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 4
+      total_value_remaining: 45000000
+      annual_value_current_season: 9450000
+      annual_value_next_season: 10800000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: "2030"
+      source: https://www.nba.com/news/aj-green-bucks-extension
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: high
+      falsification_conditions:
+        - Injury derails Green's development; multi-year recovery uncertainty.
+        - Multiple seasons of sub-5 PPG performance; draft value expectations unmet.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 4
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: Undrafted 2022, drafted by Bucks as Iowa product; $45M extension (Oct 2025) signals franchise investment in long-term core; locked through 2029-30.
+    confidence: high
+    source: https://www.nba.com/news/aj-green-bucks-extension
+  - player_id: taurean_prince
+    name: Taurean Prince
+    age: 32
+    position_listed: SF/PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 2
+      total_value_remaining: 7119635
+      annual_value_current_season: 3303774
+      annual_value_next_season: 3815861
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: "2027"
+      team_option: none
+      bird_rights: non
+      contract_through: "2027"
+      source: https://www.brewhoop.com/2025/6/30/24459434/nba-free-agency-milwaukee-bucks-taurean-prince-shams-charania-veteran-minimum-two-years
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: contract_expiring
+          weight: low
+      falsification_conditions:
+        - Prince opts out Year 2; signals departure intent.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Veteran minimum deal (9-year vet); player option Year 2 provides minimal leverage given age and salary.
+    confidence: medium
+    source: https://www.brewhoop.com/2025/6/30/24459434/nba-free-agency-milwaukee-bucks-taurean-prince-shams-charania-veteran-minimum-two-years
+  - player_id: gary_harris
+    name: Gary Harris
+    age: 32
+    position_listed: SG/SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - tertiary_scorer
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits:
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 2
+      total_value_remaining: 7450014
+      annual_value_current_season: 3634153
+      annual_value_next_season: 3815861
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: "2027"
+      team_option: none
+      bird_rights: non
+      contract_through: "2027"
+      source: https://www.brewhoop.com/2025/6/30/24459354/nba-free-agency-milwaukee-bucks-kevin-porter-jr-mid-level-bi-annual-exception
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: contract_expiring
+          weight: low
+      falsification_conditions:
+        - Harris opts out of player option Year 2; tests free agency.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Depth veteran; 2-year deal with player option signals stopgap role rather than core investment.
+    confidence: medium
+    source: https://www.brewhoop.com/2025/6/30/24459354/nba-free-agency-milwaukee-bucks-kevin-porter-jr-mid-level-bi-annual-exception
+  - player_id: ryan_rollins
+    name: Ryan Rollins
+    age: 23
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - transition_threat
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 12000000
+      annual_value_current_season: 4000000
+      annual_value_next_season: 4000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: "2028"
+      team_option: none
+      bird_rights: full
+      contract_through: "2028"
+      source: https://www.hoopsrumors.com/2025/07/bucks-bobby-portis-agree-to-three-year-deal.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: medium
+      falsification_conditions:
+        - Injury derails Rollins; long-term recovery uncertain.
+        - Bench role solidifies; primary PG role absorbed by veteran starter long-term.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: Drafted 2023 (24th overall); 3-year deal with PO Year 3 is favorable long-term retention tool; young player has minimal market leverage.
+    confidence: medium
+    source: https://www.hoopsrumors.com/2025/07/bucks-bobby-portis-agree-to-three-year-deal.html
+  - player_id: jericho_sims
+    name: Jericho Sims
+    age: 27
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+    tier: fringe
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 5262809
+      annual_value_current_season: 2461463
+      annual_value_next_season: 2801346
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: "2027"
+      team_option: none
+      bird_rights: non
+      contract_through: "2027"
+      source: https://www.nba.com/bucks/news/milwaukee-bucks-re-sign-jericho-sims
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: positional_redundancy
+          weight: low
+      falsification_conditions:
+        - Turner traded mid-season; Sims assumes larger role and signs extension.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Backup big on minimum-adjacent deal; player option Year 2 provides minimal leverage given limited role and market value.
+    confidence: medium
+    source: https://www.nba.com/bucks/news/milwaukee-bucks-re-sign-jericho-sims
+  - player_id: andre_jackson_jr
+    name: Andre Jackson Jr.
+    age: 24
+    position_listed: SF/PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+      defensive_role: switchable
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: fringe
+    trajectory: uncertain
+    contract:
+      years_remaining: 1
+      total_value_remaining: 2221677
+      annual_value_current_season: 2221677
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: "2026"
+      source: https://www.brewhoop.com/2025/7/7/24463539/milwaukee-bucks-nba-free-agency-andre-jackson-jr-eric-nehm-the-athletic
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: extension_decline
+          weight: medium
+      falsification_conditions:
+        - Bucks guarantee full salary and sign multi-year extension mid-season; signals long-term core role.
+        - Jackson Jr. averages >8 PPG, 35% 3P; transforms into reliable rotation player.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Salary pushed back guarantee date (only $800k guaranteed); Bucks managing flexibility; minimal leverage as potential waive candidate.
+    confidence: low
+    source: https://www.brewhoop.com/2025/7/7/24463539/milwaukee-bucks-nba-free-agency-andre-jackson-jr-eric-nehm-the-athletic
+  - player_id: cormac_ryan
+    name: Cormac Ryan
+    age: 25
+    position_listed: SG/SF
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary:
+          - tertiary_scorer
+      defensive_role: wing_stopper
+      shooting_profile: elite
+      special_traits:
+        - transition_threat
+    tier: two_way
+    trajectory: uncertain
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: "2026"
+      source: https://gleague.nba.com/news/the-milwaukee-bucks-sign-cormac-ryan-to-a-two-way-contract
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: contract_expiring
+          weight: low
+      falsification_conditions:
+        - Ryan converted to standard NBA contract and retained long-term.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way contract; G League assignment flexibility; no leverage given development role.
+    confidence: medium
+    source: https://gleague.nba.com/news/the-milwaukee-bucks-sign-cormac-ryan-to-a-two-way-contract
+  - player_id: alex_antetokounmpo
+    name: Alex Antetokounmpo
+    age: 23
+    position_listed: SF/PF
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: two_way
+    trajectory: uncertain
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: "2026"
+      source: https://www.hoopsrumors.com/2025/07/2025-26-nba-two-way-contract-tracker.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: contract_expiring
+          weight: low
+      falsification_conditions:
+        - Converted to standard contract; development path continues.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way contract; family relationship to Giannis provides organizational stability but no negotiating leverage.
+    confidence: low
+    source: https://www.hoopsrumors.com/2025/07/2025-26-nba-two-way-contract-tracker.html
+  - player_id: mark_sears
+    name: Mark Sears
+    age: 24
+    position_listed: SG
+    contract_type: two_way
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+      defensive_role: point_of_attack
+      shooting_profile: good
+      special_traits:
+        - transition_threat
+    tier: two_way
+    trajectory: uncertain
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: "2026"
+      source: https://www.hoopsrumors.com/2025/07/2025-26-nba-two-way-contract-tracker.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: contract_expiring
+          weight: low
+      falsification_conditions:
+        - Converted to standard contract; long-term commitment signaled.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Two-way contract; development role; G League assignment flexibility; minimal leverage.
+    confidence: low
+    source: https://www.hoopsrumors.com/2025/07/2025-26-nba-two-way-contract-tracker.html
+pending_free_agents:
+  - player_id: gary_trent_jr
+    name: Gary Trent Jr.
+    type: UFA
+    bird_rights_status: early
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Player option Year 2 (2026-27) gives Trent Jr. control; if he performs well 2025-26, likely opts out to test market. If underperforms, may opt in.
+    notes: Franchise 3-point record holder (2025-26); either opts in for stability or opts out after strong season for payday.
+    source: https://www.brewhoop.com/2025/6/30/24459457/nba-free-agency-milwaukee-bucks-gary-trent-jr-shams-charania
+  - player_id: taurean_prince
+    name: Taurean Prince
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Player option Year 2 (2026-27); veteran minimum deal suggests Prince may opt out to seek larger contract elsewhere if market exists.
+    notes: Age 32, veteran depth wing; option decision likely depends on role stability and playing time 2025-26.
+    source: https://www.brewhoop.com/2025/6/30/24459434/nba-free-agency-milwaukee-bucks-taurean-prince-shams-charania-veteran-minimum-two-years
+  - player_id: gary_harris
+    name: Gary Harris
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Player option Year 2 (2026-27); likely opts in for guaranteed money at age 32.
+    notes: Veteran depth on 2-year deal; option decision likely favors opting in for guaranteed salary.
+    source: https://www.brewhoop.com/2025/6/30/24459354/nba-free-agency-milwaukee-bucks-kevin-porter-jr-mid-level-bi-annual-exception
+  - player_id: ryan_rollins
+    name: Ryan Rollins
+    type: RFA
+    bird_rights_status: full
+    cap_hold_amount: unknown
+    expected_market: uncertain
+    expected_market_detail: Full bird rights (drafted 2023); player option Year 3 (2027-28) means Rollins controls his destiny. If he develops as intended, will likely opt out to test FA market.
+    notes: Young guard with bird rights; path to long-term core if development continues; expect restricted FA negotiations 2027-28.
+    source: https://www.hoopsrumors.com/2025/07/bucks-bobby-portis-agree-to-three-year-deal.html
+known_target_history:
+  - target: Myles Turner
+    year: 2025
+    outcome: acquired
+    detail: Signed as free agent from Indiana Pacers (July 2025) to 4-year, $107M deal with 15% trade kicker and player option Year 4.
+    source: https://www.nba.com/news/bucks-myles-turner-free-agency
+  - target: Damian Lillard
+    year: 2024
+    outcome: not_acquired
+    detail: Acquired Feb 2024; waived mid-season 2025 due to Achilles tear; Bucks paid ~$20M via stretch provision to recover cap space.
+    source: https://www.espn.com/nba/story/_/id/44903786/sources-bucks-damian-lillard-torn-left-achilles-tendon
+  - target: Khris Middleton
+    year: 2025
+    outcome: not_acquired
+    detail: Traded to Washington Wizards (Feb 2025) for Kyle Kuzma + 2025 2nd-round pick; viewed as Wizards win (Kuzma underperformed).
+    source: https://www.nba.com/news/bucks-trade-khris-middleton-wizards-kyle-kuzma
+  - target: Jericho Sims
+    year: 2025
+    outcome: acquired
+    detail: Acquired from New York Knicks via Delon Wright + cash trade; backup big on 2-year, $5.3M deal with player option Year 2.
+    source: https://www.nba.com/bucks/news/milwaukee-bucks-re-sign-jericho-sims
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "Milwaukee Bucks hold No. 10 in the official post-lottery order. Mock-source layer: No. 10: Nate Ament; treat prospect names as low-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: low
+  - priority: Secure explicit Giannis commitment or departure clarity
+    timeline: next_30_days
+    type: extension
+    detail: As-of-date May 2026; Oct. 1 extension deadline (4yr/$275M) approaches. Ownership/Horst must determine long-term franchise vector before offseason free agency/trades.
+    confidence: high
+  - priority: Evaluate Myles Turner trade market viability
+    timeline: this_offseason
+    type: trade
+    detail: Turner's 15% trade kicker and $26.75M salary make him tradeable but not free; recent rumors suggest Bucks exploring suitors (Warriors, etc.). Decision by mid-summer 2026.
+    confidence: medium
+  - priority: Integrate Taylor Jenkins system; measure early 2026-27 trajectory
+    timeline: this_season
+    type: coaching_decision
+    detail: New HC Jenkins (hired May 2026) assumes control; early offensive/defensive identity, player relationships, and roster fit signals will determine mid-season adjustments (trades, buyouts).
+    confidence: high
+  - priority: Address playoff rotation depth and spacing
+    timeline: this_offseason
+    type: roster
+    detail: Current bench (Portis, Sims, Prince, Harris, Rollins) thin on wing/guard scoring; offseason should target 3-and-D wings or secondary playmakers via trade exceptions (NTMLE $15M, BAE $5.5M).
+    confidence: medium
+  - priority: "Resolve Kyle Kuzma future: trade or integrate"
+    timeline: this_offseason
+    type: trade
+    detail: Kuzma's $21.5M salary and underperformance (Middleton trade aftermath) make him trade candidate; if retained, need clarity on role (bench scorer vs. starter). Likely off-season trade focus.
+    confidence: high
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 10 overall; own pick.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2025
+      round: 2
+      protections: Conveyed from Washington Wizards in Khris Middleton trade (Feb 2025).
+      source: https://lastwordonsports.com/basketball/2025/05/03/wizards-win-kyle-kuzma-trade/
+  draft_picks_owed:
+    - year: 2026
+      round: 2
+      to_team: BOS
+      protections: 2026 No. 40 overall; from MIL via ORL.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2025
+      round: 2
+      to_team: CLE
+      protections: None; owed to Cleveland Cavaliers.
+      source: https://www.prosportstransactions.com/basketball/DraftTrades/Future/Bucks.htm
+    - year: 2027
+      round: 1
+      to_team: NOP
+      protections: No protection; if lands top-4, NOP gets pick. If outside top-4, goes to Hawks if Hawks pick better than Pelicans; else to Pelicans.
+      source: https://fansided.com/bucks-draft-picks-every-selection-2025-2026-and-beyond
+    - year: 2028
+      round: 2
+      to_team: OKC
+      protections: None; owed to Oklahoma City Thunder (via Brooklyn).
+      source: https://fansided.com/bucks-draft-picks-every-selection-2025-2026-and-beyond
+  trade_exceptions:
+    - value: 15000000
+      expires: unknown
+      source: https://www.brewhoop.com/2025/6/26/24439653/milwaukee-bucks-nba-trades-trade-exception-dean-wade-jevon-carter-haywood-highsmith-cam-whitmore
+      confidence: medium
+    - value: 5478000
+      expires: unknown
+      source: https://www.brewhoop.com/2025/6/26/24439653/milwaukee-bucks-nba-trades-trade-exception-dean-wade-jevon-carter-haywood-highsmith-cam-whitmore
+      confidence: medium
+team_team_relationships:
+  rivalries:
+    - team_id: BOS
+      type: competitive_recent
+      basis: Conference Finals matchups (2022-23); Celtics emerged stronger; recent regular-season competitiveness.
+    - team_id: LAL
+      type: competitive_recent
+      basis: Giannis trade rumors (2026); Lakers emerged as primary suitor alongside Knicks and Heat; recent speculation signals competitive interest.
+    - team_id: MIA
+      type: competitive_recent
+      basis: Giannis trade preference (reported); competitive playoff matchups early 2020s; regional Eastern Conference rivalry.
+  notable_personnel_connections:
+    - person: Jon Horst
+      connected_team: SAS
+      connection_type: former_executive
+      detail: Served under Spurs front office before becoming Bucks GM (2017); inherited Spurs process-driven culture.
+    - person: Taylor Jenkins
+      connected_team: MIL
+      connection_type: alum_returning
+      detail: Assistant coach under Budenholzer (2018-19, 60-win team); returns as HC after 6 seasons in Memphis; known continuity hire.
+    - person: Doc Rivers
+      connected_team: MIL
+      connection_type: former_head_coach
+      detail: Stepped down post-season (May 2026) after 3 years, 97-103 record; will remain on payroll in advisory capacity or full departure pending negotiations.
+g_league_and_stash:
+  affiliate_team: Wisconsin Herd
+  notable_affiliate_players:
+    - Cormac Ryan (two-way, strong shooting, converted from Wisconsin Herd assignment)
+  international_stash: []
+narrative_summary:
+  one_paragraph: "The 2025-26 Milwaukee Bucks finished 32-50 and missed the playoffs for the first time in a decade, marking a dramatic collapse from contention. Damian Lillard's season-ending Achilles tear and the deadline trade of Khris Middleton for Kyle Kuzma (viewed as a Wizards win) exposed organizational fit issues. Despite the failure, the Bucks retained strategic optionality: Giannis Antetokounmpo (superstar, untouchable) remains through 2027 on a 3-year deal; Jon Horst was extended mid-April 2025 signaling long-term mandate; and Taylor Jenkins was hired as head coach (May 2026) to reset culture. The roster pivots between retool (if Giannis commits) and rebuild (if he departs). Key decisions loom: explicit Giannis commitment by Oct. 1 extension window; Myles Turner trade viability (recent rumors); Kyle Kuzma future; and offseason acquisitions via NTMLE/BAE exceptions. Cap sits $6.5M below tax line with ownership reluctant to pay; Bucks have flexibility to add wings/playmakers but must resolve core-four alignment (Giannis, Turner, Kuzma, Portis) before competing again."
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 10; The Athletic mock-source layer lists No. 10: Nate Ament as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - Giannis' explicit commitment signal (or trade demand) by October 2026; Oct. 1 extension eligibility ($275M over 4 years) and player option leverage shape franchise trajectory.
+    - Myles Turner's early 2026-27 performance and trade market reception; 15% kicker + $26.75M salary make him potential centerpiece in cap-relief deals if retool shifts.
+    - Taylor Jenkins' first season system integration and roster fit; early results (playoff seeding, cultural resonance) determine mid-season trade aggressiveness and long-term coaching stability.
+sources_used:
+  - https://www.spotrac.com/nba/player/_/id/13328/giannis-antetokounmpo
+  - https://www.spotrac.com/nba/milwaukee-bucks/cap
+  - https://www.nba.com/news/bucks-giannis-antetokounmpo-extension
+  - https://www.nba.com/news/bucks-myles-turner-free-agency
+  - https://www.nba.com/news/bucks-name-taylor-jenkins-head-coach
+  - https://www.brewhoop.com/2025/4/24/24415623/jon-horst-signed-multiyear-extension-milwaukee-bucks-gm-general-manager
+  - https://www.espn.com/nba/story/_/id/48225217/how-unique-milwaukee-bucks-ownership-structure-impacts-giannis-antetokounmpo-trade-wes-edens-jimmy-haslam-marc-lasry
+  - https://www.nba.com/news/bucks-trade-khris-middleton-wizards-kyle-kuzma
+  - https://www.espn.com/nba/story/_/id/44903786/sources-bucks-damian-lillard-torn-left-achilles-tendon
+  - https://www.espn.com/nba/story/_/id/45622789/kevin-porter-jr-agrees-two-year-deal-bucks
+  - https://www.brewhoop.com/2025/6/30/24459457/nba-free-agency-milwaukee-bucks-gary-trent-jr-shams-charania
+  - https://www.brewhoop.com/2025/6/30/24459434/nba-free-agency-milwaukee-bucks-taurean-prince-shams-charania-veteran-minimum-two-years
+  - https://www.si.com/nba/bucks-agree-to-45-million-contract-extension-bobby-portis
+  - https://www.nba.com/news/aj-green-bucks-extension
+  - https://www.espn.com/nba/story/_/id/45726950/cole-anthony-agrees-buyout-plans-join-bucks
+  - https://www.salaryswish.com/players/kyle-kuzma
+  - https://www.brewhoop.com/2025/7/7/24463539/milwaukee-bucks-nba-free-agency-andre-jackson-jr-eric-nehm-the-athletic
+  - https://gleague.nba.com/news/the-milwaukee-bucks-sign-cormac-ryan-to-a-two-way-contract
+  - https://www.nba.com/bucks/news/milwaukee-bucks-re-sign-jericho-sims
+  - https://www.hoopsrumors.com/2025/07/bucks-bobby-portis-agree-to-three-year-deal.html
+  - https://www.hoopsrumors.com/2025/07/2025-26-nba-two-way-contract-tracker.html
+  - https://fansided.com/bucks-draft-picks-every-selection-2025-2026-and-beyond
+  - https://www.prosportstransactions.com/basketball/DraftTrades/Future/Bucks.htm
+  - https://www.brewhoop.com/2025/6/26/24439653/milwaukee-bucks-nba-trades-trade-exception-dean-wade-jevon-carter-haywood-highsmith-cam-whitmore
+  - https://lastwordonsports.com/basketball/2025/05/03/wizards-win-kyle-kuzma-trade/
+  - https://wisconsin.gleague.nba.com/
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - Myles Turner player option guarantee status (player option 2029 confirmed; no guarantee info found)
+  - Andre Jackson Jr. full guarantees breakdown (only $800K guaranteed confirmed; remainder unknown)
+  - Cole Anthony 2026 offseason status (traded to Phoenix Suns, Feb 2026; no longer on Bucks roster)
+  - Assistant coaches for 2025-26 (Joe Prunty exited to Orlando; 2025-26 staff not fully documented)
+  - Trade exception expiration dates (availability confirmed; expiration dates unknown)
+  - Exact cap hold amounts for pending free agents (calculated holdings unknown)
+  - Draft pick values for 2026 pick swap (Pelicans option on swap; value of swap unknown)
+vocabulary_flags:
+  - "Cole Anthony status: Traded mid-season (Feb 2026) to Phoenix; marked as available/UFA but no longer on roster. Included for completeness of 2025-26 season coverage."
+  - "Kyle Kuzma player_id labeling conflict: Initially keyed as 'myles_turner' in roster; corrected to 'kyle_kuzma'. Both Turner and Kuzma are distinct players; error flagged."
+  - "Myles Turner trade kicker: Confirmed 15% (0.15) decimal format per Shams Charania ESPN reporting; trade kicker is contractual obligation, not discretionary."
+  - "Doc Rivers coaching status: Stepped down May 2026 after season; on payroll for 2026-27 in advisory or full-exit negotiations. Not new HC; Taylor Jenkins hired post-departure."
+  - "Giannis no-trade clause status: Confirmed NO no-trade clause; full trade eligibility despite superstar status. Source conflict avoided: ESPN primary reporting used."
+  - "Contract years interpretation: 'Years remaining' calculated as integer years under contract as of 2026-05-02 AS_OF_DATE; decimals used only for tenure_with_team."

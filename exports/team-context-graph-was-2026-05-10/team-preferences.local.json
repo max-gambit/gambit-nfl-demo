@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-05-09T16:31:08.602Z",
+  "teams": {
+    "WAS": {
+      "updated_at": "2026-05-09T16:31:08.602Z",
+      "preferences": {
+        "strategic_posture": {
+          "derived_from": [
+            "17-65 record (worst in NBA) confirms youth-first strategy with limited win-now pretense.",
+            "Trae Young and Anthony Davis acquisitions January–February 2026 signal medium-term contention target (2026-27 onward).",
+            "Leonsis public statements: 'these are the years to not be competitive' given strength of next two drafts; expects rebuild completion in 5 years total (3 years elapsed, 2 remaining as of 2026).",
+            "Deep roster youth (Alex Sarr age 20, Bub Carrington age 20, Tre Johnson age 20, Bilal Coulibaly age 21) precludes immediate contention.",
+            "Gambit onboarding"
+          ],
+          "last_reviewed": "2026-05-09"
+        },
+        "near_term_priorities": [
+          {
+            "priority": "Most important 90-day decision",
+            "timeline": "this_season",
+            "type": "structural",
+            "detail": "Onboarding capture: Define the evidence that would justify moving from youth-development rebuild posture into a veteran acceleration bet around Trae Young and Anthony Davis.",
+            "confidence": "high"
+          },
+          {
+            "priority": "Set the acceleration trigger for Alex Sarr / Bub Carrington / Bilal Coulibaly",
+            "timeline": "this_season",
+            "type": "structural",
+            "detail": "Onboarding capture: Define the evidence that would justify moving from rebuild posture to a veteran acceleration bet.",
+            "confidence": "high"
+          },
+          {
+            "priority": "Separate health-risk scenarios from roster-value scenarios",
+            "timeline": "this_season",
+            "type": "roster",
+            "detail": "Onboarding capture: Keep medical uncertainty from disguising fundamentally different basketball decisions.",
+            "confidence": "high"
+          },
+          {
+            "priority": "Manage apron exposure across the next two league years",
+            "timeline": "this_offseason",
+            "type": "structural",
+            "detail": "Onboarding capture: Convert cap posture into concrete legal trade and signing lanes.",
+            "confidence": "high"
+          },
+          {
+            "priority": "Health recovery for Trae Young and Anthony Davis",
+            "timeline": "this_season",
+            "type": "structural",
+            "detail": "Both players injured as of season end (May 2026); 2026-27 success contingent on return to form and availability.",
+            "confidence": "high"
+          },
+          {
+            "priority": "2026 NBA Draft selection (7th–10th projected range)",
+            "timeline": "this_offseason",
+            "type": "draft",
+            "detail": "Wizards secured their 2026 first-round pick (avoided top-8 protection); high lottery pick allows youth core bolstering.",
+            "confidence": "high"
+          },
+          {
+            "priority": "2026-27 rotation refinement and roster depth",
+            "timeline": "next_season",
+            "type": "roster",
+            "detail": "If Young and Davis healthy, Wizards must address bench depth and rim protection (Sarr is lone reliable big).",
+            "confidence": "medium"
+          },
+          {
+            "priority": "Contract extension discussions with core youth",
+            "timeline": "by_trade_deadline",
+            "type": "extension",
+            "detail": "Coulibaly and Sarr eligible for extensions by 2026-27; FO must lock in core to avoid RFA complications.",
+            "confidence": "medium"
+          }
+        ],
+        "onboarding_profile": {
+          "status": "completed",
+          "started_at": "2026-05-09T16:31:08.560Z",
+          "updated_at": "2026-05-09T16:31:08.596Z",
+          "completed_at": "2026-05-09T16:31:08.596Z",
+          "identity": {
+            "role": "president",
+            "years_in_role": "3_7",
+            "decision_authority": "sign_off"
+          },
+          "team_snapshot": {
+            "lifecycle": "rebuilding",
+            "cap_posture": "between_aprons",
+            "cornerstones": [
+              "Alex Sarr",
+              "Bub Carrington",
+              "Bilal Coulibaly"
+            ],
+            "active_scenarios": [
+              "apron_management",
+              "trade_deadline_planning",
+              "draft_prep_board",
+              "long_term_cap_planning",
+              "roster_depth_chart"
+            ],
+            "star_extension_players": "Trae Young and Anthony Davis health and contract leverage",
+            "trade_deadline_window": "offseason",
+            "other_scenarios": [
+              "2026 NBA Draft lottery outcome",
+              "Trae Young and Anthony Davis recovery status",
+              "Owner patience if 2026-27 starts below playoff pace"
+            ]
+          },
+          "strategic_priorities": {
+            "ninety_day_decision": "Define the evidence that would justify moving from youth-development rebuild posture into a veteran acceleration bet around Trae Young and Anthony Davis.",
+            "ranked_priorities": [
+              "wizards-acceleration-trigger",
+              "health-scenario-separation",
+              "apron-exposure-plan"
+            ],
+            "decision_types": [
+              "roster_depth_chart",
+              "trade_evaluation",
+              "long_term_planning",
+              "contract_cap",
+              "draft_board"
+            ],
+            "recent_decision_help": "Context Graph source says Washington is still youth-development oriented, but mid-season acquisitions of Trae Young and Anthony Davis create a conditional 2026-27 acceleration path if both are healthy.",
+            "other_decision_types": [
+              "owner check-in recommendation",
+              "health-contingent acceleration trigger"
+            ]
+          },
+          "working_style": {
+            "recommendation_style": "single_best_answer",
+            "claim_requirements": [
+              "source_citation",
+              "confidence_level",
+              "counter_evidence"
+            ],
+            "risk_posture": "balanced",
+            "cadence": "daily_morning",
+            "briefing_time": "8_am",
+            "briefing_timezone": "ET",
+            "channels": [
+              "web_app",
+              "slack"
+            ],
+            "slack_workspace": "Gambit",
+            "slack_channel": "basketball-ops"
+          },
+          "stakeholders_rituals": {
+            "people": [
+              {
+                "id": "michael-winger",
+                "name": "Michael Winger",
+                "role": "president",
+                "decision_areas": [
+                  "basketball_ops",
+                  "trade_evaluation",
+                  "long_term_planning",
+                  "contract_cap"
+                ]
+              },
+              {
+                "id": "will-dawkins",
+                "name": "Will Dawkins",
+                "role": "gm",
+                "decision_areas": [
+                  "basketball_ops",
+                  "draft_board",
+                  "roster_depth_chart"
+                ]
+              },
+              {
+                "id": "ted-leonsis",
+                "name": "Ted Leonsis",
+                "role": "owner_governor",
+                "decision_areas": [
+                  "owner_governor_check_in",
+                  "long_term_planning"
+                ]
+              },
+              {
+                "id": "brian-keefe",
+                "name": "Brian Keefe",
+                "role": "coaching_staff",
+                "decision_areas": [
+                  "roster_depth_chart",
+                  "player_development"
+                ]
+              }
+            ],
+            "authority": {
+              "cap_contracts": "Michael Winger sign-off with Will Dawkins input",
+              "basketball_ops": "Michael Winger owns final basketball-ops posture",
+              "draft": "Winger and Dawkins",
+              "coaching_staff": "Winger and Dawkins with Brian Keefe input"
+            },
+            "rituals": [
+              "weekly_basketball_ops",
+              "pre_deadline_war_room",
+              "draft_war_room",
+              "owner_governor_check_in"
+            ],
+            "other_rituals": [
+              "health-scenario review for Young and Davis"
+            ],
+            "fire_drill_frequency": "monthly"
+          },
+          "data_trust": {
+            "trust_panel_acknowledged": true,
+            "sources": [
+              "spotrac",
+              "internal_scouting_db",
+              "internal_sql",
+              "sheets"
+            ],
+            "other_sources": [
+              "NBA.com roster",
+              "Basketball Reference team page",
+              "Washington Post front-office reporting",
+              "Monumental Sports ownership and executive bios",
+              "SalarySwish cap and player pages"
+            ],
+            "off_limits": [
+              "generic_llms"
+            ],
+            "off_limits_people": "Do not invent private views for Winger, Dawkins, Leonsis, or Keefe beyond sourced context.",
+            "off_limits_topics": "Treat injury return dates and explicit trade availability as uncertain unless sourced by current team or public reporting.",
+            "integrations": [
+              "slack",
+              "drive",
+              "calendar"
+            ],
+            "other_integrations": [
+              "Context Graph local YAML and derived artifacts"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

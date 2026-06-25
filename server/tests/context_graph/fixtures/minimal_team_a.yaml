@@ -1,0 +1,208 @@
+team_id: ATL
+as_of_date: "2026-05-02"
+last_updated: "2026-05-02"
+
+identity:
+  name: Atlanta Hawks
+  conference: Eastern
+  division: Southeast
+  market_tier: tier_2
+  market_tier_rationale: Test fixture market rationale.
+
+ownership:
+  primary_owner:
+    name: Owner A
+    type: individual
+    tenure_years: 1.0
+    source: https://example.com/owner-a
+    confidence: high
+  governance_notes: none
+  recent_transitions: none
+  spending_posture: moderate
+  spending_posture_evidence:
+    - Test evidence.
+
+front_office:
+  president_basketball_ops:
+    name: President A
+    tenure_start: "2025-01"
+    prior_stops: []
+    public_philosophy_signals: []
+    confidence: high
+    source: https://example.com/president-a
+  general_manager:
+    name: GM A
+    tenure_start: "2025-01"
+    prior_stops: []
+    public_philosophy_signals: []
+    confidence: high
+    source: https://example.com/gm-a
+  head_coach:
+    name: Coach A
+    tenure_start: "2025-01"
+    contract_through: "2027"
+    style_notes: Test style.
+    coaching_tree: popovich_tree
+    confidence: high
+    source: https://example.com/coach-a
+  assistant_coaches_notable: []
+  notable_advisors_or_consultants: []
+
+strategic_posture:
+  timeframe: contend_soon
+  confidence: high
+  derived_from:
+    - Test posture.
+  constraints:
+    - reason_code: young_core_developing
+      detail: Test detail.
+      weight: medium
+  trigger_events:
+    - Test trigger.
+  last_reviewed: "2026-05-02"
+
+cap_situation:
+  current_status: below_apron
+  current_payroll_estimate: 100000000
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: "2026-27"
+      projected_status: Test status.
+  exceptions_available: []
+  source: https://example.com/cap-a
+  source_fallbacks_used: []
+  confidence: high
+
+trade_dna:
+  frequent_partners: [BOS]
+  preferred_deal_archetypes:
+    - Test deals.
+  recent_significant_trades:
+    - date: "2026-02-01"
+      summary: Atlanta traded Player Alpha to Boston Celtics for a future pick.
+  confidence: high
+
+cultural_signals:
+  stability:
+    value: high
+    detail: Test detail.
+  player_friendly:
+    value: mixed
+    detail: Test detail.
+  analytics_orientation:
+    value: balanced
+    detail: Test detail.
+  risk_tolerance:
+    value: moderate
+    detail: Test detail.
+  notable_traits: [process_driven]
+  rationale: Test rationale.
+  confidence: high
+
+roster:
+  - player_id: player_alpha
+    name: Player Alpha
+    age: 25
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary: [connector]
+      defensive_role: point_of_attack
+      shooting_profile: good
+      special_traits: [elite_passer]
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 0
+      total_value_remaining: 1000000
+      annual_value_current_season: 1000000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: "2026"
+      source: https://example.com/player-alpha-contract
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Extension signed.
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2.0
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: Test leverage.
+    confidence: high
+    source: https://example.com/player-alpha
+
+pending_free_agents:
+  - player_id: player_alpha
+    name: Player Alpha
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: 1000000
+    expected_market: retain
+    expected_market_detail: Test market.
+    notes: Test notes.
+    source: https://example.com/player-alpha-fa
+
+known_target_history:
+  - target: Player Beta
+    year: 2025
+    outcome: acquired
+    detail: Test target detail.
+    source: https://example.com/target-beta
+
+near_term_priorities:
+  - priority: Test priority
+    timeline: this_offseason
+    type: free_agency
+    detail: Test priority detail.
+    confidence: medium
+
+key_assets:
+  draft_picks_owned:
+    - year: 2027
+      round: 1
+      from_team: BOS
+      protections: none
+      source: https://example.com/pick-a
+  draft_picks_owed: []
+  trade_exceptions: []
+
+team_team_relationships:
+  rivalries:
+    - team_id: BOS
+      type: competitive_recent
+      basis: Test rivalry.
+  notable_personnel_connections:
+    - person: Coach Link
+      connected_team: BOS
+      connection_type: former_coach
+      detail: Test connection.
+
+g_league_and_stash:
+  affiliate_team: College Park Skyhawks
+  notable_affiliate_players: []
+  international_stash: []
+
+narrative_summary:
+  one_paragraph: Test narrative paragraph.
+  three_things_to_watch:
+    - Test watch item.
+
+sources_used:
+  - https://example.com/source-a
+fields_marked_unknown: []
+vocabulary_flags: []

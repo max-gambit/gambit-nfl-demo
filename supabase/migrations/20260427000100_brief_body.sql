@@ -1,0 +1,13 @@
+-- Phase 2: structured brief body. Captures the recommendation card content
+-- so each brief renders its own "Why" / blockquote / watch-points instead of
+-- the wireframe's hardcoded Porzingis text.
+--
+-- Shape:
+--   {
+--     "reasoning": "Bird-rights is the only path... [1] [3]",
+--     "blockquote": { "text": "...", "source": "CBA Article VII §7.1", "cite_ref": 3 },
+--     "watching":  [{ "tag": "Cap", "body": "If Hield opts in..." }, ...]
+--   }
+--
+-- Citation markers in `reasoning` use `[N]` pointing at brief_options/brief_sources.ref_index.
+alter table briefs add column if not exists body jsonb;

@@ -1,0 +1,985 @@
+team_id: LAC
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: LA Clippers
+  conference: Western
+  division: Pacific
+  market_tier: tier_1
+  market_tier_rationale: Los Angeles is a premier media market with large population base; Clippers compete for attention with Lakers but command significant regional/national viewership.
+ownership:
+  primary_owner:
+    name: Steve Ballmer
+    type: individual
+    tenure_years: 9.5
+    source: https://en.wikipedia.org/wiki/Steve_Ballmer
+    confidence: high
+  governance_notes: Ballmer is sole owner with majority stake; no reported minority ownership complexities; estimated net worth exceeds $150 billion, providing unrestricted financial flexibility.
+  recent_transitions: none
+  spending_posture: aggressive_spender
+  spending_posture_evidence:
+    - Payroll exceeded $200 million in 2023-24; 2025-26 payroll approximately $192 million before trade deadline moves
+    - Ownership explicitly willing to spend into second apron; pursued max-caliber talent in free agency (Kawhi 2017, PG13 2019, Harden 2021, Beal 2025)
+    - Invested $2 billion in Intuit Dome arena as flagship fan experience and organizational centerpiece
+    - Signed Tyronn Lue to five-year, $70 million extension (May 2024) indicating coaching staff stability investment
+front_office:
+  president_basketball_ops:
+    name: Lawrence Frank
+    tenure_start: 2017-06
+    prior_stops:
+      - Detroit Pistons (Assistant GM, 2008-2017)
+    public_philosophy_signals:
+      - Emphasis on defensive identity and collective play over isolation scoring
+      - Analytics-informed player evaluation; preference for size/athleticism/switchability
+      - Willing to make aggressive mid-season trades to address perceived weaknesses (Zubac to IND Feb 2026 for Mathurin)
+    confidence: high
+    source: https://www.espn.com/nba/story/_/id/37801290/sources-la-clippers-promote-trent-redden-mark-hughes
+  general_manager:
+    name: Trent Redden
+    tenure_start: 2023-06
+    prior_stops:
+      - Cleveland Cavaliers (11 years in scouting/player personnel, through 2017)
+      - LA Clippers Assistant GM (2017-2023)
+    public_philosophy_signals:
+      - Lead evaluator and talent architect under Frank; focused on role-player depth and positional fit
+      - Proponent of mid-season roster flexibility (traded Zubac for younger assets + picks)
+    confidence: high
+    source: https://www.espn.com/nba/story/_/id/37801290/sources-la-clippers-promote-trent-redden-mark-hughes
+  head_coach:
+    name: Tyronn Lue
+    tenure_start: 2020-10
+    contract_through: 2029
+    style_notes: Defensive-first, pace-controlled halfcourt scheme; emphasizes switching and perimeter defense; weak-side help principles. Favors ball movement and three-point shooting offensively.
+    coaching_tree: unknown
+    confidence: high
+    source: https://www.foxla.com/sports/clippers-ty-lue-contract-extension
+  assistant_coaches_notable:
+    - Dan Burke (Associate HC, defensive coordinator)
+    - Turiaf/coaching staff overhaul post-2024 postseason loss
+  notable_advisors_or_consultants: []
+strategic_posture:
+  timeframe: contend_now
+  confidence: high
+  derived_from:
+    - Kawhi Leonard and James Harden both locked through 2026-27 (both $50M+ annual commitments); core expiration timeline signals 2027 reset opportunity
+    - Despite 50-32 regular season in 2024-25, first-round exit (3-4 loss to Denver) triggered aggressive offseason overhaul
+    - 2025-26 roster built around aging All-Stars (average age 33.2, oldest in NBA) with 21st-year Chris Paul—explicit contention bet
+    - Play-in elimination (9-10 loss to Warriors Apr 2026) and midseason in-season trade (Zubac→IND) indicate triage mode by late March
+    - Intuit Dome inflection (2nd season) creates arena/market leverage; FO leveraging infrastructure as retention/attraction tool
+  constraints:
+    - reason_code: max_contract_lockup
+      detail: Kawhi and Harden combined ~$100M+/year through 2027; limits mid-tier free agent capacity
+      weight: high
+    - reason_code: aging_core
+      detail: Roster average age 33.2 at season start; decline risk on Paul, Lopez, Beal; injury history (Bradley Beal hip fracture Nov 2025)
+      weight: high
+    - reason_code: recent_playoff_success
+      detail: 50-32 in 2024-25 created expectations; first-round exit triggered front-office crisis and mid-season trades (Zubac, Harden)
+      weight: medium
+    - reason_code: ownership_directive
+      detail: Ballmer's explicit championship mandate and spending tolerance drove pursuit of veteran All-Stars; failed assemblage signals strategic reset likely 2027
+      weight: high
+  trigger_events:
+    - If Kawhi Leonard opts out (2027) or is traded mid-season 2026-27, contention window closes and rebuild begins
+    - If Clippers re-sign Mathurin and Collins to long-term deals post-2026, signals pivot toward younger core
+    - Intuit Dome operational issues or attendance decline below projections would force spending recalibration
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: above_first_apron
+  current_payroll_estimate: 192000000
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Kawhi and Harden both expiring; if neither re-signed, team could approach $120M+ cap space by July 2027 free agency
+  exceptions_available:
+    - unknown
+  source: https://www.spotrac.com/nba/la-clippers/cap
+  source_fallbacks_used:
+    - https://fanspo.com/nba/teams/Clippers/13
+    - https://www.salaryswish.com/teams/clippers
+  confidence: medium
+trade_dna:
+  frequent_partners:
+    - MIA
+    - IND
+    - PHX
+    - UTA
+    - PHI
+  preferred_deal_archetypes:
+    - Multi-team consolidation plays (3-team deals with Jazz/Grizzlies/Rockets in 2024-25)
+    - Mid-season aging-star refresh (Zubac→IND for Mathurin+picks; Harden→CLE for Garland)
+    - Role-player swaps for positional fit (Bogdanovic from Hawks; Kris Dunn from Jazz)
+  recent_significant_trades:
+    - date: 2025-07
+      summary: Sent Norman Powell to Miami; received John Collins from Jazz in 3-team deal with Utah
+      counterparties:
+        - MIA
+        - UTA
+    - date: 2026-02
+      summary: Traded James Harden to Cavaliers for Darius Garland; mid-season pivot off All-Star aging core
+      counterparties:
+        - CLE
+    - date: 2026-02
+      summary: Traded Ivica Zubac to Pacers for Bennedict Mathurin, Isaiah Jackson, 2026 1st, 2029 1st (top-4 protected)
+      counterparties:
+        - IND
+  confidence: high
+cultural_signals:
+  stability:
+    value: medium
+    detail: Frank and Redden tenure in place since 2017/2023; Lue locked through 2029. However, roster churn (Harden traded Feb 2026, Paul sent home Dec 2025, Beal hip fracture Nov 2025, Zubac traded Feb 2026) signals organizational turbulence masking stated 'process' commitment.
+  player_friendly:
+    value: mixed
+    detail: Ballmer offers max contracts and spending commitment (attractive). Intuit Dome infrastructure modern. Coaching is demanding (Lue's defensive intensity). Chris Paul exit (conflicts with coaches/teammates Dec 2025) and mid-season Harden trade signal low organizational patience with veteran friction.
+  analytics_orientation:
+    value: balanced
+    detail: Frank-Redden regime emphasizes three-point shooting, switchability, rim protection—modern analytics drivers. Trade deadline Zubac move for younger assets suggests analytics-driven positional re-evaluation, but roster construction (aging stars) predates that pivot.
+  risk_tolerance:
+    value: aggressive
+    detail: Pursued max All-Stars in succession (Kawhi, PG13, Harden, Beal); $2B Intuit Dome investment; willing to tax penalties into second apron. Mid-season trades and veteran departures indicate willingness to dismantle high-cost cores if expectations unmet.
+  notable_traits:
+    - star_chasing
+    - media_market_pressure
+    - arena_inflection
+    - veteran_friendly
+  rationale: Ballmer ownership is aggressively pursuing championship through acquisition of max-caliber talent and modern arena investment. Cultural identity centers on defensive intensity and role-player fit; however, 2025-26 roster construction (oldest in NBA) and mid-season departures (Paul, Harden, Zubac trades) reveal organizational frustration with aging-core strategy. Intuit Dome is explicit centerpiece of market positioning and fan engagement (Wave Makers rewards program, steep Wall seating for opposing-team suppression).
+  confidence: high
+roster:
+  - player_id: kawhi_leonard
+    name: Kawhi Leonard
+    age: 35
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: iso_creator
+        secondary:
+          - tertiary_scorer
+          - connector
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - elite_athlete
+        - vet_leadership
+        - playoff_riser
+        - iso_creator
+    tier: superstar
+    trajectory: declining_peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 50000000
+      annual_value_current_season: 50000000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.si.com/nba/clippers/onsi/news/james-harden-s-predicted-nba-contract-with-la-clippers-01jyyg9zf0cx
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: ownership_relationship
+          weight: high
+        - reason_code: recent_extension_poison_pill
+          weight: high
+      falsification_conditions:
+        - Ballmer explicitly states Kawhi is available in trade
+        - Kawhi files formal trade request to FO
+        - Injury forces season-ending diagnosis before 2027 offseason
+      signal_strength: denied_publicly
+    team_relationship:
+      tenure_with_team: 8.8
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: Superstar no-trade-clause candidate; Ballmer invested $50M+ annually; defines franchise identity post-2017
+    confidence: high
+    source: https://www.nba.com/clippers/roster
+  - player_id: bennedict_mathurin
+    name: Bennedict Mathurin
+    age: 23
+    position_listed: SF
+    contract_type: standard
+    availability_status: injured_short_term
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - finisher
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - transition_threat
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.espn.com/nba/story/_/id/47840423/sources-clippers-trading-center-ivica-zubac-pacers
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: expiring_contract_value
+          weight: high
+        - reason_code: extension_decline
+          weight: medium
+      falsification_conditions:
+        - Clippers sign Mathurin to multi-year extension before 2026 free agency
+        - Mathurin plays entire 2026 season without injury relapse and team commits publicly
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.2
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: RFA in 2026; limited leverage; averaging 17.8 points on 43% shooting post-trade (28 games)
+    confidence: medium
+    source: https://www.si.com/nba/clippers/onsi/news/clippers-trade-deadline-gamble-paying-thanks-bennedict-mathurin-01khxt579xyp
+    notes: Acquired Feb 2026 from Indiana for Zubac. Missed time due to toe injury (March 2026). RFA status post-2026 season.
+  - player_id: john_collins
+    name: John Collins
+    age: 28
+    position_listed: PF
+    contract_type: standard
+    availability_status: injured_short_term
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: finisher
+        secondary:
+          - connector
+          - post_hub
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits:
+        - elite_rebounder
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 2
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.nba.com/news/john-collins-norman-powell-trade
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: positional_redundancy
+          weight: medium
+      falsification_conditions:
+        - Collins traded mid-season 2026-27 for younger asset
+        - Collins signs extension signaling long-term role
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Acquired July 2025 from Miami for Norman Powell; became UFA post-2026 season. Injury (out until Mar 2026) affected cohesion.
+    confidence: medium
+    source: https://www.nba.com/news/john-collins-norman-powell-trade
+    notes: Acquired July 2025 in 3-team trade (Clippers→Heat Norman Powell, Jazz sent Collins to LAC). Expected to re-sign as UFA 2026 offseason.
+  - player_id: bradley_beal
+    name: Bradley Beal
+    age: 32
+    position_listed: SG
+    contract_type: standard
+    availability_status: season_ending
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+      defensive_role: point_of_attack
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: null
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: 2027
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.rappler.com/sports/nba/bradley-beal-join-los-angeles-clippers-phoenix-suns-buyout/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: injury_recovery_uncertain
+          weight: high
+      falsification_conditions:
+        - Beal clears medical and returns to play in 2026-27
+        - Team trades Beal to contender despite injury status
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.4
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Signed Phoenix Suns buyout deal, then signed 2-year $11M with Clippers (Jul 2025). Hip fracture (Nov 12, 2025) ended season; career-low performance in 6 games.
+    confidence: high
+    source: https://www.si.com/nba/clippers/onsi/news/clippers-injury-report-kawhi-leonard-march-2026/
+    notes: Season-ending hip fracture repair (November 12, 2025). Unlikely to appear in 2026-27; player option likely declined.
+  - player_id: derrick_jones_jr
+    name: Derrick Jones Jr.
+    age: 28
+    position_listed: SF
+    contract_type: standard
+    availability_status: injured_short_term
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+          - tertiary_scorer
+      defensive_role: wing_stopper
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: uncertain
+      source: https://www.si.com/nba/clippers/onsi/news/clippers-injury-report-blazers-will-derrick-jones-jr-play-01kddknm3h89
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: injury_recovery_uncertain
+          weight: high
+      falsification_conditions:
+        - Jones Jr. returns to full health and plays 70+ games in 2026-27
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2.8
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Rotational scorer/defender; sprained MCL Nov 17, 2025 (out min 6 weeks). Role defender in Lue system.
+    confidence: medium
+    source: https://www.si.com/nba/clippers/onsi/news/clippers-injury-report-blazers-will-derrick-jones-jr-play-01kddknm3h89
+  - player_id: bogdan_bogdanovic
+    name: Bogdan Bogdanović
+    age: 34
+    position_listed: SG
+    contract_type: standard
+    availability_status: injured_short_term
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 2
+      total_value_remaining: 32000000
+      annual_value_current_season: 16000000
+      annual_value_next_season: 16000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: 2027
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/bogdan-bogdanovic/salary/
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: tax_apron_pressure
+          weight: medium
+        - reason_code: declining_role
+          weight: medium
+      falsification_conditions:
+        - Team exercises 2027 team option and commits to Bogi long-term
+        - Bogdanovic produces 20+ PPG over final stretch of 2026-27
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.9
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Acquired from Hawks (2024); $16M team option for 2027. Left hip contusion limited availability (Mar 2026).
+    confidence: medium
+    source: https://www.basketball-reference.com/contracts/LAC.html
+    notes: Acquired from Atlanta Hawks (2024) for Hyland/Mann. Missed significant time due to left hip contusion (Mar 2026).
+  - player_id: kris_dunn
+    name: Kris Dunn
+    age: 30
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: connector
+        secondary: []
+      defensive_role: point_of_attack
+      shooting_profile: non_shooter
+      special_traits:
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: 2026
+      source: https://www.basketball-reference.com/contracts/LAC.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Dunn re-signed to multi-year deal; FO commits to vet defensive floor
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.9
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Acquired from Jazz (2024). 68 games started; defensive specialist; expiring contract.
+    confidence: medium
+    source: https://www.basketball-reference.com/teams/LAC/2026.html
+  - player_id: brook_lopez
+    name: Brook Lopez
+    age: 36
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: post_hub
+        secondary:
+          - spacer
+          - connector
+      defensive_role: rim_protector
+      shooting_profile: good
+      special_traits:
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 9100000
+      annual_value_current_season: 9100000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: 2026
+      source: https://www.basketball-reference.com/contracts/LAC.html
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: declining_role
+          weight: medium
+      falsification_conditions:
+        - Lopez re-signed and inserted back into regular rotation (40+ MPG)
+        - Team exercises mutual option for 2026-27
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Acquired July 2025. Fell out of rotation; limited impact in 2025-26 season.
+    confidence: medium
+    source: https://www.basketball-reference.com/contracts/LAC.html
+    notes: Acquired July 2025 as part of All-Star overhaul. Underutilized; expiring contract end-of-bench depth.
+  - player_id: chris_paul
+    name: Chris Paul
+    age: 40
+    position_listed: PG
+    contract_type: standard
+    availability_status: unknown
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: connector
+        secondary:
+          - primary_initiator
+      defensive_role: point_of_attack
+      shooting_profile: good
+      special_traits:
+        - elite_passer
+        - vet_leadership
+    tier: fringe
+    trajectory: declining
+    contract:
+      years_remaining: 0
+      total_value_remaining: null
+      annual_value_current_season: null
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: expired_pending_decision
+      source: https://www.hoopsrumors.com/2025/07/clippers-agree-to-one-year-deal.html
+    movement_constraints:
+      status: actively_traded
+      reasons:
+        - reason_code: locker_room_friction
+          weight: high
+      falsification_conditions:
+        - Paul re-signs with Clippers for 2026-27
+      signal_strength: confirmed_shopped
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Signed to one-year deal (Jul 2025); his 21st and final NBA season. Sent home by FO (Dec 3, 2025) due to coach/teammate conflicts; traded to Raptors at deadline.
+    confidence: high
+    source: https://sports.yahoo.com/article/chris-paul-clippers-parting-ways-buyout-trade-or-retirement-next/
+    notes: Sent home December 3, 2025 after conflicts; traded to Toronto Raptors at trade deadline (Feb 2026). No longer on roster as of May 2026.
+  - player_id: nicolas_batum
+    name: Nicolas Batum
+    age: 37
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - tertiary_scorer
+          - spacer
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 2
+      total_value_remaining: 11500000
+      annual_value_current_season: 5601600
+      annual_value_next_season: 5881680
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: 2027
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.hoopsrumors.com/2025/06/clippers-agree-to-two-year-deal-with-nicolas-batum.html
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: tax_apron_pressure
+          weight: low
+      falsification_conditions:
+        - Batum traded mid-season for cap relief or picks
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 4.5
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Veteran core piece; multi-year commitment signals stability; team option for 2027 provides flexibility.
+    confidence: medium
+    source: https://www.hoopsrumors.com/2025/06/clippers-agree-to-two-year-deal-with-nicolas-batum.html
+    notes: Re-signed June 2025 to 2-year, $11.5M deal after opting out of $4.9M. 18th NBA season.
+  - player_id: darius_garland
+    name: Darius Garland
+    age: 25
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - secondary_creator
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - iso_creator
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: uncertain
+      source: https://fadeawayworld.net/nba/los-angeles-clippers/los-angeles-clippers-updated-roster-and-rotation-after-acquiring-darius-garland-and-bennedict-mathurin
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: recently_acquired
+          weight: high
+      falsification_conditions:
+        - Garland traded mid-season 2026-27 or during 2027 offseason
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.2
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Acquired Feb 2026 from Cavs for Harden; young playmaker in pilot test for youth shift.
+    confidence: medium
+    source: https://fadeawayworld.net/nba/los-angeles-clippers/los-angeles-clippers-updated-roster-and-rotation-after-acquiring-darius-garland-and-bennedict-mathurin
+    notes: Acquired February 2026 in James Harden trade with Cleveland; youth-acquisition pivot.
+  - player_id: isaiah_jackson
+    name: Isaiah Jackson
+    age: 22
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - post_hub
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: unknown
+      total_value_remaining: unknown
+      annual_value_current_season: unknown
+      annual_value_next_season: unknown
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: uncertain
+      source: https://www.espn.com/nba/story/_/id/47840423/sources-clippers-trading-center-ivica-zubac-pacers
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: medium
+      falsification_conditions:
+        - Jackson traded mid-season 2026-27
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.2
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Acquired Feb 2026 from Pacers alongside Mathurin; youth asset in Zubac trade; restricted free agent path.
+    confidence: medium
+    source: https://www.espn.com/nba/story/_/id/47840423/sources-clippers-trading-center-ivica-zubac-pacers
+    notes: Acquired Feb 2026 from Indiana for Zubac/Brown. Young rim-runner for future core development.
+  - player_id: amir_coffey
+    name: Amir Coffey
+    age: 26
+    position_listed: SF
+    contract_type: standard
+    availability_status: unknown
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+          - finisher
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits: []
+    tier: fringe
+    trajectory: declining
+    contract:
+      years_remaining: 0
+      total_value_remaining: null
+      annual_value_current_season: null
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: unknown
+      contract_through: expired_pending_decision
+      source: https://www.essentiallysports.com/nba-active-basketball-news-amir-coffey-net-worth-in-twenty-twenty-five-la-clippers-star-s-salary-contract-endorsements-more-revealed/
+    movement_constraints:
+      status: unavailable
+      reasons: []
+      falsification_conditions: []
+      signal_strength: denied_publicly
+    team_relationship:
+      tenure_with_team: 3.5
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Left Clippers for Milwaukee Bucks (August 2025); no longer on roster.
+    confidence: high
+    source: https://www.essentiallysports.com/nba-active-basketball-news-amir-coffey-net-worth-in-twenty-twenty-five-la-clippers-star-s-salary-contract-endorsements-more-revealed/
+    notes: Departed Clippers for Milwaukee Bucks in August 2025. Not on 2025-26 roster.
+pending_free_agents:
+  - player_id: john_collins
+    name: John Collins
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: unknown
+    expected_market: re_sign_likely
+    expected_market_detail: Clippers have $39M+ below luxury tax; Collins expressed desire to stay. Expected 2026 offseason retention.
+    notes: UFA post-2026 season; full bird rights; injury (out until Mar 2026) may suppress market demand.
+    source: https://www.si.com/nba/clippers/onsi/clippers-2026-salary-cap-tracker-how-much-room-flexibility-does-la-have-this-offseason-01kpb7zat3q9
+  - player_id: bennedict_mathurin
+    name: Bennedict Mathurin
+    type: RFA
+    bird_rights_status: non
+    cap_hold_amount: unknown
+    expected_market: retain
+    expected_market_detail: Restricted FA post-2026; limited external interest given age (23) and injury history (toe). Clippers likely match any offer.
+    notes: RFA status; playing final year of rookie deal. Averaging 17.8 PPG in 28 games post-trade (Feb 2026).
+    source: https://www.si.com/nba/clippers/onsi/clippers-2026-salary-cap-tracker-how-much-room-flexibility-does-la-have-this-offseason-01kpb7zat3q9
+known_target_history:
+  - target: Norman Powell
+    year: 2024
+    outcome: pursued_no_deal
+    detail: Clippers inquired; deal eventually completed summer 2025 (traded to Miami)
+    source: https://www.nba.com/news/john-collins-norman-powell-trade
+  - target: Chris Paul (return)
+    year: 2025
+    outcome: acquired
+    detail: Signed one-year deal July 2025 for 21st final season. Relationship failed mid-season.
+    source: https://www.hoopsrumors.com/2025/07/clippers-sign-chris-paul-to-one-year-deal.html
+  - target: Brook Lopez
+    year: 2025
+    outcome: acquired
+    detail: Part of All-Star overhaul July 2025; underutilized and fell out of rotation
+    source: https://en.wikipedia.org/wiki/2025%E2%80%9326_Los_Angeles_Clippers_season
+  - target: Bradley Beal
+    year: 2025
+    outcome: acquired
+    detail: Signed to 2-year $11M after Phoenix Suns buyout (Jul 2025); season-ending hip fracture Nov 2025
+    source: https://www.rappler.com/sports/nba/bradley-beal-join-los-angeles-clippers-phoenix-suns-buyout/
+  - target: James Harden
+    year: 2026
+    outcome: actively_traded
+    detail: Traded to Cavaliers mid-season (Feb 2026) for Darius Garland in pivot away from aging core
+    source: https://www.profootballnetwork.com/nba/clippers-owner-steve-ballmer-strong-message-kawhi-leonard-aspiration-scandal/
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "LA Clippers hold No. 5 from IND, No. 36 from MEM, No. 52 from CLE in the official post-lottery order. Mock-source layer: No. 5: Keaton Wagler; treat prospect names as low-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: low
+  - priority: Stabilize Kawhi Leonard health and re-sign post-2027 FA
+    timeline: next_season
+    type: extension
+    detail: Kawhi contract expires 2027; FO must lock in superstar anchor or reset core. Health management critical given age (35 in May 2026).
+    confidence: high
+  - priority: Evaluate Mathurin and Jackson as future anchors vs. re-sign UFA Collins
+    timeline: this_offseason
+    type: free_agency
+    detail: "2026 offseason decision: pursue youth (Mathurin/Jackson) or retain UFA veterans (Collins). Signals long-term direction."
+    confidence: high
+  - priority: 2027 cap space clearance and contention window reboot
+    timeline: next_season
+    type: structural
+    detail: If Kawhi and Harden both expire/decline 2027 options, Clippers project $120M+ cap space for free agent reload.
+    confidence: high
+  - priority: Coaching continuity (Lue contract through 2029)
+    timeline: this_season
+    type: coaching_decision
+    detail: Lue locked through 2029-30; no change expected. Evaluate assistant staff and offensive scheme.
+    confidence: high
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 5 overall; from IND.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: IND
+    - year: 2026
+      round: 2
+      protections: 2026 No. 36 overall; from MEM via ATL and UTA.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: MEM
+    - year: 2026
+      round: 2
+      protections: 2026 No. 52 overall; from CLE.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: CLE
+    - year: 2029
+      round: 1
+      protections: Unprotected (from Indiana, acquired Feb 2026 for Zubac)
+      source: https://www.si.com/nba/clippers/onsi/breaking-down-clippers-draft-picks-protections-lottery-odds-01kpdmcqxe07
+    - year: 2027
+      round: 1
+      from_team: PHI
+      protections: Top-10 protected via prior Harden deal
+      source: https://www.liberyballers.com/
+  draft_picks_owed:
+    - year: 2026
+      round: 1
+      to_team: OKC
+      protections: 2026 No. 12 overall; from LAC.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 2
+      to_team: BKN
+      protections: 2026 No. 43 overall; from LAC via HOU.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2027
+      round: 1
+      to_team: OKC
+      protections: Swap rights (OKC can swap)
+      source: https://www.si.com/nba/clippers/onsi/breaking-down-clippers-draft-picks-protections-lottery-odds-01kpdmcqxe07
+    - year: 2027
+      round: 2
+      to_team: ATL
+      protections: From Lou Williams trade
+      source: https://www.si.com/nba/clippers/onsi/breaking-down-clippers-draft-picks-protections-lottery-odds-01kpdmcqxe07
+    - year: 2028
+      round: 1
+      to_team: PHI
+      protections: From James Harden trade (Feb 2026)
+      source: https://www.phillyvoice.com/philadelphia-76ers-sixers-future-draft-pick-tracker/
+    - year: 2028
+      round: 2
+      to_team: HOU
+      protections: Unknown protections
+      source: https://www.si.com/nba/clippers/onsi/breaking-down-clippers-draft-picks-protections-lottery-odds-01kpdmcqxe07
+  trade_exceptions:
+    - value: unknown
+      expires: unknown
+      source: https://www.spotrac.com/nba/la-clippers/cap
+      confidence: low
+g_league_and_stash:
+  affiliate_team: San Diego Clippers (formerly Agua Caliente Clippers, Ontario Clippers)
+  notable_affiliate_players:
+    - Development players rotated from NBA roster
+  international_stash:
+    - unknown
+narrative_summary:
+  one_paragraph: "The 2025-26 LA Clippers represent an organizational inflection point following a disappointing 2024-25 campaign that ended with a first-round exit to Denver despite a 50-32 regular season record. Owner Steve Ballmer's aggressive spending strategy produced the oldest roster in NBA history (avg. age 33.2), assembling a dream superteam built around Kawhi Leonard, James Harden, and veteran depth (Chris Paul's 21st season, Brook Lopez, Bradley Beal, Nicolas Batum). The experiment rapidly unraveled: Beal suffered a season-ending hip fracture (November 2025), Paul was sent home due to locker-room conflict (December 2025), and by February 2026, Harden was traded to Cleveland for Darius Garland in a mid-season pivot toward youth. The team missed the playoffs for the first time since 2022, eliminated 9-10 in the play-in by Golden State (April 15, 2026). Amid the turbulence, the Clippers acquired younger assets (Bennedict Mathurin, Isaiah Jackson) and positioned for a 2027 cap reset when Kawhi and Harden's contracts expire, signaling a strategic recalibration under Lawrence Frank's basketball operations. The Intuit Dome, now in its second season, continues to serve as organizational centerpiece and arena inflection point for fan engagement and media market positioning."
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 5 from IND, No. 36 from MEM, No. 52 from CLE; The Athletic mock-source layer lists No. 5: Keaton Wagler as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - "Kawhi Leonard health and 2026-27 contract decision: superstar anchor for franchise; injury history (35 years old) creates uncertainty on long-term viability"
+    - "2027 free agency cap flexibility reboot: $120M+ projected if Kawhi/Harden decline options; signals willingness to reset aging core and pursue new star"
+    - "Mathurin/Jackson youth integration vs. UFA veteran retention: organizational debate over near-term contention (Collins re-sign) vs. long-term youth core (Mathurin/Jackson)"
+sources_used:
+  - https://en.wikipedia.org/wiki/2025%E2%80%9326_Los_Angeles_Clippers_season
+  - https://www.basketball-reference.com/teams/LAC/2026.html
+  - https://www.nba.com/clippers/roster
+  - https://www.espn.com/nba/team/roster/_/name/lac/la-clippers
+  - https://www.si.com/nba/clippers/onsi/news/james-harden-s-predicted-nba-contract-with-la-clippers-01jyyg9zf0cx
+  - https://www.si.com/nba/clippers/onsi/news/james-harden-agrees-to-81-5-million-contract-with-clippers-01jyyg9zf0cx
+  - https://www.nba.com/news/john-collins-norman-powell-trade
+  - https://sports.yahoo.com/nba/teams/la-clippers/transactions/
+  - https://www.rappler.com/sports/nba/bradley-beal-join-los-angeles-clippers-phoenix-suns-buyout/
+  - https://www.espn.com/nba/story/_/id/47840423/sources-clippers-trading-center-ivica-zubac-pacers
+  - https://www.si.com/nba/clippers/onsi/news/clippers-trade-deadline-gamble-paying-thanks-bennedict-mathurin-01khxt579xyp
+  - https://www.espn.com/nba/story/_/id/37801290/sources-la-clippers-promote-trent-redden-mark-hughes
+  - https://www.hoopsrumors.com/2025/07/clippers-sign-chris-paul-to-one-year-deal.html
+  - https://www.foxla.com/sports/clippers-ty-lue-contract-extension
+  - https://www.hoopsrumors.com/2025/06/clippers-agree-to-two-year-deal-with-nicolas-batum.html
+  - https://www.si.com/nba/clippers/onsi/clippers-2026-salary-cap-tracker-how-much-room-flexibility-does-la-have-this-offseason-01kpb7zat3q9
+  - https://www.spotrac.com/nba/la-clippers/cap
+  - https://fadeawayworld.net/nba/los-angeles-clippers/los-angeles-clippers-updated-roster-and-rotation-after-acquiring-darius-garland-and-bennedict-mathurin
+  - https://www.si.com/nba/clippers/onsi/breaking-down-clippers-draft-picks-protections-lottery-odds-01kpdmcqxe07
+  - https://www.phillyvoice.com/philadelphia-76ers-sixers-future-draft-pick-tracker/
+  - https://www.essentiallysports.com/nba-active-basketball-news-amir-coffey-net-worth-in-twenty-twenty-five-la-clippers-star-s-salary-contract-endorsements-more-revealed/
+  - https://en.wikipedia.org/wiki/Steve_Ballmer
+  - https://en.wikipedia.org/wiki/Tyronn_Lue
+  - https://fanspo.com/nba/teams/Clippers/13
+  - https://www.salaryswish.com/teams/clippers
+  - https://www.basketball-reference.com/contracts/LAC.html
+  - https://www.spotrac.com/nba/player/bogdan-bogdanovic/salary/
+  - https://sports.yahoo.com/article/chris-paul-clippers-parting-ways-buyout-trade-or-retirement-next/
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - steven_ballmer.prior_front_office_roles
+  - trent_redden.contract_details
+  - chris_paul.contract_value_exact
+  - derrick_jones_jr.contract_details
+  - kris_dunn.contract_value_exact
+  - isaiah_jackson.contract_value_and_years
+  - darius_garland.contract_details_post_trade
+  - john_collins.contract_value_exact
+  - bennedict_mathurin.contract_value_exact
+  - bradley_beal.contract_value_next_season
+  - trade_exceptions.current_active_status_and_values
+vocabulary_flags:
+  - Chris Paul status marked as season-ending / expired due to trade mid-season (Feb 2026). Contract type remains 'standard' per original signing (Jul 2025) but he is no longer on roster.
+  - James Harden status marked as shopped/actively_traded despite being acquired Feb 2026 by Cleveland. He left Clippers roster mid-season and is listed as 'unavailable' per note.
+  - Ivica Zubac status marked as actively_traded (Feb 2026 to Indiana); no longer on roster as of May 2026 as_of_date.
+  - Amir Coffey left for Milwaukee Bucks (Aug 2025) and is not on 2025-26 Clippers roster; marked as unavailable.
+  - Bradley Beal marked season_ending due to hip fracture (Nov 12, 2025); not expected to appear in remaining 2025-26 games or 2026-27.
+  - Trade exception data unavailable from searches; marked as unknown with low confidence.
+  - Numerous player contract values (annual salary, total years) unavailable despite tier-1 source searches; marked unknown where data could not be accessed (Spotrac 403 errors or page structure summaries returned).
+  - Physical_position for Chris Paul uses 'lead_guard' per controlled vocab despite era differences (played combo guard in earlier years).
+  - San Diego Clippers affiliate name changed from Agua Caliente to Ontario to San Diego over seasons; 2025-26 affiliation is San Diego Clippers, not Agua Caliente.
+team_team_relationships:
+  rivalries: []
+  notable_personnel_connections: []

@@ -1,0 +1,232 @@
+{
+  "cases": [
+    {
+      "id": "ntmle_definition",
+      "message": "Where is the non-taxpayer MLE defined?",
+      "expectedSearchArticleId": "Article VII §6",
+      "expectedChatArticleId": "Article VII §6",
+      "expectedTopChunkId": "Article VII §6::chunk-13",
+      "requiredChunkText": "Non-Taxpayer Mid-Level Salary Exception"
+    },
+    {
+      "id": "ntmle_shorthand",
+      "message": "non taxpayer mle definition",
+      "expectedSearchArticleId": "Article VII §6",
+      "expectedChatArticleId": "Article VII §6",
+      "expectedTopChunkId": "Article VII §6::chunk-13",
+      "requiredChunkText": "Non-Taxpayer Mid-Level Salary Exception"
+    },
+    {
+      "id": "taxpayer_mle",
+      "message": "where is the taxpayer mle defined",
+      "expectedSearchArticleId": "Article VII §6",
+      "expectedChatArticleId": "Article VII §6",
+      "requiredChunkText": "Taxpayer Mid-Level Salary Exception"
+    },
+    {
+      "id": "room_mle",
+      "message": "room mid-level exception",
+      "expectedSearchArticleId": "Article VII §6",
+      "expectedChatArticleId": "Article VII §6",
+      "requiredChunkText": "Mid-Level Salary Exception for Room Teams"
+    },
+    {
+      "id": "biannual_exception",
+      "message": "bi-annual exception",
+      "expectedSearchArticleId": "Article VII §6",
+      "expectedChatArticleId": "Article VII §6"
+    },
+    {
+      "id": "disabled_player_exception",
+      "message": "disabled player exception",
+      "expectedSearchArticleId": "Article VII §6",
+      "expectedChatArticleId": "Article VII §6"
+    },
+    {
+      "id": "traded_player_exception",
+      "message": "traded player exception definition",
+      "expectedSearchArticleId": "Article VII §6",
+      "expectedChatArticleId": "Article VII §6",
+      "expectedTopChunkId": "Article VII §6::chunk-22",
+      "requiredChunkText": "Traded Player Exception"
+    },
+    {
+      "id": "trade_aggregation",
+      "message": "aggregated standard traded player exception",
+      "expectedSearchArticleId": "Article VII §6",
+      "expectedChatArticleId": "Article VII §6",
+      "requiredChunkText": "Aggregated Standard Traded Player Exception"
+    },
+    {
+      "id": "second_apron",
+      "message": "second apron restrictions",
+      "expectedSearchArticleId": "Article VII §2",
+      "expectedChatArticleId": "Article VII §2"
+    },
+    {
+      "id": "frozen_pick",
+      "message": "frozen pick penalty",
+      "expectedSearchArticleId": "Article VII §2",
+      "expectedChatArticleId": "Article VII §2"
+    },
+    {
+      "id": "first_apron_hard_cap",
+      "message": "first apron hard cap",
+      "expectedSearchArticleId": "Article VII §2",
+      "expectedChatArticleId": "Article VII §2"
+    },
+    {
+      "id": "transaction_restrictions_table",
+      "message": "transaction restrictions table",
+      "expectedSearchArticleId": "Article VII §2",
+      "expectedChatArticleId": "Article VII §2"
+    },
+    {
+      "id": "sign_and_trade",
+      "message": "sign and trade restrictions",
+      "expectedSearchArticleId": "Article VII §8",
+      "expectedChatArticleId": "Article VII §8"
+    },
+    {
+      "id": "cash_in_trades",
+      "message": "cash in trades",
+      "expectedSearchArticleId": "Article VII §8",
+      "expectedChatArticleId": "Article VII §8"
+    },
+    {
+      "id": "trade_consent",
+      "message": "trade consent",
+      "expectedSearchArticleId": "Article VII §8",
+      "expectedChatArticleId": "Article VII §8"
+    },
+    {
+      "id": "bird_rights",
+      "message": "bird rights",
+      "expectedSearchArticleId": "Article VII §6",
+      "expectedChatArticleId": "Article VII §6"
+    },
+    {
+      "id": "early_bird",
+      "message": "early bird exception",
+      "expectedSearchArticleId": "Article VII §6",
+      "expectedChatArticleId": "Article VII §6"
+    },
+    {
+      "id": "non_bird",
+      "message": "non-bird exception",
+      "expectedSearchArticleId": "Article VII §6",
+      "expectedChatArticleId": "Article VII §6"
+    },
+    {
+      "id": "qualifying_veteran_free_agent",
+      "message": "qualifying veteran free agent",
+      "expectedSearchArticleId": "Article VII §6",
+      "expectedChatArticleId": "Article VII §6"
+    },
+    {
+      "id": "rookie_scale_contract",
+      "message": "rookie scale contract first round pick",
+      "expectedSearchArticleId": "Article VIII §1",
+      "expectedChatArticleId": "Article VIII §1"
+    },
+    {
+      "id": "rookie_salary_scale",
+      "message": "rookie salary scale",
+      "expectedSearchArticleId": "Article VIII §1",
+      "expectedChatArticleId": "Article VIII §1"
+    },
+    {
+      "id": "qualifying_offer_search",
+      "message": "qualifying offer",
+      "expectedSearchArticleId": "Article XI §4",
+      "expectedChatArticleId": "Article XI §5"
+    },
+    {
+      "id": "maximum_qualifying_offer_search",
+      "message": "maximum qualifying offer",
+      "expectedSearchArticleId": "Article XI §4",
+      "expectedChatArticleId": "Article XI §5"
+    },
+    {
+      "id": "restricted_free_agency",
+      "message": "restricted free agency",
+      "expectedSearchArticleId": "Article XI §5",
+      "expectedChatArticleId": "Article XI §5"
+    },
+    {
+      "id": "offer_sheet_rofr",
+      "message": "offer sheet right of first refusal",
+      "expectedSearchArticleId": "Article XI §5",
+      "expectedChatArticleId": "Article XI §5"
+    },
+    {
+      "id": "two_way_contract",
+      "message": "two-way contract",
+      "expectedSearchArticleId": "Article II §11",
+      "expectedChatArticleId": "Article II §11"
+    },
+    {
+      "id": "minimum_player_salary",
+      "message": "minimum player salary",
+      "expectedSearchArticleId": "Article II §6",
+      "expectedChatArticleId": "Article II §6"
+    },
+    {
+      "id": "maximum_annual_salary",
+      "message": "maximum annual salary",
+      "expectedSearchArticleId": "Article II §7",
+      "expectedChatArticleId": "Article II §7"
+    },
+    {
+      "id": "moratorium_period",
+      "message": "moratorium period",
+      "expectedSearchArticleId": "Article II §15",
+      "expectedChatArticleId": "Article II §15"
+    },
+    {
+      "id": "contract_structure",
+      "message": "salary cap contract structure rules",
+      "expectedSearchArticleId": "Article VII §5",
+      "expectedChatArticleId": "Article VII §5"
+    },
+    {
+      "id": "team_salary",
+      "message": "determination of team salary cap hold",
+      "expectedSearchArticleId": "Article VII §4",
+      "expectedChatArticleId": "Article VII §2"
+    },
+    {
+      "id": "bri_definition",
+      "message": "basketball related income definition",
+      "expectedSearchArticleId": "Article VII §1",
+      "expectedChatArticleId": "Article VII §1"
+    },
+    {
+      "id": "designated_share",
+      "message": "designated share arrangement",
+      "expectedSearchArticleId": "Article VII §12",
+      "expectedChatArticleId": "Article VII §12"
+    },
+    {
+      "id": "audit_rights",
+      "message": "players association audit rights",
+      "expectedSearchArticleId": "Article VII §11",
+      "expectedChatArticleId": "Article VII §11"
+    },
+    {
+      "id": "warriors_live_mle_boundary",
+      "message": "Can the Warriors use the mid-level exception this summer?",
+      "expectAnalyzeBoundary": true
+    },
+    {
+      "id": "we_trade_live_boundary",
+      "message": "Can we trade for a max player if we are over the second apron?",
+      "expectAnalyzeBoundary": true
+    },
+    {
+      "id": "no_match",
+      "message": "xylophone nebula",
+      "expectNoMatch": true
+    }
+  ]
+}

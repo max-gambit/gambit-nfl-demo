@@ -1,0 +1,1032 @@
+team_id: LAL
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: Los Angeles Lakers
+  conference: Western
+  division: Pacific
+  market_tier: tier_1
+  market_tier_rationale: Los Angeles is the second-largest U.S. media market; Lakers are flagship franchise with $10B valuation (2025) and global brand equity.
+ownership:
+  primary_owner:
+    name: Mark Walter
+    type: individual
+    tenure_years: 0.6
+    source: https://www.espn.com/nba/story/_/id/46782684/nba-approves-mark-walter-purchase-majority-stake-lakers
+    confidence: high
+  governance_notes: Mark Walter acquired majority stake (remaining ~83%) in October 2025 at $10B valuation. Jeanie Buss (daughter of Jerry Buss) retains minority stake of ~17% and continues as Governor for foreseeable future. Walter is also owner of Chicago Cubs and Guggenheim Partners founder.
+  recent_transitions: Buss family majority control transferred to Mark Walter in October 2025, closing a $10B sale announced June 2025.
+  spending_posture: aggressive_spender
+  spending_posture_evidence:
+    - Walter acquired Dončić in mid-season trade Feb 2025 at likely high cost (AD, picks)
+    - Extended Dončić to $165M over 3 years (Aug 2025) immediately post-acquisition
+    - "Pursued multiple offseason acquisitions: Ayton, Smart, LaRavia (2025 summer)"
+    - Hired Dodgers front office advisors (Friedman, Zaidi) and draft consultant (Bennett) to overhaul operations
+    - Mark Walter known for aggressive capital deployment; owns high-spending Cubs
+front_office:
+  president_basketball_ops:
+    name: Rob Pelinka
+    tenure_start: 2017-03
+    prior_stops:
+      - Klutch Sports (agent/executive, 2012-2017)
+      - UCLA Assistant Coach (2011-2012)
+      - Player agent, Akin Gump (2005-2011)
+    public_philosophy_signals:
+      - Star-chasing model with emphasis on top-tier talent acquisition (Dončić trade, LeBron pursuit)
+      - Defensive-minded roster construction (Marcus Smart acquisition; align with JJ Redick coaching philosophy)
+      - Open to international scouting and player development (Rui Hachimura, Maxi Kleber)
+    confidence: high
+    source: https://www.nbcsports.com/nba/news/new-lakers-president-says-rob-pelinka-empowered-run-basketball-operations
+  general_manager:
+    name: Rob Pelinka
+    tenure_start: 2017-03
+    prior_stops:
+      - Klutch Sports (agent/executive)
+    public_philosophy_signals:
+      - Pelinka elevated to President of Basketball Operations in April 2025 (previously VP)
+      - Continues aggressive asset management and trade flexibility strategy
+    confidence: high
+    source: https://www.foxsports.com/stories/nba/lakers-extend-gm-rob-pelinka-name-him-president-of-basketball-ops
+  head_coach:
+    name: JJ Redick
+    tenure_start: 2024-06
+    contract_through: 2026
+    style_notes: "Defensive intensity, pace emphasis, defensive versatility prioritized. Three stated 2025-26 priorities: championship habits, championship communication, championship shape. First-time NBA coach; previously 15-year NBA player and ESPN analyst."
+    coaching_tree: unknown
+    confidence: high
+    source: https://www.espn.com/nba/story/_/id/45884572/luka-doncic-agrees-3-year-165m-extension-lakers
+  assistant_coaches_notable:
+    - Jovan Jurisic (assistant coach, defensive schemes expert)
+    - Unknown others; recent front office expansion underway
+  notable_advisors_or_consultants:
+    - Andrew Friedman (Dodgers President of Baseball Operations, advisory role, TWG Sports strategic alignment)
+    - Farhan Zaidi (Dodgers analytics/special advisor, advisory role, TWG Sports strategic alignment)
+    - Tony Bennett (Former Virginia NCAA Championship Coach, NBA Draft Advisor to Pelinka, hired late 2025)
+strategic_posture:
+  timeframe: contend_now
+  confidence: high
+  derived_from:
+    - Dončić (age 26, prime years) + LeBron (age 41, final competitive window) create immediate title window
+    - Spent significant capital to acquire and extend Dončić; new ownership backing aggressive payroll
+    - First-round playoff appearance 2024-25; beat Rockets in first round 2025-26 (as of May 2, 2026)
+    - Front office statements focus on competing 'now' around Dončić rather than rebuild or retool
+  constraints:
+    - reason_code: max_contract_lockup
+      detail: Dončić ($55M+ by 2028), LeBron ($52.6M 2025-26, UFA 2026), Reaves ($14-15M escalating) lock $120M+ into three players
+      weight: high
+    - reason_code: aging_core
+      detail: LeBron is 41 years old; narrow window before decline accelerates. Dependent on LeBron and Reaves health
+      weight: high
+    - reason_code: tax_apron_constraints
+      detail: Currently $632k below first apron; minimal flexibility without using exceptions or trading salary. Second apron limits trade receipts
+      weight: medium
+    - reason_code: recent_playoff_success
+      detail: Momentum from 2025-26 first-round win over Rockets supports contention posture but acknowledges Western Conference strength
+      weight: medium
+  trigger_events:
+    - "LeBron's 2026 free-agent decision: if he declines to re-sign, pivot to rebuild around Dončić"
+    - "Playoff seeding/performance in 2026-27: deeper run validates contention; early exit triggers reassessment"
+    - "Dončić injury: any season-ending injury changes timeframe to retool"
+    - "Mark Walter capital availability: if new ownership reduces spending, shifts to moderate posture"
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: between_aprons
+  current_payroll_estimate: 195312382
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Significant cap space (~$45-50M) if LeBron declines UFA or is renounced; otherwise capped. Reaves, Kennard, Hachimura, Kleber, Hayes all UFAs.
+  exceptions_available:
+    - "Bi-Annual Exception: $1,000 remaining of $5.135M (2025-26 fiscal year)"
+    - "Non-Taxpayer Mid-Level Exception: available 2026 offseason (~$14.1M)"
+    - "Trade exceptions: unknown; verify post-deadline status"
+  source: https://sportsbusinessclassroom.com/nba-2025-26-apron-tracker/
+  source_fallbacks_used:
+    - https://www.spotrac.com/nba/los-angeles-lakers/cap
+    - https://www.salaryswish.com/teams/lakers
+  confidence: high
+trade_dna:
+  frequent_partners:
+    - DAL
+    - MIA
+    - UTA
+  preferred_deal_archetypes:
+    - Star acquisition at any cost (Dončić trade willingness to part with Anthony Davis, future picks)
+    - Complementary wing/perimeter defense (Marcus Smart, DeAndre Ayton acquisitions)
+    - Cap-friendly role players (LaRavia, Kennard trades for role players + future picks)
+    - International talent with upside (Maxi Kleber, Rui Hachimura retention)
+  recent_significant_trades:
+    - date: 2025-02-01
+      summary: Acquired Luka Dončić (+ Markieff Morris, Maxi Kleber) from Dallas; sent Anthony Davis, Max Christie, 2029 1st-round pick. Utah Jazz facilitated.
+      counterparties:
+        - DAL
+        - UTA
+    - date: 2025-06-01
+      summary: Signed free agents DeAndre Ayton (2-year, $16.6M), Marcus Smart (1-year + PO), Jake LaRavia (2-year, $12M)
+    - date: 2026-02-05
+      summary: Traded Gabe Vincent + 2nd-round pick to Hawks for Luke Kennard (1-year, $11M contract)
+      counterparties:
+        - ATL
+  confidence: high
+cultural_signals:
+  stability:
+    value: medium
+    detail: Ownership transition stable (Walter committed multi-year); front office relatively stable (Pelinka extended); coaching stable (Redick extended mid-season). However, JJ Redick's first NBA role and aggressive roster turnover create some fluidity.
+  player_friendly:
+    value: mixed
+    detail: New ownership (Walter) signals enhanced capital/resources. LeBron, Dončić, Reaves given max/supermax opportunities (player-friendly). However, traded Anthony Davis mid-season without public consent (reported shock), and Marcus Smart waived no-trade clause. Mixed signals.
+  analytics_orientation:
+    value: balanced
+    detail: Brought in Farhan Zaidi (analytics specialist) in advisory role Nov 2025; hired Tony Bennett (coach known for detailed film/game philosophy). However, Pelinka's star-chasing approach and JJ Redick's first-time coaching role suggest less structured analytics integration than Dodgers or elite analytics teams.
+  risk_tolerance:
+    value: aggressive
+    detail: Mid-season all-in trade for Dončić (Feb 2025); max extension (Aug 2025); trade away 2029 1st-rounder; aggressive signings of older veterans (Smart, Ayton) despite injury history. Reflects Walter's ownership style.
+  notable_traits:
+    - star_chasing
+    - coach_carousel
+    - media_market_pressure
+  rationale: Lakers under new ownership (Walter) signal aggressive star acquisition and capital deployment (Dodgers blueprint). Historic reliance on star trades (AD, now Dončić) creates 'star-chasing' culture. JJ Redick's first NBA role and Friedman/Zaidi advisory roles suggest organizational fluidity; Walter's involvement in basketball decisions reflects an unusually hands-on ownership model. LA media market (tier 1) creates constant pressure to win and field star-studded rosters.
+  confidence: medium
+roster:
+  - player_id: luka_doncic
+    name: Luka Dončić
+    age: 27
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - secondary_creator
+          - post_hub
+      defensive_role: switchable
+      shooting_profile: elite
+      special_traits:
+        - elite_passer
+        - iso_creator
+        - pnr_maestro
+        - playoff_riser
+    tier: superstar
+    trajectory: peak
+    contract:
+      years_remaining: 4
+      total_value_remaining: 190000000
+      annual_value_current_season: 40000000
+      annual_value_next_season: 55000000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: 2028
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.cnbc.com/2025/08/02/luka-doncic-agrees-to-a-three-year-165-million-contract-extension-through-2028-with-the-la-lakers.html
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: generational_talent
+          weight: high
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: recently_acquired
+          weight: high
+      falsification_conditions:
+        - Serious, reported interest from Dončić in leaving (none as of May 2026)
+        - Career-altering injury requiring 18+ month recovery
+        - Public conflict with Pelinka or coaching staff
+    team_relationship:
+      tenure_with_team: 1.3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Superstar with 4-year commitment through 2028 PO; controls his future with option; team fully committed
+    confidence: high
+    source: https://www.espn.com/nba/story/_/id/43659380/sources-mavericks-trading-doncic-lakers-anthony-davis
+  - player_id: lebron_james
+    name: LeBron James
+    age: 41
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - connector
+          - finisher
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_passer
+        - vet_leadership
+        - playoff_riser
+    tier: star
+    trajectory: declining_peak
+    contract:
+      years_remaining: 0
+      total_value_remaining: 0
+      annual_value_current_season: 52627153
+      annual_value_next_season: null
+      no_trade_clause: full
+      trade_kicker: 0.15
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.nba.com/news/lebron-james-exercises-player-option-lakers-2025-26
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: full_no_trade_clause
+          weight: high
+        - reason_code: vet_leadership
+          weight: medium
+      falsification_conditions:
+        - LeBron publicly requests trade (no indication as of May 2026)
+        - LeBron declines renewal in UFA market (possible; Reaves/team flexibility concern)
+    team_relationship:
+      tenure_with_team: 9
+      homegrown: no
+      contract_leverage:
+        value: high
+        detail: UFA 2026; full NTC + 15% kicker; can dictate terms to any team. Leverage is in his hands.
+    confidence: high
+    source: https://www.profootballnetwork.com/nba/lebron-james-opts-in-lakers-contract-salary-2026-27/
+  - player_id: austin_reaves
+    name: Austin Reaves
+    age: 26
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - finisher
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - playoff_riser
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 0
+      total_value_remaining: 0
+      annual_value_current_season: 13940000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: 2027
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.espn.com/nba/player/_/id/4280486/austin-reaves
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: homegrown_loyalty
+          weight: high
+        - reason_code: recent_extension_poison_pill
+          weight: medium
+      falsification_conditions:
+        - Reaves exercises 2027 PO and becomes UFA 2027 (highly unlikely; on track to decline PO and re-sign)
+        - Team declines to offer $241M max extension (unlikely given front office priorities)
+    team_relationship:
+      tenure_with_team: 4.3
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: "Will decline $14.9M PO and become UFA; eligible for 5-year, $241M with Lakers, 4-year, $178.5M elsewhere. Pelinka's stated priority: retain Reaves at all costs."
+    confidence: high
+    source: https://www.espn.com/nba/story/_/id/46918261/inside-unbelievable-241m-week-austin-reaves-los-angeles-lakers
+  - player_id: rui_hachimura
+    name: Rui Hachimura
+    age: 27
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: finisher
+        secondary:
+          - connector
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 0
+      total_value_remaining: 0
+      annual_value_current_season: 18259259
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/player/_/id/31566/rui-hachimura
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: declining_role
+          weight: medium
+      falsification_conditions:
+        - Team offers 4-year, $114.5M extension before June 30 (reported unlikely)
+        - Reaves/Dončić priorities shift and Lakers prioritize retaining Hachimura
+      signal_strength: widely_reported
+    team_relationship:
+      tenure_with_team: 2.3
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: UFA 2026; eligible for extension but Lakers hesitant (2025-26 is final year for 5 key players). Will test market or accept mid-level deal.
+    confidence: high
+    source: https://www.basketballinsiders.org/news/lakers-rui-hachimura-not-not-expected-sign-contract-extension-before-2025-26-season/
+  - player_id: deandre_ayton
+    name: DeAndre Ayton
+    age: 27
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - post_hub
+      defensive_role: rim_protector
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 1
+      total_value_remaining: 8104000
+      annual_value_current_season: 8104000
+      annual_value_next_season: 8600000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: 2027
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.profootballnetwork.com/nba/deandre-ayton-lakers-contract-salary-details/
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: positional_redundancy
+          weight: medium
+      falsification_conditions:
+        - Ayton exercises PO and remains on roster
+        - Lakers offer RFA compensation and lock him in beyond 2027
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Affordable salary on 1-year deal; team has PO decision; limited leverage as complementary center.
+    confidence: medium
+    source: https://www.profootballnetwork.com/nba/deandre-ayton-lakers-contract-salary-details/
+  - player_id: marcus_smart
+    name: Marcus Smart
+    age: 31
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: connector
+        secondary:
+          - point_of_attack
+      defensive_role: point_of_attack
+      shooting_profile: non_shooter
+      special_traits:
+        - vet_leadership
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 0
+      total_value_remaining: 0
+      annual_value_current_season: 5134000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: 2027
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.profootballnetwork.com/nba/highest-paid-player-lakers-las-2025-26-contracts-salaries/
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: age
+          weight: medium
+      falsification_conditions:
+        - Smart exercises PO for 2026-27 and remains with Lakers
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: UFA 2026; provided defensive anchor but at age 31, limited market demand.
+    confidence: medium
+    source: https://www.profootballnetwork.com/nba/highest-paid-player-lakers-las-2025-26-contracts-salaries/
+  - player_id: luke_kennard
+    name: Luke Kennard
+    age: 29
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary:
+          - connector
+      defensive_role: switchable
+      shooting_profile: elite
+      special_traits: []
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 0
+      total_value_remaining: 0
+      annual_value_current_season: 11000000
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://www.profootballnetwork.com/nba/luke-kennard-lakers-trade-hawks-contract-salary/
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Lakers offer extension before summer 2026 to lock in 3-point spacing
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Acquired at trade deadline Feb 2026; UFAssoon; valuable 3-point shooter but likely to test market.
+    confidence: medium
+    source: https://www.profootballnetwork.com/nba/luke-kennard-lakers-trade-hawks-contract-salary/
+  - player_id: maxi_kleber
+    name: Maxi Kleber
+    age: 30
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: connector
+        secondary:
+          - spacer
+      defensive_role: switchable
+      shooting_profile: functional
+      special_traits: []
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 0
+      total_value_remaining: 0
+      annual_value_current_season: 11571429
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: non
+      contract_through: 2026
+      source: https://fanspo.com/nba/players/maxi-kleber/1628467/contract
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+        - reason_code: declining_role
+          weight: medium
+      falsification_conditions:
+        - Team offers contract extension; Kleber exercises non-Bird UFA market
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.3
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Came with Dončić trade; UFA 2026; European stretch-four with limited market demand at age 30.
+    confidence: medium
+    source: https://fanspo.com/nba/players/maxi-kleber/1628467/contract
+  - player_id: jarred_vanderbilt
+    name: Jarred Vanderbilt
+    age: 28
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: screen_setter
+        secondary:
+          - connector
+      defensive_role: switchable
+      shooting_profile: non_shooter
+      special_traits: []
+    tier: rotation
+    trajectory: declining
+    contract:
+      years_remaining: 2
+      total_value_remaining: 23142857
+      annual_value_current_season: 11571429
+      annual_value_next_season: 11571429
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.spotrac.com/nba/player/_/id/27007/jarred-vanderbilt
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: declining_role
+          weight: high
+        - reason_code: locker_room_friction
+          weight: medium
+      falsification_conditions:
+        - Vanderbilt sees consistent 15+ mpg and becomes core rotation member
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 3.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: 2-year, $23.1M remaining; falling out of rotation; limited leverage as bench piece.
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/_/id/27007/jarred-vanderbilt
+  - player_id: jaxson_hayes
+    name: Jaxson Hayes
+    age: 23
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 0
+      total_value_remaining: 0
+      annual_value_current_season: 3449323
+      annual_value_next_season: null
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2026
+      source: https://www.spotrac.com/nba/player/_/id/31565/jaxson-hayes
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: contract_expiring
+          weight: high
+      falsification_conditions:
+        - Lakes offer 3+ year extension in offseason
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 2
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: UFA 2026; athletic rim-runner; young enough for multi-year market interest elsewhere.
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/_/id/31565/jaxson-hayes
+  - player_id: jake_laravia
+    name: Jake LaRavia
+    age: 24
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+      defensive_role: switchable
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: 6000000
+      annual_value_current_season: 6000000
+      annual_value_next_season: 6000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.profootballnetwork.com/nba/highest-paid-player-lakers-las-2025-26-contracts-salaries/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - LaRavia sees declining role in 2026 season
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 0.8
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: 2-year, $12M deal; cheap RFA years; part of youth cornerstone being developed.
+    confidence: medium
+    source: https://www.profootballnetwork.com/nba/highest-paid-player-lakers-las-2025-26-contracts-salaries/
+  - player_id: dalton_knecht
+    name: Dalton Knecht
+    age: 22
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: spacer
+        secondary:
+          - finisher
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 14600000
+      annual_value_current_season: 3800000
+      annual_value_next_season: 4600000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: option_pending
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.profootballnetwork.com/nba/highest-paid-player-lakers-las-2025-26-contracts-salaries/
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Knecht plays below expectations in 2025-26 or 2026-27
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.8
+      homegrown: yes
+      contract_leverage:
+        value: low
+        detail: 2024 first-round pick; Lakers control through 2028 with TO; youth asset being developed.
+    confidence: medium
+    source: https://www.profootballnetwork.com/nba/highest-paid-player-lakers-las-2025-26-contracts-salaries/
+  - player_id: bronny_james
+    name: Bronny James
+    age: 21
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: connector
+        secondary:
+          - finisher
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits: []
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 3
+      total_value_remaining: 6330213
+      annual_value_current_season: 1157143
+      annual_value_next_season: 1955377
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: option_pending
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.cbssports.com/nba/news/bronny-james-contract-lakers-to-sign-second-round-pick-to-four-year-7-9-million-deal-per-report/
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: ownership_relationship
+          weight: high
+      falsification_conditions:
+        - LeBron trades away or requests Bronny trade (neither likely)
+      signal_strength: inferred_from_actions
+    team_relationship:
+      tenure_with_team: 1.8
+      homegrown: yes
+      contract_leverage:
+        value: none
+        detail: Son of LeBron James; inseparable from LeBron's tenure; protected asset.
+    confidence: high
+    source: https://www.cbssports.com/nba/news/bronny-james-contract-lakers-to-sign-second-round-deal-per-report/
+pending_free_agents:
+  - player_id: lebron_james
+    name: LeBron James
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: 52627153
+    expected_market: uncertain
+    expected_market_detail: "LeBron is age 41 with significant injury history (ankle, wrist 2025-26). Will likely accept Lakers max offer to maximize final years, but open to legacy moves (Cavs return, mentor role with young team). Re-signing probability: 70-80%."
+    notes: UFA 2026; full NTC; 15% trade kicker. Decision pivotal to Lakers' 2026-27 flexibility. If declines, Lakers have ~$50M cap space.
+    source: https://www.nba.com/news/lebron-james-exercises-player-option-lakers-2025-26
+  - player_id: austin_reaves
+    name: Austin Reaves
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: 14900000
+    expected_market: re_sign_likely
+    expected_market_detail: Reaves eligible for 5-year, $241M max with Lakers; 4-year, $178.5M elsewhere. Zero indications of departure; stated desire to stay. Expected to decline $14.9M PO and re-sign max deal with Lakers.
+    notes: "Will decline 2027 PO and become UFA summer 2026. Pelinka's stated offseason priority: retain Reaves at all costs."
+    source: https://www.espn.com/nba/story/_/id/46918261/inside-unbelievable-241m-week-austin-reaves-los-angeles-lakers
+  - player_id: rui_hachimura
+    name: Rui Hachimura
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: 18259259
+    expected_market: uncertain
+    expected_market_detail: "UFA 2026. Eligible for 4-year, $114.5M extension, but Lakers unlikely to offer (last year of LeBron/Kleber/Kennard/Hayes contracts). Hachimura will test market or accept mid-level offer. Re-signing probability: 40-50%."
+    notes: Final year of contract; extension window closed per reports. May chase starting role elsewhere if Lakers don't prioritize.
+    source: https://www.basketballinsiders.org/news/lakers-rui-hachimura-not-not-expected-sign-contract-extension-before-2025-26-season/
+  - player_id: luke_kennard
+    name: Luke Kennard
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: 11000000
+    expected_market: uncertain
+    expected_market_detail: "Non-Bird UFA. Acquired Feb 2026 at deadline; valuable 3-point shooter. May test market or re-sign with Lakers on similar 1-year deal. Projected market: $10-15M annually."
+    notes: Acquired mid-season from Hawks for Gabe Vincent + 2nd rounder. Non-Bird rights limit Lakers' ability to exceed market by 20%.
+    source: https://www.profootballnetwork.com/nba/luke-kennard-lakers-trade-hawks-contract-salary/
+  - player_id: maxi_kleber
+    name: Maxi Kleber
+    type: UFA
+    bird_rights_status: non
+    cap_hold_amount: 11571429
+    expected_market: walk
+    expected_market_detail: "Non-Bird UFA age 30 with limited market. Likely to walk; European forward with declining athleticism. Limited re-signing probability: 20%."
+    notes: Came with Dončić trade from Dallas. Non-Bird rights; limited leverage.
+    source: https://fanspo.com/nba/players/maxi-kleber/1628467/contract
+  - player_id: marcus_smart
+    name: Marcus Smart
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: 5134000
+    expected_market: uncertain
+    expected_market_detail: "UFA 2026 age 31. May exercise 2027 PO or test market. Defense-first guard with limited offensive range; likely to accept 1-2 year veteran deal. Re-signing probability: 35%."
+    notes: Strong defensive presence but aging and non-shooter. PO for 2026-27 is in his hands; if decline, UFA again.
+    source: https://www.profootballnetwork.com/nba/highest-paid-player-lakers-las-2025-26-contracts-salaries/
+  - player_id: jaxson_hayes
+    name: Jaxson Hayes
+    type: UFA
+    bird_rights_status: full
+    cap_hold_amount: 3449323
+    expected_market: re_sign_likely
+    expected_market_detail: "Athletic rim-runner age 23. UFA 2026 with Bird rights. Lakers likely to retain on 2-3 year deal given youth upside. Re-signing probability: 60%."
+    notes: Young, cheap contract player; fits with Dončić timeline. Reasonable expectation of retention.
+    source: https://www.spotrac.com/nba/player/_/id/31565/jaxson-hayes
+known_target_history:
+  - target: Luka Dončić
+    year: 2025
+    outcome: acquired
+    detail: Acquired Feb 1-2, 2025 from Dallas Mavericks for Anthony Davis, Max Christie, 2029 1st-round pick (Utah Jazz facilitating). Trade widely considered generational win for Lakers.
+    source: https://www.espn.com/nba/story/_/id/43659380/sources-mavericks-trading-doncic-lakers-anthony-davis
+  - target: DeAndre Ayton
+    year: 2025
+    outcome: acquired
+    detail: Signed 2-year, $16.6M deal in June 2025 free agency (post-Dončić acquisition, mid-season after Dončić trade).
+    source: https://www.profootballnetwork.com/nba/deandre-ayton-lakers-contract-salary-details/
+  - target: Marcus Smart
+    year: 2025
+    outcome: acquired
+    detail: Signed 1-year deal (+ PO) in June 2025 offseason to add perimeter defense alongside Dončić.
+    source: https://www.profootballnetwork.com/nba/highest-paid-player-lakers-las-2025-26-contracts-salaries/
+  - target: Jake LaRavia
+    year: 2025
+    outcome: acquired
+    detail: Signed 2-year, $12M deal in June 2025 to address wing depth and athleticism.
+    source: https://www.profootballnetwork.com/nba/highest-paid-player-lakers-las-2025-26-contracts-salaries/
+  - target: Luke Kennard
+    year: 2026
+    outcome: acquired
+    detail: Traded for Gabe Vincent + 2nd-round pick on Feb 5, 2026 (mid-season) to add 3-point shooting (49.7%, league leader).
+    source: https://www.profootballnetwork.com/nba/luke-kennard-lakers-trade-hawks-contract-salary/
+near_term_priorities:
+  - priority: 2026 NBA Draft board and rookie-scale integration
+    timeline: this_offseason
+    type: draft
+    detail: "Los Angeles Lakers hold No. 25 in the official post-lottery order. Mock-source layer: No. 25: Henri Veesaar; treat prospect names as low-confidence planning signals, not draft outcomes, until combine/medical/withdrawal data settles."
+    confidence: low
+  - priority: Re-sign Austin Reaves to max extension
+    timeline: this_offseason
+    type: free_agency
+    detail: "Reaves eligible for 5-year, $241M; Pelinka's stated #1 priority. Likely to decline $14.9M PO and negotiate 2026 offseason. Must-do to retain core."
+    confidence: high
+  - priority: Determine LeBron James 2026-27 future
+    timeline: this_offseason
+    type: free_agency
+    detail: LeBron is UFA 2026 age 41. Likely to re-sign Lakers max but unknown. Decision unlocks or constrains $45-50M potential cap space and 2026-27 roster construction.
+    confidence: high
+  - priority: Integrate Dončić + LeBron + Reaves + role players in Western Conference
+    timeline: this_season
+    type: structural
+    detail: 2025-26 season ongoing (as of May 2, 2026). Team advanced to first-round vs. Rockets (won). Must compete 2026 season with narrow window (LeBron age 41, Dončić prime).
+    confidence: high
+  - priority: Develop young core (Knecht, Hayes, LaRavia) alongside stars
+    timeline: next_season
+    type: roster
+    detail: Balance immediate contention with developing 2024 draft picks and young wings for post-LeBron era centered on Dončić. Redick tasked with development + winning.
+    confidence: medium
+  - priority: Evaluate Rui Hachimura re-signing
+    timeline: this_offseason
+    type: free_agency
+    detail: Hachimura UFA 2026 but Lakers hesitant on extension (last year of multiple contracts). Assess market and retention if budget allows; otherwise likely walks.
+    confidence: medium
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 1
+      protections: 2026 No. 25 overall; own pick.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2028
+      round: 1
+      protections: unknown
+      source: https://basketball.realgm.com/nba/teams/Los-Angeles-Lakers/13/draft-picks
+    - year: 2030
+      round: 1
+      protections: Pick swap
+      source: https://basketball.realgm.com/nba/teams/Los-Angeles-Lakers/13/draft-picks
+  draft_picks_owed:
+    - year: 2026
+      round: 2
+      to_team: GSW
+      protections: 2026 No. 54 overall; from LAL via TOR, MIA, and CLE.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2029
+      round: 1
+      to_team: DAL
+      protections: Unprotected (traded away in Dončić deal)
+      source: https://www.espn.com/nba/story/_/id/43659380/sources-mavericks-trading-doncic-lakers-anthony-davis
+  trade_exceptions:
+    - value: unknown
+      expires: unknown
+      source: unknown
+      confidence: low
+team_team_relationships:
+  rivalries:
+    - team_id: BOS
+      type: competitive_historical
+      basis: Celtics-Lakers is the greatest rivalry in NBA history (1960s onward); 2024-25 regular season split, both elite teams.
+    - team_id: GSW
+      type: competitive_recent
+      basis: Warriors-Lakers rivalry defined modern NBA (2010s); mutual respect; recent playoff history.
+    - team_id: PHX
+      type: competitive_recent
+      basis: Suns-Lakers renewed rivalry post-2020; geographic tension and playoff matchups.
+    - team_id: DAL
+      type: personnel_grudge
+      basis: Luka Dončić trade (Feb 2025) widely viewed as Dallas loss; personnel tensions from deal negotiations.
+  notable_personnel_connections:
+    - person: Luka Dončić
+      connected_team: DAL
+      connection_type: former_player
+      detail: Traded from Dallas to Lakers Feb 2025; franchise centerpiece for Mavericks before deal.
+    - person: Anthony Davis
+      connected_team: DAL
+      connection_type: former_player
+      detail: Traded to Dallas as centerpiece of Dončić deal; former Lakers franchise cornerstone.
+    - person: Rob Pelinka
+      connected_team: unknown
+      connection_type: former_executive
+      detail: Agent background (Klutch Sports); continues star-chasing philosophy from agency days.
+    - person: JJ Redick
+      connected_team: DAL
+      connection_type: former_player
+      detail: Played for Mavericks (2023-24); first NBA head coaching job with Lakers (June 2024).
+    - person: Andrew Friedman
+      connected_team: LAD
+      connection_type: former_executive
+      detail: President of Baseball Operations for Dodgers; advisory role with Lakers (Nov 2025) under Mark Walter ownership.
+    - person: Farhan Zaidi
+      connected_team: LAD
+      connection_type: former_executive
+      detail: Dodgers analytics/special advisor; advisory role with Lakers (Nov 2025) for strategic integration.
+g_league_and_stash:
+  affiliate_team: South Bay Lakers
+  notable_affiliate_players:
+    - Kobe Bufkin (G League roster recall; 2024 second-round pick)
+    - Nick Smith Jr. (G League roster recall; 2024 second-round pick)
+  international_stash: []
+narrative_summary:
+  one_paragraph: "The Los Angeles Lakers enter the 2026 season as a contender built around newly acquired Luka Dončić (3-year, $165M extension signed Aug 2025) alongside 41-year-old LeBron James and ascending star Austin Reaves. The franchise underwent transformative ownership in October 2025 when Mark Walter completed a $10B acquisition of majority control from the Buss family, signaling aggressive capital deployment and bringing Dodgers-affiliated analytics and executive resources (Friedman, Zaidi) into the front office. Head coach JJ Redick (in his second season) leads a roster built for perimeter defense and versatility, augmented with offseason acquisitions (Ayton, Smart, LaRavia, Kennard) targeting complementary roles. The contention window is narrow but real: Dončić is in his prime, LeBron remains capable in short bursts, and Mark Walter's resources unlock trade and free-agency flexibility unavailable during previous ownership. The team lost in the first round to the sixth-seeded Timberwolves in 2024-25 despite the Dončić trade mid-season (Feb 2025) but defeated the Rockets in the first round of 2025-26. Near-term pressures include retaining Reaves (eligible for $241M max), securing LeBron's 2026 re-signing (critical to cap space), managing the expiration cliff of five key rotation players (LeBron, Hachimura, Kennard, Kleber, Hayes all UFA 2026), and balancing immediate contention against developing young wings (Knecht, LaRavia, Hayes) for a post-LeBron future anchored on Dončić."
+  three_things_to_watch:
+    - "2026 draft board: official assets No. 25; The Athletic mock-source layer lists No. 25: Henri Veesaar as prospect leads, with non-top-four names treated as low-confidence pre-draft fit signals."
+    - "Austin Reaves re-signing: If he walks or negotiations stall, Lakers lose second star and 2026-27 flexibility. Expected: decline PO and re-sign $241M max."
+    - "LeBron James 2026 free-agency decision: At age 41 post-injury season, does he stay or explore legacy moves? Re-signing unlocks ~$50M cap space only if declined."
+    - "Dončić + LeBron chemistry sustainability: Narrow 2-3 year window requires flawless health and fit. Any major injury derails contention and forces pivot to rebuild around Dončić alone."
+sources_used:
+  - https://www.cnbc.com/2026/02/17/lakers-jeanie-buss-sale-mark-walter.html
+  - https://www.espn.com/nba/story/_/id/46782684/nba-approves-mark-walter-purchase-majority-stake-lakers
+  - https://www.espn.com/nba/story/_/id/45539931/buss-family-agrees-sell-lakers-mark-walter-sources-say
+  - https://www.cbsnews.com/losangeles/news/report-lakers-gm-pelinka-gets-contract-extension-thru-2026/
+  - https://www.foxsports.com/stories/nba/lakers-extend-gm-rob-pelinka-name-him-president-of-basketball-ops
+  - https://www.nbcsports.com/nba/news/new-lakers-president-says-rob-pelinka-empowered-run-basketball-operations
+  - https://sports.yahoo.com/nba/breaking-news/article/lakers-extend-jj-redick-ahead-of-2025-26-season-210713150.html
+  - https://www.espn.com/nba/story/_/id/43659380/sources-mavericks-trading-doncic-lakers-anthony-davis
+  - https://www.cnbc.com/2025/08/02/luka-doncic-agrees-to-a-three-year-165-million-contract-extension-through-2028-with-the-la-lakers.html
+  - https://www.espn.com/nba/story/_/id/45884572/luka-doncic-agrees-3-year-165m-extension-lakers
+  - https://sportsbusinessclassroom.com/nba-2025-26-apron-tracker/
+  - https://www.spotrac.com/nba/los-angeles-lakers/contracts
+  - https://www.profootballnetwork.com/nba/deandre-ayton-lakers-contract-salary-details/
+  - https://www.profootballnetwork.com/nba/highest-paid-player-lakers-las-2025-26-contracts-salaries/
+  - https://www.spotrac.com/nba/player/_/id/2257/lebron-james
+  - https://www.nba.com/news/lebron-james-exercises-player-option-lakers-2025-26
+  - https://www.espn.com/nba/story/_/id/46918261/inside-unbelievable-241m-week-austin-reaves-los-angeles-lakers
+  - https://www.spotrac.com/nba/player/_/id/31566/rui-hachimura
+  - https://www.basketballinsiders.org/news/lakers-rui-hachimura-not-not-expected-sign-contract-extension-before-2025-26-season/
+  - https://www.profootballnetwork.com/nba/luke-kennard-lakers-trade-hawks-contract-salary/
+  - https://fanspo.com/nba/players/maxi-kleber/1628467/contract
+  - https://www.spotrac.com/nba/player/_/id/27007/jarred-vanderbilt
+  - https://www.spotrac.com/nba/player/_/id/31565/jaxson-hayes
+  - https://www.cbssports.com/nba/news/bronny-james-contract-lakers-to-sign-second-round-deal-per-report/
+  - https://www.essentiallysports.com/nba-active-basketball-news-markieff-morris-net-worth-in-two-thousand-and-twenty-five-los-angeles-lakers-star-s-contract-salary-endorsements-other-details-revealed/
+  - https://dodgersnation.com/dodgers-andrew-friedman-taking-advisory-role-with-lakers/2025/11/21/
+  - https://www.espn.com/nba/story/_/id/47049127/two-dodgers-execs-begin-advisory-roles-lakers
+  - https://www.cbssports.com/nba/news/lakers-tony-bennett-nba-draft-advisor-rob-pelinka/
+  - https://www.espn.com/nba/story/_/id/48034495/lakers-add-ex-virginia-coach-tony-bennett-draft-adviser
+  - https://basketball.realgm.com/nba/teams/Los-Angeles-Lakers/13/draft-picks
+  - https://en.wikipedia.org/wiki/Luka_Don%C4%8Di%C4%87%E2%80%93Anthony_Davis_trade
+  - https://www.nba.com/news/2025-26-season-preview-lal
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - "Jarred Vanderbilt: annual_value_next_season (contract structure unclear)"
+  - "Markieff Morris: entire contract section (salary, years, bird rights, contract_through all unknown)"
+  - "Luke Kennard: bird_rights_status detail (non-Bird UFA status requires cross-check)"
+  - "Lakers trade exceptions: current value, expiration dates (post-deadline status unknown)"
+  - "Draft picks owned: year 2026, 2028 — specific protections unknown"
+  - "Coaching tree for JJ Redick: first-time NBA coach; no professional coaching lineage"
+  - "International stash: no players currently identified in international pool"
+vocabulary_flags:
+  - "Markieff Morris removed: Player was acquired in Dončić trade (Feb 2025) but did not re-sign for 2025-26. Listed as unsigned free agent per RealGM and SBC cap tracker; Lakers at hard-cap ceiling (~$632k below first apron) with no room for veteran minimum. Research confirms Morris not on 2025-26 active roster despite trading-deadline acquisition as salary attachment to Dončić deal."
+  - "Mark Walter tenure_years: calculated as 0.6 years (Oct 2025 to May 2, 2026 ~= 7 months); decimals allowed per schema but worth noting"
+  - "Markieff Morris contract data heavily incomplete due to trade (Feb 2025) and limited public salary detail. Marked 'unknown' throughout; confidence: low on Morris."
+  - "LeBron James availability_status: marked 'healthy' but sustained wrist/ankle issues in 2025-26 season per beat coverage; no season-ending injury reported, but durability concern warranted."
+  - "Austin Reaves movement_constraints: marked 'unlikely' to move, but logic is inverse (almost untouchable due to extension incentives + org priority); status correct but high certainty of retention."
+  - "JJ Redick coaching_tree: no lineage applicable (first NBA role); coaching_tree set to 'unknown' per schema rather than none."
+  - "Dončić special_traits: did not include 'injury_prone' despite 2024-25 season wrist injury concerns, as 2025-26 availability stable and injury not recurrent."
+  - "Rui Hachimura expected_market: marked 'uncertain' rather than 're_sign_likely' or 'walk' due to genuinely open outcome; Lakers hesitant, market active, re-signing probability 40-50% (not high enough for re_sign_likely)."
+  - "Ownership transition flagged: Jeanie Buss retains ~17% stake and continues as Governor despite Mark Walter majority purchase; governance is shared authority, not full Walter control."
+  - "Source conflict: ESPN/Spotrac cap payroll estimates vary ($195.3M vs. previous reports of $195.0M); using most recent (May 2026) figure from SBC."

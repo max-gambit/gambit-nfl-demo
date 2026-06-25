@@ -1,0 +1,10 @@
+<svg viewBox="0 0 1240 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Gambit">
+  
+  <g>
+    <path d="M40 40L280 40 280 120 120 120 120 200 200 200 200 160 280 160 280 280 40 280Z" fill="#161820"></path>
+    <line x1="140" y1="160" x2="180" y2="160" stroke="#B08040" stroke-width="0.75"></line>
+    <line x1="160" y1="140" x2="160" y2="180" stroke="#B08040" stroke-width="0.75"></line>
+  </g>
+  
+  <text x="360" y="216" font-family="Chakra Petch, Helvetica Neue, sans-serif" font-weight="700" font-size="200" letter-spacing="20" fill="#161820">GAMBIT</text>
+</svg>

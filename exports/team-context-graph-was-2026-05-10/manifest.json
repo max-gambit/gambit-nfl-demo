@@ -1,0 +1,34 @@
+{
+  "export_name": "Gambit team context graph export",
+  "team_id": "WAS",
+  "team_name": "Washington Wizards",
+  "generated_at": "2026-05-10T17:05:47.292Z",
+  "generated_from_repo": "/Users/maxweiss/Documents/GitHub/Gambit UI Remix",
+  "validation": {
+    "status": "pass",
+    "error_count": 0,
+    "warning_count": 0
+  },
+  "includes_local_overrides": true,
+  "files": [
+    "was-effective-context.json",
+    "was-war-room.json",
+    "all-team-preferences.json",
+    "team-memory.was.json",
+    "raw-was.yaml",
+    "derived-teams.json",
+    "derived-edges.json",
+    "validation_report.md",
+    "team-preferences.local.json",
+    "team-memory.local.json",
+    "README.md"
+  ],
+  "source_paths": {
+    "source_team_yaml": "data/nba-context-graph/teams/was.yaml",
+    "derived_teams": "data/nba-context-graph/derived/teams.json",
+    "derived_edges": "data/nba-context-graph/derived/edges.json",
+    "validation_report": "data/nba-context-graph/derived/validation_report.md",
+    "local_preferences_override": "data/nba-context-graph/overrides/team-preferences.local.json",
+    "local_team_memory": "data/nba-context-graph/overrides/team-memory.local.json"
+  }
+}

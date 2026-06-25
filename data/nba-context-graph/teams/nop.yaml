@@ -1,0 +1,928 @@
+team_id: NOP
+as_of_date: 2026-05-12
+last_updated: 2026-05-12
+identity:
+  name: New Orleans Pelicans
+  conference: Western
+  division: Southwest
+  market_tier: tier_2
+  market_tier_rationale: Mid-market metro (population ~1.3M) with historic franchise equity from the Benson ownership but perpetually weakened by injury triage and FO instability.
+ownership:
+  primary_owner:
+    name: Gayle Benson
+    type: individual
+    tenure_years: 7.9
+    source: https://www.neworleanssaints.com/team/front-office-roster/gayle-benson
+    confidence: high
+  governance_notes: Gayle Benson became principal owner following the death of her husband, Tom Benson, in 2018. She owns both the Saints and Pelicans. No reported co-ownership disputes or minority stakes.
+  recent_transitions: none
+  spending_posture: moderate
+  spending_posture_evidence:
+    - Pelicans currently project $4.1M below the $200.5M luxury tax threshold with 14 players rostered as of May 2026.
+    - Ownership approved hiring Joe Dumars in April 2025 and backed his restructuring moves including Willie Green's mid-season firing.
+    - No evidence of aggressive spend-to-the-cap posture; cap flexibility prioritized via team option decisions.
+front_office:
+  president_basketball_ops:
+    name: Joe Dumars
+    tenure_start: 2025-04
+    prior_stops:
+      - NBA League Office (EVP Head of Basketball Operations, 2022-2025)
+      - Sacramento Kings (3 years, 2019-2022)
+      - Detroit Pistons (President of Basketball Operations, 2000-2014)
+      - Phoenix Suns (Assistant under Monty Williams, prior to 2025)
+    public_philosophy_signals:
+      - "Dumars stated in post-season 2026 presser: 'We are much further along than when I took over in Detroit.' Signals long-term rebuild tolerance."
+      - "Early moves: aggressive draft (Fears #7, Queen #13 via trade-up), multiple trades mid-season (McCollum/Poole swap, Ingram to TOR, Alvarado deadline deal)."
+      - Philosophy centers on youth development and positional versatility; drafted high-ceiling guards/wings.
+    confidence: high
+    source: https://www.nba.com/news/pelicans-name-joe-dumars-executive-vp-basketball-operations
+  general_manager:
+    name: unknown
+    tenure_start: unknown
+    prior_stops: []
+    public_philosophy_signals: []
+    confidence: low
+    source: unknown
+  head_coach:
+    name: James Borrego
+    tenure_start: 2025-11
+    contract_through: pending 2026 offseason decision
+    style_notes: Interim promotion mid-season. Went 24-46 after Green's 2-10 start. Defensive-minded coach from Popovich coaching tree; emphasizes versatility and effort consistency.
+    coaching_tree: popovich_tree
+    confidence: high
+    source: https://www.nba.com/news/pelicans-willie-green-out-as-head-coach
+  assistant_coaches_notable: []
+  notable_advisors_or_consultants: []
+strategic_posture:
+  timeframe: rebuild
+  confidence: high
+  derived_from:
+    - 26-56 finish (2025-26 season); 11th in West; lottery result sent the No. 8 pick to Atlanta; did not make playoffs for 3rd consecutive season.
+    - Multiple trades of veteran complementary pieces (Brandon Ingram to TOR in Feb 2025, Jose Alvarado deadline deal, CJ McCollum exit).
+    - "Draft pivot: back-to-back high lottery picks (Fears #7, Queen #13 via trade-up); 2026 first-round pick traded away (to Hawks for Queen)."
+    - Zion Williamson availability and health remain unresolved; Dejounte Murray Achilles injury severely limits 2025-26 impact (14 games).
+  constraints:
+    - reason_code: aging_core
+      detail: Zion (25) and Dejounte (29, post-injury) represent the core, but Zion's health/conditioning clauses and Murray's Achilles status create durability risk.
+      weight: high
+    - reason_code: multi_year_lottery
+      detail: Three consecutive seasons out of playoffs (2023-24, 2024-25, 2025-26); 2026 first-round pick conveyance to Atlanta lengthens the rebuild margin for error.
+      weight: high
+    - reason_code: new_front_office
+      detail: Joe Dumars hired April 2025; needs 2-3 seasons to fully reshape roster and establish system identity.
+      weight: medium
+  trigger_events:
+    - Zion Williamson sustained, injury-free season (60+ games) with positive conditioning compliance; mid-tier playoff seeding.
+    - Jeremiah Fears or Derik Queen emergence as legitimate all-star caliber player within 18 months.
+    - Trade acquisition of a secondary star-level playmaker/scorer to pair alongside Zion.
+  last_reviewed: 2026-05-02
+cap_situation:
+  current_status: above_first_apron
+  current_payroll_estimate: 190786965
+  hard_capped: no
+  hard_cap_reason: none
+  flexibility_windows:
+    - season: 2026-27
+      projected_status: Significant flexibility if Looney and Matkovic options declined. Est. $12.8M below luxury tax threshold; access to non-taxpayer mid-level exception ($15M).
+    - season: 2027-28
+      projected_status: Zion's contract guarantees tied to conditioning/game appearances; Murray's return uncertain. Poole ($34M) still under contract; cap relief dependent on trades.
+  exceptions_available:
+    - "Mid-level exception: $15M (2026-27; available if Looney declined)"
+    - "Biannual exception: $5.5M"
+    - "Trade exceptions: $13.4M and $4.5M (as of May 2026)"
+  source: https://www.spotrac.com/nba/new-orleans-pelicans/cap
+  source_fallbacks_used: []
+  confidence: medium
+trade_dna:
+  frequent_partners:
+    - WAS
+    - ATL
+    - TOR
+  preferred_deal_archetypes:
+    - "Draft-capital centric (traded #23 + unprotected 2026 first to ATL for #13; willing to surrender future picks)."
+    - Guard/wing swaps (CJ McCollum/Kelly Olynyk to WAS for Jordan Poole/Saddiq Bey; Brandon Ingram to TOR).
+    - Salary relief + depth (Alvarado trade; explored Poole exit pre-deadline).
+  recent_significant_trades:
+    - date: 2026-02
+      summary: Brandon Ingram traded to Toronto Raptors with future protections; received Bruce Brown, Kelly Olynyk (recirculated), 2026 first (Indiana), 2031 second.
+      counterparties:
+        - IND
+        - TOR
+    - date: 2025-07
+      summary: "Three-team deal: Pelicans sent McCollum/Olynyk to Wizards; received Poole, Bey from WAS; Houston involved (Whitmore to WAS)."
+      counterparties:
+        - HOU
+        - WAS
+    - date: 2025-06
+      summary: Dejounte Murray acquired from Hawks for 2025 Lakers first, 2027 first, Larry Nance Jr., E.J. Liddell, Dyson Daniels.
+      counterparties:
+        - ATL
+        - LAL
+    - date: 2025
+      summary: "Draft night: Traded #23 + unprotected 2026 first to ATL for move to #13 (Derik Queen)."
+      counterparties:
+        - ATL
+  confidence: high
+cultural_signals:
+  stability:
+    value: low
+    detail: Three coaching changes in four seasons (Alvin Gentry exit 2022 → Willie Green 2021-2025 → James Borrego mid-season 2025-26). Uncertainty around Borrego's permanent status as of May 2026.
+  player_friendly:
+    value: mixed
+    detail: Benson ownership approved aggressive trades (Ingram, McCollum exits) mid-season; however, early contract extensions offered to young players (Fears/Queen rookie deals standard). Zion's unique conditioning-based guarantees create tension.
+  analytics_orientation:
+    value: balanced
+    detail: Dumars' Sacramento stint and NBA office role suggest analytics-informed approach. Draft picks (Fears, Queen) emphasize high-ceiling, positionless play. Cap modeling and trade evaluation appear data-driven.
+  risk_tolerance:
+    value: aggressive
+    detail: Willingness to trade unprotected first-round picks (2026 to ATL); aggressive mid-season coaching change; multiple simultaneous roster overhauls.
+  notable_traits:
+    - coach_carousel
+    - star_chasing
+    - young_core_developing
+  rationale: The Pelicans have experienced repeated coaching instability and front-office churn, culminating in Dumars' hire and mid-season pivot. Recent trades indicate aggressive youth prioritization over veteran continuity. However, ownership remains committed to Zion and is willing to absorb cap penalties for young talent development.
+  confidence: medium
+roster:
+  - player_id: zion_williamson
+    name: Zion Williamson
+    age: 25
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: forward
+      offensive_role:
+        primary: primary_initiator
+        secondary:
+          - finisher
+          - connector
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+        - iso_creator
+        - offensive_rebound_specialist
+    tier: superstar
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 120000000
+      annual_value_current_season: 39446090
+      annual_value_next_season: 39446090
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.spotrac.com/nba/player/_/id/31558/zion-williamson
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: franchise_brand_equity
+          weight: high
+        - reason_code: generational_talent
+          weight: high
+      falsification_conditions:
+        - Dumars or ownership publicly signals Zion is available for trade.
+        - Three consecutive seasons of sub-50-game availability; conditioning clause failures.
+    team_relationship:
+      tenure_with_team: 5.7
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Conditioning/game-appearance guarantees provide leverage; incentivizes team compliance with extension discussions.
+    confidence: high
+    source: https://www.nba.com/news/2025-26-season-preview-nop
+  - player_id: dejounte_murray
+    name: Dejounte Murray
+    age: 29
+    position_listed: PG
+    contract_type: standard
+    availability_status: injured_long_term
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - connector
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_passer
+        - transition_threat
+    tier: star
+    trajectory: declining
+    contract:
+      years_remaining: 3
+      total_value_remaining: 90000000
+      annual_value_current_season: 30000000
+      annual_value_next_season: 30000000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.cbssports.com/nba/players/2203544/dejounte-murray/
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: injury_recovery_uncertain
+          weight: high
+        - reason_code: failed_fit
+          weight: high
+      falsification_conditions:
+        - Clearance from medical staff for full unrestricted participation in training camp 2026.
+        - Public statement from Dumars reaffirming long-term Murray commitment post-Achilles recovery.
+      signal_strength: widely_reported
+    team_relationship:
+      tenure_with_team: 1.9
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Achilles injury (Jan 2026, returned ~Feb 2026) reduces asset value; 3 years remaining at $30M AAV limits trade market.
+    confidence: high
+    source: https://www.nba.com/news/pelicans-murray-injury
+  - player_id: trey_murphy_iii
+    name: Trey Murphy III
+    age: 24
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: elite
+      special_traits:
+        - transition_threat
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 4
+      total_value_remaining: 60000000
+      annual_value_current_season: 15000000
+      annual_value_next_season: 15000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.spotrac.com/nba/player/_/id/82184/trey-murphy-iii
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Reports of trade discussions involving Murphy with other playoff teams.
+    team_relationship:
+      tenure_with_team: 3.7
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Drafted 2021; cost-controlled through 2029; elite 3-point shooting makes him foundational.
+    confidence: high
+    source: https://www.nba.com/news/2025-26-season-preview-nop
+  - player_id: herb_jones
+    name: Herb Jones
+    age: 25
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - connector
+      defensive_role: wing_stopper
+      shooting_profile: non_shooter
+      special_traits:
+        - transition_threat
+        - elite_athlete
+    tier: starter
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 20000000
+      annual_value_current_season: 10000000
+      annual_value_next_season: 10000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/82194/herb-jones
+    movement_constraints:
+      status: unlikely
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Public indication from Dumars that Jones is available in trades.
+    team_relationship:
+      tenure_with_team: 3.7
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: 2 years/$20M remaining; defensive specialist role limits offense and trade market appeal but youth and team control retain value.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/82194/herb-jones
+  - player_id: jordan_poole
+    name: Jordan Poole
+    age: 25
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - spacer
+      defensive_role: liability
+      shooting_profile: good
+      special_traits:
+        - iso_creator
+    tier: starter
+    trajectory: declining_peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 66000000
+      annual_value_current_season: 32000000
+      annual_value_next_season: 34000000
+      no_trade_clause: none
+      trade_kicker: unknown
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/31587/jordan-poole
+    movement_constraints:
+      status: shopped
+      reasons:
+        - reason_code: failed_fit
+          weight: high
+        - reason_code: cap_relief_target
+          weight: high
+      falsification_conditions:
+        - Poole inserted into consistent rotation and produces 15+ PPG with positive net rating.
+        - Dumars publicly affirms Poole as core piece of future roster.
+      signal_strength: confirmed_shopped
+    team_relationship:
+      tenure_with_team: 1
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: $32M salary removed from rotation mid-season (March 2026); negative optics limit trade partner interest.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/31587/jordan-poole
+  - player_id: yves_missi
+    name: Yves Missi
+    age: 21
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+          - post_hub
+      defensive_role: rim_protector
+      shooting_profile: non_shooter
+      special_traits:
+        - elite_rebounder
+        - elite_athlete
+    tier: starter
+    trajectory: ascending
+    contract:
+      years_remaining: 4
+      total_value_remaining: 16000000
+      annual_value_current_season: 3600000
+      annual_value_next_season: 4000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: "2027"
+      bird_rights: full
+      contract_through: 2029
+      source: https://www.spotrac.com/nba/player/_/id/31562/yves-missi
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+        - reason_code: homegrown_loyalty
+          weight: medium
+      falsification_conditions:
+        - Significant regression in rebounding or rim protection efficiency over next 18 months.
+    team_relationship:
+      tenure_with_team: 1
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: 2024 lottery pick; cost-controlled rookie deal; elite athleticism and rebounding make him foundational to long-term core.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/31562/yves-missi
+  - player_id: jeremiah_fears
+    name: Jeremiah Fears
+    age: 19
+    position_listed: PG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: lead_guard
+      offensive_role:
+        primary: secondary_creator
+        secondary:
+          - tertiary_scorer
+          - spacer
+      defensive_role: point_of_attack
+      shooting_profile: functional
+      special_traits:
+        - elite_passer
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 4
+      total_value_remaining: 12000000
+      annual_value_current_season: 2000000
+      annual_value_next_season: 2500000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://pelicans.com/news/jeremiah-fears-derik-queen-new-orleans-pelicans-rookies-signed-roster-update-july-5-2025
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Significant regression in efficiency or production trajectory over 2 seasons.
+    team_relationship:
+      tenure_with_team: 0.9
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: 2025 lottery pick (#7); early season performance (15.4 PPG, 3.1 APG, 36.9% 3PT) validated draft capital; ceiling-dependent but central to Dumars' rebuild.
+    confidence: high
+    source: https://www.nba.com/news/jeremiah-fears-derik-queen-pelicans-feature
+  - player_id: derik_queen
+    name: Derik Queen
+    age: 20
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+          - connector
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits:
+        - elite_rebounder
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 4
+      total_value_remaining: 10000000
+      annual_value_current_season: 1900000
+      annual_value_next_season: 2300000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://pelicans.com/news/jeremiah-fears-derik-queen-new-orleans-pelicans-rookies-signed-roster-update-july-5-2025
+    movement_constraints:
+      status: untouchable
+      reasons:
+        - reason_code: young_core_centerpiece
+          weight: high
+      falsification_conditions:
+        - Removal from starting lineup post-Borrego; significant DNP-CDs over extended stretch.
+    team_relationship:
+      tenure_with_team: 0.9
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Acquired via draft-night trade-up (unprotected 2026 first to ATL); inserted into starting lineup post-Borrego hire; versatile offensive toolkit.
+    confidence: high
+    source: https://www.nba.com/news/jeremiah-fears-derik-queen-pelicans-feature
+  - player_id: saddiq_bey
+    name: Saddiq Bey
+    age: 26
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: good
+      special_traits:
+        - transition_threat
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 2
+      total_value_remaining: 12000000
+      annual_value_current_season: 6229755
+      annual_value_next_season: 6533333
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/70661/saddiq-bey
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: positional_redundancy
+          weight: medium
+      falsification_conditions:
+        - Bey signed to 4-year extension at $55-65M range; elevated to core role.
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 0.9
+      homegrown: no
+      contract_leverage:
+        value: medium
+        detail: Acquired in McCollum swap (July 2025); played most of season; extension negotiations reported mid-season.
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/_/id/70661/saddiq-bey
+  - player_id: jordan_hawkins
+    name: Jordan Hawkins
+    age: 23
+    position_listed: SG
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: combo_guard
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+      defensive_role: switchable
+      shooting_profile: good
+      special_traits: []
+    tier: rotation
+    trajectory: peak
+    contract:
+      years_remaining: 3
+      total_value_remaining: 15000000
+      annual_value_current_season: 4741320
+      annual_value_next_season: 5099235
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2028
+      source: https://www.spotrac.com/nba/player/_/id/82208/jordan-hawkins
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions:
+        - Trade reports involving Hawkins.
+    team_relationship:
+      tenure_with_team: 3
+      homegrown: yes
+      contract_leverage:
+        value: medium
+        detail: 2023 first-round pick; cost-controlled through 2028; floor spacing role secured.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/82208/jordan-hawkins
+  - player_id: kevon_looney
+    name: Kevon Looney
+    age: 28
+    position_listed: C
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: connector
+        secondary:
+          - screen_setter
+          - finisher
+      defensive_role: helper
+      shooting_profile: non_shooter
+      special_traits:
+        - vet_leadership
+    tier: fringe
+    trajectory: declining
+    contract:
+      years_remaining: 1
+      total_value_remaining: 8000000
+      annual_value_current_season: 8000000
+      annual_value_next_season: "null"
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: "2027"
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/1626172/kevon-looney
+    movement_constraints:
+      status: available
+      reasons:
+        - reason_code: declining_role
+          weight: high
+      falsification_conditions:
+        - Looney re-inserted into regular rotation (15+ MPG) and performs at >+ net rating.
+      signal_strength: unknown
+    team_relationship:
+      tenure_with_team: 1
+      homegrown: no
+      contract_leverage:
+        value: low
+        detail: Veteran min deal effectively; benched for most of 2025-26 season as Missi/Queen prioritized.
+    confidence: high
+    source: https://www.spotrac.com/nba/player/_/id/1626172/kevon-looney
+  - player_id: karlo_matkovic
+    name: Karlo Matkovic
+    age: 24
+    position_listed: PF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: big
+      offensive_role:
+        primary: finisher
+        secondary:
+          - screen_setter
+      defensive_role: helper
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: rotation
+    trajectory: ascending
+    contract:
+      years_remaining: 1
+      total_value_remaining: 2300000
+      annual_value_current_season: 2300000
+      annual_value_next_season: "null"
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: "2027"
+      bird_rights: full
+      contract_through: 2027
+      source: https://www.spotrac.com/nba/player/_/id/82283/karlo-matkovic
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions: []
+    team_relationship:
+      tenure_with_team: 1.9
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: Second-year big competing with Looney for backup minutes; minimal salary provides optionality for front office.
+    confidence: medium
+    source: https://www.spotrac.com/nba/player/_/id/82283/karlo-matkovic
+  - player_id: micah_peavy
+    name: Micah Peavy
+    age: 19
+    position_listed: SF
+    contract_type: standard
+    availability_status: healthy
+    archetype:
+      physical_position: wing
+      offensive_role:
+        primary: tertiary_scorer
+        secondary:
+          - spacer
+      defensive_role: wing_stopper
+      shooting_profile: functional
+      special_traits:
+        - elite_athlete
+    tier: fringe
+    trajectory: ascending
+    contract:
+      years_remaining: 4
+      total_value_remaining: 8000000
+      annual_value_current_season: 1500000
+      annual_value_next_season: 2000000
+      no_trade_clause: none
+      trade_kicker: none
+      player_option: none
+      team_option: none
+      bird_rights: full
+      contract_through: 2029
+      source: https://pelicans.com/news/jeremiah-fears-derik-queen-new-orleans-pelicans-rookies-signed-roster-update-july-5-2025
+    movement_constraints:
+      status: unlikely
+      reasons: []
+      falsification_conditions: []
+    team_relationship:
+      tenure_with_team: 0.9
+      homegrown: yes
+      contract_leverage:
+        value: high
+        detail: 2025 draft pick (#40); cost-controlled rookie deal; played 330 minutes; developmental prospect.
+    confidence: medium
+    source: https://www.nba.com/news/2025-26-season-preview-nop
+pending_free_agents: []
+known_target_history:
+  - target: Brandon Ingram
+    year: 2025
+    outcome: acquired
+    detail: Traded to Toronto Raptors Feb 2025 in exchange for Bruce Brown, Kelly Olynyk, 2026 first (Indiana), 2031 second. Ingram was not part of 2025-26 roster.
+    source: https://www.nba.com/news/new-orleans-trades-brandon-ingram-to-toronto
+  - target: CJ McCollum
+    year: 2025
+    outcome: redirected
+    detail: Traded to Washington in June 2025 as part of 3-team swap. McCollum was core piece exited in Poole/Bey return.
+    source: https://www.nba.com/news/new-orleans-trades-brandon-ingram-to-toronto
+  - target: Jose Alvarado
+    year: 2026
+    outcome: traded
+    detail: Traded at deadline (Feb 2026) to another team. Was core backup PG; trade signaled shift to younger guards (Fears, Murray development).
+    source: https://www.hoopsrumors.com/2026/01/pelicans-rumors-draft-missi-morant-murray-alvarado-more.html
+  - target: Donovan Mitchell
+    year: 2026
+    outcome: pursued_no_deal
+    detail: Pelicans emerged as potential suitor early 2026 but no credible trade talks. Mitchell stayed with Cleveland.
+    source: https://clutchpoints.com/nba-rumors-pelicans-emerge-as-potential-donovan-mitchell-trade-suitor
+near_term_priorities:
+  - priority: 2026 second-round and undrafted pipeline
+    timeline: this_offseason
+    type: draft
+    detail: New Orleans Pelicans do not own a 2026 first-round pick but hold No. 58 from DET. Use second-round mocks as low-confidence scouting leads rather than strategic posture anchors.
+    confidence: low
+  - priority: Solidify Borrego as permanent HC or conduct full coaching search
+    timeline: this_offseason
+    type: coaching_decision
+    detail: Interim Borrego went 24-46 post-mid-season hire. Dumars must decide permanence vs. open market search.
+    confidence: high
+  - priority: Resolve Zion durability and conditioning commitment
+    timeline: next_season
+    type: structural
+    detail: Zion's 2027-28 guarantee tied to continued game appearances and weight compliance. FO must establish realistic health timeline and extension parameters.
+    confidence: high
+  - priority: Evaluate Dejounte Murray post-Achilles recovery trajectory
+    timeline: this_offseason
+    type: trade
+    detail: Murray was limited to 14 games in 2025-26 post-injury. Front office must assess if he fits 2026-27 timeline or explore trade partners.
+    confidence: high
+  - priority: Explore Jordan Poole trade market to create cap space
+    timeline: by_trade_deadline
+    type: trade
+    detail: Poole removed from rotation mid-March 2026; $32M salary represents largest flexibility lever. FO continues to shop for acceptable return.
+    confidence: high
+  - priority: Accelerate Jeremiah Fears / Derik Queen development and establish their ceiling
+    timeline: this_season
+    type: roster
+    detail: Both 2025 rookies showed promise in Year 1 (Fears 15.4 PPG, Queen entered starting lineup). 2026-27 must establish if either can become co-star alongside Zion.
+    confidence: high
+  - priority: Determine whether to extend Saddiq Bey in $55-65M range
+    timeline: this_offseason
+    type: extension
+    detail: Bey has been positive addition post-trade (6.2M contract); FO exploring 4-year deal to secure depth piece and reduce future free agency uncertainty.
+    confidence: medium
+key_assets:
+  draft_picks_owned:
+    - year: 2026
+      round: 2
+      protections: 2026 No. 58 overall; from DET via NYK, BKN, PHX, ORL, and LAC.
+      source: https://www.nba.com/news/2026-nba-draft-order
+      from_team: DET
+    - year: 2027
+      round: 1
+      protections: unknown
+      source: unknown
+    - year: 2027
+      round: 1
+      from_team: ATL
+      protections: Most favorable of New Orleans and Milwaukee
+      source: https://www.nba.com/news/hawks-trade-murray-to-pelicans
+    - year: 2027
+      round: 1
+      from_team: MIL
+      protections: No protection; if lands top-4, NOP gets pick. If outside top-4, goes to Hawks if Hawks pick better than Pelicans; else to Pelicans.
+      source: https://fansided.com/bucks-draft-picks-every-selection-2025-2026-and-beyond
+    - year: 2031
+      round: 2
+      from_team: TOR
+      protections: none
+      source: https://www.espn.com/nba/story/_/id/43797789/brandon-ingram-agrees-3-year-120m-extension-raptors
+  draft_picks_owed:
+    - year: 2026
+      round: 1
+      to_team: ATL
+      protections: 2026 No. 8 overall; from NOP.
+      source: https://www.nba.com/news/2026-nba-draft-order
+    - year: 2026
+      round: 2
+      to_team: CHI
+      protections: 2026 No. 38 overall; from NOP via BOS, DET, and POR.
+      source: https://www.nba.com/news/2026-nba-draft-order
+  trade_exceptions:
+    - value: 13400000
+      expires: unknown
+      source: https://www.si.com/nba/pelicans/onsi/news/pelicans-2026-salary-cap-tracker-how-much-room-flexibility-have-offseason-01kp3a1jm8hf
+      confidence: medium
+    - value: 4500000
+      expires: unknown
+      source: https://www.si.com/nba/pelicans/onsi/news/pelicans-2026-salary-cap-tracker-how-much-room-flexibility-have-offseason-01kp3a1jm8hf
+      confidence: medium
+team_team_relationships:
+  rivalries:
+    - team_id: MEM
+      type: geographic
+      basis: Southwest division rivals; similar market size and young core competition.
+    - team_id: GSW
+      type: personnel_grudge
+      basis: Willie Green asst. history; Borrego connections to Popovich network (San Antonio).
+  notable_personnel_connections:
+    - person: Joe Dumars
+      connected_team: DET
+      connection_type: former_president
+      detail: Dumars was Pistons president of basketball operations (2000-2014), winning 2004 championship and building multi-year EC Finals contenders.
+    - person: Joe Dumars
+      connected_team: SAC
+      connection_type: former_assistant_gm
+      detail: Dumars spent 3 years with Sacramento Kings front office (2019-2022) before NBA league office role.
+    - person: James Borrego
+      connected_team: SAS
+      connection_type: former_assistant
+      detail: Borrego was assistant under Gregg Popovich; won 2 championships; core of Popovich coaching tree.
+    - person: James Borrego
+      connected_team: CHA
+      connection_type: former_head_coach
+      detail: Borrego was Charlotte Hornets HC prior to Pelicans interim role; no connection to current Hornets FO.
+g_league_and_stash:
+  affiliate_team: unknown
+  notable_affiliate_players: []
+  international_stash: []
+narrative_summary:
+  one_paragraph: "The New Orleans Pelicans completed a historically disastrous 2025-26 season (26-56, 11th West, missed playoffs for third straight year) that culminated in the firing of Willie Green and promotion of James Borrego to interim head coach in November 2025. New basketball operations chief Joe Dumars, hired in April 2025 from the NBA league office, orchestrated a youth-first rebuild, acquiring high-upside guards in the 2025 draft (Jeremiah Fears #7, Derik Queen #13 via trade-up), while shedding veteran complementary pieces (Brandon Ingram to TOR, CJ McCollum to WAS, Jose Alvarado at deadline). Zion Williamson remains the franchise cornerstone at 25, but his durability and conditioning-based guarantees create uncertainty; Dejounte Murray's Achilles injury (January 2026) severely limited impact in Year 1 of his acquisition. The core now centers on three promising rookies (Fears, Queen, Micah Peavy), young wings with shooting upside (Trey Murphy, Herb Jones, Saddiq Bey), and lottery-pick center Yves Missi. Jordan Poole, acquired in the McCollum swap, was removed from the rotation mid-season due to failed fit, creating a significant trade asset to explore for cap relief. The 2026 offseason will define the franchise: decisions on Borrego's permanent status, Murray's future, Poole's tradability, and whether Fears/Queen can develop into legitimate co-stars alongside Zion."
+  three_things_to_watch:
+    - "2026 second-round board: official assets No. 58 from DET; use mocked second-round names as low-confidence depth or rights leads, not rotation assumptions."
+    - "Jeremiah Fears / Derik Queen ceiling: Do either 2025 rookies emerge as a bonafide star-level player within 18 months to accelerate the rebuild timeline?"
+    - "Zion durability and commitment: Can Williamson remain healthy 60+ games and comply with conditioning clauses, or will injury uncertainty force a franchise pivot?"
+    - "Post-Achilles Dejounte Murray: Will medical clearance and on-court productivity justify keeping $30M/year guard, or does Dumars pivot to trade him and reallocate salary?"
+sources_used:
+  - https://www.nba.com/news/pelicans-name-joe-dumars-executive-vp-basketball-operations
+  - https://www.nba.com/news/pelicans-willie-green-out-as-head-coach
+  - https://www.nba.com/news/2025-26-season-preview-nop
+  - https://www.nba.com/news/jeremiah-fears-derik-queen-pelicans-feature
+  - https://www.spotrac.com/nba/new-orleans-pelicans/cap
+  - https://www.spotrac.com/nba/player/_/id/31558/zion-williamson
+  - https://www.spotrac.com/nba/player/_/id/31587/jordan-poole
+  - https://www.spotrac.com/nba/player/_/id/82184/trey-murphy-iii
+  - https://www.spotrac.com/nba/player/_/id/82194/herb-jones
+  - https://www.basketball-reference.com/teams/NOP/2026.html
+  - https://www.cbssports.com/nba/players/2203544/dejounte-murray/
+  - https://www.cbssports.com/nba/news/pelicans-fire-willie-green-new-orleans-coach/
+  - https://www.nola.com/sports/pelicans/whats-next-for-pelicans-in-year-2-of-joe-dumars-era/article_6008041d-c39e-426c-b42d-07368e878f95.html
+  - https://www.neworleanssaints.com/team/front-office-roster/gayle-benson
+  - https://www.nba.com/news/new-orleans-trades-brandon-ingram-to-toronto
+  - https://www.hoopsrumors.com/2026/01/pelicans-rumors-draft-missi-morant-murray-alvarado-more.html
+  - https://www.si.com/nba/pelicans/onsi/news/pelicans-2026-salary-cap-tracker-how-much-room-flexibility-have-offseason-01kp3a1jm8hf
+  - https://clutchpoints.com/nba-rumors-pelicans-emerge-as-potential-donovan-mitchell-trade-suitor
+  - https://pelicans.com/news/jeremiah-fears-derik-queen-new-orleans-pelicans-rookies-signed-roster-update-july-5-2025
+  - https://www.nba.com/news/2026-nba-draft-order
+  - https://www.nba.com/news/2026-nba-draft-lottery-result
+  - https://www.nba.com/news/2026-nba-draft-class-high-expectations-after-lottery
+  - https://www.nba.com/news/the-athletic-in-post-lottery-mock-draft-aj-dybantsa-to-wizards-darryn-peterson-to-jazz
+  - https://new.cbssports.com/nba/news/nba-mock-draft-2026-lottery-aj-dybantsa-darryn-peterson-cameron-boozer/
+fields_marked_unknown:
+  - general_manager (name, tenure, prior stops, philosophy)
+  - assistant_coaches_notable (full list not available from sources)
+  - notable_advisors_or_consultants
+  - Borrego contract_through status (2026 offseason decision pending)
+  - multiple player trade_kicker values (confirmed 'none' or exact amounts not available)
+  - key_assets.draft_picks_owned 2027 protections
+  - key_assets.draft_picks_owed protections details
+  - g_league_and_stash affiliate_team, players, international stash (not researched)
+  - multiple player archetype secondary offensive roles (inferred from limited 2025-26 season data)
+vocabulary_flags:
+  - "Borrego interim status: YAML uses 'contract_through: pending 2026 offseason decision' as non-standard string; prefer future update with binary decision (hired permanently or departed)."
+  - "Looney and Matkovic: Listed as 'standard' contract type with 'team_option' for 2027, though technically they are team-option eligible free agents (not yet exercised/declined as of May 2, 2026). Treated as roster-incumbent pending option decisions."
+  - "Dejounte Murray availability: Marked 'available' based on failed fit (14 games played) and injury recovery uncertainty, but no confirmed FO shopping reported. Signal_strength marked 'widely_reported' reflects general expectation of availability rather than explicit team statements."
