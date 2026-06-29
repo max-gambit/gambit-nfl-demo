@@ -16,8 +16,10 @@ import type { CurrentCapSheetViewRow } from '../nba_cap_sheets/seed.js';
 import type { CurrentPlayerStatViewRow } from '../nba_player_stats/seed.js';
 import type { CurrentRosterViewRow } from '../nba_rosters/seed.js';
 import { defaultNbaEvidenceTeamId } from './nba_evidence.js';
-import { loadNflDemoSeed, nflTeamDetail, type NflDemoSeed } from '../nfl_data/seed.js';
+import { buildNflTradeGoalScreen } from './nfl_evidence.js';
+import { loadCurrentNflData, nflTeamDetail, type NflDemoSeed } from '../nfl_data/seed.js';
 import { loadNflRulesCorpus } from '../nfl_rules/seed.js';
+import { buildNflCoverageMatrix } from '../nfl_coverage/index.js';
 
 const MAX_TOOL_ROUNDS = 6;
 const DEFAULT_LIMIT = 40;
@@ -37,16 +39,22 @@ Output requirements:
 - Use tables when the answer compares players, teams, salaries, or stats.
 - Cite source refs in findings, tables, and calculations.
 - State missing/stale data plainly. Current app datasets are snapshots, not live feeds.
+- For NFL roster, cap, contract, position-group, audit, restructure, cut, tag, extension, or trade questions, query query_nfl_data with at least rosters, cap_sheets, and coverage before final analysis. Treat nfl_rosters_current and nfl_cap_sheets_current as authoritative over NFL Intel/context graph roster snippets for roster counts, cap completeness, player-team membership, and position-group cap claims.
+- Treat nfl_coverage_current as the readiness boundary for answer strength. Strong supports a firm claim; directional requires a caveat; weak/blocked requires limiting or refusing the unsupported part instead of filling gaps with prose.
+- NFL cap_sheets rows expose contract fields including contract_years_remaining, contract_end_year, void_year_count/status, dead/cut, post-June-1 cut/trade, trade, restructure, extension, and confidence. Do not caveat that contract years, guarantees, dead money, or post-June fields are "not exposed" when those fields are present; cite row confidence in tables or source notes instead.
+- Do not say the Giants have only 4 rostered players or that a Giants cap audit is blocked on ingestion when the current roster and cap files cover the same team population. Rows needing source review are caveats, not a full-audit blocker.
+- In the visible answer, translate internal data-quality labels into front-office language. Avoid product/schema phrasing like "Contract Ledger v1", "captured-confidence", "captured rows", "derived rows", "estimated rows", "source-needed cap row", "row parity", "app rows", or "source status" in the lead paragraph. Prefer "priced in the current cap file", "high confidence", "directional", "needs source review", or "one unpriced row"; mention these qualifications only where they change a recommendation.
+- For NFL trade-goal prompts, include trade_screen. Before recommending a trade, run four checks: depth after the outgoing player leaves, lower-pain outgoing hierarchy before premium starters, seller-thesis cards from the current cap file plus counterparty Intel, and clean caveat logic for negative trade economics. Lead only with target_lanes recommended_action=call_now or check_call; frame monitor as a watch lane, posture_change_only as high-impact/low-probability, and do_not_lead as a lane to reject unless a new seller signal appears. Do not recite internal motivation_tier labels in visible prose.
 - When the question or answer involves NFL rules mechanics, name the specific rule family. Prefer the loaded NFL rule rows returned by query_nfl_data and caveat missing full-corpus coverage.
 - Keep the tone tight, expert, and data-driven.
 - Submit the final analysis by calling submit_data_analysis exactly once.`;
 
 export const DATA_ANALYST_CHAT_SYSTEM = `You are the Gambit Data Analyst answering follow-up questions inside an existing analyst thread.
 
-Use read-only app data tools whenever the user asks for fresh numbers, rankings, comparisons, tables, or source-backed checks. This local setup is the New York Giants NFL demo POV for NFL questions; omitted NFL team scope defaults to NYG. Do not write SQL. Do not invent data. Lead with the answer, then show the relevant evidence and caveats in concise prose.`;
+Use read-only app data tools whenever the user asks for fresh numbers, rankings, comparisons, tables, or source-backed checks. This local setup is the New York Giants NFL demo POV for NFL questions; omitted NFL team scope defaults to NYG. Do not write SQL. Do not invent data. Lead with the answer, then show the relevant evidence and caveats in concise prose. Translate internal data-quality labels into normal front-office language; reserve schema/product labels for tables or source metadata.`;
 
 type NbaDatasetKey = 'rosters' | 'cap_sheets' | 'player_stats' | 'context_graph' | 'cba_articles';
-type NflDatasetKey = 'rosters' | 'cap_sheets' | 'player_metrics' | 'context_graph' | 'rules';
+type NflDatasetKey = 'rosters' | 'cap_sheets' | 'player_metrics' | 'coverage' | 'context_graph' | 'rules' | 'trade_screen';
 type DataAnalystToolName = 'list_available_datasets' | 'query_nba_data' | 'query_nfl_data' | 'query_brief_workspace';
 
 interface DataAnalystToolResult {
@@ -108,7 +116,7 @@ export const queryNbaDataTool: Anthropic.Tool = {
 export const queryNflDataTool: Anthropic.Tool = {
   name: 'query_nfl_data',
   description:
-    'Read bounded NFL demo app datasets for team/player cap, roster, metrics, Intel, and rules analysis. Use standard NFL team_ids such as NYG, DAL, PHI. If team_ids are omitted, this local setup defaults to NYG.',
+    'Read bounded NFL demo app datasets for team/player cap, roster, metrics, coverage readiness, Intel, and rules analysis. Use standard NFL team_ids such as NYG, DAL, PHI. If team_ids are omitted, this local setup defaults to NYG.',
   input_schema: {
     type: 'object',
     properties: {
@@ -126,15 +134,19 @@ export const queryNflDataTool: Anthropic.Tool = {
       },
       datasets: {
         type: 'array',
-        description: 'Datasets to query. Defaults to roster/cap/metric/context/rules data.',
-        items: { type: 'string', enum: ['rosters', 'cap_sheets', 'player_metrics', 'context_graph', 'rules'] },
-        maxItems: 5,
+        description: 'Datasets to query. Defaults to roster/cap/metric/coverage/context/rules data. Include trade_screen for trade-goal prompts that need outgoing hierarchy, depth checks, and target lanes.',
+        items: { type: 'string', enum: ['rosters', 'cap_sheets', 'player_metrics', 'coverage', 'context_graph', 'rules', 'trade_screen'] },
+        maxItems: 7,
       },
       limit: {
         type: 'integer',
         minimum: 1,
         maximum: MAX_LIMIT,
         description: 'Maximum rows per dataset returned to the model.',
+      },
+      trade_goal: {
+        type: 'string',
+        description: 'Optional natural-language trade objective. Use with trade_screen so the screen can protect target position groups and 2027 cap guardrails.',
       },
     },
   },
@@ -174,7 +186,7 @@ export const submitDataAnalysisTool: Anthropic.Tool = {
     properties: {
       answer: {
         type: 'string',
-        description: 'Direct answer first. One concise paragraph.',
+        description: 'Direct answer first. One concise paragraph. Use front-office language, not implementation/meta language; avoid product/schema labels unless the user asks for data QA.',
       },
       key_findings: {
         type: 'array',
@@ -602,12 +614,13 @@ async function listAvailableDatasetsResult(): Promise<DataAnalystToolResult> {
 
 async function nflStaticCatalogEntries(): Promise<Array<DataAnalystTraceDataset | { scope: string; error: string }>> {
   try {
-    const seed = await loadNflDemoSeed();
+    const seed = await loadCurrentNflData();
     const teamIds = seed.teams.map((team) => team.team_id);
     return [
       nflDatasetTrace('nfl_rosters_current', 'NFL offseason rosters', seed, teamIds, seed.roster_entries.length),
       nflDatasetTrace('nfl_cap_sheets_current', 'NFL cap and contract rows', seed, teamIds, seed.cap_rows.length),
       nflDatasetTrace('nfl_player_metrics_current', 'NFL player metrics', seed, teamIds, seed.player_metrics.length),
+      await nflCoverageCatalogEntry(),
     ];
   } catch (error) {
     return [{ scope: 'nfl_static_catalog', error: error instanceof Error ? error.message : String(error) }];
@@ -617,11 +630,12 @@ async function nflStaticCatalogEntries(): Promise<Array<DataAnalystTraceDataset 
 async function queryNflDataResult(input: unknown): Promise<DataAnalystToolResult> {
   const result = emptyResult('query_nfl_data');
   const body = objectInput(input);
-  const seed = await loadNflDemoSeed();
+  const seed = await loadCurrentNflData();
   const requestedDatasets = parseNflDatasets(body.datasets);
   const limit = clampLimit(numberInput(body.limit) ?? DEFAULT_LIMIT);
   const teamIds = resolveNflTeamIds(body.team_ids, seed, result);
   const playerNames = stringArrayInput(body.player_names).map((name) => name.toLowerCase());
+  const tradeGoal = typeof body.trade_goal === 'string' ? body.trade_goal : '';
 
   if (requestedDatasets.includes('rosters')) {
     const rows = filterNflPlayers(seed.roster_entries.filter((row) => teamIds.includes(row.team_id)), playerNames).slice(0, limit);
@@ -629,7 +643,9 @@ async function queryNflDataResult(input: unknown): Promise<DataAnalystToolResult
     result.datasets.push(nflDatasetTrace('nfl_rosters_current', 'NFL offseason rosters', seed, teamIds, rows.length));
   }
   if (requestedDatasets.includes('cap_sheets')) {
-    const rows = filterNflPlayers(seed.cap_rows.filter((row) => teamIds.includes(row.team_id)), playerNames).slice(0, limit);
+    const rows = sortNflCapRows(
+      filterNflPlayers(seed.cap_rows.filter((row) => teamIds.includes(row.team_id)), playerNames),
+    ).slice(0, limit);
     result.data.cap_sheets = { rows };
     result.datasets.push(nflDatasetTrace('nfl_cap_sheets_current', 'NFL cap and contract rows', seed, teamIds, rows.length));
   }
@@ -637,6 +653,25 @@ async function queryNflDataResult(input: unknown): Promise<DataAnalystToolResult
     const rows = filterNflPlayers(seed.player_metrics.filter((row) => teamIds.includes(row.team_id)), playerNames).slice(0, limit);
     result.data.player_metrics = { rows };
     result.datasets.push(nflDatasetTrace('nfl_player_metrics_current', 'NFL player metrics', seed, teamIds, rows.length));
+  }
+  if (requestedDatasets.includes('coverage')) {
+    const matrix = await buildNflCoverageMatrix();
+    const teams = matrix.teams.filter((team) => teamIds.includes(team.team_id));
+    result.data.coverage = {
+      source_mode: matrix.source_mode,
+      fallback_reason: matrix.fallback_reason,
+      league: matrix.league,
+      rules: matrix.rules,
+      teams,
+    };
+    result.datasets.push({
+      dataset_id: 'nfl_coverage_current',
+      label: 'NFL coverage matrix',
+      source_name: 'Gambit NFL Coverage Matrix',
+      as_of_date: matrix.snapshot.as_of_date,
+      team_ids: teams.map((team) => team.team_id),
+      row_count: teams.length,
+    });
   }
   if (requestedDatasets.includes('context_graph')) {
     const teams = [];
@@ -665,6 +700,30 @@ async function queryNflDataResult(input: unknown): Promise<DataAnalystToolResult
       as_of_date: rulesCorpus.as_of_date,
       team_ids: teamIds,
       row_count: rules.length,
+    });
+  }
+  if (requestedDatasets.includes('trade_screen')) {
+    const screens = (await Promise.all(teamIds.map((teamId) => buildNflTradeGoalScreen(seed, teamId, tradeGoal))))
+      .filter((screen): screen is NonNullable<typeof screen> => Boolean(screen));
+    result.data.trade_screen = { screens };
+    const counterpartyIntelTeamIds = screens
+      .flatMap((screen) => screen.counterparty_intel_team_ids)
+      .filter((teamId, index, arr) => arr.indexOf(teamId) === index);
+    result.datasets.push({
+      dataset_id: 'nfl_trade_screen_current',
+      label: 'NFL trade-goal screen',
+      source_name: seed.source_name,
+      as_of_date: seed.as_of_date,
+      team_ids: screens.map((screen) => screen.subject_team_id),
+      row_count: screens.reduce((total, screen) => total + screen.row_count, 0),
+    });
+    result.datasets.push({
+      dataset_id: 'nfl_context_graph',
+      label: 'NFL counterparty Intel',
+      source_name: 'Gambit Intel',
+      as_of_date: seed.as_of_date,
+      team_ids: counterpartyIntelTeamIds,
+      row_count: counterpartyIntelTeamIds.length,
     });
   }
 
@@ -837,7 +896,7 @@ async function contextGraphCatalogEntry(): Promise<DataAnalystTraceDataset | { s
 
 async function nflDemoCatalogEntry(): Promise<DataAnalystTraceDataset | { scope: string; error: string }> {
   try {
-    const seed = await loadNflDemoSeed();
+    const seed = await loadCurrentNflData();
     return {
       dataset_id: 'nfl_demo_static',
       label: 'NFL static demo data',
@@ -848,6 +907,22 @@ async function nflDemoCatalogEntry(): Promise<DataAnalystTraceDataset | { scope:
     };
   } catch (error) {
     return { scope: 'nfl_demo_static', error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+async function nflCoverageCatalogEntry(): Promise<DataAnalystTraceDataset | { scope: string; error: string }> {
+  try {
+    const matrix = await buildNflCoverageMatrix();
+    return {
+      dataset_id: 'nfl_coverage_current',
+      label: 'NFL coverage matrix',
+      source_name: 'Gambit NFL Coverage Matrix',
+      as_of_date: matrix.snapshot.as_of_date,
+      team_ids: matrix.teams.map((team) => team.team_id),
+      row_count: matrix.teams.length,
+    };
+  } catch (error) {
+    return { scope: 'nfl_coverage_current', error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -985,11 +1060,11 @@ function parseNbaDatasets(value: unknown): NbaDatasetKey[] {
 }
 
 function parseNflDatasets(value: unknown): NflDatasetKey[] {
-  const allowed = new Set<NflDatasetKey>(['rosters', 'cap_sheets', 'player_metrics', 'context_graph', 'rules']);
+  const allowed = new Set<NflDatasetKey>(['rosters', 'cap_sheets', 'player_metrics', 'coverage', 'context_graph', 'rules', 'trade_screen']);
   const parsed = Array.isArray(value)
     ? value.filter((item): item is NflDatasetKey => typeof item === 'string' && allowed.has(item as NflDatasetKey))
     : [];
-  return parsed.length ? parsed : ['rosters', 'cap_sheets', 'player_metrics', 'context_graph', 'rules'];
+  return parsed.length ? parsed : ['rosters', 'cap_sheets', 'player_metrics', 'coverage', 'context_graph', 'rules'];
 }
 
 function parseWorkspaceIncludes(value: unknown): ('sources' | 'options' | 'chat_turns')[] {
@@ -1047,6 +1122,14 @@ function filterRosterByPlayerNames(rows: CurrentRosterViewRow[], playerNames: st
 function filterNflPlayers<T extends { player_name: string }>(rows: T[], playerNames: string[]): T[] {
   if (playerNames.length === 0) return rows;
   return rows.filter((row) => playerNames.some((name) => row.player_name.toLowerCase().includes(name)));
+}
+
+function sortNflCapRows<T extends { team_id: string; cap_number_2026: number | null; source_order?: number }>(rows: T[]): T[] {
+  return rows.slice().sort((a, b) => (
+    (b.cap_number_2026 ?? -1) - (a.cap_number_2026 ?? -1)
+    || a.team_id.localeCompare(b.team_id)
+    || (a.source_order ?? 9999) - (b.source_order ?? 9999)
+  ));
 }
 
 function resolveNflTeamIds(value: unknown, seed: NflDemoSeed, result?: DataAnalystToolResult): string[] {

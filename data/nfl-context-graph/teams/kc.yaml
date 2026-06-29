@@ -102,6 +102,48 @@ trade_dna:
       counterparties: [DEN]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: buyer_hold
+    confidence: high
+    evidence: Kansas City should be treated as a hold/buyer on premium players; positive trade room alone is not enough to infer availability from a contender core.
+    source: https://overthecap.com/salary-cap/chiefs
+  position_group_stance:
+    - group: CB
+      stance: Kristian Fulton is a monitor-only one-year corner lane; Kansas City loses playable secondary depth and has no reason to sell cheaply from a contender posture.
+      core_players: [Trent McDuffie]
+      movable_players: [Kristian Fulton]
+      seller_depth_notes: Fulton has clean-looking 2026 trade room, but the seller case depends on secondary depth and whether the Chiefs prefer a pick over veteran coverage depth.
+      sell_threshold: Check only if Kansas City has surplus corner depth or a specific cap/draft reason to move a one-year veteran.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/chiefs
+  market_preferences:
+    desired_return_types:
+      - Deals that preserve the championship window
+      - Premium draft capital for any useful veteran starter
+    avoided_deal_types:
+      - Selling core pass rush, quarterback protection, or coverage pieces below football value
+      - Taking back future salary in a depth trade
+    division_rivalry_friction: No division issue with NYG; contender posture still raises the sell threshold.
+    confidence: high
+    source: https://www.nfl.com/teams/chiefs/roster
+  trade_triggers:
+    - trigger: Kansas City establishes surplus at corner and needs room or draft value more than veteran depth.
+      implication: Fulton moves from monitor to check-call.
+      confidence: medium
+      source: https://www.nfl.com/teams/chiefs/roster
+  availability_validation:
+    - check: Confirm corner depth and whether Fulton is a weekly coverage piece.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/chiefs/roster
+    - check: Confirm one-year acquisition terms and no 2027 salary component.
+      owner: cap
+      source: https://overthecap.com/salary-cap/chiefs
+  no_trade_guardrails:
+    - guardrail: Do not infer a Chiefs seller lane from cap savings alone; championship-window teams require a real surplus or compensation trigger.
+      confidence: high
+      source: https://overthecap.com/salary-cap/chiefs
+
 cultural_signals:
   stability:
     value: medium

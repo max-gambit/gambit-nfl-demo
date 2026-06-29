@@ -745,6 +745,13 @@ export type ContextGraphStability = 'high' | 'medium' | 'low';
 export type ContextGraphPlayerFriendly = 'yes' | 'mixed' | 'no';
 export type ContextGraphAnalyticsOrientation = 'heavy' | 'balanced' | 'traditional' | 'unknown';
 export type ContextGraphRiskTolerance = 'aggressive' | 'moderate' | 'conservative';
+export type ContextGraphSellerPosture =
+  | 'buyer_hold'
+  | 'selective_seller'
+  | 'asset_accumulator'
+  | 'cap_seller'
+  | 'posture_change_only'
+  | 'unknown';
 export type ContextGraphRivalryType =
   | 'competitive_recent'
   | 'competitive_historical'
@@ -789,6 +796,60 @@ export interface ContextGraphPersonnelConnectionNote {
   connected_team: string;
   connection_type: string;
   detail: string;
+}
+
+export interface ContextGraphSellerPostureSignal {
+  value: ContextGraphSellerPosture | string;
+  confidence: ContextGraphConfidence | string;
+  evidence: string;
+  source: string;
+}
+
+export interface ContextGraphPositionGroupStance {
+  group: string;
+  stance: string;
+  core_players: string[];
+  movable_players: string[];
+  seller_depth_notes: string;
+  sell_threshold: string;
+  confidence: ContextGraphConfidence | string;
+  source: string;
+}
+
+export interface ContextGraphMarketPreferences {
+  desired_return_types: string[];
+  avoided_deal_types: string[];
+  division_rivalry_friction: string;
+  confidence: ContextGraphConfidence | string;
+  source: string;
+}
+
+export interface ContextGraphTradeTrigger {
+  trigger: string;
+  implication: string;
+  confidence: ContextGraphConfidence | string;
+  source: string;
+}
+
+export interface ContextGraphAvailabilityValidation {
+  check: string;
+  owner: string;
+  source: string;
+}
+
+export interface ContextGraphNoTradeGuardrail {
+  guardrail: string;
+  confidence: ContextGraphConfidence | string;
+  source: string;
+}
+
+export interface ContextGraphTradeMarketIntel {
+  seller_posture: ContextGraphSellerPostureSignal;
+  position_group_stance: ContextGraphPositionGroupStance[];
+  market_preferences: ContextGraphMarketPreferences;
+  trade_triggers: ContextGraphTradeTrigger[];
+  availability_validation: ContextGraphAvailabilityValidation[];
+  no_trade_guardrails: ContextGraphNoTradeGuardrail[];
 }
 
 export type ContextGraphOnboardingStatus = 'not_started' | 'in_progress' | 'completed';
@@ -986,6 +1047,7 @@ export interface TeamContextPreferenceValues {
     rivalries: ContextGraphRivalryNote[];
     notable_personnel_connections: ContextGraphPersonnelConnectionNote[];
   };
+  trade_market_intel?: ContextGraphTradeMarketIntel;
   onboarding_profile: ContextGraphOnboardingProfile;
 }
 
@@ -1197,6 +1259,7 @@ export interface ContextGraphPreferenceVocab {
   analytics_orientation: string[];
   risk_tolerance: string[];
   rivalry_type: string[];
+  seller_posture: string[];
 }
 
 export interface ListContextGraphPreferencesResponse {
@@ -1714,6 +1777,11 @@ export interface NflRosterEntry {
   source_order: number;
   source_url: string | null;
   source_note: string;
+  jersey_number?: string | null;
+  height_inches?: number | null;
+  weight_lbs?: number | null;
+  experience?: string | null;
+  college?: string | null;
 }
 
 export interface NflCapRow {
@@ -1725,14 +1793,30 @@ export interface NflCapRow {
   cash_due_2026: number | null;
   total_value_remaining: number | null;
   years_remaining: number | null;
+  contract_end_year: number | null;
+  contract_years_remaining: number | null;
+  void_year_count: number | null;
+  void_years_source_status: string;
   guaranteed_remaining: number | null;
   dead_money_if_cut_2026: number | null;
   cut_savings_2026: number | null;
+  post_june_1_dead_money_2026: number | null;
+  post_june_1_cut_savings_2026: number | null;
+  trade_dead_money_2026: number | null;
+  trade_savings_2026: number | null;
+  post_june_1_trade_dead_money_2026: number | null;
+  post_june_1_trade_savings_2026: number | null;
   restructure_savings_estimate_2026: number | null;
+  extension_savings_estimate_2026: number | null;
+  contract_ledger_status: string;
+  contract_ledger_confidence: string;
   tag_eligible_2027: boolean;
   contract_lever: string;
   source_url: string | null;
   source_status: string;
+  source_order?: number;
+  source_note?: string;
+  source_data?: Record<string, unknown>;
 }
 
 export interface NflPlayerMetricRow {
@@ -1741,12 +1825,29 @@ export interface NflPlayerMetricRow {
   player_name: string;
   position: string | null;
   snaps_2025: number | null;
+  offense_snaps_2025?: number | null;
+  defense_snaps_2025?: number | null;
+  special_teams_snaps_2025?: number | null;
+  snap_share_2025?: number | null;
   games_2025: number | null;
+  starts_2025?: number | null;
+  passing_yards_2025?: number | null;
+  rushing_yards_2025?: number | null;
+  receiving_yards_2025?: number | null;
+  scrimmage_yards_2025?: number | null;
+  tackles_2025?: number | null;
+  sacks_2025?: number | null;
+  interceptions_2025?: number | null;
+  touchdowns_2025?: number | null;
   availability_risk: string;
   role: string;
   value_tier: string;
   metric_note: string;
+  metric_source_family?: string | null;
+  metric_gap_reason?: string | null;
   source_url: string | null;
+  source_status?: string;
+  source_data?: Record<string, unknown>;
 }
 
 export interface NflSourceRef {
@@ -1762,12 +1863,14 @@ export interface NflDemoTotals {
   roster_row_count: number;
   cap_row_count: number;
   player_metric_row_count: number;
+  source_needed_cap_row_count?: number;
 }
 
 export interface NflTeamListRow extends NflDemoTeam {
   roster_count: number;
   cap_row_count: number;
   player_metric_row_count: number;
+  source_needed_cap_row_count?: number;
 }
 
 export interface ListCurrentNflDemoResponse {
@@ -1775,6 +1878,8 @@ export interface ListCurrentNflDemoResponse {
   teams: NflTeamListRow[];
   totals: NflDemoTotals;
   rows: NflRosterEntry[] | NflCapRow[] | NflPlayerMetricRow[];
+  source_mode?: NflCoverageSourceMode;
+  fallback_reason?: string | null;
 }
 
 export interface GetCurrentNflTeamResponse {
@@ -1785,6 +1890,8 @@ export interface GetCurrentNflTeamResponse {
   player_metrics: NflPlayerMetricRow[];
   source_refs: NflSourceRef[];
   notes: string[];
+  source_mode?: NflCoverageSourceMode;
+  fallback_reason?: string | null;
 }
 
 export interface GetCurrentNflPlayerMetricsTeamResponse {
@@ -1793,6 +1900,126 @@ export interface GetCurrentNflPlayerMetricsTeamResponse {
   rows: NflPlayerMetricRow[];
   source_refs: NflSourceRef[];
   notes: string[];
+  source_mode?: NflCoverageSourceMode;
+  fallback_reason?: string | null;
+}
+
+// ── NFL coverage matrix ─────────────────────────────────────────────────────
+export type NflCoverageStatus = 'strong' | 'directional' | 'weak' | 'blocked';
+export type NflCoverageDomain = 'roster' | 'cap_contracts' | 'player_metrics' | 'rules' | 'intel' | 'seller_thesis';
+export type NflCoverageReadinessKey =
+  | 'roster_cap_audit'
+  | 'cut_restructure'
+  | 'trade_outgoing'
+  | 'seller_trade'
+  | 'player_quality'
+  | 'rules_question';
+export type NflCoverageSourceMode = 'supabase_current_views' | 'checked_in_snapshot' | 'checked_in_snapshot_fallback';
+
+export interface NflCoverageGap {
+  key: string;
+  label: string;
+  severity: NflCoverageStatus;
+  detail: string;
+  affected_count?: number;
+  affected_players?: string[];
+}
+
+export interface NflCoverageSourceRef {
+  id: string;
+  name: string;
+  url: string | null;
+  source_type: 'app_data' | 'rules' | 'context_graph' | 'fallback' | 'derived';
+  as_of_date: string | null;
+  notes: string[];
+}
+
+export interface NflCoverageDomainSummary {
+  domain: NflCoverageDomain;
+  status: NflCoverageStatus;
+  score: number;
+  label: string;
+  detail: string;
+  row_count: number;
+  source_needed_count: number;
+  gaps: NflCoverageGap[];
+}
+
+export interface NflCoveragePositionGroupSummary {
+  group: string;
+  status: NflCoverageStatus;
+  roster_count: number;
+  cap_row_count: number;
+  player_metric_row_count: number;
+  total_cap_number_2026: number;
+  source_needed_cap_count: number;
+  contract_field_count: number;
+  contract_field_total: number;
+  metric_source_status: 'captured' | 'roster-derived' | 'source-needed' | 'mixed' | 'missing';
+  seller_thesis_status: NflCoverageStatus;
+  top_gaps: NflCoverageGap[];
+}
+
+export interface NflCoverageQuestionReadiness {
+  key: NflCoverageReadinessKey;
+  status: NflCoverageStatus;
+  label: string;
+  detail: string;
+  required_domains: NflCoverageDomain[];
+  gaps: NflCoverageGap[];
+}
+
+export interface NflCoverageTeamRow extends NflDemoTeam {
+  status: NflCoverageStatus;
+  roster_count: number;
+  cap_row_count: number;
+  player_metric_row_count: number;
+  source_needed_cap_row_count: number;
+  contract_field_coverage: {
+    rows_with_years: number;
+    rows_with_dead_cut: number;
+    rows_with_post_june: number;
+    rows_with_trade: number;
+    total_player_cap_rows: number;
+  };
+  domains: NflCoverageDomainSummary[];
+  position_groups: NflCoveragePositionGroupSummary[];
+  readiness: NflCoverageQuestionReadiness[];
+  top_gaps: NflCoverageGap[];
+  graph_roster_count: number;
+  trade_market_intel_group_count: number;
+}
+
+export interface NflCoverageMatrixResponse {
+  snapshot: NflDemoSnapshot;
+  source_mode: NflCoverageSourceMode;
+  fallback_reason: string | null;
+  generated_at: string;
+  league: {
+    status: NflCoverageStatus;
+    team_count: number;
+    roster_row_count: number;
+    cap_row_count: number;
+    player_metric_row_count: number;
+    source_needed_cap_row_count: number;
+    contract_field_coverage: {
+      rows_with_years: number;
+      rows_with_dead_cut: number;
+      rows_with_post_june: number;
+      rows_with_trade: number;
+      total_player_cap_rows: number;
+    };
+    rules_status: NflCoverageStatus;
+    intel_status: NflCoverageStatus;
+    seller_thesis_team_count: number;
+  };
+  teams: NflCoverageTeamRow[];
+  rules: NflCoverageDomainSummary;
+  sources: NflCoverageSourceRef[];
+}
+
+export interface GetCurrentNflCoverageTeamResponse extends NflCoverageMatrixResponse {
+  team: NflCoverageTeamRow | null;
 }
 
 // ── CBA reference corpus ────────────────────────────────────────────────────

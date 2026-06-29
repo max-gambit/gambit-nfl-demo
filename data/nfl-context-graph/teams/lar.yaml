@@ -102,6 +102,48 @@ trade_dna:
       counterparties: [SF]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: selective_seller
+    confidence: medium
+    evidence: The Rams have multiple expensive veteran one-year levers, but a normal buyer posture means only non-core or surplus veterans should be treated as check-call lanes.
+    source: https://overthecap.com/salary-cap/rams
+  position_group_stance:
+    - group: WR
+      stance: Davante Adams is a high-impact but price-sensitive one-year call because the buyer gets 2026 production without 2027 salary, while Los Angeles loses a top passing-game piece.
+      core_players: [Puka Nacua]
+      movable_players: [Davante Adams]
+      seller_depth_notes: The sell case depends on whether the Rams prefer draft value and cap room over carrying an expensive veteran receiver for a run.
+      sell_threshold: Treat as monitor or check-call only if Los Angeles signals that a premium pick return matters more than the short-term receiver role.
+      confidence: high
+      source: https://overthecap.com/salary-cap/rams
+  market_preferences:
+    desired_return_types:
+      - Premium or conditional draft capital for a one-year veteran starter
+      - Deals that clear current-year salary without adding future guarantees
+    avoided_deal_types:
+      - Selling a top offensive weapon cheaply during a competitive window
+      - Veteran-for-veteran swaps that add 2027 commitments
+    division_rivalry_friction: No division issue with NYG; Los Angeles should still price a featured receiver as a meaningful football loss.
+    confidence: medium
+    source: https://www.nfl.com/teams/rams/roster
+  trade_triggers:
+    - trigger: Rams receiver depth holds up and the front office prioritizes draft capital over carrying a costly one-year veteran.
+      implication: Adams-style calls move from monitor to check-call.
+      confidence: medium
+      source: https://www.nfl.com/teams/rams/roster
+  availability_validation:
+    - check: Confirm whether Adams is a core starter in the weekly plan or a negotiable veteran contract.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/rams/roster
+    - check: Confirm no extension or restructure is required at acquisition.
+      owner: cap
+      source: https://overthecap.com/salary-cap/rams
+  no_trade_guardrails:
+    - guardrail: Do not frame Adams as available only because the contract is one-year; the seller case needs a real pick-value or depth trigger.
+      confidence: high
+      source: https://overthecap.com/salary-cap/rams
+
 cultural_signals:
   stability:
     value: medium

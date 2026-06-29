@@ -84,6 +84,12 @@ const DATA_PATTERNS = [
   /\busage\b/i,
   /\bnet rating\b/i,
   /\btrue shooting\b/i,
+  /\b(cap\s+)?audit\b/i,
+  /\bposition[-\s]?group\b/i,
+  /\bcap ledger\b/i,
+  /\bspend share\b/i,
+  /\bover[-\s]?invested\b/i,
+  /\bunder[-\s]?invested\b/i,
 ];
 const STAFF_PATTERNS = [
   /\bstaff\b/i,

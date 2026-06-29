@@ -102,6 +102,48 @@ trade_dna:
       counterparties: [ATL]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: posture_change_only
+    confidence: high
+    evidence: Tampa's contend-soon posture and high-cap veteran core point to holding useful trench starters unless performance or injury changes the club's direction.
+    source: https://overthecap.com/salary-cap/buccaneers
+  position_group_stance:
+    - group: DL
+      stance: Vita Vea is a high-impact, low-probability target because his one-year cap fit is attractive to the buyer but Tampa loses a premium interior anchor.
+      core_players: [Vita Vea]
+      movable_players: [A'Shawn Robinson]
+      seller_depth_notes: A Vea trade should be treated as posture-change only; Robinson is the more plausible expiring-veteran check if Tampa is trimming depth rather than moving a core piece.
+      sell_threshold: Only price Vea after a clear Tampa sell signal; a normal rental offer should start lower in the room.
+      confidence: high
+      source: https://overthecap.com/salary-cap/buccaneers
+  market_preferences:
+    desired_return_types:
+      - Premium draft capital if a core veteran is discussed
+      - Short-term cap flexibility from non-core veterans
+    avoided_deal_types:
+      - Selling a defensive anchor during a contention window
+      - Low-price rental return for a top-of-room player
+    division_rivalry_friction: No division issue with NYG, but Tampa should still demand a premium for a core defensive tackle.
+    confidence: high
+    source: https://www.nfl.com/teams/buccaneers/roster
+  trade_triggers:
+    - trigger: Tampa falls out of contention or younger interior defenders prove they can absorb starter snaps.
+      implication: Vea changes from do-not-lead to posture-change watch.
+      confidence: medium
+      source: https://www.nfl.com/teams/buccaneers/roster
+  availability_validation:
+    - check: Confirm whether Tampa is protecting the defensive spine or willing to turn a veteran DT into draft capital.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/buccaneers/roster
+    - check: Confirm void-year and post-June accounting before treating Vea as cleanly movable.
+      owner: cap
+      source: https://overthecap.com/player/vita-vea/6897/
+  no_trade_guardrails:
+    - guardrail: Do not headline Vita Vea as the best lane unless Tampa's posture flips from hold to seller.
+      confidence: high
+      source: https://overthecap.com/salary-cap/buccaneers
+
 cultural_signals:
   stability:
     value: medium

@@ -102,6 +102,48 @@ trade_dna:
       counterparties: [NE]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: asset_accumulator
+    confidence: medium
+    evidence: Retool posture plus a near-cap profile makes an expiring veteran DT a plausible pick-for-veteran conversation, but the team still needs a reason to thin the room.
+    source: https://overthecap.com/salary-cap/jets
+  position_group_stance:
+    - group: DL
+      stance: Harrison Phillips is the cleanest Giants call because he is a one-year DT with trade room, but the Jets lose a top-of-room body unless younger depth is ready.
+      core_players: [Quinnen Williams]
+      movable_players: [Harrison Phillips]
+      seller_depth_notes: Treat Phillips as available only if the Jets prefer draft capital and younger DL snaps over holding the veteran for one more season.
+      sell_threshold: A pick premium or roster-transition signal is needed; cap fit alone is not enough.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/jets
+  market_preferences:
+    desired_return_types:
+      - Draft capital for an expiring veteran
+      - Roster reset without future dead money
+    avoided_deal_types:
+      - In-division discounting
+      - Selling a starter without younger replacement confidence
+    division_rivalry_friction: Giants-Jets geography adds public-market friction, but it is not a division block.
+    confidence: medium
+    source: https://www.nfl.com/teams/jets/roster
+  trade_triggers:
+    - trigger: Younger defensive linemen earn larger camp or early-season roles.
+      implication: Phillips can move from monitor to check-call because the seller-depth objection weakens.
+      confidence: medium
+      source: https://www.nfl.com/teams/jets/roster
+  availability_validation:
+    - check: Ask whether Phillips is a hold-for-depth veteran or a tradeable expiring contract.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/jets/roster
+    - check: Confirm the Jets value a pick over the 2026 DT snaps and locker-room role.
+      owner: scouting
+      source: https://overthecap.com/salary-cap/jets
+  no_trade_guardrails:
+    - guardrail: Do not call Phillips a credible seller lane unless the answer names the top-of-room/depth loss for New York.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/jets
+
 cultural_signals:
   stability:
     value: medium

@@ -102,6 +102,48 @@ trade_dna:
       counterparties: [PIT]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: cap_seller
+    confidence: medium
+    evidence: Cleveland's cap file includes heavy dead-money constraints, so the better trade lens is selective cap cleanup, not assuming every expensive name is movable.
+    source: https://overthecap.com/salary-cap/browns
+  position_group_stance:
+    - group: DL
+      stance: Maliek Collins is a monitor-only veteran interior name; Mason Graham should be treated as a hold because he is young, expensive to move, and core to the front.
+      core_players: [Mason Graham]
+      movable_players: [Maliek Collins]
+      seller_depth_notes: Collins has a smaller cap profile than the core pieces, but his seller economics are not clean enough to call without a Cleveland cap trigger.
+      sell_threshold: Check only if Cleveland is prioritizing cap cleanup or younger defensive-line snaps over veteran rotation depth.
+      confidence: high
+      source: https://overthecap.com/salary-cap/browns
+  market_preferences:
+    desired_return_types:
+      - Draft capital tied to cap cleanup
+      - Deals that reduce future burden without selling young core players
+    avoided_deal_types:
+      - Moving Mason Graham-type core investments as ordinary rentals
+      - Taking back 2027 money while already carrying heavy cap commitments
+    division_rivalry_friction: No division issue with NYG; AFC North posture does not directly block an NFC buyer.
+    confidence: medium
+    source: https://www.nfl.com/teams/browns/roster
+  trade_triggers:
+    - trigger: Cleveland decides a veteran defensive-line salary is expendable in a broader cap cleanup.
+      implication: Collins-style calls become check-call; Graham remains a hold.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/browns
+  availability_validation:
+    - check: Confirm whether Cleveland is actually selling veterans or just managing restructures internally.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/browns/roster
+    - check: Confirm seller dead money, trade room, and any 2027 acceleration.
+      owner: cap
+      source: https://overthecap.com/salary-cap/browns
+  no_trade_guardrails:
+    - guardrail: Do not treat Mason Graham as available from cap fit; the seller thesis marks him as a core hold.
+      confidence: high
+      source: https://overthecap.com/salary-cap/browns
+
 cultural_signals:
   stability:
     value: medium

@@ -1,6 +1,8 @@
 import type {
+  GetCurrentNflCoverageTeamResponse,
   GetCurrentNflPlayerMetricsTeamResponse,
   GetCurrentNflTeamResponse,
+  NflCoverageMatrixResponse,
   ListCurrentNflDemoResponse,
 } from '@shared/types';
 import { SERVER_URL } from './client';
@@ -10,6 +12,8 @@ let currentCapSheetsPromise: Promise<ListCurrentNflDemoResponse> | null = null;
 let currentPlayerMetricsPromise: Promise<ListCurrentNflDemoResponse> | null = null;
 const teamDetailPromises = new Map<string, Promise<GetCurrentNflTeamResponse>>();
 const playerMetricsTeamPromises = new Map<string, Promise<GetCurrentNflPlayerMetricsTeamResponse>>();
+let currentCoveragePromise: Promise<NflCoverageMatrixResponse> | null = null;
+const coverageTeamPromises = new Map<string, Promise<GetCurrentNflCoverageTeamResponse>>();
 
 export async function getCurrentNflRosters(opts: { force?: boolean } = {}): Promise<ListCurrentNflDemoResponse> {
   if (!currentRosterPromise || opts.force) {
@@ -62,6 +66,29 @@ export async function getCurrentNflPlayerMetricsTeam(
     playerMetricsTeamPromises.set(key, promise);
   }
   return playerMetricsTeamPromises.get(key)!;
+}
+
+export async function getCurrentNflCoverage(opts: { force?: boolean } = {}): Promise<NflCoverageMatrixResponse> {
+  if (!currentCoveragePromise || opts.force) {
+    currentCoveragePromise = getJson('/nfl/coverage/current');
+  }
+  return currentCoveragePromise;
+}
+
+export async function getCurrentNflCoverageTeam(
+  teamId: string,
+  opts: { force?: boolean } = {},
+): Promise<GetCurrentNflCoverageTeamResponse> {
+  const key = teamId.toUpperCase();
+  if (!coverageTeamPromises.has(key) || opts.force) {
+    const promise = getJson<GetCurrentNflCoverageTeamResponse>(`/nfl/coverage/current/${encodeURIComponent(key)}`)
+      .catch((err) => {
+        if (coverageTeamPromises.get(key) === promise) coverageTeamPromises.delete(key);
+        throw err;
+      });
+    coverageTeamPromises.set(key, promise);
+  }
+  return coverageTeamPromises.get(key)!;
 }
 
 async function getJson<T>(path: string): Promise<T> {

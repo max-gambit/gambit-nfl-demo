@@ -102,6 +102,52 @@ trade_dna:
       counterparties: [LAR]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: buyer_hold
+    confidence: medium
+    evidence: Arizona has enough public cap flexibility that Dante Stills should be treated as a roster-role monitor, not a financially forced seller lane.
+    source: https://overthecap.com/salary-cap/cardinals
+  position_group_stance:
+    - group: DL
+      stance: Dante Stills is a clean one-year depth-contract monitor because the buyer gets a cheap interior body, but Arizona needs a football reason to move him.
+      core_players: [Walter Nolen, Darius Robinson, Josh Sweat]
+      movable_players: [Dante Stills]
+      seller_depth_notes: Arizona would lose a low-cost interior rotation option and has no cap-pressure reason to create the hole.
+      sell_threshold: Upgrade only if camp usage or another defensive-line addition makes Stills clearly outside the game-day rotation.
+      confidence: medium
+      source: https://overthecap.com/player/dante-stills/11037/
+  market_preferences:
+    desired_return_types:
+      - Day-three pick premium over replacement-level depth.
+      - Player-for-player swap only if it solves a sharper roster need.
+    avoided_deal_types:
+      - Selling young defensive-line depth for ordinary cap relief.
+      - NFC contender help without a clear draft premium.
+    division_rivalry_friction: No direct division friction with the Giants; conference trade still needs a draft premium because Arizona is not cap-forced.
+    confidence: medium
+    source: https://overthecap.com/salary-cap/cardinals
+  trade_triggers:
+    - trigger: Cardinals add or elevate another interior lineman ahead of Stills.
+      implication: Stills becomes a plausible check-call target because the roster cost falls below the draft-pick return.
+      confidence: medium
+      source: https://www.nfl.com/teams/cardinals/roster
+    - trigger: Arizona shifts from buyer-hold posture to asset collection after camp or early-season losses.
+      implication: A one-year depth contract can move from monitor to check-call.
+      confidence: low
+      source: https://overthecap.com/salary-cap/cardinals
+  availability_validation:
+    - check: Confirm Stills' interior-snap role, game-day status, and whether Arizona views him as expendable after defensive-line cuts.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/cardinals/roster
+    - check: Verify the one-year trade economics and no hidden guarantee blocker before pricing a day-three pick.
+      owner: cap_staff
+      source: https://overthecap.com/player/dante-stills/11037/
+  no_trade_guardrails:
+    - guardrail: Do not lead with Stills unless Arizona has a roster-role reason to sell; cap fit alone is not enough.
+      confidence: high
+      source: https://overthecap.com/salary-cap/cardinals
+
 cultural_signals:
   stability:
     value: medium

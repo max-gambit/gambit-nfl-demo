@@ -102,6 +102,45 @@ trade_dna:
       counterparties: [BAL]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: selective_seller
+    confidence: medium
+    evidence: Cincinnati's cap file has expensive core commitments, so a one-year rotational DT can be discussed only if the return helps flexibility without weakening the core plan.
+    source: https://overthecap.com/salary-cap/bengals
+  position_group_stance:
+    - group: DL
+      stance: Tedarrell Slaton is a check-call lane because the contract is short and trade-positive, but the seller still loses a playable interior body.
+      core_players: [Dexter Lawrence, B.J. Hill]
+      movable_players: [Tedarrell Slaton]
+      seller_depth_notes: Slaton is more plausible than a core interior name because he is one year and salary-positive, yet the buyer should validate whether Cincinnati has replacement snaps.
+      sell_threshold: Pick value must beat the cost of replacing a rotational run-game body.
+      confidence: medium
+      source: https://overthecap.com/player/tedarrell-slaton/9637/
+  market_preferences:
+    desired_return_types:
+      - Draft capital for short-contract depth
+      - Cap-neutral roster balancing
+    avoided_deal_types:
+      - Weakening the starting defensive front
+      - Taking back future salary
+    division_rivalry_friction: No division issue with NYG.
+    confidence: medium
+    source: https://www.nfl.com/teams/bengals/roster
+  trade_triggers:
+    - trigger: Cincinnati identifies cheaper interior depth or needs cap room for a higher-priority extension.
+      implication: Slaton moves from monitor to check-call.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/bengals
+  availability_validation:
+    - check: Confirm Slaton's role and replacement plan before treating him as available.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/bengals/roster
+  no_trade_guardrails:
+    - guardrail: Do not treat Slaton as a lead target without explaining why Cincinnati can replace his interior snaps.
+      confidence: medium
+      source: https://overthecap.com/player/tedarrell-slaton/9637/
+
 cultural_signals:
   stability:
     value: medium

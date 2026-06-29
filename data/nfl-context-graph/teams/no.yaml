@@ -102,6 +102,48 @@ trade_dna:
       counterparties: [ATL]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: cap_seller
+    confidence: high
+    evidence: New Orleans' restructure-needed posture makes expensive veterans worth monitoring, but the sell case is strongest for non-core players with positive trade room rather than foundational offensive pieces.
+    source: https://overthecap.com/salary-cap/saints
+  position_group_stance:
+    - group: DL
+      stance: Davon Godchaux is a more realistic check-call than Chase Young or Carl Granderson because the latter two carry large negative trade economics and anchor the edge plan.
+      core_players: [Chase Young, Carl Granderson]
+      movable_players: [Davon Godchaux, Nathan Shepherd]
+      seller_depth_notes: Godchaux shows positive 2026 trade room while the higher-impact edge contracts would create bad seller economics.
+      sell_threshold: Start with a mid-round pick or pick-swap concept only if New Orleans is prioritizing cap flexibility over keeping veteran interior depth.
+      confidence: high
+      source: https://overthecap.com/salary-cap/saints
+  market_preferences:
+    desired_return_types:
+      - Draft capital for older non-core veterans
+      - Cap flexibility without weakening quarterback or young premium-position plans
+    avoided_deal_types:
+      - Selling core edge talent at a dead-money loss
+      - Moving young offensive building blocks for short-term cap relief
+    division_rivalry_friction: No division friction with NYG; NFC premium-position pricing still applies.
+    confidence: high
+    source: https://www.nfl.com/teams/saints/roster
+  trade_triggers:
+    - trigger: New Orleans chooses cap flexibility over carrying a veteran interior rotation salary.
+      implication: Godchaux-style calls move from monitor to check-call.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/saints
+  availability_validation:
+    - check: Confirm whether the Saints view the target as rotation depth or part of the defensive front spine.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/saints/roster
+    - check: Confirm seller dead-money and trade savings before pricing the offer.
+      owner: cap
+      source: https://overthecap.com/salary-cap/saints
+  no_trade_guardrails:
+    - guardrail: Do not treat Chase Young or Carl Granderson as clean salary-out seller lanes when the current file shows negative trade economics.
+      confidence: high
+      source: https://overthecap.com/salary-cap/saints
+
 cultural_signals:
   stability:
     value: medium

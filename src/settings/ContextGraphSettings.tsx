@@ -30,6 +30,7 @@ const EMPTY_VOCAB: ContextGraphPreferenceVocab = {
   analytics_orientation: [],
   risk_tolerance: [],
   rivalry_type: [],
+  seller_posture: [],
 };
 
 interface ContextGraphSettingsProps {

@@ -5,8 +5,16 @@ import {
   briefProgressStreamPayload,
   buildBriefUserPrompt,
   currentNbaEvidenceTeamIds,
+  currentNflEvidenceTeamIds,
+  hasNflCounterpartyIntelTrace,
+  hasNflTradeIntelTrace,
+  hasNflCoverageTrace,
+  hasNflTradeScreenTrace,
+  hasRequiredNflRosterCapTrace,
   missingSubmitBriefFields,
+  normalizeSubmitDataAnalysisInput,
   normalizeSubmitBriefInput,
+  requiresNflRosterCapDataLookup,
   shouldRunContextGraphLookup,
   shouldRepairMissingSubmitBriefFields,
 } from '../../src/routes/briefs.js';
@@ -28,6 +36,351 @@ test('first-person roster questions inherit the active demo team for app evidenc
 
 test('NFL branch does not preload legacy NBA evidence for first-person NFL brief prompts', () => {
   assert.deepEqual(currentNbaEvidenceTeamIds('Should we trade for a veteran edge rusher?'), []);
+});
+
+test('NFL roster/cap audit prompts preload NFL app evidence and do not require Intel-only lookup', () => {
+  const question = 'Audit the Giants offseason roster. Which position groups look over- or under-invested by 2026 cap number, and where is the data incomplete?';
+
+  assert.deepEqual(currentNflEvidenceTeamIds(question), ['NYG']);
+  assert.deepEqual(currentNbaEvidenceTeamIds(question), []);
+  assert.equal(shouldRunContextGraphLookup(question, true), false);
+});
+
+test('first-person NFL audit prompts inherit the Giants POV in Brief mode', () => {
+  const question = 'We are the Giants. Run a position-group cap audit for our offseason roster.';
+
+  assert.deepEqual(currentNflEvidenceTeamIds(question), ['NYG']);
+  assert.match(buildBriefUserPrompt(question, 'NYG'), /Subject team: NYG/);
+});
+
+test('explicit first-person NFL subject replaces the Giants default', () => {
+  assert.deepEqual(
+    currentNflEvidenceTeamIds('We are the Eagles. Run a position-group cap audit for our offseason roster.'),
+    ['PHI'],
+  );
+  assert.deepEqual(
+    currentNflEvidenceTeamIds('We are the Eagles. Should we call the Jets about a defensive tackle trade?'),
+    ['PHI', 'NYJ'],
+  );
+  assert.deepEqual(
+    currentNflEvidenceTeamIds('Should we call the Jets about a defensive tackle trade?'),
+    ['NYG', 'NYJ'],
+  );
+});
+
+test('NFL roster/cap audit trace validation rejects context-graph-only data', () => {
+  const question = 'Audit the Giants offseason roster by position-group cap number.';
+
+  assert.equal(requiresNflRosterCapDataLookup(question), true);
+  assert.equal(hasRequiredNflRosterCapTrace([{
+    tool_use_id: 'trace_context_only',
+    tool_name: 'query_nfl_data',
+    datasets: [{
+      dataset_id: 'nfl_context_graph',
+      label: 'NFL Intel',
+      source_name: 'Gambit Intel',
+      as_of_date: '2026-06-25',
+      team_ids: ['NYG'],
+      row_count: 1,
+    }],
+    errors: [],
+  }]), false);
+  assert.equal(hasRequiredNflRosterCapTrace([{
+    tool_use_id: 'trace_app_data',
+    tool_name: 'query_nfl_data',
+    datasets: [
+      {
+        dataset_id: 'nfl_rosters_current',
+        label: 'NFL offseason rosters',
+        source_name: 'Reviewed NFL snapshot',
+        as_of_date: '2026-06-25',
+        team_ids: ['NYG'],
+        row_count: 92,
+      },
+      {
+        dataset_id: 'nfl_cap_sheets_current',
+        label: 'NFL cap and contract rows',
+        source_name: 'Reviewed NFL snapshot',
+        as_of_date: '2026-06-25',
+        team_ids: ['NYG'],
+        row_count: 92,
+      },
+    ],
+    errors: [],
+  }], ['NYG']), true);
+  assert.equal(hasRequiredNflRosterCapTrace([{
+    tool_use_id: 'trace_wrong_team',
+    tool_name: 'query_nfl_data',
+    datasets: [
+      {
+        dataset_id: 'nfl_rosters_current',
+        label: 'NFL offseason rosters',
+        source_name: 'Reviewed NFL snapshot',
+        as_of_date: '2026-06-25',
+        team_ids: ['NO'],
+        row_count: 92,
+      },
+      {
+        dataset_id: 'nfl_cap_sheets_current',
+        label: 'NFL cap and contract rows',
+        source_name: 'Reviewed NFL snapshot',
+        as_of_date: '2026-06-25',
+        team_ids: ['NO'],
+        row_count: 92,
+      },
+    ],
+    errors: [],
+  }], ['NYG']), false);
+  assert.equal(hasRequiredNflRosterCapTrace([{
+    tool_use_id: 'trace_empty',
+    tool_name: 'query_nfl_data',
+    datasets: [
+      {
+        dataset_id: 'nfl_rosters_current',
+        label: 'NFL offseason rosters',
+        source_name: 'Reviewed NFL snapshot',
+        as_of_date: '2026-06-25',
+        team_ids: ['NYG'],
+        row_count: 0,
+      },
+      {
+        dataset_id: 'nfl_cap_sheets_current',
+        label: 'NFL cap and contract rows',
+        source_name: 'Reviewed NFL snapshot',
+        as_of_date: '2026-06-25',
+        team_ids: ['NYG'],
+        row_count: 0,
+      },
+    ],
+    errors: [],
+  }], ['NYG']), false);
+  assert.equal(hasRequiredNflRosterCapTrace([{
+    tool_use_id: 'trace_error',
+    tool_name: 'query_nfl_data',
+    datasets: [
+      {
+        dataset_id: 'nfl_rosters_current',
+        label: 'NFL offseason rosters',
+        source_name: 'Reviewed NFL snapshot',
+        as_of_date: '2026-06-25',
+        team_ids: ['NYG'],
+        row_count: 92,
+      },
+      {
+        dataset_id: 'nfl_cap_sheets_current',
+        label: 'NFL cap and contract rows',
+        source_name: 'Reviewed NFL snapshot',
+        as_of_date: '2026-06-25',
+        team_ids: ['NYG'],
+        row_count: 92,
+      },
+    ],
+    errors: [{ scope: 'nfl_cap_sheets_current', error: 'failed' }],
+  }], ['NYG']), false);
+  assert.equal(hasRequiredNflRosterCapTrace([{
+    tool_use_id: 'trace_truncated_all_teams',
+    tool_name: 'query_nfl_data',
+    datasets: [
+      {
+        dataset_id: 'nfl_rosters_current',
+        label: 'NFL offseason rosters',
+        source_name: 'Reviewed NFL snapshot',
+        as_of_date: '2026-06-25',
+        team_ids: ['NYG', 'DAL'],
+        row_count: 100,
+      },
+      {
+        dataset_id: 'nfl_cap_sheets_current',
+        label: 'NFL cap and contract rows',
+        source_name: 'Reviewed NFL snapshot',
+        as_of_date: '2026-06-25',
+        team_ids: ['NYG', 'DAL'],
+        row_count: 100,
+      },
+    ],
+    errors: [],
+  }], ['NYG', 'DAL']), false);
+  assert.equal(hasRequiredNflRosterCapTrace([
+    {
+      tool_use_id: 'trace_nyg',
+      tool_name: 'query_nfl_data',
+      datasets: [
+        {
+          dataset_id: 'nfl_rosters_current',
+          label: 'NFL offseason rosters',
+          source_name: 'Reviewed NFL snapshot',
+          as_of_date: '2026-06-25',
+          team_ids: ['NYG'],
+          row_count: 92,
+        },
+        {
+          dataset_id: 'nfl_cap_sheets_current',
+          label: 'NFL cap and contract rows',
+          source_name: 'Reviewed NFL snapshot',
+          as_of_date: '2026-06-25',
+          team_ids: ['NYG'],
+          row_count: 92,
+        },
+      ],
+      errors: [],
+    },
+    {
+      tool_use_id: 'trace_dal',
+      tool_name: 'query_nfl_data',
+      datasets: [
+        {
+          dataset_id: 'nfl_rosters_current',
+          label: 'NFL offseason rosters',
+          source_name: 'Reviewed NFL snapshot',
+          as_of_date: '2026-06-25',
+          team_ids: ['DAL'],
+          row_count: 86,
+        },
+        {
+          dataset_id: 'nfl_cap_sheets_current',
+          label: 'NFL cap and contract rows',
+          source_name: 'Reviewed NFL snapshot',
+          as_of_date: '2026-06-25',
+          team_ids: ['DAL'],
+          row_count: 86,
+        },
+      ],
+      errors: [],
+    },
+  ], ['NYG', 'DAL']), true);
+});
+
+test('NFL trade screen trace validation requires the subject team trade screen', () => {
+  assert.equal(hasNflTradeScreenTrace([{
+    tool_use_id: 'trace_trade_screen',
+    tool_name: 'query_nfl_data',
+    datasets: [{
+      dataset_id: 'nfl_trade_screen_current',
+      label: 'NFL trade-goal screen',
+      source_name: 'Reviewed NFL snapshot',
+      as_of_date: '2026-06-25',
+      team_ids: ['NYG'],
+      row_count: 12,
+    }],
+    errors: [],
+  }], 'NYG'), true);
+  assert.equal(hasNflTradeScreenTrace([{
+    tool_use_id: 'trace_wrong_team_trade_screen',
+    tool_name: 'query_nfl_data',
+    datasets: [{
+      dataset_id: 'nfl_trade_screen_current',
+      label: 'NFL trade-goal screen',
+      source_name: 'Reviewed NFL snapshot',
+      as_of_date: '2026-06-25',
+      team_ids: ['DAL'],
+      row_count: 12,
+    }],
+    errors: [],
+  }], 'NYG'), false);
+  assert.equal(hasNflTradeScreenTrace([{
+    tool_use_id: 'trace_empty_trade_screen',
+    tool_name: 'query_nfl_data',
+    datasets: [{
+      dataset_id: 'nfl_trade_screen_current',
+      label: 'NFL trade-goal screen',
+      source_name: 'Reviewed NFL snapshot',
+      as_of_date: '2026-06-25',
+      team_ids: ['NYG'],
+      row_count: 0,
+    }],
+    errors: [],
+  }], 'NYG'), false);
+});
+
+test('NFL coverage trace validation requires the requested teams', () => {
+  assert.equal(hasNflCoverageTrace([{
+    tool_use_id: 'trace_coverage',
+    tool_name: 'query_nfl_data',
+    datasets: [{
+      dataset_id: 'nfl_coverage_current',
+      label: 'NFL coverage matrix',
+      source_name: 'Gambit NFL Coverage Matrix',
+      as_of_date: '2026-06-25',
+      team_ids: ['NYG', 'DAL'],
+      row_count: 2,
+    }],
+    errors: [],
+  }], ['NYG', 'DAL']), true);
+  assert.equal(hasNflCoverageTrace([{
+    tool_use_id: 'trace_wrong_coverage',
+    tool_name: 'query_nfl_data',
+    datasets: [{
+      dataset_id: 'nfl_coverage_current',
+      label: 'NFL coverage matrix',
+      source_name: 'Gambit NFL Coverage Matrix',
+      as_of_date: '2026-06-25',
+      team_ids: ['DAL'],
+      row_count: 1,
+    }],
+    errors: [],
+  }], ['NYG']), false);
+});
+
+test('NFL counterparty Intel trace validation requires subject and target context', () => {
+  assert.equal(hasNflCounterpartyIntelTrace([{
+    tool_use_id: 'trace_trade_intel',
+    tool_name: 'query_nfl_data',
+    datasets: [{
+      dataset_id: 'nfl_context_graph',
+      label: 'NFL counterparty Intel',
+      source_name: 'Gambit Intel',
+      as_of_date: '2026-06-25',
+      team_ids: ['NYG', 'TB', 'GB'],
+      row_count: 3,
+    }],
+    errors: [],
+  }], 'NYG'), true);
+  assert.equal(hasNflCounterpartyIntelTrace([{
+    tool_use_id: 'trace_subject_only_intel',
+    tool_name: 'query_nfl_data',
+    datasets: [{
+      dataset_id: 'nfl_context_graph',
+      label: 'NFL Intel',
+      source_name: 'Gambit Intel',
+      as_of_date: '2026-06-25',
+      team_ids: ['NYG'],
+      row_count: 1,
+    }],
+    errors: [],
+  }], 'NYG'), false);
+  assert.equal(hasNflCounterpartyIntelTrace([{
+    tool_use_id: 'trace_wrong_subject_intel',
+    tool_name: 'query_nfl_data',
+    datasets: [{
+      dataset_id: 'nfl_context_graph',
+      label: 'NFL counterparty Intel',
+      source_name: 'Gambit Intel',
+      as_of_date: '2026-06-25',
+      team_ids: ['TB', 'GB'],
+      row_count: 2,
+    }],
+    errors: [],
+  }], 'NYG'), false);
+});
+
+test('NFL trade Intel trace validation accepts subject-only no-lane screens', () => {
+  const subjectOnlyTrace = [{
+    tool_use_id: 'trace_subject_only_trade_intel',
+    tool_name: 'query_nfl_data' as const,
+    datasets: [{
+      dataset_id: 'nfl_context_graph',
+      label: 'NFL Intel',
+      source_name: 'Gambit Intel',
+      as_of_date: '2026-06-25',
+      team_ids: ['NYG'],
+      row_count: 1,
+    }],
+    errors: [],
+  }];
+
+  assert.equal(hasNflTradeIntelTrace(subjectOnlyTrace, 'NYG'), true);
+  assert.equal(hasNflCounterpartyIntelTrace(subjectOnlyTrace, 'NYG'), false);
+  assert.equal(hasNflTradeIntelTrace(subjectOnlyTrace, 'DAL'), false);
 });
 
 test('explicit team names win over the active demo team for app evidence', () => {
@@ -103,6 +456,27 @@ test('submit brief normalization accepts server-provided source rows', () => {
 
   assert.deepEqual(input.sources, []);
   assert.deepEqual(missingSubmitBriefFields(input), []);
+});
+
+test('data analyst submit normalization recovers usable answers with missing optional arrays', () => {
+  const normalized = normalizeSubmitDataAnalysisInput({
+    answer: 'Call the rental DT market first; do not lead with Tampa unless a seller signal appears.',
+    findings: [
+      {
+        title: 'Counterparty check',
+        text: 'Vita Vea is high impact but low probability because Tampa profiles as a contender and he is top-of-room.',
+      },
+    ],
+  });
+
+  assert.ok(normalized);
+  assert.equal(normalized.answer, 'Call the rental DT market first; do not lead with Tampa unless a seller signal appears.');
+  assert.equal(normalized.key_findings[0]?.label, 'Counterparty check');
+  assert.deepEqual(normalized.key_findings[0]?.source_refs, [1]);
+  assert.deepEqual(normalized.tables, []);
+  assert.deepEqual(normalized.calculations, []);
+  assert.deepEqual(normalized.sources, []);
+  assert.ok(normalized.caveats.some((caveat) => /availability/i.test(caveat)));
 });
 
 test('submit brief normalization drops archetype-only move candidates', () => {

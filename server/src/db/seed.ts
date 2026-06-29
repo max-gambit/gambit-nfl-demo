@@ -13,6 +13,7 @@ import {
   loadNbaPlayerStatsSeed,
   seedNbaPlayerStats,
 } from '../nba_player_stats/seed.js';
+import { loadNflDemoSeed, seedNflDemoData } from '../nfl_data/seed.js';
 import { loadCbaCorpusSeed, seedCbaCorpus } from '../cba/seed.js';
 
 // Baseline seed — runs on every fresh DB.
@@ -57,7 +58,15 @@ async function main() {
     `(${playerStatsSummary.matched_player_count} roster-linked, ${playerStatsSummary.unmatched_player_count} stats-only)`,
   );
 
-  console.log('✓ baseline seed complete. The app will load with zero sessions / zero briefs and a seeded NBA roster + cap-sheet + player-stats database.');
+  const nflSeed = await loadNflDemoSeed();
+  const nflSummary = await seedNflDemoData(nflSeed);
+  console.log(
+    `  · NFL data ${nflSummary.as_of_date}: ` +
+    `${nflSummary.team_count} teams / ${nflSummary.roster_row_count} roster rows / ` +
+    `${nflSummary.cap_row_count} cap rows / ${nflSummary.source_needed_cap_row_count} source-needed cap rows`,
+  );
+
+  console.log('✓ baseline seed complete. The app will load with zero sessions / zero briefs and seeded NBA + NFL reference databases.');
   console.log('  Run `npm run seed:demo` to populate sample sessions and briefs.');
 }
 

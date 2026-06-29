@@ -500,7 +500,7 @@ function thesisDescription(templateId: BriefTemplateId): string {
   if (templateId === 'staff_packet') {
     return 'A one-sentence operating thesis that tells staff why these tasks/questions matter.';
   }
-  return 'A single sentence stating the working thesis/current lean. Concrete, with numbers where they matter, but frame player values and offer terms as assumptions or validation targets unless the user supplied authoritative private data.';
+  return 'A single sentence stating the working thesis/current lean. Concrete, with numbers where they matter, but use front-office language rather than product/schema labels; frame player values and offer terms as assumptions or validation targets unless the user supplied authoritative private data.';
 }
 
 function reasoningDescription(templateId: BriefTemplateId): string {
@@ -516,7 +516,7 @@ function reasoningDescription(templateId: BriefTemplateId): string {
   if (templateId === 'staff_packet') {
     return 'A short handoff note explaining what staff should resolve. Do not write a full path comparison.';
   }
-  return '1-3 short paragraphs explaining the evidence, assumptions, tradeoffs, and why this is the current lean. Use [N] citation markers (e.g. "[2]" or "[3]") to reference options or sources by their ref_index. Plain prose, no markdown headers, no bullet lists.';
+  return '1-3 short paragraphs explaining the evidence, assumptions, tradeoffs, and why this is the current lean. Use [N] citation markers (e.g. "[2]" or "[3]") to reference options or sources by their ref_index. Plain prose, no markdown headers, no bullet lists. Translate data-quality labels into normal operator language; avoid terms like "Contract Ledger v1", "captured", "derived", "estimated", "source-needed", "row parity", "app rows", or "source status" unless the user asked for a data QA audit. For NFL trade-goal prompts, explicitly use the trade-goal checks: depth after the outgoing player leaves, lower-pain outgoing hierarchy before premium starters, seller-thesis cards, recommended actions, and clean caveat logic for negative trade economics. Do not lead with a named target unless its recommended_action is call_now or check_call, and do not recite internal motivation_tier labels in visible prose.';
 }
 
 function presentationDescription(templateId: BriefTemplateId): string {

@@ -197,6 +197,80 @@ const PREFERENCE_PATCH_SPEC: PatchSpec = {
         },
       },
     },
+    trade_market_intel: {
+      kind: 'object',
+      fields: {
+        seller_posture: {
+          kind: 'object',
+          fields: {
+            value: { kind: 'string', enum: VOCAB.sellerPosture },
+            confidence: { kind: 'string', enum: VOCAB.confidence },
+            evidence: { kind: 'string' },
+            source: { kind: 'string' },
+          },
+        },
+        position_group_stance: {
+          kind: 'array',
+          item: {
+            kind: 'object',
+            fields: {
+              group: { kind: 'string' },
+              stance: { kind: 'string' },
+              core_players: { kind: 'array', item: { kind: 'string' } },
+              movable_players: { kind: 'array', item: { kind: 'string' } },
+              seller_depth_notes: { kind: 'string' },
+              sell_threshold: { kind: 'string' },
+              confidence: { kind: 'string', enum: VOCAB.confidence },
+              source: { kind: 'string' },
+            },
+          },
+        },
+        market_preferences: {
+          kind: 'object',
+          fields: {
+            desired_return_types: { kind: 'array', item: { kind: 'string' } },
+            avoided_deal_types: { kind: 'array', item: { kind: 'string' } },
+            division_rivalry_friction: { kind: 'string' },
+            confidence: { kind: 'string', enum: VOCAB.confidence },
+            source: { kind: 'string' },
+          },
+        },
+        trade_triggers: {
+          kind: 'array',
+          item: {
+            kind: 'object',
+            fields: {
+              trigger: { kind: 'string' },
+              implication: { kind: 'string' },
+              confidence: { kind: 'string', enum: VOCAB.confidence },
+              source: { kind: 'string' },
+            },
+          },
+        },
+        availability_validation: {
+          kind: 'array',
+          item: {
+            kind: 'object',
+            fields: {
+              check: { kind: 'string' },
+              owner: { kind: 'string' },
+              source: { kind: 'string' },
+            },
+          },
+        },
+        no_trade_guardrails: {
+          kind: 'array',
+          item: {
+            kind: 'object',
+            fields: {
+              guardrail: { kind: 'string' },
+              confidence: { kind: 'string', enum: VOCAB.confidence },
+              source: { kind: 'string' },
+            },
+          },
+        },
+      },
+    },
     onboarding_profile: {
       kind: 'object',
       fields: {
@@ -520,6 +594,7 @@ function extractPreferenceValues(team: Record<string, unknown>): TeamContextPref
         detail: stringValue(connection.detail),
       })),
     },
+    trade_market_intel: tradeMarketIntelAt(team),
     onboarding_profile: emptyOnboardingProfile(stringAt(team, 'team_id'), stringAt(team, 'identity.name')),
   };
 }
@@ -589,6 +664,53 @@ function preferenceVocab(): ContextGraphPreferenceVocab {
     analytics_orientation: [...VOCAB.analyticsOrientation],
     risk_tolerance: [...VOCAB.riskTolerance],
     rivalry_type: [...VOCAB.rivalryType],
+    seller_posture: [...VOCAB.sellerPosture],
+  };
+}
+
+function tradeMarketIntelAt(team: Record<string, unknown>): TeamContextPreferenceValues['trade_market_intel'] | undefined {
+  const intel = recordAt(team, 'trade_market_intel');
+  if (!intel) return undefined;
+  return {
+    seller_posture: {
+      value: stringAt(intel, 'seller_posture.value'),
+      confidence: stringAt(intel, 'seller_posture.confidence'),
+      evidence: stringAt(intel, 'seller_posture.evidence'),
+      source: stringAt(intel, 'seller_posture.source'),
+    },
+    position_group_stance: recordsAt(intel, 'position_group_stance').map((stance) => ({
+      group: stringValue(stance.group),
+      stance: stringValue(stance.stance),
+      core_players: stringArrayAt(stance, 'core_players'),
+      movable_players: stringArrayAt(stance, 'movable_players'),
+      seller_depth_notes: stringValue(stance.seller_depth_notes),
+      sell_threshold: stringValue(stance.sell_threshold),
+      confidence: stringValue(stance.confidence),
+      source: stringValue(stance.source),
+    })),
+    market_preferences: {
+      desired_return_types: stringArrayAt(intel, 'market_preferences.desired_return_types'),
+      avoided_deal_types: stringArrayAt(intel, 'market_preferences.avoided_deal_types'),
+      division_rivalry_friction: stringAt(intel, 'market_preferences.division_rivalry_friction'),
+      confidence: stringAt(intel, 'market_preferences.confidence'),
+      source: stringAt(intel, 'market_preferences.source'),
+    },
+    trade_triggers: recordsAt(intel, 'trade_triggers').map((trigger) => ({
+      trigger: stringValue(trigger.trigger),
+      implication: stringValue(trigger.implication),
+      confidence: stringValue(trigger.confidence),
+      source: stringValue(trigger.source),
+    })),
+    availability_validation: recordsAt(intel, 'availability_validation').map((validation) => ({
+      check: stringValue(validation.check),
+      owner: stringValue(validation.owner),
+      source: stringValue(validation.source),
+    })),
+    no_trade_guardrails: recordsAt(intel, 'no_trade_guardrails').map((guardrail) => ({
+      guardrail: stringValue(guardrail.guardrail),
+      confidence: stringValue(guardrail.confidence),
+      source: stringValue(guardrail.source),
+    })),
   };
 }
 
@@ -823,6 +945,11 @@ function signalAt(root: Record<string, unknown>, pathName: string): { value: str
 function recordsAt(root: Record<string, unknown>, pathName: string): Record<string, unknown>[] {
   const value = getAt(root, pathName);
   return Array.isArray(value) ? value.filter(isRecord) : [];
+}
+
+function recordAt(root: Record<string, unknown>, pathName: string): Record<string, unknown> | null {
+  const value = getAt(root, pathName);
+  return isRecord(value) ? value : null;
 }
 
 function stringArrayAt(root: Record<string, unknown>, pathName: string): string[] {

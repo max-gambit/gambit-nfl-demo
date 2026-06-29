@@ -1,14 +1,15 @@
 # gambit-nfl-demo
 
-`gambit-nfl-demo` is an internal NFL demo fork of Gambit's front-office operating-system prototype. Milestone 1 is graph-first: the visible profile and Intel preference surfaces default to the New York Giants / `NYG`, while the app preserves the existing three-panel shell and avoids claiming the legacy Analyze/cap/rules surfaces are NFL-complete.
+`gambit-nfl-demo` is an internal NFL demo fork of Gambit's front-office operating-system prototype. The visible profile and Intel preference surfaces default to the New York Giants / `NYG`, while the app preserves the existing three-panel shell and adds reviewed static NFL roster, cap, rules, and Intel data for demo use.
 
 The app is intentionally product-shaped rather than demo-slide-shaped: the first screen remains the usable three-panel workspace, with supporting Dashboard, Database, and Settings surfaces. Settings is available for profile/preferences even when first-run onboarding is skipped.
 
 ## What It Includes
 
 - **Three-panel workspace**: channel-style decision briefs, follow-up chat, right-panel brief threads, source cards, artifacts, and compare flows.
-- **AI brief generation**: Anthropic-backed recommendation briefs, follow-up chat, agent outputs, context-graph tool use, and data-analyst mode. This path still contains legacy NBA assumptions and should not be treated as an NFL Analyze claim.
-- **Legacy NBA data layer**: seeded roster, cap-sheet, and player-stat snapshots exposed through the app database and `/nba/*` server routes. Milestone 1 does not modify this data layer.
+- **AI brief generation**: Anthropic-backed recommendation briefs, follow-up chat, agent outputs, context-graph tool use, and NFL data-analyst mode. Live generated flows require `ANTHROPIC_API_KEY`.
+- **Legacy NBA data layer**: seeded roster, cap-sheet, and player-stat snapshots remain available through `/nba/*` server routes for compatibility tests.
+- **NFL data layer**: reviewed static NFL.com roster rows, public cap rows, roster-derived metric placeholders, Supabase `nfl_*` snapshot tables/views, and `/nfl/*` server routes.
 - **NFL Intel slice**: NFL context-graph source files, generated relationship artifacts, validation/reporting tools, Settings overrides, and AI lookup adapters.
 - **Intel onboarding**: optional team-context capture that stores user-provided priorities, working style, and trust boundaries as local Intel overrides. The first-run gate is disabled by default in this fork.
 - **Settings profile/preferences**: profile and source-connection surfaces tuned for the NFL internal demo.
@@ -45,6 +46,7 @@ The app is intentionally product-shaped rather than demo-slide-shaped: the first
   data/
     nfl-context-graph/         NFL team YAML sources, derived graph JSON, validation report
     nba-context-graph/         Legacy NBA team YAML sources and derived artifacts
+    nfl-demo/                  Reviewed NFL roster/cap/player-metric snapshot
     nba-rosters/               Reviewed roster seed snapshot
     nba-cap-sheets/            Reviewed cap-sheet seed snapshot
     nba-player-stats/          Reviewed player-stat seed snapshot
@@ -147,6 +149,8 @@ npm run build                # TypeScript project build + Vite production build
 npm run typecheck            # Client/shared TypeScript check
 npm --prefix server test     # Server data/context-graph/NBA tests
 npm --prefix server run typecheck
+npm --prefix server run build:nfl-data
+npm --prefix server run seed:nfl-data
 npm run db:status
 npm run db:reset
 npm run db:seed
@@ -182,6 +186,12 @@ GET    /monitors
 GET    /nba/rosters/current
 GET    /nba/cap-sheets/current
 GET    /nba/player-stats/current
+GET    /nfl/rosters/current
+GET    /nfl/cap-sheets/current
+GET    /nfl/cap-sheets/current/:teamId
+GET    /nfl/player-stats/current
+GET    /nfl/player-stats/current/:teamId
+GET    /nfl/rules
 GET    /context-graph/preferences
 PATCH  /context-graph/preferences/:teamId
 GET    /context-graph/onboarding/:teamId
@@ -206,6 +216,13 @@ For Intel data work, also run:
 ```sh
 npm --prefix server run context-graph:validate
 npm --prefix server run context-graph:build
+```
+
+For NFL roster/cap data work, rebuild and validate the reviewed static snapshot:
+
+```sh
+npm --prefix server run build:nfl-data
+npm --prefix server test -- --test-name-pattern NFL
 ```
 
 The QA harness is exploratory rather than pass/fail regression testing. It requires the app and Supabase to already be running:

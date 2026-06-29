@@ -134,6 +134,7 @@ export const VOCAB = {
   playerFriendly: ['yes', 'mixed', 'no'],
   analyticsOrientation: ['heavy', 'balanced', 'traditional', 'unknown'],
   riskTolerance: ['aggressive', 'moderate', 'conservative'],
+  sellerPosture: ['buyer_hold', 'selective_seller', 'asset_accumulator', 'cap_seller', 'posture_change_only', 'unknown'],
   notableTraits: [
     'family_culture', 'developmental_org', 'veteran_friendly', 'chaotic',
     'process_driven', 'star_chasing', 'homegrown_priority', 'coach_carousel',

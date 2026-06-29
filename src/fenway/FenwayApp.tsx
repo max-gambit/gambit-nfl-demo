@@ -18,6 +18,7 @@ import { CbaWorkbench } from '../cba/CbaWorkbench';
 import { ProjectsView } from '../projects/ProjectsView';
 import { SettingsView } from '../settings/SettingsView';
 import { useBriefs, useSessions, useToasts, useUi } from '../store';
+import type { NavTab } from '../store/ui';
 
 interface FenwayAppProps {
   leftRailExtra?: ReactNode;
@@ -45,7 +46,8 @@ export function FenwayApp({
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('tab') === 'cba') setActiveNav('cba');
+    const tab = params.get('tab');
+    if (isDeepLinkNavTab(tab)) setActiveNav(tab);
   }, [setActiveNav]);
 
   // Phase 9 — clicking a brief from Dashboard / Projects / search jumps into the
@@ -215,4 +217,13 @@ export function FenwayApp({
       <KeyboardHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
     </div>
   );
+}
+
+function isDeepLinkNavTab(value: string | null): value is NavTab {
+  return value === 'dashboard'
+    || value === 'analyze'
+    || value === 'projects'
+    || value === 'database'
+    || value === 'cba'
+    || value === 'settings';
 }
