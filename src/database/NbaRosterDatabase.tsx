@@ -575,6 +575,24 @@ function NflCoverageTeamDetail({ team }: { team: NflCoverageTeamRow }) {
         </div>
       </section>
 
+      {team.demo_safe_prompts.length > 0 && (
+        <section style={{ display: 'grid', gap: SPACE.sm }}>
+          <FinancialLabel>Demo safe prompts</FinancialLabel>
+          {team.demo_safe_prompts.map((prompt) => (
+            <div key={prompt} style={{
+              padding: `${SPACE.sm}px 0`,
+              borderBottom: `1px solid ${F.border}`,
+              fontFamily: 'var(--font-sans)',
+              fontSize: TYPE.body.sm,
+              color: F.ink,
+              lineHeight: 1.35,
+            }}>
+              {prompt}
+            </div>
+          ))}
+        </section>
+      )}
+
       <section style={{ display: 'grid', gap: SPACE.sm }}>
         <FinancialLabel>Top gaps</FinancialLabel>
         {team.top_gaps.length ? team.top_gaps.map((gap) => (
@@ -590,6 +608,11 @@ function NflCoverageTeamDetail({ team }: { team: NflCoverageTeamRow }) {
             <div>
               <div style={{ fontFamily: 'var(--font-sans)', fontSize: TYPE.body.sm, fontWeight: 700, color: F.ink }}>{gap.label}</div>
               <div style={{ marginTop: 2, fontFamily: 'var(--font-sans)', fontSize: TYPE.body.sm, color: F.fgMuted, lineHeight: 1.35 }}>{gap.detail}</div>
+              {gap.next_source_family && (
+                <div style={{ marginTop: 2, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs, color: F.fenway }}>
+                  next: {gap.next_source_family}
+                </div>
+              )}
             </div>
           </div>
         )) : (

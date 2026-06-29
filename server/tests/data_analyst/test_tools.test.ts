@@ -136,10 +136,10 @@ test('data analyst NFL tool supports Giants cut restructure tag prompt evidence 
   assert.deepEqual(result.datasets.find((dataset) => dataset.dataset_id === 'nfl_cap_sheets_current')?.team_ids, ['NYG']);
   assert.equal(result.datasets.some((dataset) => dataset.dataset_id === 'nfl_coverage_current'), true);
   const coverage = result.data.coverage as {
-    teams: Array<{ team_id: string; readiness: Array<{ key: string; status: string }> }>;
+    teams: Array<{ team_id: string; readiness: Array<{ key: string; status: string; gaps?: Array<{ public_ceiling?: boolean }> }> }>;
   };
   assert.equal(coverage.teams[0]?.team_id, 'NYG');
-  assert.equal(coverage.teams[0]?.readiness.some((item) => item.key === 'player_quality' && item.status === 'weak'), true);
+  assert.equal(coverage.teams[0]?.readiness.some((item) => item.key === 'player_quality' && item.status === 'strong'), true);
   const capRows = (result.data.cap_sheets as { rows: Array<{ player_name: string; restructure_savings_estimate_2026: number | null; tag_eligible_2027: boolean }> }).rows;
   assert.ok(capRows.some((row) => row.player_name === 'Andrew Thomas' && typeof row.restructure_savings_estimate_2026 === 'number'));
   assert.ok(capRows.some((row) => row.tag_eligible_2027));

@@ -102,6 +102,84 @@ trade_dna:
       counterparties: [DET]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: buyer_hold
+    confidence: high
+    evidence: Minnesota's contend-soon profile and near-cap status point to holding starters around the quarterback transition, with calls focused on redundant veterans.
+    source: https://overthecap.com/salary-cap/vikings
+  position_group_stance:
+    - group: DL
+      stance: Minnesota's interior-front names should be monitor-only unless a younger lineman creates a true surplus.
+      core_players: [Caleb Banks]
+      movable_players: [Javon Hargrave]
+      seller_depth_notes: The roster has DT and DL bodies, but the Vikings do not have an obvious excess of proven interior rush to sell cheaply.
+      sell_threshold: Require a role displacement or cap necessity before treating a defensive lineman as available.
+      confidence: medium
+      source: https://www.nfl.com/teams/vikings/roster
+    - group: EDGE/LB
+      stance: Andrew Van Ginkel and Blake Cashman are hold pieces for a contender; lower linebacker depth is the only realistic call.
+      core_players: [Andrew Van Ginkel, Blake Cashman]
+      movable_players: [Tyler Batty]
+      seller_depth_notes: Moving front-seven starters would undercut the defensive structure in a contend-soon year.
+      sell_threshold: Ask about players outside the pressure or subpackage plan.
+      confidence: high
+      source: https://overthecap.com/salary-cap/vikings
+    - group: CB/S
+      stance: One-year DB money can be checked, but Minnesota should not sell its top coverage options without a replacement.
+      core_players: [Byron Murphy, Josh Metellus]
+      movable_players: [Isaiah Rodgers]
+      seller_depth_notes: The Vikings have enough secondary rows for depth conversations, but starting DB exits create immediate matchup risk.
+      sell_threshold: Require a younger DB to own the role before pricing the veteran.
+      confidence: medium
+      source: https://www.nfl.com/teams/vikings/roster
+    - group: WR
+      stance: Justin Jefferson is a hard hold; Jauan Jennings is the more plausible call only if the receiver room is crowded.
+      core_players: [Justin Jefferson, Jordan Addison]
+      movable_players: [Jauan Jennings]
+      seller_depth_notes: Selling a primary target would damage quarterback development; buyers should look below the top of the room.
+      sell_threshold: Validate route-share compression before making a receiver call.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/vikings
+    - group: OL
+      stance: Brian O'Neill has clean trade room but is a high-pain target because Minnesota still needs tackle stability.
+      core_players: [Brian O'Neill, Christian Darrisaw]
+      movable_players: [Blake Brandel]
+      seller_depth_notes: Tackle trades weaken the quarterback transition unless Minnesota has a proven replacement and a clear cap reason.
+      sell_threshold: Treat starting tackles as posture-change only; check backup or one-year interior depth first.
+      confidence: high
+      source: https://overthecap.com/salary-cap/vikings
+  market_preferences:
+    desired_return_types:
+      - Draft capital for redundant veterans
+      - Player swaps that help the quarterback transition
+    avoided_deal_types:
+      - Selling Justin Jefferson support or starting tackle stability
+      - NFC North discounts
+    division_rivalry_friction: NFC North trades carry high friction; a Giants call is cleaner but still must protect Minnesota's quarterback-support plan.
+    confidence: high
+    source: https://www.nfl.com/teams/vikings/roster
+  trade_triggers:
+    - trigger: Younger DB, WR, or DL depth proves it can handle regular roles.
+      implication: A veteran can move from hold to check-call without a rebuild signal.
+      confidence: medium
+      source: https://www.nfl.com/teams/vikings/roster
+    - trigger: Near-cap pressure forces Minnesota to choose a depth exit over touching core contracts.
+      implication: Calls should focus on displaced veterans, not starters.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/vikings
+  availability_validation:
+    - check: Confirm the target is not needed to stabilize the quarterback transition.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/vikings/roster
+    - check: Confirm the cap ledger supports a clean sale instead of a restructure.
+      owner: cap
+      source: https://overthecap.com/salary-cap/vikings
+  no_trade_guardrails:
+    - guardrail: Do not treat Minnesota as a broad seller while the graph posture remains contend-soon.
+      confidence: high
+      source: https://overthecap.com/salary-cap/vikings
+
 cultural_signals:
   stability:
     value: medium

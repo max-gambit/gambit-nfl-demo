@@ -102,6 +102,84 @@ trade_dna:
       counterparties: [TB]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: selective_seller
+    confidence: medium
+    evidence: Atlanta's contend-soon roster and near-cap profile make core sales unlikely, but one-year skill or depth contracts can be discussed if the return helps the Penix window.
+    source: https://overthecap.com/salary-cap/falcons
+  position_group_stance:
+    - group: DL
+      stance: Interior-front sales should start as monitor-only because Atlanta's loaded cap rows do not show a proven surplus of expensive DTs.
+      core_players: [Grady Jarrett]
+      movable_players: [Ross Blacklock]
+      seller_depth_notes: The roster has bodies across DT and DE, but the top interior value is more useful as protection for a young quarterback-led contender than as a discount rental.
+      sell_threshold: Require a clear Falcons depth win or a pick overpay before treating an interior defender as available.
+      confidence: medium
+      source: https://www.nfl.com/teams/falcons/roster
+    - group: EDGE/LB
+      stance: Atlanta can listen on veteran linebacker depth before touching young edge or front-seven investments.
+      core_players: [Jalon Walker, Troy Andersen]
+      movable_players: [Divine Deablo]
+      seller_depth_notes: A linebacker trade is only plausible if the Falcons prefer cap room and younger snaps over keeping a one-year veteran.
+      sell_threshold: Ask whether the player is outside the defensive subpackage plan before discussing compensation.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/falcons
+    - group: CB/S
+      stance: Jessie Bates and A.J. Terrell are hold pieces, while lower DB depth is the only realistic call lane.
+      core_players: [Jessie Bates, A.J. Terrell]
+      movable_players: [Mike Hughes]
+      seller_depth_notes: Moving a starting-caliber defensive back weakens the coverage spine, so Atlanta needs either a replacement confidence signal or a premium return.
+      sell_threshold: Price only one-year or depth DB contracts unless Atlanta's season direction changes.
+      confidence: medium
+      source: https://www.nfl.com/teams/falcons/roster
+    - group: WR
+      stance: Drake London is not a seller lane, but a crowded receiver room can produce depth-player calls.
+      core_players: [Drake London]
+      movable_players: [Jahan Dotson, Chris Blair]
+      seller_depth_notes: The Falcons should not strip primary targets from Michael Penix Jr.; buyers should look for role compression lower on the depth chart.
+      sell_threshold: Require evidence that the receiver is outside the weekly target plan.
+      confidence: medium
+      source: https://www.nfl.com/teams/falcons/roster
+    - group: OL
+      stance: Atlanta should protect the starting offensive line unless a one-year veteran is clearly outside its best five.
+      core_players: [Chris Lindstrom, Jake Matthews, Matthew Bergeron]
+      movable_players: [Ryan Neuzil, Jawaan Taylor]
+      seller_depth_notes: Any OL sale must be measured against the cost of exposing Penix, so cap room alone is not a good seller case.
+      sell_threshold: Treat only backup or contract-year linemen as call candidates.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/falcons
+  market_preferences:
+    desired_return_types:
+      - Draft capital for one-year veterans outside the core
+      - Cap flexibility that does not weaken the quarterback support system
+    avoided_deal_types:
+      - Selling protection or coverage pillars during a contend-soon window
+      - Taking back long 2027 money for a depth-player exit
+    division_rivalry_friction: NFC South trades carry normal division friction; a Giants call has no division block but still needs to protect Atlanta's young-QB timeline.
+    confidence: medium
+    source: https://www.nfl.com/teams/falcons/roster
+  trade_triggers:
+    - trigger: Younger DB, WR, or OL depth wins weekly roles before the deadline.
+      implication: Atlanta can convert a displaced veteran into a pick without changing the core plan.
+      confidence: medium
+      source: https://www.nfl.com/teams/falcons/roster
+    - trigger: Near-cap pressure forces a small veteran trim rather than a starter sale.
+      implication: One-year contracts become check-call lanes, not headline targets.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/falcons
+  availability_validation:
+    - check: Confirm which veterans are outside Atlanta's top game-day plan before naming them as available.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/falcons/roster
+    - check: Confirm trade, post-June, and 2027 effects on any one-year contract before calling the move clean.
+      owner: cap
+      source: https://overthecap.com/salary-cap/falcons
+  no_trade_guardrails:
+    - guardrail: Do not frame Bates, Terrell, London, Lindstrom, or Matthews as realistic seller lanes without a posture-change signal.
+      confidence: high
+      source: https://overthecap.com/salary-cap/falcons
+
 cultural_signals:
   stability:
     value: medium

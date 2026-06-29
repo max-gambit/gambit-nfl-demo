@@ -102,6 +102,84 @@ trade_dna:
       counterparties: [BAL]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: buyer_hold
+    confidence: high
+    evidence: Pittsburgh's contend-soon posture, veteran quarterback bridge, and near-cap profile make it more likely to hold starters than sell premium players.
+    source: https://overthecap.com/salary-cap/steelers
+  position_group_stance:
+    - group: DL
+      stance: Cameron Heyward is a high-pain legacy hold, while younger interior depth can be monitored only if Pittsburgh's rotation is overstocked.
+      core_players: [Cameron Heyward, Keeanu Benton]
+      movable_players: [Kyler Baugh]
+      seller_depth_notes: The Steelers' defensive identity relies on front strength, so a DT call needs more than buyer need.
+      sell_threshold: Require a clear youth movement or contention drop before treating a core defensive lineman as available.
+      confidence: high
+      source: https://www.nfl.com/teams/steelers/roster
+    - group: EDGE/LB
+      stance: T.J. Watt, Alex Highsmith, and Patrick Queen are hold pieces; only lower linebacker depth is a realistic inquiry.
+      core_players: [T.J. Watt, Alex Highsmith, Patrick Queen]
+      movable_players: [Malik Harrison]
+      seller_depth_notes: Moving pass-rush or linebacker starters would cut against the roster's clearest competitive identity.
+      sell_threshold: Do not lead with edge/LB unless the player is outside the defensive core.
+      confidence: high
+      source: https://overthecap.com/salary-cap/steelers
+    - group: CB/S
+      stance: Jalen Ramsey's cap row may look movable, but the seller objection is losing a veteran coverage anchor.
+      core_players: [Jalen Ramsey, Jaquan Brisker]
+      movable_players: [Jamel Dean, DeShon Elliott]
+      seller_depth_notes: The secondary has veteran money, but Pittsburgh needs coverage stability during a contend-soon season.
+      sell_threshold: Validate whether the DB is a starter or a subpackage luxury before pricing.
+      confidence: medium
+      source: https://www.nfl.com/teams/steelers/roster
+    - group: WR
+      stance: DK Metcalf is a hold; secondary receiver names are only plausible if Pittsburgh is reshaping around the quarterback bridge.
+      core_players: [DK Metcalf]
+      movable_players: [Michael Pittman, Germie Bernard]
+      seller_depth_notes: Selling top receiver value would weaken the offense, so the realistic path is a non-primary target.
+      sell_threshold: Require role compression or a major return before discussing a starting receiver.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/steelers
+    - group: OL
+      stance: Broderick Jones and starting protection should be held; OL depth calls are lower-probability.
+      core_players: [Broderick Jones]
+      movable_players: [Dylan Cook]
+      seller_depth_notes: A veteran quarterback bridge and physical offense both reduce the logic for selling linemen.
+      sell_threshold: Only ask on backup linemen outside the game-day plan.
+      confidence: medium
+      source: https://www.nfl.com/teams/steelers/roster
+  market_preferences:
+    desired_return_types:
+      - Win-now player swaps
+      - Picks for displaced depth only
+    avoided_deal_types:
+      - Selling defensive identity pieces
+      - AFC North discounts
+    division_rivalry_friction: AFC North friction is severe; a Giants call is cleaner but should still assume Pittsburgh protects defensive core players.
+    confidence: high
+    source: https://www.nfl.com/teams/steelers/roster
+  trade_triggers:
+    - trigger: Pittsburgh falls out of contention or commits to a younger roster direction.
+      implication: Expensive veterans can move from hold to posture-change watch.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/steelers
+    - trigger: A younger DB or receiver pushes a veteran out of the weekly plan.
+      implication: The Steelers can consider a selective sale without weakening the core identity.
+      confidence: medium
+      source: https://www.nfl.com/teams/steelers/roster
+  availability_validation:
+    - check: Confirm whether the target is central to Pittsburgh's defensive identity or quarterback-support plan.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/steelers/roster
+    - check: Confirm any savings are not outweighed by dead-money or leadership cost.
+      owner: cap
+      source: https://overthecap.com/salary-cap/steelers
+  no_trade_guardrails:
+    - guardrail: Do not turn Steelers star cap numbers into seller recommendations without a contention-drop signal.
+      confidence: high
+      source: https://overthecap.com/salary-cap/steelers
+
 cultural_signals:
   stability:
     value: medium

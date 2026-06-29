@@ -102,6 +102,84 @@ trade_dna:
       counterparties: [GB]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: selective_seller
+    confidence: medium
+    evidence: Chicago's contend-soon posture and near-cap profile support selective veteran calls, but recent investments on both lines make core trench sales unlikely.
+    source: https://overthecap.com/salary-cap/bears
+  position_group_stance:
+    - group: DL
+      stance: Grady Jarrett or Dayo Odeyingbo should be treated as high-impact, low-probability targets unless Chicago pivots away from its defensive-front build.
+      core_players: [Montez Sweat, Dayo Odeyingbo, Grady Jarrett]
+      movable_players: [Andrew Billings]
+      seller_depth_notes: Chicago has bodies on the defensive line, but the top cap players are part of a front the club appears to be building around.
+      sell_threshold: Require either a younger DT winning the role or a clear cap-driven reset before making a serious DT offer.
+      confidence: medium
+      source: https://www.nfl.com/teams/bears/roster
+    - group: EDGE/LB
+      stance: The Bears can listen on off-ball linebacker depth, but Montez Sweat is not a salary-out target.
+      core_players: [Montez Sweat, T.J. Edwards]
+      movable_players: [Devin Bush]
+      seller_depth_notes: Moving a non-core linebacker is plausible only if younger depth covers special teams and subpackage snaps.
+      sell_threshold: Keep edge inquiries to posture-change watch; direct calls should focus on displaced linebackers.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/bears
+    - group: CB/S
+      stance: Jaylon Johnson and Kyler Gordon are hold pieces, with surplus DB depth a lower-pain path.
+      core_players: [Jaylon Johnson, Kyler Gordon]
+      movable_players: [Coby Bryant, Josh Blackwell]
+      seller_depth_notes: Chicago's secondary has enough rows to create depth calls, but moving a top corner damages the defensive plan.
+      sell_threshold: Require evidence that a DB is not in the nickel or starting plan.
+      confidence: medium
+      source: https://www.nfl.com/teams/bears/roster
+    - group: WR
+      stance: Rome Odunze and Luther Burden are young hold assets; receiver depth is call-worthy only below the main target tree.
+      core_players: [Rome Odunze, Luther Burden III]
+      movable_players: [Maurice Alexander]
+      seller_depth_notes: A young quarterback ecosystem should not sell its best route volume unless the team receives a major overpay.
+      sell_threshold: Ask about players buried outside the top-four receiver plan, not the starting pair.
+      confidence: medium
+      source: https://www.nfl.com/teams/bears/roster
+    - group: OL
+      stance: Chicago has movable cap at guard, but selling Joe Thuney or Jonah Jackson weakens the exact support structure Caleb Williams needs.
+      core_players: [Joe Thuney, Jonah Jackson, Darnell Wright]
+      movable_players: [Garrett Bradbury]
+      seller_depth_notes: A center or backup-lineman call is more plausible than a starting-guard trade.
+      sell_threshold: Confirm Chicago has a replacement starter before treating an OL contract as available.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/bears
+  market_preferences:
+    desired_return_types:
+      - Draft capital for displaced veterans
+      - Need-position swaps that keep the young quarterback support plan intact
+    avoided_deal_types:
+      - Selling recent trench investments at a discount
+      - Divisional trades that help NFC North rivals
+    division_rivalry_friction: NFC North friction is high; a Giants call is cleaner but still needs to avoid stripping Caleb Williams support.
+    confidence: medium
+    source: https://www.nfl.com/teams/bears/roster
+  trade_triggers:
+    - trigger: A young lineman or defensive back wins a starting role and turns a veteran into depth.
+      implication: Chicago can listen on the displaced contract without changing the club's direction.
+      confidence: medium
+      source: https://www.nfl.com/teams/bears/roster
+    - trigger: Near-cap pressure makes a role-player exit preferable to another restructure.
+      implication: The seller case moves from monitor to check-call for non-core veterans.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/bears
+  availability_validation:
+    - check: Confirm the target is not part of Chicago's quarterback-support or starting-front plan.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/bears/roster
+    - check: Verify whether a trade creates clean 2026 room or just moves cap pain.
+      owner: cap
+      source: https://overthecap.com/salary-cap/bears
+  no_trade_guardrails:
+    - guardrail: Do not lead with Bears trench starters unless the answer names the young-QB or defensive-front cost.
+      confidence: high
+      source: https://overthecap.com/salary-cap/bears
+
 cultural_signals:
   stability:
     value: medium

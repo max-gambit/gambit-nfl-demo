@@ -102,6 +102,84 @@ trade_dna:
       counterparties: [TEN]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: selective_seller
+    confidence: medium
+    evidence: Jacksonville's contend-soon posture and near-cap status support selective veteran calls, but the Lawrence and defensive-front core should be treated as hold unless the season turns.
+    source: https://overthecap.com/salary-cap/jaguars
+  position_group_stance:
+    - group: DL
+      stance: Arik Armstead or DaVon Hamilton are contract-fit names to monitor, but Jacksonville loses front depth unless younger linemen are ready.
+      core_players: [Josh Hines-Allen, Travon Walker]
+      movable_players: [Arik Armstead, DaVon Hamilton]
+      seller_depth_notes: The Jaguars have defensive-line bodies, yet the top veterans still protect a defense built around edge pressure.
+      sell_threshold: Require a depth-chart displacement or a cap-driven signal before turning a DT into a call-now lane.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/jaguars
+    - group: EDGE/LB
+      stance: Josh Hines-Allen and Travon Walker are hold pieces; only lower rotation edge depth should be discussed.
+      core_players: [Josh Hines-Allen, Travon Walker]
+      movable_players: [Yasir Abdullah]
+      seller_depth_notes: Moving a top edge removes the engine of the pass rush and is not supported by a normal seller thesis.
+      sell_threshold: Edge inquiries need a posture change, not just buyer need.
+      confidence: high
+      source: https://www.nfl.com/teams/jaguars/roster
+    - group: CB/S
+      stance: Jacksonville can listen on veteran secondary depth, but Travis Hunter and the starting DB plan are not seller lanes.
+      core_players: [Travis Hunter, Jourdan Lewis]
+      movable_players: [Eric Murray, Montaric Brown]
+      seller_depth_notes: The roster has enough DB rows for depth calls, but selling top coverage options weakens the defensive floor.
+      sell_threshold: Ask whether the player is outside nickel or starting safety plans before pricing.
+      confidence: medium
+      source: https://www.nfl.com/teams/jaguars/roster
+    - group: WR
+      stance: Brian Thomas Jr. is a hold, while a veteran receiver call is plausible only if the room has role compression.
+      core_players: [Brian Thomas Jr., Travis Hunter]
+      movable_players: [Jakobi Meyers]
+      seller_depth_notes: A Lawrence-centered offense should not lose primary separators, but may convert a non-core veteran if younger receivers earn volume.
+      sell_threshold: Require proof that a receiver is outside the top target plan.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/jaguars
+    - group: OL
+      stance: Jacksonville has expensive OL contracts that can be discussed, but protection value caps seller motivation.
+      core_players: [Walker Little, Anton Harrison]
+      movable_players: [Ezra Cleveland, Patrick Mekari]
+      seller_depth_notes: Any lineman exit must be measured against Trevor Lawrence protection and swing-depth risk.
+      sell_threshold: Confirm a replacement starter and clean trade accounting before treating OL as available.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/jaguars
+  market_preferences:
+    desired_return_types:
+      - Draft capital for veterans displaced by younger players
+      - Cap relief that does not weaken Trevor Lawrence support
+    avoided_deal_types:
+      - Selling core edge rushers or primary offensive weapons
+      - AFC South discounts
+    division_rivalry_friction: Division friction is high inside the AFC South; a Giants call is cleaner but still needs a clear Jacksonville depth win.
+    confidence: medium
+    source: https://www.nfl.com/teams/jaguars/roster
+  trade_triggers:
+    - trigger: Younger DL, DB, or WR options prove they can absorb a veteran's snaps.
+      implication: The seller case shifts from cap-only to credible depth reallocation.
+      confidence: medium
+      source: https://www.nfl.com/teams/jaguars/roster
+    - trigger: Near-cap management pushes Jacksonville to move a veteran instead of restructuring core contracts.
+      implication: Non-core veteran contracts become check-call lanes.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/jaguars
+  availability_validation:
+    - check: Confirm whether the target is behind a younger player in Jacksonville's actual weekly plan.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/jaguars/roster
+    - check: Confirm trade savings, guarantees, and future-year proration before recommending the lane.
+      owner: cap
+      source: https://overthecap.com/salary-cap/jaguars
+  no_trade_guardrails:
+    - guardrail: Do not treat Jacksonville core edge or Lawrence-support pieces as available without a posture-change trigger.
+      confidence: high
+      source: https://overthecap.com/salary-cap/jaguars
+
 cultural_signals:
   stability:
     value: medium

@@ -102,6 +102,84 @@ trade_dna:
       counterparties: [NYJ]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: selective_seller
+    confidence: medium
+    evidence: New England's cap-room profile removes forced-seller pressure, but the roster can still convert older or crowded-room veterans into picks if younger players win jobs.
+    source: https://overthecap.com/salary-cap/patriots
+  position_group_stance:
+    - group: DL
+      stance: Milton Williams and Christian Barmore are hold pieces, while older defensive-front depth is a monitor lane.
+      core_players: [Milton Williams, Christian Barmore]
+      movable_players: [Dre'Mont Jones]
+      seller_depth_notes: The Patriots have interior numbers but no reason to discount high-end DTs while cap room is available.
+      sell_threshold: Require a younger DL to push a veteran out of the rotation before calling.
+      confidence: medium
+      source: https://www.nfl.com/teams/patriots/roster
+    - group: EDGE/LB
+      stance: Harold Landry and Robert Spillane can be discussed only if New England prioritizes picks over veteran defensive floor.
+      core_players: [Harold Landry III, Robert Spillane]
+      movable_players: [Christian Elliss]
+      seller_depth_notes: The room has linebacker volume, but the Patriots do not need cap relief badly enough to sell useful starters cheaply.
+      sell_threshold: Ask whether the target is part of the defensive identity or a bridge player.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/patriots
+    - group: CB/S
+      stance: Carlton Davis and Kevin Byard are tradeable only as veteran-bridge decisions, not because New England needs cap room.
+      core_players: [Carlton Davis III, Marcus Jones]
+      movable_players: [Kevin Byard]
+      seller_depth_notes: A DB sale requires confidence that younger coverage players can absorb snaps and that the pick is worth losing veteran stability.
+      sell_threshold: Validate the staff's appetite for a younger secondary before pricing the veteran.
+      confidence: medium
+      source: https://www.nfl.com/teams/patriots/roster
+    - group: WR
+      stance: New England's receiver room can generate calls if younger options crowd out a veteran, but primary Drake Maye support should be protected.
+      core_players: [A.J. Brown, Romeo Doubs]
+      movable_players: [Kayshon Boutte]
+      seller_depth_notes: Cap room means the seller case must be role compression, not money.
+      sell_threshold: Require route-share evidence that the player is outside the weekly plan.
+      confidence: medium
+      source: https://www.nfl.com/teams/patriots/roster
+    - group: OL
+      stance: Morgan Moses is a possible bridge-veteran call; Will Campbell is a hard hold for the Drake Maye development plan.
+      core_players: [Will Campbell]
+      movable_players: [Morgan Moses]
+      seller_depth_notes: The Patriots can sell an older tackle only if they are comfortable with the young protection plan.
+      sell_threshold: Confirm the replacement tackle path before treating Moses as available.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/patriots
+  market_preferences:
+    desired_return_types:
+      - Picks for bridge veterans displaced by young players
+      - Player swaps that accelerate the Drake Maye support plan
+    avoided_deal_types:
+      - Selling high-end front or young quarterback support just for cap room
+      - AFC East discounts
+    division_rivalry_friction: AFC East friction is high; a Giants call avoids division conflict but still needs a role-compression seller case.
+    confidence: medium
+    source: https://www.nfl.com/teams/patriots/roster
+  trade_triggers:
+    - trigger: Young linemen, receivers, or defensive backs win roles and turn a veteran into a bridge surplus.
+      implication: New England can move from hold to selective seller without cap pressure.
+      confidence: medium
+      source: https://www.nfl.com/teams/patriots/roster
+    - trigger: The Patriots decide a veteran contract does not match the next competitive window.
+      implication: Draft-capital offers become more plausible than player-for-player offers.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/patriots
+  availability_validation:
+    - check: Confirm whether the veteran is a bridge starter, a leadership hold, or a displaced depth piece.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/patriots/roster
+    - check: Confirm New England gains value from a pick despite already having cap room.
+      owner: cap
+      source: https://overthecap.com/salary-cap/patriots
+  no_trade_guardrails:
+    - guardrail: Do not call the Patriots a forced seller; their cap-room profile means availability must come from role or timeline fit.
+      confidence: high
+      source: https://overthecap.com/salary-cap/patriots
+
 cultural_signals:
   stability:
     value: medium

@@ -2,8 +2,8 @@
   "generated_at": "2026-06-25T11:45:00.000Z",
   "as_of_date": "2026-06-25",
   "totals": {
-    "source_needed": 62,
-    "estimated": 13,
+    "source_needed": 55,
+    "estimated": 11,
     "source_needed_above_5m": 0
   },
   "source_needed_rows": [
@@ -61,39 +61,6 @@
       "contract_ledger_confidence": "source-needed",
       "source_note": "Roster player present on NFL.com; matching OverTheCap row not found in this snapshot.",
       "source_url": "https://www.nfl.com/teams/baltimore-ravens/roster"
-    },
-    {
-      "team_id": "BUF",
-      "player_id": "nfl:BUF:michael-danna",
-      "player_name": "Michael Danna",
-      "position": "LB",
-      "cap_number_2026": null,
-      "source_status": "source-needed",
-      "contract_ledger_confidence": "source-needed",
-      "source_note": "Roster player present on NFL.com; matching OverTheCap row not found in this snapshot.",
-      "source_url": "https://www.nfl.com/teams/buffalo-bills/roster"
-    },
-    {
-      "team_id": "BUF",
-      "player_id": "nfl:BUF:chauncey-gardner-johnson",
-      "player_name": "C.J. Gardner-Johnson",
-      "position": "SAF",
-      "cap_number_2026": null,
-      "source_status": "source-needed",
-      "contract_ledger_confidence": "source-needed",
-      "source_note": "Roster player present on NFL.com; matching OverTheCap row not found in this snapshot.",
-      "source_url": "https://www.nfl.com/teams/buffalo-bills/roster"
-    },
-    {
-      "team_id": "BUF",
-      "player_id": "nfl:BUF:gregory-rousseau",
-      "player_name": "Greg Rousseau",
-      "position": "LB",
-      "cap_number_2026": null,
-      "source_status": "source-needed",
-      "contract_ledger_confidence": "source-needed",
-      "source_note": "Roster player present on NFL.com; matching OverTheCap row not found in this snapshot.",
-      "source_url": "https://www.nfl.com/teams/buffalo-bills/roster"
     },
     {
       "team_id": "BUF",
@@ -195,17 +162,6 @@
       "source_url": "https://www.nfl.com/teams/denver-broncos/roster"
     },
     {
-      "team_id": "DEN",
-      "player_id": "nfl:DEN:patrick-surtain-ii",
-      "player_name": "Pat Surtain II",
-      "position": "CB",
-      "cap_number_2026": null,
-      "source_status": "source-needed",
-      "contract_ledger_confidence": "source-needed",
-      "source_note": "Roster player present on NFL.com; matching OverTheCap row not found in this snapshot.",
-      "source_url": "https://www.nfl.com/teams/denver-broncos/roster"
-    },
-    {
       "team_id": "DET",
       "player_id": "nfl:DET:kendrick-law",
       "player_name": "Kendrick Law",
@@ -237,6 +193,17 @@
       "contract_ledger_confidence": "source-needed",
       "source_note": "Roster player present on NFL.com; matching OverTheCap row not found in this snapshot.",
       "source_url": "https://www.nfl.com/teams/green-bay-packers/roster"
+    },
+    {
+      "team_id": "HOU",
+      "player_id": "nfl:HOU:ajani-carter",
+      "player_name": "Ajani Carter",
+      "position": "DB",
+      "cap_number_2026": null,
+      "source_status": "source-needed",
+      "contract_ledger_confidence": "source-needed",
+      "source_note": "Roster player present on NFL.com; matching OverTheCap row not found in this snapshot.",
+      "source_url": "https://www.nfl.com/teams/houston-texans/roster"
     },
     {
       "team_id": "HOU",
@@ -283,17 +250,6 @@
       "source_url": "https://www.nfl.com/teams/indianapolis-colts/roster"
     },
     {
-      "team_id": "IND",
-      "player_id": "nfl:IND:sauce-gardner",
-      "player_name": "Sauce Gardner",
-      "position": "CB",
-      "cap_number_2026": null,
-      "source_status": "source-needed",
-      "contract_ledger_confidence": "source-needed",
-      "source_note": "Roster player present on NFL.com; matching OverTheCap row not found in this snapshot.",
-      "source_url": "https://www.nfl.com/teams/indianapolis-colts/roster"
-    },
-    {
       "team_id": "JAX",
       "player_id": "nfl:JAX:foye-oluokun",
       "player_name": "Foye Oluokun",
@@ -314,17 +270,6 @@
       "contract_ledger_confidence": "source-needed",
       "source_note": "Roster player present on NFL.com; matching OverTheCap row not found in this snapshot.",
       "source_url": "https://www.nfl.com/teams/los-angeles-chargers/roster"
-    },
-    {
-      "team_id": "LAR",
-      "player_id": "nfl:LAR:kamren-curl",
-      "player_name": "Kam Curl",
-      "position": "SAF",
-      "cap_number_2026": null,
-      "source_status": "source-needed",
-      "contract_ledger_confidence": "source-needed",
-      "source_note": "Roster player present on NFL.com; matching OverTheCap row not found in this snapshot.",
-      "source_url": "https://www.nfl.com/teams/los-angeles-rams/roster"
     },
     {
       "team_id": "LAR",
@@ -353,17 +298,6 @@
       "player_id": "nfl:LAR:drey-norwood",
       "player_name": "Drey Norwood",
       "position": "CB",
-      "cap_number_2026": null,
-      "source_status": "source-needed",
-      "contract_ledger_confidence": "source-needed",
-      "source_note": "Roster player present on NFL.com; matching OverTheCap row not found in this snapshot.",
-      "source_url": "https://www.nfl.com/teams/los-angeles-rams/roster"
-    },
-    {
-      "team_id": "LAR",
-      "player_id": "nfl:LAR:matthew-stafford",
-      "player_name": "Matthew Stafford",
-      "position": "QB",
       "cap_number_2026": null,
       "source_status": "source-needed",
       "contract_ledger_confidence": "source-needed",
@@ -647,6 +581,17 @@
     },
     {
       "team_id": "TEN",
+      "player_id": "nfl:TEN:c-j-ravenell",
+      "player_name": "C.J. Ravenell",
+      "position": "DE",
+      "cap_number_2026": null,
+      "source_status": "source-needed",
+      "contract_ledger_confidence": "source-needed",
+      "source_note": "Roster player present on NFL.com; matching OverTheCap row not found in this snapshot.",
+      "source_url": "https://www.nfl.com/teams/tennessee-titans/roster"
+    },
+    {
+      "team_id": "TEN",
       "player_id": "nfl:TEN:nicholas-singleton",
       "player_name": "Nicholas Singleton",
       "position": "RB",
@@ -655,28 +600,6 @@
       "contract_ledger_confidence": "source-needed",
       "source_note": "Roster player present on NFL.com; matching OverTheCap row not found in this snapshot.",
       "source_url": "https://www.nfl.com/teams/tennessee-titans/roster"
-    },
-    {
-      "team_id": "WAS",
-      "player_id": "nfl:WAS:samuel-cosmi",
-      "player_name": "Sam Cosmi",
-      "position": "OT",
-      "cap_number_2026": null,
-      "source_status": "source-needed",
-      "contract_ledger_confidence": "source-needed",
-      "source_note": "Roster player present on NFL.com; matching OverTheCap row not found in this snapshot.",
-      "source_url": "https://www.nfl.com/teams/washington-commanders/roster"
-    },
-    {
-      "team_id": "WAS",
-      "player_id": "nfl:WAS:chigoziem-okonkwo",
-      "player_name": "Chig Okonkwo",
-      "position": "TE",
-      "cap_number_2026": null,
-      "source_status": "source-needed",
-      "contract_ledger_confidence": "source-needed",
-      "source_note": "Roster player present on NFL.com; matching OverTheCap row not found in this snapshot.",
-      "source_url": "https://www.nfl.com/teams/washington-commanders/roster"
     },
     {
       "team_id": "WAS",
@@ -712,17 +635,6 @@
       "contract_ledger_confidence": "estimated",
       "source_note": "Estimated low-cap/offseason contract placeholder from NFL.com roster row because no matching OverTheCap row was found; use for coverage and directional cap math, not exact legal modeling.",
       "source_url": "https://www.nfl.com/teams/baltimore-ravens/roster"
-    },
-    {
-      "team_id": "HOU",
-      "player_id": "nfl:HOU:ajani-carter",
-      "player_name": "Ajani Carter",
-      "position": "DB",
-      "cap_number_2026": 1030000,
-      "source_status": "estimated",
-      "contract_ledger_confidence": "estimated",
-      "source_note": "Estimated low-cap/offseason contract placeholder from NFL.com roster row because no matching OverTheCap row was found; use for coverage and directional cap math, not exact legal modeling.",
-      "source_url": "https://www.nfl.com/teams/houston-texans/roster"
     },
     {
       "team_id": "MIA",
@@ -796,17 +708,6 @@
       "player_name": "David Agoha",
       "position": "DE",
       "cap_number_2026": 960000,
-      "source_status": "estimated",
-      "contract_ledger_confidence": "estimated",
-      "source_note": "Estimated low-cap/offseason contract placeholder from NFL.com roster row because no matching OverTheCap row was found; use for coverage and directional cap math, not exact legal modeling.",
-      "source_url": "https://www.nfl.com/teams/tennessee-titans/roster"
-    },
-    {
-      "team_id": "TEN",
-      "player_id": "nfl:TEN:c-j-ravenell",
-      "player_name": "C.J. Ravenell",
-      "position": "DE",
-      "cap_number_2026": 1030000,
       "source_status": "estimated",
       "contract_ledger_confidence": "estimated",
       "source_note": "Estimated low-cap/offseason contract placeholder from NFL.com roster row because no matching OverTheCap row was found; use for coverage and directional cap math, not exact legal modeling.",

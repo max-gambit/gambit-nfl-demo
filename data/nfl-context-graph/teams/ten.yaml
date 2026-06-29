@@ -102,6 +102,84 @@ trade_dna:
       counterparties: [JAX]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: asset_accumulator
+    confidence: high
+    evidence: Tennessee's retool posture and cap-room profile make pick accumulation plausible for non-core veterans, while young quarterback support and Jeffery Simmons remain protected.
+    source: https://overthecap.com/salary-cap/titans
+  position_group_stance:
+    - group: DL
+      stance: Jeffery Simmons is a hold, but John Franklin-Myers or other veteran front pieces can be credible calls if Tennessee prioritizes picks.
+      core_players: [Jeffery Simmons]
+      movable_players: [John Franklin-Myers, Jermaine Johnson II]
+      seller_depth_notes: The Titans have defensive-end volume and a retool posture, so veteran front calls are more plausible than with contenders.
+      sell_threshold: Confirm Simmons is excluded, then ask whether Tennessee wants picks for veteran DE snaps.
+      confidence: high
+      source: https://overthecap.com/salary-cap/titans
+    - group: EDGE/LB
+      stance: Edge and linebacker veterans are realistic check-call lanes if they are not part of the next-core plan.
+      core_players: [Jermaine Johnson II]
+      movable_players: [Cody Barton, David Agoha]
+      seller_depth_notes: Tennessee can accept some 2026 defensive pain if the return helps the retool and preserves younger-player development.
+      sell_threshold: Require a pick return that beats the value of keeping the veteran bridge role.
+      confidence: medium
+      source: https://www.nfl.com/teams/titans/roster
+    - group: CB/S
+      stance: Alontae Taylor and Amani Hooker are not automatic sellers, but veteran secondary depth can be discussed.
+      core_players: [Alontae Taylor, Amani Hooker]
+      movable_players: [Tony Adams, Cordale Flott]
+      seller_depth_notes: The Titans have DB bodies, yet selling a top starter can make a young roster harder to evaluate.
+      sell_threshold: Validate whether Tennessee views the player as next-core or bridge before pricing.
+      confidence: medium
+      source: https://www.nfl.com/teams/titans/roster
+    - group: WR
+      stance: Calvin Ridley is a plausible veteran-market conversation only if Tennessee prefers future assets over immediate quarterback support.
+      core_players: [Carnell Tate, Wan'Dale Robinson]
+      movable_players: [Calvin Ridley, Hank Beatty]
+      seller_depth_notes: The main objection is weakening Cam Ward's evaluation environment; a seller case needs replacement target volume.
+      sell_threshold: Ask whether Tennessee is protecting the young QB support group before making a receiver offer.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/titans
+    - group: OL
+      stance: Dan Moore Jr., JC Latham, and Peter Skoronski should be treated as quarterback-support holds unless Tennessee is resetting the line.
+      core_players: [Dan Moore Jr., JC Latham, Peter Skoronski]
+      movable_players: [Fernando Carmona]
+      seller_depth_notes: Even in a retool, selling starting protection creates evaluation risk for Cam Ward.
+      sell_threshold: Keep OL calls to depth players unless the Titans signal a full line reset.
+      confidence: high
+      source: https://www.nfl.com/teams/titans/roster
+  market_preferences:
+    desired_return_types:
+      - Draft capital for bridge veterans
+      - Young-player swaps that fit the next competitive core
+    avoided_deal_types:
+      - Selling young quarterback support without a replacement
+      - AFC South discounts
+    division_rivalry_friction: AFC South friction is high; a Giants call is cleaner and should emphasize future assets over division leverage.
+    confidence: high
+    source: https://www.nfl.com/teams/titans/roster
+  trade_triggers:
+    - trigger: Tennessee prioritizes developmental snaps over veteran bridge performance.
+      implication: Veteran front-seven, DB, and receiver lanes become credible calls.
+      confidence: high
+      source: https://www.nfl.com/teams/titans/roster
+    - trigger: A pick offer lets Tennessee add future capital without taking back 2027 money.
+      implication: The Titans can accept short-term depth loss for retool value.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/titans
+  availability_validation:
+    - check: Confirm whether the player is part of the next core or a bridge veteran.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/titans/roster
+    - check: Confirm Tennessee keeps the young quarterback support structure intact after the trade.
+      owner: front_office
+      source: https://overthecap.com/salary-cap/titans
+  no_trade_guardrails:
+    - guardrail: Do not treat Simmons or starting OL as available just because the team is retooling.
+      confidence: high
+      source: https://overthecap.com/salary-cap/titans
+
 cultural_signals:
   stability:
     value: medium

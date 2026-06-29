@@ -102,6 +102,84 @@ trade_dna:
       counterparties: [BUF]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: cap_seller
+    confidence: medium
+    evidence: Miami's restructure-needed cap status creates a real seller screen, but the team should still protect core speed and defensive-line pieces unless the season direction changes.
+    source: https://overthecap.com/salary-cap/dolphins
+  position_group_stance:
+    - group: DL
+      stance: Zach Sieler is a strong hold unless Miami chooses a broader reset, while lower DT depth is more plausible than moving the front's best piece.
+      core_players: [Zach Sieler, Kenneth Grant]
+      movable_players: [Zeek Biggers]
+      seller_depth_notes: The Dolphins have interior bodies but not a clear surplus of proven high-end interior rush.
+      sell_threshold: Require a cap-reset signal before pricing Sieler; depth-only calls can be checked earlier.
+      confidence: medium
+      source: https://www.nfl.com/teams/dolphins/roster
+    - group: EDGE/LB
+      stance: Miami can listen on one-year linebacker roles before touching young edge investments.
+      core_players: [Chop Robinson, Jordyn Brooks]
+      movable_players: [Tyrel Dodson]
+      seller_depth_notes: A linebacker sale is plausible only if it does not compromise run fits or special-teams coverage.
+      sell_threshold: Ask whether the player is outside the starting or subpackage linebacker plan.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/dolphins
+    - group: CB/S
+      stance: The DB room is a practical cap-seller lane because Miami has multiple corners and safeties, but buyers must separate depth from starting coverage.
+      core_players: [Chris Johnson]
+      movable_players: [Julius Brents, Zayne Anderson]
+      seller_depth_notes: Miami can convert secondary depth if younger corners own the depth chart, yet a starting corner sale still creates coverage risk.
+      sell_threshold: Require a nickel or boundary-depth surplus before calling a DB credible.
+      confidence: medium
+      source: https://www.nfl.com/teams/dolphins/roster
+    - group: WR
+      stance: Receiver sales should be limited to lower-depth contracts because Miami's offensive identity needs speed and spacing.
+      core_players: [Tutu Atwell]
+      movable_players: [Chris Bell]
+      seller_depth_notes: Cap pressure can make depth receivers movable, but top speed threats should not be assumed available.
+      sell_threshold: Validate route-share compression before sending a pick offer.
+      confidence: medium
+      source: https://www.nfl.com/teams/dolphins/roster
+    - group: OL
+      stance: Miami has several tackle and interior contracts, but OL exits must be treated as dangerous unless the replacement plan is proven.
+      core_players: [Austin Jackson, Aaron Brewer]
+      movable_players: [Patrick Paul, Jonah Savaiinaea]
+      seller_depth_notes: The cap sheet suggests possible relief, but protection and run-game continuity are the seller objections.
+      sell_threshold: Require a defined starting five plus swing depth before pricing a lineman.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/dolphins
+  market_preferences:
+    desired_return_types:
+      - Draft capital for depth players in crowded rooms
+      - Clean 2026 cap relief without adding 2027 obligations
+    avoided_deal_types:
+      - Selling core speed or top defensive-front value for marginal relief
+      - AFC East trades unless price is clearly favorable
+    division_rivalry_friction: AFC East friction is high; a Giants call is easier, but Miami still needs clean cap value or a role-player surplus.
+    confidence: medium
+    source: https://www.nfl.com/teams/dolphins/roster
+  trade_triggers:
+    - trigger: Miami chooses a cap trim over another restructure.
+      implication: One-year and depth contracts become active check-call lanes.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/dolphins
+    - trigger: Young DB, LB, or OL depth wins a role and makes a veteran redundant.
+      implication: The seller case improves from cap-only to roster-backed.
+      confidence: medium
+      source: https://www.nfl.com/teams/dolphins/roster
+  availability_validation:
+    - check: Confirm whether Miami is in cap-trim mode or still protecting all core contention pieces.
+      owner: front_office
+      source: https://overthecap.com/salary-cap/dolphins
+    - check: Confirm a target's actual game-day role before treating cap pressure as availability.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/dolphins/roster
+  no_trade_guardrails:
+    - guardrail: Do not rank a Dolphins target as call-now from cap pressure alone; require depth surplus or a cap-trim signal.
+      confidence: high
+      source: https://overthecap.com/salary-cap/dolphins
+
 cultural_signals:
   stability:
     value: medium

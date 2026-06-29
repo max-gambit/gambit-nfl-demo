@@ -102,6 +102,84 @@ trade_dna:
       counterparties: [MIA]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: buyer_hold
+    confidence: high
+    evidence: Buffalo's contend-now posture and Josh Allen contract window point to holding useful starters; near-cap pressure creates only lower-roster or contract-specific trade conversations.
+    source: https://overthecap.com/salary-cap/bills
+  position_group_stance:
+    - group: DL
+      stance: Ed Oliver is a hold, while lower-cost DT depth can be discussed only if Buffalo has rotation surplus after camp.
+      core_players: [Ed Oliver]
+      movable_players: [Tommy Akingbesote]
+      seller_depth_notes: A contender should not thin its best interior rusher for a mid-round return unless the depth chart produces a real replacement.
+      sell_threshold: Require a younger DT to own rotation snaps before any interior sale moves past monitor.
+      confidence: high
+      source: https://www.nfl.com/teams/bills/roster
+    - group: EDGE/LB
+      stance: Buffalo can listen on non-core linebacker roles, but the edge/LB room is more buyer-hold than seller.
+      core_players: [Terrel Bernard, Bradley Chubb]
+      movable_players: [Michael Hoecht]
+      seller_depth_notes: The room has numbers, yet the Bills need rush and second-level depth for a playoff push.
+      sell_threshold: Only discuss a veteran if Buffalo is choosing younger subpackage players over the contract.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/bills
+    - group: CB/S
+      stance: Christian Benford and the starting secondary should be treated as hold assets, with safety depth as the more plausible inquiry.
+      core_players: [Christian Benford, Cole Bishop]
+      movable_players: [Mike Edwards]
+      seller_depth_notes: Trading a starting defensive back creates more win-now pain than cap relief.
+      sell_threshold: Ask first whether the player is outside the dime and injury-depth plan.
+      confidence: medium
+      source: https://www.nfl.com/teams/bills/roster
+    - group: WR
+      stance: A crowded receiver room can produce calls, but Buffalo should not sell a trusted Allen target for simple cap cleanup.
+      core_players: [Khalil Shakir, DJ Moore]
+      movable_players: [Josh Palmer]
+      seller_depth_notes: The cap sheet shows movable money at receiver, but the football cost depends on whether the player is part of Allen's weekly progression.
+      sell_threshold: Require role compression from younger receivers before pricing a veteran target.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/bills
+    - group: OL
+      stance: Dion Dawkins and Spencer Brown are protection holds; guard depth is a check-call only if Buffalo's interior backups separate.
+      core_players: [Dion Dawkins, Spencer Brown, Connor McGovern]
+      movable_players: [O'Cyrus Torrence]
+      seller_depth_notes: Trading offensive line help during an Allen contention window is high pain unless the player is clearly displaced.
+      sell_threshold: Do not lead with OL unless Buffalo signals a depth surplus.
+      confidence: high
+      source: https://www.nfl.com/teams/bills/roster
+  market_preferences:
+    desired_return_types:
+      - Picks for surplus role players only
+      - Cap-neutral player swaps that help the current window
+    avoided_deal_types:
+      - Selling protection or pass-rush starters during a contend-now season
+      - AFC East discount trades
+    division_rivalry_friction: AFC East counterparties face high friction; a Giants call avoids division issues but still needs win-now utility for Buffalo.
+    confidence: high
+    source: https://www.nfl.com/teams/bills/roster
+  trade_triggers:
+    - trigger: Injuries elsewhere force Buffalo to turn surplus depth into a need-position player.
+      implication: Player-for-player structures become more realistic than pure pick sales.
+      confidence: medium
+      source: https://www.nfl.com/teams/bills/roster
+    - trigger: A younger receiver, DB, or linebacker wins a role and pushes a veteran below the weekly plan.
+      implication: The displaced veteran can move from hold to check-call.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/bills
+  availability_validation:
+    - check: Confirm the player is not in Buffalo's playoff-week starting or injury-depth plan.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/bills/roster
+    - check: Compare current-year relief with seller dead money before calling any Bills contract movable.
+      owner: cap
+      source: https://overthecap.com/salary-cap/bills
+  no_trade_guardrails:
+    - guardrail: Do not turn a Buffalo cap-fit row into a lead lane if it removes Josh Allen support, interior rush, or starting secondary value.
+      confidence: high
+      source: https://overthecap.com/salary-cap/bills
+
 cultural_signals:
   stability:
     value: medium

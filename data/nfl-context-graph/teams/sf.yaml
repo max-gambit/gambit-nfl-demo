@@ -102,6 +102,84 @@ trade_dna:
       counterparties: [LAR]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: buyer_hold
+    confidence: high
+    evidence: San Francisco's contend-now posture and near-cap status point to restructuring or trimming depth before selling core starters.
+    source: https://overthecap.com/salary-cap/49ers
+  position_group_stance:
+    - group: DL
+      stance: Osa Odighizuwa and the young defensive front should be treated as hold unless the 49ers clearly pivot from contend-now.
+      core_players: [Nick Bosa, Osa Odighizuwa, Mykel Williams]
+      movable_players: [Evan Anderson]
+      seller_depth_notes: The 49ers need defensive-front depth for a contention run, so an interior call needs a surplus signal rather than cap math alone.
+      sell_threshold: Require a young-depth breakout or posture change before treating a DL target as credible.
+      confidence: high
+      source: https://www.nfl.com/teams/49ers/roster
+    - group: EDGE/LB
+      stance: Nick Bosa and Fred Warner are no-trade anchors; lower front-seven depth is the only call lane.
+      core_players: [Nick Bosa, Fred Warner, Dre Greenlaw]
+      movable_players: [Will Bradley-King]
+      seller_depth_notes: The seller loss is too large on core rush and linebacker players during a contend-now year.
+      sell_threshold: Do not lead with EDGE/LB unless the target is outside the defensive rotation.
+      confidence: high
+      source: https://overthecap.com/salary-cap/49ers
+    - group: CB/S
+      stance: San Francisco can listen on safety or corner depth if it has younger replacements, but Deommodore Lenoir is a hold.
+      core_players: [Deommodore Lenoir]
+      movable_players: [Ji'Ayir Brown, Eli Apple]
+      seller_depth_notes: The secondary has enough rows for depth calls, but selling starters weakens a contender's margin.
+      sell_threshold: Validate the player is a rotational DB before pricing the lane.
+      confidence: medium
+      source: https://www.nfl.com/teams/49ers/roster
+    - group: WR
+      stance: Brandon Aiyuk and Ricky Pearsall are hold pieces unless San Francisco makes a broader cap reset.
+      core_players: [Brandon Aiyuk, Ricky Pearsall]
+      movable_players: [Mike Evans]
+      seller_depth_notes: Receiver calls need to account for Brock Purdy's support system and the current window.
+      sell_threshold: Require a cap reset or role compression signal before naming a WR as available.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/49ers
+    - group: OL
+      stance: Trent Williams is a posture-change-only name; depth linemen can be checked if the 49ers need cap room.
+      core_players: [Trent Williams, Colton McKivitz]
+      movable_players: [Isaac Alarcon]
+      seller_depth_notes: Trading starting protection in a contend-now window creates immediate offensive risk.
+      sell_threshold: Treat starting OL as hold and ask only on players outside the top swing-depth plan.
+      confidence: high
+      source: https://www.nfl.com/teams/49ers/roster
+  market_preferences:
+    desired_return_types:
+      - Player swaps that help the current contention window
+      - Picks for depth players outside the weekly plan
+    avoided_deal_types:
+      - Selling core stars for simple cap relief
+      - NFC West discounts
+    division_rivalry_friction: NFC West trades are high-friction; a Giants call is cleaner but still must fit a contend-now roster.
+    confidence: high
+    source: https://www.nfl.com/teams/49ers/roster
+  trade_triggers:
+    - trigger: San Francisco's injury or cap picture forces depth churn rather than another restructure.
+      implication: Role players can become check-call candidates while core stars remain holds.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/49ers
+    - trigger: A younger DB, DL, or WR claims a weekly role.
+      implication: A displaced veteran can move from hold to selective-seller status.
+      confidence: medium
+      source: https://www.nfl.com/teams/49ers/roster
+  availability_validation:
+    - check: Confirm the target is not part of San Francisco's current playoff-core plan.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/49ers/roster
+    - check: Confirm whether a trade is cleaner than a restructure for near-cap management.
+      owner: cap
+      source: https://overthecap.com/salary-cap/49ers
+  no_trade_guardrails:
+    - guardrail: Do not convert San Francisco cap pressure into a seller recommendation for Bosa, Warner, Williams, or Aiyuk.
+      confidence: high
+      source: https://overthecap.com/salary-cap/49ers
+
 cultural_signals:
   stability:
     value: medium

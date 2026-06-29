@@ -705,6 +705,138 @@
       ],
       "confidence": "medium"
     },
+    "trade_market_intel": {
+      "seller_posture": {
+        "value": "selective_seller",
+        "confidence": "medium",
+        "evidence": "Atlanta's contend-soon roster and near-cap profile make core sales unlikely, but one-year skill or depth contracts can be discussed if the return helps the Penix window.",
+        "source": "https://overthecap.com/salary-cap/falcons"
+      },
+      "position_group_stance": [
+        {
+          "group": "DL",
+          "stance": "Interior-front sales should start as monitor-only because Atlanta's loaded cap rows do not show a proven surplus of expensive DTs.",
+          "core_players": [
+            "Grady Jarrett"
+          ],
+          "movable_players": [
+            "Ross Blacklock"
+          ],
+          "seller_depth_notes": "The roster has bodies across DT and DE, but the top interior value is more useful as protection for a young quarterback-led contender than as a discount rental.",
+          "sell_threshold": "Require a clear Falcons depth win or a pick overpay before treating an interior defender as available.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/falcons/roster"
+        },
+        {
+          "group": "EDGE/LB",
+          "stance": "Atlanta can listen on veteran linebacker depth before touching young edge or front-seven investments.",
+          "core_players": [
+            "Jalon Walker",
+            "Troy Andersen"
+          ],
+          "movable_players": [
+            "Divine Deablo"
+          ],
+          "seller_depth_notes": "A linebacker trade is only plausible if the Falcons prefer cap room and younger snaps over keeping a one-year veteran.",
+          "sell_threshold": "Ask whether the player is outside the defensive subpackage plan before discussing compensation.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/falcons"
+        },
+        {
+          "group": "CB/S",
+          "stance": "Jessie Bates and A.J. Terrell are hold pieces, while lower DB depth is the only realistic call lane.",
+          "core_players": [
+            "Jessie Bates",
+            "A.J. Terrell"
+          ],
+          "movable_players": [
+            "Mike Hughes"
+          ],
+          "seller_depth_notes": "Moving a starting-caliber defensive back weakens the coverage spine, so Atlanta needs either a replacement confidence signal or a premium return.",
+          "sell_threshold": "Price only one-year or depth DB contracts unless Atlanta's season direction changes.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/falcons/roster"
+        },
+        {
+          "group": "WR",
+          "stance": "Drake London is not a seller lane, but a crowded receiver room can produce depth-player calls.",
+          "core_players": [
+            "Drake London"
+          ],
+          "movable_players": [
+            "Jahan Dotson",
+            "Chris Blair"
+          ],
+          "seller_depth_notes": "The Falcons should not strip primary targets from Michael Penix Jr.; buyers should look for role compression lower on the depth chart.",
+          "sell_threshold": "Require evidence that the receiver is outside the weekly target plan.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/falcons/roster"
+        },
+        {
+          "group": "OL",
+          "stance": "Atlanta should protect the starting offensive line unless a one-year veteran is clearly outside its best five.",
+          "core_players": [
+            "Chris Lindstrom",
+            "Jake Matthews",
+            "Matthew Bergeron"
+          ],
+          "movable_players": [
+            "Ryan Neuzil",
+            "Jawaan Taylor"
+          ],
+          "seller_depth_notes": "Any OL sale must be measured against the cost of exposing Penix, so cap room alone is not a good seller case.",
+          "sell_threshold": "Treat only backup or contract-year linemen as call candidates.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/falcons"
+        }
+      ],
+      "market_preferences": {
+        "desired_return_types": [
+          "Draft capital for one-year veterans outside the core",
+          "Cap flexibility that does not weaken the quarterback support system"
+        ],
+        "avoided_deal_types": [
+          "Selling protection or coverage pillars during a contend-soon window",
+          "Taking back long 2027 money for a depth-player exit"
+        ],
+        "division_rivalry_friction": "NFC South trades carry normal division friction; a Giants call has no division block but still needs to protect Atlanta's young-QB timeline.",
+        "confidence": "medium",
+        "source": "https://www.nfl.com/teams/falcons/roster"
+      },
+      "trade_triggers": [
+        {
+          "trigger": "Younger DB, WR, or OL depth wins weekly roles before the deadline.",
+          "implication": "Atlanta can convert a displaced veteran into a pick without changing the core plan.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/falcons/roster"
+        },
+        {
+          "trigger": "Near-cap pressure forces a small veteran trim rather than a starter sale.",
+          "implication": "One-year contracts become check-call lanes, not headline targets.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/falcons"
+        }
+      ],
+      "availability_validation": [
+        {
+          "check": "Confirm which veterans are outside Atlanta's top game-day plan before naming them as available.",
+          "owner": "pro_personnel",
+          "source": "https://www.nfl.com/teams/falcons/roster"
+        },
+        {
+          "check": "Confirm trade, post-June, and 2027 effects on any one-year contract before calling the move clean.",
+          "owner": "cap",
+          "source": "https://overthecap.com/salary-cap/falcons"
+        }
+      ],
+      "no_trade_guardrails": [
+        {
+          "guardrail": "Do not frame Bates, Terrell, London, Lindstrom, or Matthews as realistic seller lanes without a posture-change signal.",
+          "confidence": "high",
+          "source": "https://overthecap.com/salary-cap/falcons"
+        }
+      ]
+    },
     "cultural_signals": {
       "stability": {
         "value": "medium",
@@ -1762,6 +1894,137 @@
         }
       ],
       "confidence": "medium"
+    },
+    "trade_market_intel": {
+      "seller_posture": {
+        "value": "buyer_hold",
+        "confidence": "high",
+        "evidence": "Buffalo's contend-now posture and Josh Allen contract window point to holding useful starters; near-cap pressure creates only lower-roster or contract-specific trade conversations.",
+        "source": "https://overthecap.com/salary-cap/bills"
+      },
+      "position_group_stance": [
+        {
+          "group": "DL",
+          "stance": "Ed Oliver is a hold, while lower-cost DT depth can be discussed only if Buffalo has rotation surplus after camp.",
+          "core_players": [
+            "Ed Oliver"
+          ],
+          "movable_players": [
+            "Tommy Akingbesote"
+          ],
+          "seller_depth_notes": "A contender should not thin its best interior rusher for a mid-round return unless the depth chart produces a real replacement.",
+          "sell_threshold": "Require a younger DT to own rotation snaps before any interior sale moves past monitor.",
+          "confidence": "high",
+          "source": "https://www.nfl.com/teams/bills/roster"
+        },
+        {
+          "group": "EDGE/LB",
+          "stance": "Buffalo can listen on non-core linebacker roles, but the edge/LB room is more buyer-hold than seller.",
+          "core_players": [
+            "Terrel Bernard",
+            "Bradley Chubb"
+          ],
+          "movable_players": [
+            "Michael Hoecht"
+          ],
+          "seller_depth_notes": "The room has numbers, yet the Bills need rush and second-level depth for a playoff push.",
+          "sell_threshold": "Only discuss a veteran if Buffalo is choosing younger subpackage players over the contract.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/bills"
+        },
+        {
+          "group": "CB/S",
+          "stance": "Christian Benford and the starting secondary should be treated as hold assets, with safety depth as the more plausible inquiry.",
+          "core_players": [
+            "Christian Benford",
+            "Cole Bishop"
+          ],
+          "movable_players": [
+            "Mike Edwards"
+          ],
+          "seller_depth_notes": "Trading a starting defensive back creates more win-now pain than cap relief.",
+          "sell_threshold": "Ask first whether the player is outside the dime and injury-depth plan.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/bills/roster"
+        },
+        {
+          "group": "WR",
+          "stance": "A crowded receiver room can produce calls, but Buffalo should not sell a trusted Allen target for simple cap cleanup.",
+          "core_players": [
+            "Khalil Shakir",
+            "DJ Moore"
+          ],
+          "movable_players": [
+            "Josh Palmer"
+          ],
+          "seller_depth_notes": "The cap sheet shows movable money at receiver, but the football cost depends on whether the player is part of Allen's weekly progression.",
+          "sell_threshold": "Require role compression from younger receivers before pricing a veteran target.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/bills"
+        },
+        {
+          "group": "OL",
+          "stance": "Dion Dawkins and Spencer Brown are protection holds; guard depth is a check-call only if Buffalo's interior backups separate.",
+          "core_players": [
+            "Dion Dawkins",
+            "Spencer Brown",
+            "Connor McGovern"
+          ],
+          "movable_players": [
+            "O'Cyrus Torrence"
+          ],
+          "seller_depth_notes": "Trading offensive line help during an Allen contention window is high pain unless the player is clearly displaced.",
+          "sell_threshold": "Do not lead with OL unless Buffalo signals a depth surplus.",
+          "confidence": "high",
+          "source": "https://www.nfl.com/teams/bills/roster"
+        }
+      ],
+      "market_preferences": {
+        "desired_return_types": [
+          "Picks for surplus role players only",
+          "Cap-neutral player swaps that help the current window"
+        ],
+        "avoided_deal_types": [
+          "Selling protection or pass-rush starters during a contend-now season",
+          "AFC East discount trades"
+        ],
+        "division_rivalry_friction": "AFC East counterparties face high friction; a Giants call avoids division issues but still needs win-now utility for Buffalo.",
+        "confidence": "high",
+        "source": "https://www.nfl.com/teams/bills/roster"
+      },
+      "trade_triggers": [
+        {
+          "trigger": "Injuries elsewhere force Buffalo to turn surplus depth into a need-position player.",
+          "implication": "Player-for-player structures become more realistic than pure pick sales.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/bills/roster"
+        },
+        {
+          "trigger": "A younger receiver, DB, or linebacker wins a role and pushes a veteran below the weekly plan.",
+          "implication": "The displaced veteran can move from hold to check-call.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/bills"
+        }
+      ],
+      "availability_validation": [
+        {
+          "check": "Confirm the player is not in Buffalo's playoff-week starting or injury-depth plan.",
+          "owner": "pro_personnel",
+          "source": "https://www.nfl.com/teams/bills/roster"
+        },
+        {
+          "check": "Compare current-year relief with seller dead money before calling any Bills contract movable.",
+          "owner": "cap",
+          "source": "https://overthecap.com/salary-cap/bills"
+        }
+      ],
+      "no_trade_guardrails": [
+        {
+          "guardrail": "Do not turn a Buffalo cap-fit row into a lead lane if it removes Josh Allen support, interior rush, or starting secondary value.",
+          "confidence": "high",
+          "source": "https://overthecap.com/salary-cap/bills"
+        }
+      ]
     },
     "cultural_signals": {
       "stability": {
@@ -2827,6 +3090,140 @@
         }
       ],
       "confidence": "medium"
+    },
+    "trade_market_intel": {
+      "seller_posture": {
+        "value": "selective_seller",
+        "confidence": "medium",
+        "evidence": "Chicago's contend-soon posture and near-cap profile support selective veteran calls, but recent investments on both lines make core trench sales unlikely.",
+        "source": "https://overthecap.com/salary-cap/bears"
+      },
+      "position_group_stance": [
+        {
+          "group": "DL",
+          "stance": "Grady Jarrett or Dayo Odeyingbo should be treated as high-impact, low-probability targets unless Chicago pivots away from its defensive-front build.",
+          "core_players": [
+            "Montez Sweat",
+            "Dayo Odeyingbo",
+            "Grady Jarrett"
+          ],
+          "movable_players": [
+            "Andrew Billings"
+          ],
+          "seller_depth_notes": "Chicago has bodies on the defensive line, but the top cap players are part of a front the club appears to be building around.",
+          "sell_threshold": "Require either a younger DT winning the role or a clear cap-driven reset before making a serious DT offer.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/bears/roster"
+        },
+        {
+          "group": "EDGE/LB",
+          "stance": "The Bears can listen on off-ball linebacker depth, but Montez Sweat is not a salary-out target.",
+          "core_players": [
+            "Montez Sweat",
+            "T.J. Edwards"
+          ],
+          "movable_players": [
+            "Devin Bush"
+          ],
+          "seller_depth_notes": "Moving a non-core linebacker is plausible only if younger depth covers special teams and subpackage snaps.",
+          "sell_threshold": "Keep edge inquiries to posture-change watch; direct calls should focus on displaced linebackers.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/bears"
+        },
+        {
+          "group": "CB/S",
+          "stance": "Jaylon Johnson and Kyler Gordon are hold pieces, with surplus DB depth a lower-pain path.",
+          "core_players": [
+            "Jaylon Johnson",
+            "Kyler Gordon"
+          ],
+          "movable_players": [
+            "Coby Bryant",
+            "Josh Blackwell"
+          ],
+          "seller_depth_notes": "Chicago's secondary has enough rows to create depth calls, but moving a top corner damages the defensive plan.",
+          "sell_threshold": "Require evidence that a DB is not in the nickel or starting plan.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/bears/roster"
+        },
+        {
+          "group": "WR",
+          "stance": "Rome Odunze and Luther Burden are young hold assets; receiver depth is call-worthy only below the main target tree.",
+          "core_players": [
+            "Rome Odunze",
+            "Luther Burden III"
+          ],
+          "movable_players": [
+            "Maurice Alexander"
+          ],
+          "seller_depth_notes": "A young quarterback ecosystem should not sell its best route volume unless the team receives a major overpay.",
+          "sell_threshold": "Ask about players buried outside the top-four receiver plan, not the starting pair.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/bears/roster"
+        },
+        {
+          "group": "OL",
+          "stance": "Chicago has movable cap at guard, but selling Joe Thuney or Jonah Jackson weakens the exact support structure Caleb Williams needs.",
+          "core_players": [
+            "Joe Thuney",
+            "Jonah Jackson",
+            "Darnell Wright"
+          ],
+          "movable_players": [
+            "Garrett Bradbury"
+          ],
+          "seller_depth_notes": "A center or backup-lineman call is more plausible than a starting-guard trade.",
+          "sell_threshold": "Confirm Chicago has a replacement starter before treating an OL contract as available.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/bears"
+        }
+      ],
+      "market_preferences": {
+        "desired_return_types": [
+          "Draft capital for displaced veterans",
+          "Need-position swaps that keep the young quarterback support plan intact"
+        ],
+        "avoided_deal_types": [
+          "Selling recent trench investments at a discount",
+          "Divisional trades that help NFC North rivals"
+        ],
+        "division_rivalry_friction": "NFC North friction is high; a Giants call is cleaner but still needs to avoid stripping Caleb Williams support.",
+        "confidence": "medium",
+        "source": "https://www.nfl.com/teams/bears/roster"
+      },
+      "trade_triggers": [
+        {
+          "trigger": "A young lineman or defensive back wins a starting role and turns a veteran into depth.",
+          "implication": "Chicago can listen on the displaced contract without changing the club's direction.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/bears/roster"
+        },
+        {
+          "trigger": "Near-cap pressure makes a role-player exit preferable to another restructure.",
+          "implication": "The seller case moves from monitor to check-call for non-core veterans.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/bears"
+        }
+      ],
+      "availability_validation": [
+        {
+          "check": "Confirm the target is not part of Chicago's quarterback-support or starting-front plan.",
+          "owner": "pro_personnel",
+          "source": "https://www.nfl.com/teams/bears/roster"
+        },
+        {
+          "check": "Verify whether a trade creates clean 2026 room or just moves cap pain.",
+          "owner": "cap",
+          "source": "https://overthecap.com/salary-cap/bears"
+        }
+      ],
+      "no_trade_guardrails": [
+        {
+          "guardrail": "Do not lead with Bears trench starters unless the answer names the young-QB or defensive-front cost.",
+          "confidence": "high",
+          "source": "https://overthecap.com/salary-cap/bears"
+        }
+      ]
     },
     "cultural_signals": {
       "stability": {
@@ -6700,6 +7097,137 @@
       ],
       "confidence": "medium"
     },
+    "trade_market_intel": {
+      "seller_posture": {
+        "value": "buyer_hold",
+        "confidence": "high",
+        "evidence": "Houston's contend-soon posture, near-cap profile, and Stroud rookie-contract window point to holding core players while listening only on displaced veterans.",
+        "source": "https://overthecap.com/salary-cap/texans"
+      },
+      "position_group_stance": [
+        {
+          "group": "DL",
+          "stance": "Danielle Hunter and Will Anderson Jr. are not seller lanes; interior or rotational depth can be checked only if Houston's front has a surplus.",
+          "core_players": [
+            "Danielle Hunter",
+            "Will Anderson Jr."
+          ],
+          "movable_players": [
+            "Dominic Bailey"
+          ],
+          "seller_depth_notes": "The Texans should value pass-rush depth highly while trying to contend around C.J. Stroud.",
+          "sell_threshold": "Ask only on rotation players who are outside the pressure package.",
+          "confidence": "high",
+          "source": "https://www.nfl.com/teams/texans/roster"
+        },
+        {
+          "group": "EDGE/LB",
+          "stance": "Edge and linebacker calls should be conservative because the high-cap rows are tied to the defensive identity.",
+          "core_players": [
+            "Danielle Hunter",
+            "Will Anderson Jr.",
+            "Azeez Al-Shaair"
+          ],
+          "movable_players": [
+            "E.J. Speed"
+          ],
+          "seller_depth_notes": "Houston can move a role linebacker only if it does not reduce pressure packages, run fits, or special-teams reliability.",
+          "sell_threshold": "Require role displacement plus a pick or need-position return.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/texans"
+        },
+        {
+          "group": "CB/S",
+          "stance": "Derek Stingley Jr. and Jalen Pitre are hold assets; safety depth is the only realistic inquiry.",
+          "core_players": [
+            "Derek Stingley Jr.",
+            "Jalen Pitre"
+          ],
+          "movable_players": [
+            "Reed Blankenship"
+          ],
+          "seller_depth_notes": "Trading a starting defensive back creates more playoff-path pain than cap relief.",
+          "sell_threshold": "Treat DB calls as monitor unless a veteran is outside Houston's subpackage plan.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/texans/roster"
+        },
+        {
+          "group": "WR",
+          "stance": "Nico Collins is a hold, and receiver sales should be limited to role compression below the main target tree.",
+          "core_players": [
+            "Nico Collins"
+          ],
+          "movable_players": [
+            "Lewis Bond"
+          ],
+          "seller_depth_notes": "A Stroud-centered offense should protect its top targets and only consider depth exits.",
+          "sell_threshold": "Require evidence that the receiver is outside the weekly rotation.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/texans/roster"
+        },
+        {
+          "group": "OL",
+          "stance": "One-year tackle money can be a check-call, but Houston should not thin protection without a replacement.",
+          "core_players": [
+            "Braden Smith"
+          ],
+          "movable_players": [
+            "Trent Brown",
+            "Jake Andrews"
+          ],
+          "seller_depth_notes": "The cap sheet shows short-term OL contracts, but the football cost is tied directly to Stroud protection.",
+          "sell_threshold": "Confirm Houston's starting five and swing-tackle plan before pricing any lineman.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/texans"
+        }
+      ],
+      "market_preferences": {
+        "desired_return_types": [
+          "Player-for-player help that supports the Stroud window",
+          "Picks for veterans outside the weekly plan"
+        ],
+        "avoided_deal_types": [
+          "Selling premium rush or coverage starters",
+          "AFC South trades that solve a rival's need"
+        ],
+        "division_rivalry_friction": "AFC South friction is high; a Giants inquiry avoids division conflict but still needs to respect Houston's contend-soon window.",
+        "confidence": "high",
+        "source": "https://www.nfl.com/teams/texans/roster"
+      },
+      "trade_triggers": [
+        {
+          "trigger": "A veteran falls behind a younger player in Houston's offensive line or secondary rotation.",
+          "implication": "The Texans can turn depth into a pick without touching core starters.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/texans/roster"
+        },
+        {
+          "trigger": "Near-cap pressure makes a depth sale preferable to touching core extensions.",
+          "implication": "Check-call targets should be non-core contracts only.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/texans"
+        }
+      ],
+      "availability_validation": [
+        {
+          "check": "Confirm the target is not part of Houston's protection, pressure, or coverage core.",
+          "owner": "pro_personnel",
+          "source": "https://www.nfl.com/teams/texans/roster"
+        },
+        {
+          "check": "Confirm trade savings and dead-money treatment before calling a veteran exit helpful.",
+          "owner": "cap",
+          "source": "https://overthecap.com/salary-cap/texans"
+        }
+      ],
+      "no_trade_guardrails": [
+        {
+          "guardrail": "Do not rank a Texans target as a lead lane if the only evidence is buyer cap fit and not Houston seller motivation.",
+          "confidence": "high",
+          "source": "https://overthecap.com/salary-cap/texans"
+        }
+      ]
+    },
     "cultural_signals": {
       "stability": {
         "value": "medium",
@@ -7756,6 +8284,140 @@
         }
       ],
       "confidence": "medium"
+    },
+    "trade_market_intel": {
+      "seller_posture": {
+        "value": "selective_seller",
+        "confidence": "medium",
+        "evidence": "Jacksonville's contend-soon posture and near-cap status support selective veteran calls, but the Lawrence and defensive-front core should be treated as hold unless the season turns.",
+        "source": "https://overthecap.com/salary-cap/jaguars"
+      },
+      "position_group_stance": [
+        {
+          "group": "DL",
+          "stance": "Arik Armstead or DaVon Hamilton are contract-fit names to monitor, but Jacksonville loses front depth unless younger linemen are ready.",
+          "core_players": [
+            "Josh Hines-Allen",
+            "Travon Walker"
+          ],
+          "movable_players": [
+            "Arik Armstead",
+            "DaVon Hamilton"
+          ],
+          "seller_depth_notes": "The Jaguars have defensive-line bodies, yet the top veterans still protect a defense built around edge pressure.",
+          "sell_threshold": "Require a depth-chart displacement or a cap-driven signal before turning a DT into a call-now lane.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/jaguars"
+        },
+        {
+          "group": "EDGE/LB",
+          "stance": "Josh Hines-Allen and Travon Walker are hold pieces; only lower rotation edge depth should be discussed.",
+          "core_players": [
+            "Josh Hines-Allen",
+            "Travon Walker"
+          ],
+          "movable_players": [
+            "Yasir Abdullah"
+          ],
+          "seller_depth_notes": "Moving a top edge removes the engine of the pass rush and is not supported by a normal seller thesis.",
+          "sell_threshold": "Edge inquiries need a posture change, not just buyer need.",
+          "confidence": "high",
+          "source": "https://www.nfl.com/teams/jaguars/roster"
+        },
+        {
+          "group": "CB/S",
+          "stance": "Jacksonville can listen on veteran secondary depth, but Travis Hunter and the starting DB plan are not seller lanes.",
+          "core_players": [
+            "Travis Hunter",
+            "Jourdan Lewis"
+          ],
+          "movable_players": [
+            "Eric Murray",
+            "Montaric Brown"
+          ],
+          "seller_depth_notes": "The roster has enough DB rows for depth calls, but selling top coverage options weakens the defensive floor.",
+          "sell_threshold": "Ask whether the player is outside nickel or starting safety plans before pricing.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/jaguars/roster"
+        },
+        {
+          "group": "WR",
+          "stance": "Brian Thomas Jr. is a hold, while a veteran receiver call is plausible only if the room has role compression.",
+          "core_players": [
+            "Brian Thomas Jr.",
+            "Travis Hunter"
+          ],
+          "movable_players": [
+            "Jakobi Meyers"
+          ],
+          "seller_depth_notes": "A Lawrence-centered offense should not lose primary separators, but may convert a non-core veteran if younger receivers earn volume.",
+          "sell_threshold": "Require proof that a receiver is outside the top target plan.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/jaguars"
+        },
+        {
+          "group": "OL",
+          "stance": "Jacksonville has expensive OL contracts that can be discussed, but protection value caps seller motivation.",
+          "core_players": [
+            "Walker Little",
+            "Anton Harrison"
+          ],
+          "movable_players": [
+            "Ezra Cleveland",
+            "Patrick Mekari"
+          ],
+          "seller_depth_notes": "Any lineman exit must be measured against Trevor Lawrence protection and swing-depth risk.",
+          "sell_threshold": "Confirm a replacement starter and clean trade accounting before treating OL as available.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/jaguars"
+        }
+      ],
+      "market_preferences": {
+        "desired_return_types": [
+          "Draft capital for veterans displaced by younger players",
+          "Cap relief that does not weaken Trevor Lawrence support"
+        ],
+        "avoided_deal_types": [
+          "Selling core edge rushers or primary offensive weapons",
+          "AFC South discounts"
+        ],
+        "division_rivalry_friction": "Division friction is high inside the AFC South; a Giants call is cleaner but still needs a clear Jacksonville depth win.",
+        "confidence": "medium",
+        "source": "https://www.nfl.com/teams/jaguars/roster"
+      },
+      "trade_triggers": [
+        {
+          "trigger": "Younger DL, DB, or WR options prove they can absorb a veteran's snaps.",
+          "implication": "The seller case shifts from cap-only to credible depth reallocation.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/jaguars/roster"
+        },
+        {
+          "trigger": "Near-cap management pushes Jacksonville to move a veteran instead of restructuring core contracts.",
+          "implication": "Non-core veteran contracts become check-call lanes.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/jaguars"
+        }
+      ],
+      "availability_validation": [
+        {
+          "check": "Confirm whether the target is behind a younger player in Jacksonville's actual weekly plan.",
+          "owner": "pro_personnel",
+          "source": "https://www.nfl.com/teams/jaguars/roster"
+        },
+        {
+          "check": "Confirm trade savings, guarantees, and future-year proration before recommending the lane.",
+          "owner": "cap",
+          "source": "https://overthecap.com/salary-cap/jaguars"
+        }
+      ],
+      "no_trade_guardrails": [
+        {
+          "guardrail": "Do not treat Jacksonville core edge or Lawrence-support pieces as available without a posture-change trigger.",
+          "confidence": "high",
+          "source": "https://overthecap.com/salary-cap/jaguars"
+        }
+      ]
     },
     "cultural_signals": {
       "stability": {
@@ -8820,6 +9482,136 @@
         }
       ],
       "confidence": "medium"
+    },
+    "trade_market_intel": {
+      "seller_posture": {
+        "value": "buyer_hold",
+        "confidence": "high",
+        "evidence": "The Chargers' contend-soon posture and near-cap profile point to holding core Herbert-support and defensive pieces, with only one-year veteran trims plausible.",
+        "source": "https://overthecap.com/salary-cap/chargers"
+      },
+      "position_group_stance": [
+        {
+          "group": "DL",
+          "stance": "Dalvin Tomlinson is a check-call only because his one-year profile is clean, while Teair Tart and young DT depth are not automatic sale signals.",
+          "core_players": [
+            "Teair Tart"
+          ],
+          "movable_players": [
+            "Dalvin Tomlinson"
+          ],
+          "seller_depth_notes": "The Chargers have interior bodies, but a contender should not thin the run front unless young depth clearly wins the role.",
+          "sell_threshold": "Require a rotation displacement or explicit cap trim before calling an interior defender available.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/chargers"
+        },
+        {
+          "group": "EDGE/LB",
+          "stance": "Khalil Mack can be monitored as a one-year veteran, but the seller case is capped by his role in a playoff rush plan.",
+          "core_players": [
+            "Khalil Mack",
+            "Tuli Tuipulotu"
+          ],
+          "movable_players": [
+            "Junior Colson"
+          ],
+          "seller_depth_notes": "A Mack trade requires either a postseason-direction change or confidence that younger rushers can carry high-leverage snaps.",
+          "sell_threshold": "Do not lead with Mack unless the Chargers signal they prefer the pick and future flexibility over his 2026 snaps.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/chargers"
+        },
+        {
+          "group": "CB/S",
+          "stance": "Derwin James is a hold; one-year corner contracts are more realistic if Los Angeles has nickel depth.",
+          "core_players": [
+            "Derwin James"
+          ],
+          "movable_players": [
+            "Donte Jackson",
+            "Elijah Molden"
+          ],
+          "seller_depth_notes": "The seller loss is meaningful in the secondary, so the buyer must validate whether a corner is outside the starting plan.",
+          "sell_threshold": "Ask about role and injury depth before sending a pick offer.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/chargers/roster"
+        },
+        {
+          "group": "WR",
+          "stance": "Receiver depth is a monitor lane because the Chargers need Herbert weapons more than marginal cap room.",
+          "core_players": [
+            "Quentin Johnston"
+          ],
+          "movable_players": [
+            "Dalevon Campbell"
+          ],
+          "seller_depth_notes": "A WR sale should target players below the weekly route tree, not core targets.",
+          "sell_threshold": "Require clear route-share compression before naming a receiver as available.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/chargers/roster"
+        },
+        {
+          "group": "OL",
+          "stance": "Rashawn Slater and Joe Alt are hard holds; interior OL depth can be discussed only below the starter tier.",
+          "core_players": [
+            "Rashawn Slater",
+            "Joe Alt"
+          ],
+          "movable_players": [
+            "Ben Cleveland",
+            "Cole Strange"
+          ],
+          "seller_depth_notes": "Herbert protection is the no-trade objection for any premium lineman.",
+          "sell_threshold": "A lineman must be outside the best-five or swing plan before the Chargers should listen.",
+          "confidence": "high",
+          "source": "https://overthecap.com/salary-cap/chargers"
+        }
+      ],
+      "market_preferences": {
+        "desired_return_types": [
+          "Picks for one-year veterans outside the weekly plan",
+          "Need-position player swaps that help the Herbert window"
+        ],
+        "avoided_deal_types": [
+          "Selling quarterback protection",
+          "Moving defensive stars without a postseason-direction change"
+        ],
+        "division_rivalry_friction": "AFC West friction is high; a Giants call avoids division issues but still needs to protect the Chargers' contention plan.",
+        "confidence": "high",
+        "source": "https://www.nfl.com/teams/chargers/roster"
+      },
+      "trade_triggers": [
+        {
+          "trigger": "Younger defensive-front or secondary players win rotation roles.",
+          "implication": "One-year veterans can move from monitor to check-call.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/chargers/roster"
+        },
+        {
+          "trigger": "Near-cap pressure makes a small veteran exit preferable to restructuring a core player.",
+          "implication": "The Chargers can sell depth without damaging the Herbert-support spine.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/chargers"
+        }
+      ],
+      "availability_validation": [
+        {
+          "check": "Confirm whether the target is outside the Chargers' weekly starter or heavy-rotation plan.",
+          "owner": "pro_personnel",
+          "source": "https://www.nfl.com/teams/chargers/roster"
+        },
+        {
+          "check": "Confirm the one-year trade room is real and does not create a 2027 offset problem.",
+          "owner": "cap",
+          "source": "https://overthecap.com/salary-cap/chargers"
+        }
+      ],
+      "no_trade_guardrails": [
+        {
+          "guardrail": "Do not describe a Chargers core protector or star defender as available unless the answer names the contention cost.",
+          "confidence": "high",
+          "source": "https://overthecap.com/salary-cap/chargers"
+        }
+      ]
     },
     "cultural_signals": {
       "stability": {
@@ -10443,6 +11235,137 @@
       ],
       "confidence": "medium"
     },
+    "trade_market_intel": {
+      "seller_posture": {
+        "value": "cap_seller",
+        "confidence": "medium",
+        "evidence": "Miami's restructure-needed cap status creates a real seller screen, but the team should still protect core speed and defensive-line pieces unless the season direction changes.",
+        "source": "https://overthecap.com/salary-cap/dolphins"
+      },
+      "position_group_stance": [
+        {
+          "group": "DL",
+          "stance": "Zach Sieler is a strong hold unless Miami chooses a broader reset, while lower DT depth is more plausible than moving the front's best piece.",
+          "core_players": [
+            "Zach Sieler",
+            "Kenneth Grant"
+          ],
+          "movable_players": [
+            "Zeek Biggers"
+          ],
+          "seller_depth_notes": "The Dolphins have interior bodies but not a clear surplus of proven high-end interior rush.",
+          "sell_threshold": "Require a cap-reset signal before pricing Sieler; depth-only calls can be checked earlier.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/dolphins/roster"
+        },
+        {
+          "group": "EDGE/LB",
+          "stance": "Miami can listen on one-year linebacker roles before touching young edge investments.",
+          "core_players": [
+            "Chop Robinson",
+            "Jordyn Brooks"
+          ],
+          "movable_players": [
+            "Tyrel Dodson"
+          ],
+          "seller_depth_notes": "A linebacker sale is plausible only if it does not compromise run fits or special-teams coverage.",
+          "sell_threshold": "Ask whether the player is outside the starting or subpackage linebacker plan.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/dolphins"
+        },
+        {
+          "group": "CB/S",
+          "stance": "The DB room is a practical cap-seller lane because Miami has multiple corners and safeties, but buyers must separate depth from starting coverage.",
+          "core_players": [
+            "Chris Johnson"
+          ],
+          "movable_players": [
+            "Julius Brents",
+            "Zayne Anderson"
+          ],
+          "seller_depth_notes": "Miami can convert secondary depth if younger corners own the depth chart, yet a starting corner sale still creates coverage risk.",
+          "sell_threshold": "Require a nickel or boundary-depth surplus before calling a DB credible.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/dolphins/roster"
+        },
+        {
+          "group": "WR",
+          "stance": "Receiver sales should be limited to lower-depth contracts because Miami's offensive identity needs speed and spacing.",
+          "core_players": [
+            "Tutu Atwell"
+          ],
+          "movable_players": [
+            "Chris Bell"
+          ],
+          "seller_depth_notes": "Cap pressure can make depth receivers movable, but top speed threats should not be assumed available.",
+          "sell_threshold": "Validate route-share compression before sending a pick offer.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/dolphins/roster"
+        },
+        {
+          "group": "OL",
+          "stance": "Miami has several tackle and interior contracts, but OL exits must be treated as dangerous unless the replacement plan is proven.",
+          "core_players": [
+            "Austin Jackson",
+            "Aaron Brewer"
+          ],
+          "movable_players": [
+            "Patrick Paul",
+            "Jonah Savaiinaea"
+          ],
+          "seller_depth_notes": "The cap sheet suggests possible relief, but protection and run-game continuity are the seller objections.",
+          "sell_threshold": "Require a defined starting five plus swing depth before pricing a lineman.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/dolphins"
+        }
+      ],
+      "market_preferences": {
+        "desired_return_types": [
+          "Draft capital for depth players in crowded rooms",
+          "Clean 2026 cap relief without adding 2027 obligations"
+        ],
+        "avoided_deal_types": [
+          "Selling core speed or top defensive-front value for marginal relief",
+          "AFC East trades unless price is clearly favorable"
+        ],
+        "division_rivalry_friction": "AFC East friction is high; a Giants call is easier, but Miami still needs clean cap value or a role-player surplus.",
+        "confidence": "medium",
+        "source": "https://www.nfl.com/teams/dolphins/roster"
+      },
+      "trade_triggers": [
+        {
+          "trigger": "Miami chooses a cap trim over another restructure.",
+          "implication": "One-year and depth contracts become active check-call lanes.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/dolphins"
+        },
+        {
+          "trigger": "Young DB, LB, or OL depth wins a role and makes a veteran redundant.",
+          "implication": "The seller case improves from cap-only to roster-backed.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/dolphins/roster"
+        }
+      ],
+      "availability_validation": [
+        {
+          "check": "Confirm whether Miami is in cap-trim mode or still protecting all core contention pieces.",
+          "owner": "front_office",
+          "source": "https://overthecap.com/salary-cap/dolphins"
+        },
+        {
+          "check": "Confirm a target's actual game-day role before treating cap pressure as availability.",
+          "owner": "pro_personnel",
+          "source": "https://www.nfl.com/teams/dolphins/roster"
+        }
+      ],
+      "no_trade_guardrails": [
+        {
+          "guardrail": "Do not rank a Dolphins target as call-now from cap pressure alone; require depth surplus or a cap-trim signal.",
+          "confidence": "high",
+          "source": "https://overthecap.com/salary-cap/dolphins"
+        }
+      ]
+    },
     "cultural_signals": {
       "stability": {
         "value": "medium",
@@ -10943,6 +11866,136 @@
       ],
       "confidence": "medium"
     },
+    "trade_market_intel": {
+      "seller_posture": {
+        "value": "buyer_hold",
+        "confidence": "high",
+        "evidence": "Minnesota's contend-soon profile and near-cap status point to holding starters around the quarterback transition, with calls focused on redundant veterans.",
+        "source": "https://overthecap.com/salary-cap/vikings"
+      },
+      "position_group_stance": [
+        {
+          "group": "DL",
+          "stance": "Minnesota's interior-front names should be monitor-only unless a younger lineman creates a true surplus.",
+          "core_players": [
+            "Caleb Banks"
+          ],
+          "movable_players": [
+            "Javon Hargrave"
+          ],
+          "seller_depth_notes": "The roster has DT and DL bodies, but the Vikings do not have an obvious excess of proven interior rush to sell cheaply.",
+          "sell_threshold": "Require a role displacement or cap necessity before treating a defensive lineman as available.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/vikings/roster"
+        },
+        {
+          "group": "EDGE/LB",
+          "stance": "Andrew Van Ginkel and Blake Cashman are hold pieces for a contender; lower linebacker depth is the only realistic call.",
+          "core_players": [
+            "Andrew Van Ginkel",
+            "Blake Cashman"
+          ],
+          "movable_players": [
+            "Tyler Batty"
+          ],
+          "seller_depth_notes": "Moving front-seven starters would undercut the defensive structure in a contend-soon year.",
+          "sell_threshold": "Ask about players outside the pressure or subpackage plan.",
+          "confidence": "high",
+          "source": "https://overthecap.com/salary-cap/vikings"
+        },
+        {
+          "group": "CB/S",
+          "stance": "One-year DB money can be checked, but Minnesota should not sell its top coverage options without a replacement.",
+          "core_players": [
+            "Byron Murphy",
+            "Josh Metellus"
+          ],
+          "movable_players": [
+            "Isaiah Rodgers"
+          ],
+          "seller_depth_notes": "The Vikings have enough secondary rows for depth conversations, but starting DB exits create immediate matchup risk.",
+          "sell_threshold": "Require a younger DB to own the role before pricing the veteran.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/vikings/roster"
+        },
+        {
+          "group": "WR",
+          "stance": "Justin Jefferson is a hard hold; Jauan Jennings is the more plausible call only if the receiver room is crowded.",
+          "core_players": [
+            "Justin Jefferson",
+            "Jordan Addison"
+          ],
+          "movable_players": [
+            "Jauan Jennings"
+          ],
+          "seller_depth_notes": "Selling a primary target would damage quarterback development; buyers should look below the top of the room.",
+          "sell_threshold": "Validate route-share compression before making a receiver call.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/vikings"
+        },
+        {
+          "group": "OL",
+          "stance": "Brian O'Neill has clean trade room but is a high-pain target because Minnesota still needs tackle stability.",
+          "core_players": [
+            "Brian O'Neill",
+            "Christian Darrisaw"
+          ],
+          "movable_players": [
+            "Blake Brandel"
+          ],
+          "seller_depth_notes": "Tackle trades weaken the quarterback transition unless Minnesota has a proven replacement and a clear cap reason.",
+          "sell_threshold": "Treat starting tackles as posture-change only; check backup or one-year interior depth first.",
+          "confidence": "high",
+          "source": "https://overthecap.com/salary-cap/vikings"
+        }
+      ],
+      "market_preferences": {
+        "desired_return_types": [
+          "Draft capital for redundant veterans",
+          "Player swaps that help the quarterback transition"
+        ],
+        "avoided_deal_types": [
+          "Selling Justin Jefferson support or starting tackle stability",
+          "NFC North discounts"
+        ],
+        "division_rivalry_friction": "NFC North trades carry high friction; a Giants call is cleaner but still must protect Minnesota's quarterback-support plan.",
+        "confidence": "high",
+        "source": "https://www.nfl.com/teams/vikings/roster"
+      },
+      "trade_triggers": [
+        {
+          "trigger": "Younger DB, WR, or DL depth proves it can handle regular roles.",
+          "implication": "A veteran can move from hold to check-call without a rebuild signal.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/vikings/roster"
+        },
+        {
+          "trigger": "Near-cap pressure forces Minnesota to choose a depth exit over touching core contracts.",
+          "implication": "Calls should focus on displaced veterans, not starters.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/vikings"
+        }
+      ],
+      "availability_validation": [
+        {
+          "check": "Confirm the target is not needed to stabilize the quarterback transition.",
+          "owner": "pro_personnel",
+          "source": "https://www.nfl.com/teams/vikings/roster"
+        },
+        {
+          "check": "Confirm the cap ledger supports a clean sale instead of a restructure.",
+          "owner": "cap",
+          "source": "https://overthecap.com/salary-cap/vikings"
+        }
+      ],
+      "no_trade_guardrails": [
+        {
+          "guardrail": "Do not treat Minnesota as a broad seller while the graph posture remains contend-soon.",
+          "confidence": "high",
+          "source": "https://overthecap.com/salary-cap/vikings"
+        }
+      ]
+    },
     "cultural_signals": {
       "stability": {
         "value": "medium",
@@ -11442,6 +12495,136 @@
         }
       ],
       "confidence": "medium"
+    },
+    "trade_market_intel": {
+      "seller_posture": {
+        "value": "selective_seller",
+        "confidence": "medium",
+        "evidence": "New England's cap-room profile removes forced-seller pressure, but the roster can still convert older or crowded-room veterans into picks if younger players win jobs.",
+        "source": "https://overthecap.com/salary-cap/patriots"
+      },
+      "position_group_stance": [
+        {
+          "group": "DL",
+          "stance": "Milton Williams and Christian Barmore are hold pieces, while older defensive-front depth is a monitor lane.",
+          "core_players": [
+            "Milton Williams",
+            "Christian Barmore"
+          ],
+          "movable_players": [
+            "Dre'Mont Jones"
+          ],
+          "seller_depth_notes": "The Patriots have interior numbers but no reason to discount high-end DTs while cap room is available.",
+          "sell_threshold": "Require a younger DL to push a veteran out of the rotation before calling.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/patriots/roster"
+        },
+        {
+          "group": "EDGE/LB",
+          "stance": "Harold Landry and Robert Spillane can be discussed only if New England prioritizes picks over veteran defensive floor.",
+          "core_players": [
+            "Harold Landry III",
+            "Robert Spillane"
+          ],
+          "movable_players": [
+            "Christian Elliss"
+          ],
+          "seller_depth_notes": "The room has linebacker volume, but the Patriots do not need cap relief badly enough to sell useful starters cheaply.",
+          "sell_threshold": "Ask whether the target is part of the defensive identity or a bridge player.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/patriots"
+        },
+        {
+          "group": "CB/S",
+          "stance": "Carlton Davis and Kevin Byard are tradeable only as veteran-bridge decisions, not because New England needs cap room.",
+          "core_players": [
+            "Carlton Davis III",
+            "Marcus Jones"
+          ],
+          "movable_players": [
+            "Kevin Byard"
+          ],
+          "seller_depth_notes": "A DB sale requires confidence that younger coverage players can absorb snaps and that the pick is worth losing veteran stability.",
+          "sell_threshold": "Validate the staff's appetite for a younger secondary before pricing the veteran.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/patriots/roster"
+        },
+        {
+          "group": "WR",
+          "stance": "New England's receiver room can generate calls if younger options crowd out a veteran, but primary Drake Maye support should be protected.",
+          "core_players": [
+            "A.J. Brown",
+            "Romeo Doubs"
+          ],
+          "movable_players": [
+            "Kayshon Boutte"
+          ],
+          "seller_depth_notes": "Cap room means the seller case must be role compression, not money.",
+          "sell_threshold": "Require route-share evidence that the player is outside the weekly plan.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/patriots/roster"
+        },
+        {
+          "group": "OL",
+          "stance": "Morgan Moses is a possible bridge-veteran call; Will Campbell is a hard hold for the Drake Maye development plan.",
+          "core_players": [
+            "Will Campbell"
+          ],
+          "movable_players": [
+            "Morgan Moses"
+          ],
+          "seller_depth_notes": "The Patriots can sell an older tackle only if they are comfortable with the young protection plan.",
+          "sell_threshold": "Confirm the replacement tackle path before treating Moses as available.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/patriots"
+        }
+      ],
+      "market_preferences": {
+        "desired_return_types": [
+          "Picks for bridge veterans displaced by young players",
+          "Player swaps that accelerate the Drake Maye support plan"
+        ],
+        "avoided_deal_types": [
+          "Selling high-end front or young quarterback support just for cap room",
+          "AFC East discounts"
+        ],
+        "division_rivalry_friction": "AFC East friction is high; a Giants call avoids division conflict but still needs a role-compression seller case.",
+        "confidence": "medium",
+        "source": "https://www.nfl.com/teams/patriots/roster"
+      },
+      "trade_triggers": [
+        {
+          "trigger": "Young linemen, receivers, or defensive backs win roles and turn a veteran into a bridge surplus.",
+          "implication": "New England can move from hold to selective seller without cap pressure.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/patriots/roster"
+        },
+        {
+          "trigger": "The Patriots decide a veteran contract does not match the next competitive window.",
+          "implication": "Draft-capital offers become more plausible than player-for-player offers.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/patriots"
+        }
+      ],
+      "availability_validation": [
+        {
+          "check": "Confirm whether the veteran is a bridge starter, a leadership hold, or a displaced depth piece.",
+          "owner": "pro_personnel",
+          "source": "https://www.nfl.com/teams/patriots/roster"
+        },
+        {
+          "check": "Confirm New England gains value from a pick despite already having cap room.",
+          "owner": "cap",
+          "source": "https://overthecap.com/salary-cap/patriots"
+        }
+      ],
+      "no_trade_guardrails": [
+        {
+          "guardrail": "Do not call the Patriots a forced seller; their cap-room profile means availability must come from role or timeline fit.",
+          "confidence": "high",
+          "source": "https://overthecap.com/salary-cap/patriots"
+        }
+      ]
     },
     "cultural_signals": {
       "stability": {
@@ -14213,6 +15396,138 @@
       ],
       "confidence": "medium"
     },
+    "trade_market_intel": {
+      "seller_posture": {
+        "value": "buyer_hold",
+        "confidence": "high",
+        "evidence": "Pittsburgh's contend-soon posture, veteran quarterback bridge, and near-cap profile make it more likely to hold starters than sell premium players.",
+        "source": "https://overthecap.com/salary-cap/steelers"
+      },
+      "position_group_stance": [
+        {
+          "group": "DL",
+          "stance": "Cameron Heyward is a high-pain legacy hold, while younger interior depth can be monitored only if Pittsburgh's rotation is overstocked.",
+          "core_players": [
+            "Cameron Heyward",
+            "Keeanu Benton"
+          ],
+          "movable_players": [
+            "Kyler Baugh"
+          ],
+          "seller_depth_notes": "The Steelers' defensive identity relies on front strength, so a DT call needs more than buyer need.",
+          "sell_threshold": "Require a clear youth movement or contention drop before treating a core defensive lineman as available.",
+          "confidence": "high",
+          "source": "https://www.nfl.com/teams/steelers/roster"
+        },
+        {
+          "group": "EDGE/LB",
+          "stance": "T.J. Watt, Alex Highsmith, and Patrick Queen are hold pieces; only lower linebacker depth is a realistic inquiry.",
+          "core_players": [
+            "T.J. Watt",
+            "Alex Highsmith",
+            "Patrick Queen"
+          ],
+          "movable_players": [
+            "Malik Harrison"
+          ],
+          "seller_depth_notes": "Moving pass-rush or linebacker starters would cut against the roster's clearest competitive identity.",
+          "sell_threshold": "Do not lead with edge/LB unless the player is outside the defensive core.",
+          "confidence": "high",
+          "source": "https://overthecap.com/salary-cap/steelers"
+        },
+        {
+          "group": "CB/S",
+          "stance": "Jalen Ramsey's cap row may look movable, but the seller objection is losing a veteran coverage anchor.",
+          "core_players": [
+            "Jalen Ramsey",
+            "Jaquan Brisker"
+          ],
+          "movable_players": [
+            "Jamel Dean",
+            "DeShon Elliott"
+          ],
+          "seller_depth_notes": "The secondary has veteran money, but Pittsburgh needs coverage stability during a contend-soon season.",
+          "sell_threshold": "Validate whether the DB is a starter or a subpackage luxury before pricing.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/steelers/roster"
+        },
+        {
+          "group": "WR",
+          "stance": "DK Metcalf is a hold; secondary receiver names are only plausible if Pittsburgh is reshaping around the quarterback bridge.",
+          "core_players": [
+            "DK Metcalf"
+          ],
+          "movable_players": [
+            "Michael Pittman",
+            "Germie Bernard"
+          ],
+          "seller_depth_notes": "Selling top receiver value would weaken the offense, so the realistic path is a non-primary target.",
+          "sell_threshold": "Require role compression or a major return before discussing a starting receiver.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/steelers"
+        },
+        {
+          "group": "OL",
+          "stance": "Broderick Jones and starting protection should be held; OL depth calls are lower-probability.",
+          "core_players": [
+            "Broderick Jones"
+          ],
+          "movable_players": [
+            "Dylan Cook"
+          ],
+          "seller_depth_notes": "A veteran quarterback bridge and physical offense both reduce the logic for selling linemen.",
+          "sell_threshold": "Only ask on backup linemen outside the game-day plan.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/steelers/roster"
+        }
+      ],
+      "market_preferences": {
+        "desired_return_types": [
+          "Win-now player swaps",
+          "Picks for displaced depth only"
+        ],
+        "avoided_deal_types": [
+          "Selling defensive identity pieces",
+          "AFC North discounts"
+        ],
+        "division_rivalry_friction": "AFC North friction is severe; a Giants call is cleaner but should still assume Pittsburgh protects defensive core players.",
+        "confidence": "high",
+        "source": "https://www.nfl.com/teams/steelers/roster"
+      },
+      "trade_triggers": [
+        {
+          "trigger": "Pittsburgh falls out of contention or commits to a younger roster direction.",
+          "implication": "Expensive veterans can move from hold to posture-change watch.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/steelers"
+        },
+        {
+          "trigger": "A younger DB or receiver pushes a veteran out of the weekly plan.",
+          "implication": "The Steelers can consider a selective sale without weakening the core identity.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/steelers/roster"
+        }
+      ],
+      "availability_validation": [
+        {
+          "check": "Confirm whether the target is central to Pittsburgh's defensive identity or quarterback-support plan.",
+          "owner": "pro_personnel",
+          "source": "https://www.nfl.com/teams/steelers/roster"
+        },
+        {
+          "check": "Confirm any savings are not outweighed by dead-money or leadership cost.",
+          "owner": "cap",
+          "source": "https://overthecap.com/salary-cap/steelers"
+        }
+      ],
+      "no_trade_guardrails": [
+        {
+          "guardrail": "Do not turn Steelers star cap numbers into seller recommendations without a contention-drop signal.",
+          "confidence": "high",
+          "source": "https://overthecap.com/salary-cap/steelers"
+        }
+      ]
+    },
     "cultural_signals": {
       "stability": {
         "value": "medium",
@@ -15277,6 +16592,139 @@
       ],
       "confidence": "medium"
     },
+    "trade_market_intel": {
+      "seller_posture": {
+        "value": "buyer_hold",
+        "confidence": "high",
+        "evidence": "San Francisco's contend-now posture and near-cap status point to restructuring or trimming depth before selling core starters.",
+        "source": "https://overthecap.com/salary-cap/49ers"
+      },
+      "position_group_stance": [
+        {
+          "group": "DL",
+          "stance": "Osa Odighizuwa and the young defensive front should be treated as hold unless the 49ers clearly pivot from contend-now.",
+          "core_players": [
+            "Nick Bosa",
+            "Osa Odighizuwa",
+            "Mykel Williams"
+          ],
+          "movable_players": [
+            "Evan Anderson"
+          ],
+          "seller_depth_notes": "The 49ers need defensive-front depth for a contention run, so an interior call needs a surplus signal rather than cap math alone.",
+          "sell_threshold": "Require a young-depth breakout or posture change before treating a DL target as credible.",
+          "confidence": "high",
+          "source": "https://www.nfl.com/teams/49ers/roster"
+        },
+        {
+          "group": "EDGE/LB",
+          "stance": "Nick Bosa and Fred Warner are no-trade anchors; lower front-seven depth is the only call lane.",
+          "core_players": [
+            "Nick Bosa",
+            "Fred Warner",
+            "Dre Greenlaw"
+          ],
+          "movable_players": [
+            "Will Bradley-King"
+          ],
+          "seller_depth_notes": "The seller loss is too large on core rush and linebacker players during a contend-now year.",
+          "sell_threshold": "Do not lead with EDGE/LB unless the target is outside the defensive rotation.",
+          "confidence": "high",
+          "source": "https://overthecap.com/salary-cap/49ers"
+        },
+        {
+          "group": "CB/S",
+          "stance": "San Francisco can listen on safety or corner depth if it has younger replacements, but Deommodore Lenoir is a hold.",
+          "core_players": [
+            "Deommodore Lenoir"
+          ],
+          "movable_players": [
+            "Ji'Ayir Brown",
+            "Eli Apple"
+          ],
+          "seller_depth_notes": "The secondary has enough rows for depth calls, but selling starters weakens a contender's margin.",
+          "sell_threshold": "Validate the player is a rotational DB before pricing the lane.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/49ers/roster"
+        },
+        {
+          "group": "WR",
+          "stance": "Brandon Aiyuk and Ricky Pearsall are hold pieces unless San Francisco makes a broader cap reset.",
+          "core_players": [
+            "Brandon Aiyuk",
+            "Ricky Pearsall"
+          ],
+          "movable_players": [
+            "Mike Evans"
+          ],
+          "seller_depth_notes": "Receiver calls need to account for Brock Purdy's support system and the current window.",
+          "sell_threshold": "Require a cap reset or role compression signal before naming a WR as available.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/49ers"
+        },
+        {
+          "group": "OL",
+          "stance": "Trent Williams is a posture-change-only name; depth linemen can be checked if the 49ers need cap room.",
+          "core_players": [
+            "Trent Williams",
+            "Colton McKivitz"
+          ],
+          "movable_players": [
+            "Isaac Alarcon"
+          ],
+          "seller_depth_notes": "Trading starting protection in a contend-now window creates immediate offensive risk.",
+          "sell_threshold": "Treat starting OL as hold and ask only on players outside the top swing-depth plan.",
+          "confidence": "high",
+          "source": "https://www.nfl.com/teams/49ers/roster"
+        }
+      ],
+      "market_preferences": {
+        "desired_return_types": [
+          "Player swaps that help the current contention window",
+          "Picks for depth players outside the weekly plan"
+        ],
+        "avoided_deal_types": [
+          "Selling core stars for simple cap relief",
+          "NFC West discounts"
+        ],
+        "division_rivalry_friction": "NFC West trades are high-friction; a Giants call is cleaner but still must fit a contend-now roster.",
+        "confidence": "high",
+        "source": "https://www.nfl.com/teams/49ers/roster"
+      },
+      "trade_triggers": [
+        {
+          "trigger": "San Francisco's injury or cap picture forces depth churn rather than another restructure.",
+          "implication": "Role players can become check-call candidates while core stars remain holds.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/49ers"
+        },
+        {
+          "trigger": "A younger DB, DL, or WR claims a weekly role.",
+          "implication": "A displaced veteran can move from hold to selective-seller status.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/49ers/roster"
+        }
+      ],
+      "availability_validation": [
+        {
+          "check": "Confirm the target is not part of San Francisco's current playoff-core plan.",
+          "owner": "pro_personnel",
+          "source": "https://www.nfl.com/teams/49ers/roster"
+        },
+        {
+          "check": "Confirm whether a trade is cleaner than a restructure for near-cap management.",
+          "owner": "cap",
+          "source": "https://overthecap.com/salary-cap/49ers"
+        }
+      ],
+      "no_trade_guardrails": [
+        {
+          "guardrail": "Do not convert San Francisco cap pressure into a seller recommendation for Bosa, Warner, Williams, or Aiyuk.",
+          "confidence": "high",
+          "source": "https://overthecap.com/salary-cap/49ers"
+        }
+      ]
+    },
     "cultural_signals": {
       "stability": {
         "value": "medium",
@@ -16340,6 +17788,140 @@
         }
       ],
       "confidence": "medium"
+    },
+    "trade_market_intel": {
+      "seller_posture": {
+        "value": "asset_accumulator",
+        "confidence": "high",
+        "evidence": "Tennessee's retool posture and cap-room profile make pick accumulation plausible for non-core veterans, while young quarterback support and Jeffery Simmons remain protected.",
+        "source": "https://overthecap.com/salary-cap/titans"
+      },
+      "position_group_stance": [
+        {
+          "group": "DL",
+          "stance": "Jeffery Simmons is a hold, but John Franklin-Myers or other veteran front pieces can be credible calls if Tennessee prioritizes picks.",
+          "core_players": [
+            "Jeffery Simmons"
+          ],
+          "movable_players": [
+            "John Franklin-Myers",
+            "Jermaine Johnson II"
+          ],
+          "seller_depth_notes": "The Titans have defensive-end volume and a retool posture, so veteran front calls are more plausible than with contenders.",
+          "sell_threshold": "Confirm Simmons is excluded, then ask whether Tennessee wants picks for veteran DE snaps.",
+          "confidence": "high",
+          "source": "https://overthecap.com/salary-cap/titans"
+        },
+        {
+          "group": "EDGE/LB",
+          "stance": "Edge and linebacker veterans are realistic check-call lanes if they are not part of the next-core plan.",
+          "core_players": [
+            "Jermaine Johnson II"
+          ],
+          "movable_players": [
+            "Cody Barton",
+            "David Agoha"
+          ],
+          "seller_depth_notes": "Tennessee can accept some 2026 defensive pain if the return helps the retool and preserves younger-player development.",
+          "sell_threshold": "Require a pick return that beats the value of keeping the veteran bridge role.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/titans/roster"
+        },
+        {
+          "group": "CB/S",
+          "stance": "Alontae Taylor and Amani Hooker are not automatic sellers, but veteran secondary depth can be discussed.",
+          "core_players": [
+            "Alontae Taylor",
+            "Amani Hooker"
+          ],
+          "movable_players": [
+            "Tony Adams",
+            "Cordale Flott"
+          ],
+          "seller_depth_notes": "The Titans have DB bodies, yet selling a top starter can make a young roster harder to evaluate.",
+          "sell_threshold": "Validate whether Tennessee views the player as next-core or bridge before pricing.",
+          "confidence": "medium",
+          "source": "https://www.nfl.com/teams/titans/roster"
+        },
+        {
+          "group": "WR",
+          "stance": "Calvin Ridley is a plausible veteran-market conversation only if Tennessee prefers future assets over immediate quarterback support.",
+          "core_players": [
+            "Carnell Tate",
+            "Wan'Dale Robinson"
+          ],
+          "movable_players": [
+            "Calvin Ridley",
+            "Hank Beatty"
+          ],
+          "seller_depth_notes": "The main objection is weakening Cam Ward's evaluation environment; a seller case needs replacement target volume.",
+          "sell_threshold": "Ask whether Tennessee is protecting the young QB support group before making a receiver offer.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/titans"
+        },
+        {
+          "group": "OL",
+          "stance": "Dan Moore Jr., JC Latham, and Peter Skoronski should be treated as quarterback-support holds unless Tennessee is resetting the line.",
+          "core_players": [
+            "Dan Moore Jr.",
+            "JC Latham",
+            "Peter Skoronski"
+          ],
+          "movable_players": [
+            "Fernando Carmona"
+          ],
+          "seller_depth_notes": "Even in a retool, selling starting protection creates evaluation risk for Cam Ward.",
+          "sell_threshold": "Keep OL calls to depth players unless the Titans signal a full line reset.",
+          "confidence": "high",
+          "source": "https://www.nfl.com/teams/titans/roster"
+        }
+      ],
+      "market_preferences": {
+        "desired_return_types": [
+          "Draft capital for bridge veterans",
+          "Young-player swaps that fit the next competitive core"
+        ],
+        "avoided_deal_types": [
+          "Selling young quarterback support without a replacement",
+          "AFC South discounts"
+        ],
+        "division_rivalry_friction": "AFC South friction is high; a Giants call is cleaner and should emphasize future assets over division leverage.",
+        "confidence": "high",
+        "source": "https://www.nfl.com/teams/titans/roster"
+      },
+      "trade_triggers": [
+        {
+          "trigger": "Tennessee prioritizes developmental snaps over veteran bridge performance.",
+          "implication": "Veteran front-seven, DB, and receiver lanes become credible calls.",
+          "confidence": "high",
+          "source": "https://www.nfl.com/teams/titans/roster"
+        },
+        {
+          "trigger": "A pick offer lets Tennessee add future capital without taking back 2027 money.",
+          "implication": "The Titans can accept short-term depth loss for retool value.",
+          "confidence": "medium",
+          "source": "https://overthecap.com/salary-cap/titans"
+        }
+      ],
+      "availability_validation": [
+        {
+          "check": "Confirm whether the player is part of the next core or a bridge veteran.",
+          "owner": "pro_personnel",
+          "source": "https://www.nfl.com/teams/titans/roster"
+        },
+        {
+          "check": "Confirm Tennessee keeps the young quarterback support structure intact after the trade.",
+          "owner": "front_office",
+          "source": "https://overthecap.com/salary-cap/titans"
+        }
+      ],
+      "no_trade_guardrails": [
+        {
+          "guardrail": "Do not treat Simmons or starting OL as available just because the team is retooling.",
+          "confidence": "high",
+          "source": "https://overthecap.com/salary-cap/titans"
+        }
+      ]
     },
     "cultural_signals": {
       "stability": {

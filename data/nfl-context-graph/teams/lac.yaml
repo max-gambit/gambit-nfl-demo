@@ -102,6 +102,84 @@ trade_dna:
       counterparties: [KC]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: buyer_hold
+    confidence: high
+    evidence: The Chargers' contend-soon posture and near-cap profile point to holding core Herbert-support and defensive pieces, with only one-year veteran trims plausible.
+    source: https://overthecap.com/salary-cap/chargers
+  position_group_stance:
+    - group: DL
+      stance: Dalvin Tomlinson is a check-call only because his one-year profile is clean, while Teair Tart and young DT depth are not automatic sale signals.
+      core_players: [Teair Tart]
+      movable_players: [Dalvin Tomlinson]
+      seller_depth_notes: The Chargers have interior bodies, but a contender should not thin the run front unless young depth clearly wins the role.
+      sell_threshold: Require a rotation displacement or explicit cap trim before calling an interior defender available.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/chargers
+    - group: EDGE/LB
+      stance: Khalil Mack can be monitored as a one-year veteran, but the seller case is capped by his role in a playoff rush plan.
+      core_players: [Khalil Mack, Tuli Tuipulotu]
+      movable_players: [Junior Colson]
+      seller_depth_notes: A Mack trade requires either a postseason-direction change or confidence that younger rushers can carry high-leverage snaps.
+      sell_threshold: Do not lead with Mack unless the Chargers signal they prefer the pick and future flexibility over his 2026 snaps.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/chargers
+    - group: CB/S
+      stance: Derwin James is a hold; one-year corner contracts are more realistic if Los Angeles has nickel depth.
+      core_players: [Derwin James]
+      movable_players: [Donte Jackson, Elijah Molden]
+      seller_depth_notes: The seller loss is meaningful in the secondary, so the buyer must validate whether a corner is outside the starting plan.
+      sell_threshold: Ask about role and injury depth before sending a pick offer.
+      confidence: medium
+      source: https://www.nfl.com/teams/chargers/roster
+    - group: WR
+      stance: Receiver depth is a monitor lane because the Chargers need Herbert weapons more than marginal cap room.
+      core_players: [Quentin Johnston]
+      movable_players: [Dalevon Campbell]
+      seller_depth_notes: A WR sale should target players below the weekly route tree, not core targets.
+      sell_threshold: Require clear route-share compression before naming a receiver as available.
+      confidence: medium
+      source: https://www.nfl.com/teams/chargers/roster
+    - group: OL
+      stance: Rashawn Slater and Joe Alt are hard holds; interior OL depth can be discussed only below the starter tier.
+      core_players: [Rashawn Slater, Joe Alt]
+      movable_players: [Ben Cleveland, Cole Strange]
+      seller_depth_notes: Herbert protection is the no-trade objection for any premium lineman.
+      sell_threshold: A lineman must be outside the best-five or swing plan before the Chargers should listen.
+      confidence: high
+      source: https://overthecap.com/salary-cap/chargers
+  market_preferences:
+    desired_return_types:
+      - Picks for one-year veterans outside the weekly plan
+      - Need-position player swaps that help the Herbert window
+    avoided_deal_types:
+      - Selling quarterback protection
+      - Moving defensive stars without a postseason-direction change
+    division_rivalry_friction: AFC West friction is high; a Giants call avoids division issues but still needs to protect the Chargers' contention plan.
+    confidence: high
+    source: https://www.nfl.com/teams/chargers/roster
+  trade_triggers:
+    - trigger: Younger defensive-front or secondary players win rotation roles.
+      implication: One-year veterans can move from monitor to check-call.
+      confidence: medium
+      source: https://www.nfl.com/teams/chargers/roster
+    - trigger: Near-cap pressure makes a small veteran exit preferable to restructuring a core player.
+      implication: The Chargers can sell depth without damaging the Herbert-support spine.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/chargers
+  availability_validation:
+    - check: Confirm whether the target is outside the Chargers' weekly starter or heavy-rotation plan.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/chargers/roster
+    - check: Confirm the one-year trade room is real and does not create a 2027 offset problem.
+      owner: cap
+      source: https://overthecap.com/salary-cap/chargers
+  no_trade_guardrails:
+    - guardrail: Do not describe a Chargers core protector or star defender as available unless the answer names the contention cost.
+      confidence: high
+      source: https://overthecap.com/salary-cap/chargers
+
 cultural_signals:
   stability:
     value: medium

@@ -102,6 +102,84 @@ trade_dna:
       counterparties: [IND]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: buyer_hold
+    confidence: high
+    evidence: Houston's contend-soon posture, near-cap profile, and Stroud rookie-contract window point to holding core players while listening only on displaced veterans.
+    source: https://overthecap.com/salary-cap/texans
+  position_group_stance:
+    - group: DL
+      stance: Danielle Hunter and Will Anderson Jr. are not seller lanes; interior or rotational depth can be checked only if Houston's front has a surplus.
+      core_players: [Danielle Hunter, Will Anderson Jr.]
+      movable_players: [Dominic Bailey]
+      seller_depth_notes: The Texans should value pass-rush depth highly while trying to contend around C.J. Stroud.
+      sell_threshold: Ask only on rotation players who are outside the pressure package.
+      confidence: high
+      source: https://www.nfl.com/teams/texans/roster
+    - group: EDGE/LB
+      stance: Edge and linebacker calls should be conservative because the high-cap rows are tied to the defensive identity.
+      core_players: [Danielle Hunter, Will Anderson Jr., Azeez Al-Shaair]
+      movable_players: [E.J. Speed]
+      seller_depth_notes: Houston can move a role linebacker only if it does not reduce pressure packages, run fits, or special-teams reliability.
+      sell_threshold: Require role displacement plus a pick or need-position return.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/texans
+    - group: CB/S
+      stance: Derek Stingley Jr. and Jalen Pitre are hold assets; safety depth is the only realistic inquiry.
+      core_players: [Derek Stingley Jr., Jalen Pitre]
+      movable_players: [Reed Blankenship]
+      seller_depth_notes: Trading a starting defensive back creates more playoff-path pain than cap relief.
+      sell_threshold: Treat DB calls as monitor unless a veteran is outside Houston's subpackage plan.
+      confidence: medium
+      source: https://www.nfl.com/teams/texans/roster
+    - group: WR
+      stance: Nico Collins is a hold, and receiver sales should be limited to role compression below the main target tree.
+      core_players: [Nico Collins]
+      movable_players: [Lewis Bond]
+      seller_depth_notes: A Stroud-centered offense should protect its top targets and only consider depth exits.
+      sell_threshold: Require evidence that the receiver is outside the weekly rotation.
+      confidence: medium
+      source: https://www.nfl.com/teams/texans/roster
+    - group: OL
+      stance: One-year tackle money can be a check-call, but Houston should not thin protection without a replacement.
+      core_players: [Braden Smith]
+      movable_players: [Trent Brown, Jake Andrews]
+      seller_depth_notes: The cap sheet shows short-term OL contracts, but the football cost is tied directly to Stroud protection.
+      sell_threshold: Confirm Houston's starting five and swing-tackle plan before pricing any lineman.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/texans
+  market_preferences:
+    desired_return_types:
+      - Player-for-player help that supports the Stroud window
+      - Picks for veterans outside the weekly plan
+    avoided_deal_types:
+      - Selling premium rush or coverage starters
+      - AFC South trades that solve a rival's need
+    division_rivalry_friction: AFC South friction is high; a Giants inquiry avoids division conflict but still needs to respect Houston's contend-soon window.
+    confidence: high
+    source: https://www.nfl.com/teams/texans/roster
+  trade_triggers:
+    - trigger: A veteran falls behind a younger player in Houston's offensive line or secondary rotation.
+      implication: The Texans can turn depth into a pick without touching core starters.
+      confidence: medium
+      source: https://www.nfl.com/teams/texans/roster
+    - trigger: Near-cap pressure makes a depth sale preferable to touching core extensions.
+      implication: Check-call targets should be non-core contracts only.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/texans
+  availability_validation:
+    - check: Confirm the target is not part of Houston's protection, pressure, or coverage core.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/texans/roster
+    - check: Confirm trade savings and dead-money treatment before calling a veteran exit helpful.
+      owner: cap
+      source: https://overthecap.com/salary-cap/texans
+  no_trade_guardrails:
+    - guardrail: Do not rank a Texans target as a lead lane if the only evidence is buyer cap fit and not Houston seller motivation.
+      confidence: high
+      source: https://overthecap.com/salary-cap/texans
+
 cultural_signals:
   stability:
     value: medium

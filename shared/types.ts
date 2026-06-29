@@ -1929,6 +1929,11 @@ export interface NflCoverageGap {
   detail: string;
   affected_count?: number;
   affected_players?: string[];
+  current_score?: number;
+  target_score?: number;
+  gap_to_target?: number;
+  next_source_family?: string;
+  public_ceiling?: boolean;
 }
 
 export interface NflCoverageSourceRef {
@@ -1944,6 +1949,10 @@ export interface NflCoverageDomainSummary {
   domain: NflCoverageDomain;
   status: NflCoverageStatus;
   score: number;
+  readiness_score: number;
+  target_score: number;
+  gap_to_9_10: number;
+  to_9_10: string;
   label: string;
   detail: string;
   row_count: number;
@@ -1954,6 +1963,10 @@ export interface NflCoverageDomainSummary {
 export interface NflCoveragePositionGroupSummary {
   group: string;
   status: NflCoverageStatus;
+  readiness_score: number;
+  target_score: number;
+  gap_to_9_10: number;
+  to_9_10: string;
   roster_count: number;
   cap_row_count: number;
   player_metric_row_count: number;
@@ -1969,6 +1982,9 @@ export interface NflCoveragePositionGroupSummary {
 export interface NflCoverageQuestionReadiness {
   key: NflCoverageReadinessKey;
   status: NflCoverageStatus;
+  readiness_score: number;
+  target_score: number;
+  gap_to_9_10: number;
   label: string;
   detail: string;
   required_domains: NflCoverageDomain[];
@@ -1977,6 +1993,11 @@ export interface NflCoverageQuestionReadiness {
 
 export interface NflCoverageTeamRow extends NflDemoTeam {
   status: NflCoverageStatus;
+  readiness_score: number;
+  target_score: number;
+  gap_to_9_10: number;
+  to_9_10: string;
+  demo_safe_prompts: string[];
   roster_count: number;
   cap_row_count: number;
   player_metric_row_count: number;
@@ -2003,6 +2024,10 @@ export interface NflCoverageMatrixResponse {
   generated_at: string;
   league: {
     status: NflCoverageStatus;
+    readiness_score: number;
+    target_score: number;
+    gap_to_9_10: number;
+    to_9_10: string;
     team_count: number;
     roster_row_count: number;
     cap_row_count: number;

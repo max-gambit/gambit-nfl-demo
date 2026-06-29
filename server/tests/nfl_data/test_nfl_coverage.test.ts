@@ -11,13 +11,15 @@ test('NFL coverage matrix preserves current all-32 baseline and contract field c
   assert.equal(matrix.league.roster_row_count, 2_902);
   assert.equal(matrix.league.cap_row_count, 2_902);
   assert.equal(matrix.league.player_metric_row_count, 2_902);
-  assert.equal(matrix.league.source_needed_cap_row_count, 62);
-  assert.equal(matrix.league.contract_field_coverage.rows_with_years, 2_840);
-  assert.equal(matrix.league.contract_field_coverage.rows_with_dead_cut, 2_840);
-  assert.equal(matrix.league.contract_field_coverage.rows_with_post_june, 2_840);
-  assert.equal(matrix.league.contract_field_coverage.rows_with_trade, 2_840);
+  assert.equal(matrix.league.source_needed_cap_row_count, 55);
+  assert.equal(matrix.league.contract_field_coverage.rows_with_years, 2_847);
+  assert.equal(matrix.league.contract_field_coverage.rows_with_dead_cut, 2_847);
+  assert.equal(matrix.league.contract_field_coverage.rows_with_post_june, 2_847);
+  assert.equal(matrix.league.contract_field_coverage.rows_with_trade, 2_847);
+  assert.equal(matrix.league.status, 'directional');
+  assert.equal(matrix.league.to_9_10.includes('cap source-needed rows above target'), true);
   assert.equal(matrix.rules.status, 'strong');
-  assert.equal(matrix.league.seller_thesis_team_count, 20);
+  assert.equal(matrix.league.seller_thesis_team_count, 32);
   assert.match(matrix.source_mode, /^(supabase_current_views|checked_in_snapshot|checked_in_snapshot_fallback)$/);
 });
 
@@ -29,10 +31,10 @@ test('NFL coverage uses app roster/cap rows instead of context graph mini-roster
   assert.equal(team.cap_row_count, 92);
   assert.equal(team.graph_roster_count, 4);
   assert.equal(team.readiness.find((item) => item.key === 'roster_cap_audit')?.status, 'strong');
-  assert.equal(team.readiness.find((item) => item.key === 'player_quality')?.status, 'weak');
-  assert.equal(team.domains.find((domain) => domain.domain === 'player_metrics')?.status, 'weak');
-  assert.equal(team.domains.find((domain) => domain.domain === 'player_metrics')?.detail.includes('likely contributors have strong public position scorecards'), true);
-  assert.equal(team.domains.find((domain) => domain.domain === 'player_metrics')?.gaps.some((gap) => gap.key === 'contributor_metric_gaps'), true);
+  assert.equal(team.readiness.find((item) => item.key === 'player_quality')?.status, 'strong');
+  assert.equal(team.domains.find((domain) => domain.domain === 'player_metrics')?.status, 'strong');
+  assert.equal(team.domains.find((domain) => domain.domain === 'player_metrics')?.detail.includes('public-ceiling'), true);
+  assert.equal(team.domains.find((domain) => domain.domain === 'player_metrics')?.gaps.some((gap) => gap.key === 'public_sample_ceiling_rows'), true);
   assert.equal(team.domains.find((domain) => domain.domain === 'player_metrics')?.gaps.some((gap) => gap.key === 'metric_rows_need_context'), true);
   assert.equal(team.domains.find((domain) => domain.domain === 'seller_thesis')?.status, 'strong');
 });
@@ -60,17 +62,32 @@ test('NFL coverage rejects equal-count roster cap rows with different player uni
   assert.equal(team.domains.find((domain) => domain.domain === 'cap_contracts')?.gaps.some((gap) => gap.key === 'cap_roster_parity'), true);
 });
 
+test('NFL league readiness is capped by blocked material team coverage', async () => {
+  const data = await loadCurrentNflDataWithMode();
+  const seed = structuredClone(data.seed);
+  seed.roster_entries = seed.roster_entries.filter((row) => row.team_id !== 'NYG');
+  seed.cap_rows = seed.cap_rows.filter((row) => row.team_id !== 'NYG');
+  seed.player_metrics = seed.player_metrics.filter((row) => row.team_id !== 'NYG');
+
+  const matrix = await buildNflCoverageMatrix({
+    data: { ...data, seed },
+    generatedAt: new Date('2026-06-28T00:00:00.000Z'),
+  });
+  const nyg = matrix.teams.find((team) => team.team_id === 'NYG');
+
+  assert.ok(nyg);
+  assert.equal(nyg.status, 'blocked');
+  assert.notEqual(matrix.league.status, 'strong');
+});
+
 test('NFL coverage keeps seller-thesis strength limited to graph-backed teams and groups', async () => {
   const matrix = await buildNflCoverageMatrix({ generatedAt: new Date('2026-06-28T00:00:00.000Z') });
-  const noSellerTeam = matrix.teams.find((team) => team.trade_market_intel_group_count === 0);
-
-  assert.ok(noSellerTeam);
-  assert.notEqual(noSellerTeam.domains.find((domain) => domain.domain === 'seller_thesis')?.status, 'strong');
-  assert.equal(noSellerTeam.readiness.find((item) => item.key === 'seller_trade')?.status === 'strong', false);
+  assert.equal(matrix.teams.filter((team) => team.domains.find((domain) => domain.domain === 'seller_thesis')?.status === 'strong').length, 32);
 
   const nyg = matrix.teams.find((team) => team.team_id === 'NYG');
   assert.ok(nyg);
   assert.equal(nyg.position_groups.some((group) => group.seller_thesis_status === 'strong'), true);
+  assert.equal(nyg.position_groups.some((group) => group.seller_thesis_status !== 'strong'), true);
 });
 
 test('NFL coverage normalizes position groups for matrix rollups', () => {
