@@ -7,6 +7,13 @@ import {
   type ValidationReport,
 } from './schema.js';
 
+const FOCUSED_TRADE_MARKET_INTEL_TEAM_IDS = new Set(['NYG', 'NYJ', 'TB', 'CIN', 'IND', 'GB', 'BAL', 'WAS', 'LV', 'PHI', 'ARI']);
+const TRADE_MARKET_GENERIC_PHRASES = [
+  'internal demo synthesis',
+  'verify before external use',
+  'premium-position decisions',
+];
+
 export function validateTeamDocuments(teams: TeamDocument[]): ValidationMessage[] {
   return teams.flatMap((team) => validateTeamDocument(team));
 }
@@ -199,6 +206,7 @@ class TeamSchemaValidator {
     this.validateStrategicPosture();
     this.validateCapSituation();
     this.validateTradeDna();
+    this.validateTradeMarketIntel();
     this.validateCulturalSignals();
     this.validateRoster();
     this.validatePendingFreeAgents();
@@ -300,6 +308,90 @@ class TeamSchemaValidator {
       }
     }
     this.enumValue('trade_dna.confidence', VOCAB.confidence, false);
+  }
+
+  private validateTradeMarketIntel(): void {
+    const rawIntel = this.value('trade_market_intel');
+    const focused = FOCUSED_TRADE_MARKET_INTEL_TEAM_IDS.has(this.team.teamId);
+    if (rawIntel === undefined) {
+      if (focused) this.add('trade_market_intel', 'Focused NFL trade-demo teams require trade_market_intel.');
+      return;
+    }
+    if (!isRecord(rawIntel)) {
+      this.add('trade_market_intel', `Expected object, got ${typeName(rawIntel)}.`);
+      return;
+    }
+
+    this.enumValue('trade_market_intel.seller_posture.value', VOCAB.sellerPosture, false);
+    this.enumValue('trade_market_intel.seller_posture.confidence', VOCAB.confidence, false);
+    this.requiredNonGenericString('trade_market_intel.seller_posture.evidence');
+    this.requiredUrl('trade_market_intel.seller_posture.source');
+
+    this.requiredNonEmptyArray('trade_market_intel.position_group_stance');
+    for (const [index] of this.records('trade_market_intel.position_group_stance').entries()) {
+      const base = `trade_market_intel.position_group_stance[${index}]`;
+      this.requiredNonGenericString(`${base}.group`);
+      this.requiredNonGenericString(`${base}.stance`);
+      this.requiredArray(`${base}.core_players`);
+      this.requiredArray(`${base}.movable_players`);
+      this.requiredNonGenericString(`${base}.seller_depth_notes`);
+      this.requiredNonGenericString(`${base}.sell_threshold`);
+      this.enumValue(`${base}.confidence`, VOCAB.confidence, false);
+      this.requiredUrl(`${base}.source`);
+    }
+
+    this.requiredRecord('trade_market_intel.market_preferences');
+    this.requiredNonEmptyArray('trade_market_intel.market_preferences.desired_return_types');
+    this.requiredArray('trade_market_intel.market_preferences.avoided_deal_types');
+    this.requiredNonGenericString('trade_market_intel.market_preferences.division_rivalry_friction');
+    this.enumValue('trade_market_intel.market_preferences.confidence', VOCAB.confidence, false);
+    this.requiredUrl('trade_market_intel.market_preferences.source');
+
+    this.requiredNonEmptyArray('trade_market_intel.trade_triggers');
+    for (const [index] of this.records('trade_market_intel.trade_triggers').entries()) {
+      const base = `trade_market_intel.trade_triggers[${index}]`;
+      this.requiredNonGenericString(`${base}.trigger`);
+      this.requiredNonGenericString(`${base}.implication`);
+      this.enumValue(`${base}.confidence`, VOCAB.confidence, false);
+      this.requiredUrl(`${base}.source`);
+    }
+
+    this.requiredNonEmptyArray('trade_market_intel.availability_validation');
+    for (const [index] of this.records('trade_market_intel.availability_validation').entries()) {
+      const base = `trade_market_intel.availability_validation[${index}]`;
+      this.requiredNonGenericString(`${base}.check`);
+      this.requiredNonGenericString(`${base}.owner`);
+      this.requiredUrl(`${base}.source`);
+    }
+
+    this.requiredNonEmptyArray('trade_market_intel.no_trade_guardrails');
+    for (const [index] of this.records('trade_market_intel.no_trade_guardrails').entries()) {
+      const base = `trade_market_intel.no_trade_guardrails[${index}]`;
+      this.requiredNonGenericString(`${base}.guardrail`);
+      this.enumValue(`${base}.confidence`, VOCAB.confidence, false);
+      this.requiredUrl(`${base}.source`);
+    }
+
+    const intelText = JSON.stringify(rawIntel).toLowerCase();
+    for (const phrase of TRADE_MARKET_GENERIC_PHRASES) {
+      if (intelText.includes(phrase)) {
+        this.add('trade_market_intel', `Trade-facing seller Intel must not use generic template phrase "${phrase}".`);
+      }
+    }
+
+    if (focused && this.team.teamId === 'NYG') {
+      const groups = this.values('trade_market_intel.position_group_stance').map((stance) => (
+        isRecord(stance) ? String(stance.group ?? '').toUpperCase() : ''
+      ));
+      if (!groups.includes('OL')) this.add('trade_market_intel.position_group_stance', 'NYG trade_market_intel requires an OL salary-out tradeoff stance.');
+      if (!groups.includes('DB')) this.add('trade_market_intel.position_group_stance', 'NYG trade_market_intel requires a DB salary-out tradeoff stance.');
+    } else if (focused) {
+      const hasInteriorFront = this.values('trade_market_intel.position_group_stance').some((stance) => {
+        const group = isRecord(stance) ? String(stance.group ?? '') : '';
+        return /\b(DL|DT|interior_front|defensive_line)\b/i.test(group);
+      });
+      if (!hasInteriorFront) this.add('trade_market_intel.position_group_stance', 'Focused seller teams require a DL/interior-front stance.');
+    }
   }
 
   private validateCulturalSignals(): void {
@@ -564,6 +656,18 @@ class TeamSchemaValidator {
     }
   }
 
+  private requiredNonGenericString(pathName: string): void {
+    this.requiredString(pathName);
+    const value = this.value(pathName);
+    if (typeof value !== 'string') return;
+    const lower = value.toLowerCase();
+    for (const phrase of TRADE_MARKET_GENERIC_PHRASES) {
+      if (lower.includes(phrase)) {
+        this.add(pathName, `Trade-facing seller Intel must not use generic template phrase "${phrase}".`);
+      }
+    }
+  }
+
   private requiredNumber(pathName: string): void {
     const value = this.value(pathName);
     if (typeof value !== 'number' || Number.isNaN(value)) {
@@ -592,6 +696,19 @@ class TeamSchemaValidator {
     if (typeof value !== 'string' || !/^https?:\/\//.test(value)) {
       this.add(pathName, `Expected URL string or "unknown", got ${typeName(value)}.`);
     }
+  }
+
+  private requiredUrl(pathName: string): void {
+    const value = this.value(pathName);
+    if (typeof value !== 'string' || !/^https?:\/\//.test(value)) {
+      this.add(pathName, `Expected URL string, got ${typeName(value)}.`);
+    }
+  }
+
+  private requiredNonEmptyArray(pathName: string): void {
+    this.requiredArray(pathName);
+    const value = this.value(pathName);
+    if (Array.isArray(value) && value.length === 0) this.add(pathName, 'Expected non-empty array.');
   }
 
   private values(pathName: string): unknown[] {

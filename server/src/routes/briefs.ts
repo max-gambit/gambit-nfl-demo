@@ -8,6 +8,7 @@ import {
   buildMessagesWithDataAnalystLookups,
   dataAnalysisCbaCitationSources,
   dataAnalystTracesToBriefSources,
+  handleDataAnalystToolUse,
   isSubmitDataAnalysisInput,
   recommendationBriefCbaCitationSources,
   submitDataAnalysisTool,
@@ -32,6 +33,13 @@ import {
   reserveGeneratedSourceRefs,
 } from '../claude/nba_evidence.js';
 import {
+  buildCurrentNflEvidence,
+  currentNflEvidenceScopeForQuestion,
+  currentNflEvidenceTeamIds as resolveCurrentNflEvidenceTeamIds,
+  defaultNflEvidenceTeamId,
+  isNflTradeGoalQuestion,
+} from '../claude/nfl_evidence.js';
+import {
   enrichSpecificMoveCandidates,
   sanitizeSubmitBriefMoveCandidates,
 } from '../claude/move_candidates.js';
@@ -50,7 +58,8 @@ import type {
   AddBriefShareRecipientRequest, Brief, BriefMode, BriefProgress, BriefProgressEventKind, BriefProgressPhase, BriefProgressStreamEvent, BriefShare, BriefShareLink, BriefShareLinkResponse,
   BriefShareRecipientResponse, BriefShareSnapshot, CreateBriefRequest, CreateBriefResponse,
   CreateSavedBriefTemplateResponse, ListBriefTemplatesResponse, RegenerateBriefRequest,
-  ResolveBriefShareLinkResponse, SavedBriefTemplate, SubmitBriefInput, TeamMember, CbaArticle,
+  ResolveBriefShareLinkResponse, SavedBriefTemplate, SubmitBriefInput, TeamMember, CbaArticle, DataAnalystTrace,
+  SubmitDataAnalysisInput,
 } from '@shared/types';
 
 export const briefRoutes = new Hono();
@@ -616,8 +625,12 @@ export async function generateBrief(brief: Brief) {
   const heartbeat = startBriefGenerationHeartbeat(brief);
   const progress = createBriefProgressTracker(brief, heartbeat);
   const defaultTeamId = defaultBriefTeamId();
-  const evidenceTeamIds = currentNbaEvidenceTeamIds(brief.question, defaultTeamId);
-  const evidenceScope = currentNbaEvidenceScopeForQuestion(brief.question);
+  const nflEvidenceTeamIds = currentNflEvidenceTeamIds(brief.question, defaultTeamId);
+  const nflEvidenceScope = currentNflEvidenceScopeForQuestion(brief.question);
+  const nbaEvidenceTeamIds = nflEvidenceTeamIds.length > 0
+    ? []
+    : currentNbaEvidenceTeamIds(brief.question, null);
+  const nbaEvidenceScope = currentNbaEvidenceScopeForQuestion(brief.question);
   const templateSelection = templateSelectionForBrief(brief);
 
   // Let Claude gather Intel tool results first, then force the final
@@ -629,35 +642,44 @@ export async function generateBrief(brief: Brief) {
       'collecting_evidence',
       8,
       'Collecting current app evidence',
-      evidenceTeamIds.length
-        ? `Loading ${evidenceScope ?? 'transaction'} evidence for ${evidenceTeamIds.join(', ')}.`
-        : 'No current NBA evidence scope was detected for this prompt.',
+      nflEvidenceTeamIds.length
+        ? `Loading ${nflEvidenceScope ?? 'transaction'} NFL evidence for ${nflEvidenceTeamIds.join(', ')}.`
+        : nbaEvidenceTeamIds.length
+          ? `Loading ${nbaEvidenceScope ?? 'transaction'} NBA evidence for ${nbaEvidenceTeamIds.join(', ')}.`
+          : 'No current app evidence scope was detected for this prompt.',
       'data',
     );
-    const currentNbaEvidence = evidenceTeamIds.length > 0
-      ? await buildCurrentNbaEvidence(brief.question, {
-        teamIds: evidenceTeamIds,
-        scope: evidenceScope ?? 'transaction_full',
+    const currentNflEvidence = nflEvidenceTeamIds.length > 0
+      ? await buildCurrentNflEvidence(brief.question, {
+        teamIds: nflEvidenceTeamIds,
+        scope: nflEvidenceScope ?? 'transaction_full',
       })
       : null;
-    const runContextGraphLookup = shouldRunContextGraphLookup(brief.question, !!currentNbaEvidence);
-    const currentEvidenceSourceCount = currentNbaEvidence?.sources.length ?? 0;
+    const currentNbaEvidence = !currentNflEvidence && nbaEvidenceTeamIds.length > 0
+      ? await buildCurrentNbaEvidence(brief.question, {
+        teamIds: nbaEvidenceTeamIds,
+        scope: nbaEvidenceScope ?? 'transaction_full',
+      })
+      : null;
+    const currentAppEvidence = currentNflEvidence ?? currentNbaEvidence;
+    const runContextGraphLookup = shouldRunContextGraphLookup(brief.question, !!currentAppEvidence);
+    const currentEvidenceSourceCount = currentAppEvidence?.sources.length ?? 0;
     await progress.mark(
       'context_lookup',
-      currentNbaEvidence ? 18 : 14,
-      currentNbaEvidence ? 'Current evidence loaded' : 'Checking team context',
-      currentNbaEvidence
+      currentAppEvidence ? 18 : 14,
+      currentAppEvidence ? 'Current evidence loaded' : 'Checking team context',
+      currentAppEvidence
         ? `${currentEvidenceSourceCount} current-data source ${currentEvidenceSourceCount === 1 ? 'ref' : 'refs'} reserved${runContextGraphLookup ? '; Intel lookup also requested.' : '; enough to cover the team context layer.'}`
         : 'Preparing Intel lookup.',
-      currentNbaEvidence ? 'data' : 'tool',
+      currentAppEvidence ? 'data' : 'tool',
     );
     const contextGraphBlock = runContextGraphLookup ? await buildContextGraphSystemBlock() : null;
     const system: Anthropic.TextBlockParam[] = [
       ...(defaultTeamId ? [{ type: 'text' as const, text: buildDemoTeamPerspectiveBlock(defaultTeamId) }] : []),
       { type: 'text', text: BRIEF_SYSTEM, cache_control: { type: 'ephemeral' } },
       { type: 'text', text: buildBriefTemplateSystemBlock(templateSelection), cache_control: { type: 'ephemeral' } },
-      ...(currentNbaEvidence
-        ? [{ type: 'text' as const, text: currentNbaEvidence.systemBlock }]
+      ...(currentAppEvidence
+        ? [{ type: 'text' as const, text: currentAppEvidence.systemBlock }]
         : []),
       ...(contextGraphBlock
         ? [{ type: 'text' as const, text: contextGraphBlock, cache_control: { type: 'ephemeral' as const } }]
@@ -714,7 +736,7 @@ export async function generateBrief(brief: Brief) {
       'model',
     );
 
-    const reservedSourceCount = currentNbaEvidence?.sources.length ?? 0;
+    const reservedSourceCount = currentAppEvidence?.sources.length ?? 0;
     const allowServerProvidedSources = reservedSourceCount > 0 || contextGraphLookup.traces.length > 0;
     let input = normalizeSubmitBriefInput(
       toolUse.input,
@@ -723,16 +745,16 @@ export async function generateBrief(brief: Brief) {
 
     if (!(await heartbeat.isCurrent())) return;
 
-    const reservedSources = currentNbaEvidence?.sources ?? [];
+    const reservedSources = currentAppEvidence?.sources ?? [];
     let generatedSources = reserveGeneratedSourceRefs(
       Array.isArray(input.sources) ? input.sources : [],
-      currentNbaEvidence?.reserved_max_ref_index ?? 0,
+      currentAppEvidence?.reserved_max_ref_index ?? 0,
     );
     let maxSourceRefIndex = [...reservedSources, ...generatedSources].reduce(
       (max, source) => Math.max(max, source.ref_index),
       0,
     );
-    let contextGraphSources = currentNbaEvidence
+    let contextGraphSources = currentAppEvidence
       ? []
       : contextGraphTracesToBriefSources(
         contextGraphLookup.traces,
@@ -759,13 +781,13 @@ export async function generateBrief(brief: Brief) {
         input = repaired.input;
         generatedSources = reserveGeneratedSourceRefs(
           Array.isArray(input.sources) ? input.sources : [],
-          currentNbaEvidence?.reserved_max_ref_index ?? 0,
+          currentAppEvidence?.reserved_max_ref_index ?? 0,
         );
         maxSourceRefIndex = [...reservedSources, ...generatedSources].reduce(
           (max, source) => Math.max(max, source.ref_index),
           0,
         );
-        contextGraphSources = currentNbaEvidence
+        contextGraphSources = currentAppEvidence
           ? []
           : contextGraphTracesToBriefSources(
             contextGraphLookup.traces,
@@ -813,13 +835,13 @@ export async function generateBrief(brief: Brief) {
         input = repaired.input;
         generatedSources = reserveGeneratedSourceRefs(
           input.sources,
-          currentNbaEvidence?.reserved_max_ref_index ?? 0,
+          currentAppEvidence?.reserved_max_ref_index ?? 0,
         );
         maxSourceRefIndex = [...reservedSources, ...generatedSources].reduce(
           (max, source) => Math.max(max, source.ref_index),
           0,
         );
-        contextGraphSources = currentNbaEvidence
+        contextGraphSources = currentAppEvidence
           ? []
           : contextGraphTracesToBriefSources(
             contextGraphLookup.traces,
@@ -1021,7 +1043,7 @@ export async function generateDataAnalysisBrief(brief: Brief) {
       'Running bounded roster, cap, stats, context, or CBA lookups before answering.',
       'data',
     );
-    const dataLookup = await buildMessagesWithDataAnalystLookups({
+    let dataLookup = await buildMessagesWithDataAnalystLookups({
       model: BRIEF_MODEL,
       max_tokens: 8192,
       system,
@@ -1029,6 +1051,7 @@ export async function generateDataAnalysisBrief(brief: Brief) {
         { role: 'user', content: brief.question },
       ],
     });
+    dataLookup = await ensureNflRosterCapDataLookup(brief.question, dataLookup);
     if (dataLookup.traces.length === 0) {
       throw new Error('Data analyst generation did not call an app-data tool.');
     }
@@ -1061,11 +1084,12 @@ export async function generateDataAnalysisBrief(brief: Brief) {
       'model',
     );
 
-    if (!isSubmitDataAnalysisInput(toolUse.input)) {
+    const normalizedInput = normalizeSubmitDataAnalysisInput(toolUse.input);
+    if (!normalizedInput) {
       throw new Error('submit_data_analysis input missing required fields');
     }
 
-    const input = toolUse.input;
+    const input = normalizedInput;
     await progress.mark(
       'matching_sources',
       88,
@@ -1138,16 +1162,190 @@ export async function generateDataAnalysisBrief(brief: Brief) {
   }
 }
 
+async function ensureNflRosterCapDataLookup(
+  question: string,
+  lookup: { messages: Anthropic.MessageParam[]; traces: DataAnalystTrace[] },
+): Promise<{ messages: Anthropic.MessageParam[]; traces: DataAnalystTrace[] }> {
+  if (!requiresNflRosterCapDataLookup(question)) return lookup;
+  const teamIds = currentNflEvidenceTeamIds(question, defaultBriefTeamId());
+  if (teamIds.length === 0) return lookup;
+  const needsTradeScreen = isNflTradeGoalQuestion(question);
+  if (
+    hasRequiredNflRosterCapTrace(lookup.traces, teamIds)
+    && hasNflCoverageTrace(lookup.traces, teamIds)
+    && (!needsTradeScreen || (
+      hasNflTradeScreenTrace(lookup.traces, teamIds[0])
+      && hasNflTradeIntelTrace(lookup.traces, teamIds[0])
+    ))
+  ) {
+    return lookup;
+  }
+
+  const repairLookups = await Promise.all(teamIds.map(async (teamId, index) => {
+    const toolUseId = `server_required_nfl_roster_cap_${randomBytes(6).toString('hex')}`;
+    const includeTradeScreen = needsTradeScreen && index === 0;
+    const input = {
+      team_ids: [teamId],
+      datasets: ['rosters', 'cap_sheets', 'player_metrics', 'coverage', ...(index === 0 ? ['rules'] : []), ...(includeTradeScreen ? ['trade_screen'] : [])],
+      limit: 100,
+      ...(includeTradeScreen ? { trade_goal: question } : {}),
+    };
+    const result = await handleDataAnalystToolUse('query_nfl_data', input);
+    const trace: DataAnalystTrace = {
+      tool_use_id: toolUseId,
+      tool_name: 'query_nfl_data',
+      datasets: result.datasets,
+      errors: result.errors,
+    };
+    return { toolUseId, input, result, trace };
+  }));
+  const repairTraces = repairLookups.map((item) => item.trace);
+
+  if (!hasRequiredNflRosterCapTrace(repairTraces, teamIds)) {
+    throw new Error('NFL roster/cap data analyst generation did not load nfl_rosters_current and nfl_cap_sheets_current.');
+  }
+  if (!hasNflCoverageTrace(repairTraces, teamIds)) {
+    throw new Error('NFL roster/cap data analyst generation did not load nfl_coverage_current.');
+  }
+  if (needsTradeScreen && !hasNflTradeScreenTrace(repairTraces, teamIds[0])) {
+    throw new Error('NFL trade-goal data analyst generation did not load nfl_trade_screen_current.');
+  }
+  if (needsTradeScreen && !hasNflTradeIntelTrace(repairTraces, teamIds[0])) {
+    throw new Error('NFL trade-goal data analyst generation did not load nfl_context_graph trade Intel.');
+  }
+
+  return {
+    messages: [
+      ...lookup.messages,
+      ...repairLookups.flatMap(({ toolUseId, input, result }) => [
+        {
+          role: 'assistant' as const,
+          content: [{
+            type: 'tool_use',
+            id: toolUseId,
+            name: 'query_nfl_data',
+            input,
+          }] as Anthropic.ContentBlockParam[],
+        },
+        {
+          role: 'user' as const,
+          content: [{
+            type: 'tool_result',
+            tool_use_id: toolUseId,
+            content: JSON.stringify(result),
+            is_error: !result.ok,
+          }] as Anthropic.ContentBlockParam[],
+        },
+      ]),
+    ],
+    traces: [...lookup.traces, ...repairTraces],
+  };
+}
+
+export function requiresNflRosterCapDataLookup(question: string): boolean {
+  return currentNflEvidenceScopeForQuestion(question) === 'transaction_full'
+    && currentNflEvidenceTeamIds(question, defaultBriefTeamId()).length > 0;
+}
+
+export function hasRequiredNflRosterCapTrace(
+  traces: DataAnalystTrace[],
+  requiredTeamIds: string[] = [],
+): boolean {
+  return datasetCoversRequiredNflTeams(traces, 'nfl_rosters_current', requiredTeamIds)
+    && datasetCoversRequiredNflTeams(traces, 'nfl_cap_sheets_current', requiredTeamIds);
+}
+
+export function hasNflTradeScreenTrace(
+  traces: DataAnalystTrace[],
+  requiredTeamId: string | null = null,
+): boolean {
+  return traces.some((trace) => {
+    if (trace.errors.length > 0) return false;
+    return trace.datasets.some((dataset) => (
+      dataset.dataset_id === 'nfl_trade_screen_current'
+      && dataset.row_count > 0
+      && (!requiredTeamId || dataset.team_ids.includes(requiredTeamId))
+    ));
+  });
+}
+
+export function hasNflCounterpartyIntelTrace(
+  traces: DataAnalystTrace[],
+  requiredSubjectTeamId: string | null = null,
+): boolean {
+  return hasNflTradeIntelTrace(traces, requiredSubjectTeamId, 2);
+}
+
+export function hasNflTradeIntelTrace(
+  traces: DataAnalystTrace[],
+  requiredSubjectTeamId: string | null = null,
+  minimumRowCount = 1,
+): boolean {
+  return traces.some((trace) => {
+    if (trace.errors.length > 0) return false;
+    return trace.datasets.some((dataset) => (
+      dataset.dataset_id === 'nfl_context_graph'
+      && dataset.row_count >= minimumRowCount
+      && (!requiredSubjectTeamId || dataset.team_ids.includes(requiredSubjectTeamId))
+    ));
+  });
+}
+
+export function hasNflCoverageTrace(
+  traces: DataAnalystTrace[],
+  requiredTeamIds: string[] = [],
+): boolean {
+  const cleanDatasets = traces
+    .filter((trace) => trace.errors.length === 0)
+    .flatMap((trace) => trace.datasets)
+    .filter((dataset) => dataset.dataset_id === 'nfl_coverage_current' && dataset.row_count > 0);
+  if (requiredTeamIds.length === 0) return cleanDatasets.length > 0;
+
+  const covered = new Set<string>();
+  for (const dataset of cleanDatasets) {
+    for (const teamId of requiredTeamIds) {
+      if (dataset.team_ids.includes(teamId)) covered.add(teamId);
+    }
+  }
+  return requiredTeamIds.every((teamId) => covered.has(teamId));
+}
+
+function datasetCoversRequiredNflTeams(
+  traces: DataAnalystTrace[],
+  datasetId: 'nfl_rosters_current' | 'nfl_cap_sheets_current',
+  requiredTeamIds: string[],
+): boolean {
+  const cleanDatasets = traces
+    .filter((trace) => trace.errors.length === 0)
+    .flatMap((trace) => trace.datasets)
+    .filter((dataset) => dataset.dataset_id === datasetId && dataset.row_count > 0);
+  if (requiredTeamIds.length === 0) return cleanDatasets.length > 0;
+
+  const covered = new Set<string>();
+  for (const dataset of cleanDatasets) {
+    const matchedTeamIds = requiredTeamIds.filter((teamId) => dataset.team_ids.includes(teamId));
+    if (matchedTeamIds.length === 0) continue;
+    const minimumRows = matchedTeamIds.length * 70;
+    if (dataset.row_count < minimumRows) continue;
+    for (const teamId of matchedTeamIds) covered.add(teamId);
+  }
+  return requiredTeamIds.every((teamId) => covered.has(teamId));
+}
+
 function normalizeBriefMode(mode: unknown): BriefMode | null {
   return mode === 'data_analyst' || mode === 'brief' ? mode : null;
 }
 
 export function defaultBriefTeamId(): string | null {
-  return null;
+  return defaultNflEvidenceTeamId();
 }
 
-export function currentNbaEvidenceTeamIds(question: string, defaultTeamId = defaultBriefTeamId()): string[] {
+export function currentNbaEvidenceTeamIds(question: string, defaultTeamId: string | null = null): string[] {
   return resolveCurrentNbaEvidenceTeamIds(question, defaultTeamId);
+}
+
+export function currentNflEvidenceTeamIds(question: string, defaultTeamId = defaultBriefTeamId()): string[] {
+  return resolveCurrentNflEvidenceTeamIds(question, defaultTeamId);
 }
 
 async function loadCbaArticlesForAnalysis(): Promise<CbaArticle[]> {
@@ -1211,6 +1409,110 @@ export function normalizeSubmitBriefInput(input: unknown, allowServerProvidedSou
     record.options = [];
   }
   return sanitizeSubmitBriefMoveCandidates(record as unknown as SubmitBriefInput);
+}
+
+export function normalizeSubmitDataAnalysisInput(input: unknown): SubmitDataAnalysisInput | null {
+  if (isSubmitDataAnalysisInput(input)) return input;
+  if (!isRecord(input)) return null;
+
+  const answer = stringValue(input.answer)
+    ?? stringValue(input.thesis)
+    ?? stringValue(input.summary)
+    ?? stringValue(input.recommendation);
+  if (!answer) return null;
+
+  return {
+    answer,
+    key_findings: normalizeDataAnalysisFindings(input.key_findings ?? input.findings, answer),
+    tables: normalizeDataAnalysisTables(input.tables),
+    calculations: normalizeDataAnalysisCalculations(input.calculations),
+    sources: normalizeDataAnalysisSources(input.sources),
+    caveats: normalizeStringArray(input.caveats, [
+      'Player availability and counterparty willingness still require direct club validation before execution.',
+    ]),
+    followups: normalizeStringArray(input.followups ?? input.follow_ups, []),
+  };
+}
+
+function normalizeDataAnalysisFindings(value: unknown, answer: string): SubmitDataAnalysisInput['key_findings'] {
+  if (!Array.isArray(value)) {
+    return [{ label: 'Current read', body: answer, source_refs: [1] }];
+  }
+  const findings = value
+    .filter(isRecord)
+    .map((item) => ({
+      label: stringValue(item.label) ?? stringValue(item.title) ?? 'Current read',
+      body: stringValue(item.body) ?? stringValue(item.text) ?? stringValue(item.finding) ?? '',
+      source_refs: normalizeSourceRefs(item.source_refs),
+    }))
+    .filter((item) => item.body.length > 0);
+  return findings.length ? findings : [{ label: 'Current read', body: answer, source_refs: [1] }];
+}
+
+function normalizeDataAnalysisTables(value: unknown): SubmitDataAnalysisInput['tables'] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter(isRecord)
+    .map((item) => ({
+      title: stringValue(item.title) ?? 'Data table',
+      columns: normalizeStringArray(item.columns, []),
+      rows: Array.isArray(item.rows) ? item.rows.filter(Array.isArray).slice(0, 12) as (string | number | null)[][] : [],
+      source_refs: normalizeSourceRefs(item.source_refs),
+    }))
+    .filter((item) => item.columns.length > 0);
+}
+
+function normalizeDataAnalysisCalculations(value: unknown): SubmitDataAnalysisInput['calculations'] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter(isRecord)
+    .map((item) => ({
+      label: stringValue(item.label) ?? 'Calculation',
+      formula: stringValue(item.formula),
+      value: stringValue(item.value) ?? '',
+      source_refs: normalizeSourceRefs(item.source_refs),
+    }))
+    .filter((item) => item.value.length > 0);
+}
+
+function normalizeDataAnalysisSources(value: unknown): SubmitDataAnalysisInput['sources'] {
+  if (!Array.isArray(value)) return [];
+  const sources: SubmitDataAnalysisInput['sources'] = [];
+  for (const item of value) {
+    if (!isRecord(item)) continue;
+    const refIndex = numberValue(item.ref_index);
+    const title = stringValue(item.title);
+    if (!refIndex || !title) continue;
+    sources.push({
+      ref_index: refIndex,
+      kind: stringValue(item.kind) ?? 'ANALYST_DATA',
+      source: stringValue(item.source) ?? null,
+      title,
+      updated_at: stringValue(item.updated_at) ?? null,
+      data: isRecord(item.data) ? item.data : null,
+    });
+  }
+  return sources;
+}
+
+function normalizeStringArray(value: unknown, fallback: string[]): string[] {
+  if (!Array.isArray(value)) return fallback;
+  const strings = value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0);
+  return strings.length ? strings : fallback;
+}
+
+function normalizeSourceRefs(value: unknown): number[] {
+  if (!Array.isArray(value)) return [1];
+  const refs = value.filter((item): item is number => Number.isInteger(item) && item > 0).slice(0, 8);
+  return refs.length ? refs : [1];
+}
+
+function stringValue(value: unknown): string | undefined {
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined;
+}
+
+function numberValue(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
 }
 
 export function missingSubmitBriefFields(

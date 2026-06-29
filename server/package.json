@@ -14,6 +14,8 @@
     "build:nba-cap-sheets": "node --import tsx src/nba_cap_sheets/build_reviewed_snapshot.ts",
     "refresh:nba-cap-sheets": "node --import tsx src/nba_cap_sheets/refresh.ts",
     "build:nba-player-stats": "node --import tsx src/nba_player_stats/build_reviewed_snapshot.ts",
+    "build:nfl-data": "tsx src/nfl_data/build_reviewed_snapshot.ts",
+    "seed:nfl-data": "tsx src/db/seed-nfl-data.ts",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/context_graph/*.test.ts tests/nfl_data/*.test.ts tests/nfl_rules/*.test.ts tests/nba_rosters/*.test.ts tests/nba_cap_sheets/*.test.ts tests/nba_player_stats/*.test.ts tests/data_analyst/*.test.ts",
     "test:cba": "tsx --test tests/data_analyst/test_cba_workbench.test.ts tests/data_analyst/test_cba_retrieval_eval.test.ts",

@@ -102,6 +102,44 @@ trade_dna:
       counterparties: [NYG]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: buyer_hold
+    confidence: medium
+    evidence: Washington has interior cap pieces that fit a buyer's screen, but an NFC East counterparty should require a stronger seller signal and premium price.
+    source: https://overthecap.com/salary-cap/commanders
+  position_group_stance:
+    - group: DL
+      stance: Daron Payne and Javon Kinlaw are not clean Giants lanes without a clear Washington sell signal because they are meaningful interior-front pieces inside the division.
+      core_players: [Daron Payne, Javon Kinlaw]
+      movable_players: []
+      seller_depth_notes: Any Washington interior-front call should be treated as expensive and politically harder than an AFC or non-division seller.
+      sell_threshold: Only pursue if Washington is openly selling and accepts a division premium.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/commanders
+  market_preferences:
+    desired_return_types:
+      - Division premium if a front-line player is discussed
+      - Future picks over salary coming back
+    avoided_deal_types:
+      - Helping the Giants solve a trench need cheaply
+    division_rivalry_friction: NFC East friction is high; require an explicit premium and seller trigger.
+    confidence: high
+    source: https://www.commanders.com/team/players-roster/
+  trade_triggers:
+    - trigger: Washington exits the buyer window and prioritizes pick accumulation over defensive-line continuity.
+      implication: Interior-front calls move from do-not-lead to posture-change watch.
+      confidence: medium
+      source: https://www.commanders.com/team/players-roster/
+  availability_validation:
+    - check: Confirm Washington would even discuss a division deal before pricing the player.
+      owner: pro_personnel
+      source: https://www.commanders.com/team/players-roster/
+  no_trade_guardrails:
+    - guardrail: Do not recommend a Washington DT unless the answer names NFC East premium and seller-posture risk.
+      confidence: high
+      source: https://overthecap.com/salary-cap/commanders
+
 cultural_signals:
   stability:
     value: medium

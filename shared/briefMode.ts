@@ -21,7 +21,10 @@ const NFL_DATA_ACTION_PATTERNS = [
   /\b(restructure|restructure candidate|convert salary|signing bonus)\b/i,
   /\b(cut|release|post[-\s]?june 1|dead money|cut savings)\b/i,
   /\b(franchise tag|transition tag|tag eligible|tender)\b/i,
-  /\b(cap room|cap space|cap sheet|contract lever|guarantees?)\b/i,
+  /\b(cap room|cap space|cap sheet|cap number|cap hit|cap ledger|contract lever|guarantees?)\b/i,
+  /\b(position[-\s]?group|roster\/cap|roster and cap|roster cap)\s+(cap\s+)?audit\b/i,
+  /\b(cap\s+)?audit\b/i,
+  /\b(over[-\s]?invested|under[-\s]?invested|spend share|salary allocation)\b/i,
 ];
 
 const ACTION_PATTERNS = [

@@ -19,6 +19,13 @@ import {
   currentNbaEvidenceTeamIds,
   currentNbaEvidenceToDataAnalystTrace,
 } from '../claude/nba_evidence.js';
+import {
+  buildCurrentNflEvidence,
+  currentNflEvidenceScopeForQuestion,
+  currentNflEvidenceTeamIds,
+  currentNflEvidenceToDataAnalystTrace,
+  defaultNflEvidenceTeamId,
+} from '../claude/nfl_evidence.js';
 import { db } from '../db/client.js';
 import type {
   Brief, BriefSource, BriefOption, ChatStreamEvent, ChatTurn, ContextGraphTrace, DataAnalystTrace, ToolCall,
@@ -144,7 +151,7 @@ chatRoutes.post('/', async (c) => {
         assistantText = streamResult.text;
         assistantToolCalls = dataAnalystTracesToToolCalls(streamResult.traces);
       } else {
-        const preload = await preloadCurrentNbaEvidenceForChat(message, systemBlocks, userTurnId);
+        const preload = await preloadCurrentAppEvidenceForChat(message, systemBlocks, userTurnId);
         if (preload.trace) {
           assistantToolCalls = toolCallsFromTraces([], [preload.trace]);
           const toolCall = assistantToolCalls[0];
@@ -207,7 +214,8 @@ chatRoutes.post('/', async (c) => {
           streamResult.contextGraphTraces,
           [
             ...extractExistingDataAnalystTraces(assistantToolCalls).filter((trace) => (
-              trace.tool_use_id.startsWith('preloaded_current_nba_evidence_')
+              trace.tool_use_id.startsWith('preloaded_current_nba_evidence_') ||
+              trace.tool_use_id.startsWith('preloaded_current_nfl_evidence_')
             )),
             ...streamResult.dataAnalystTraces,
           ],
@@ -285,16 +293,36 @@ function toolCallsFromTraces(
   ];
 }
 
-async function preloadCurrentNbaEvidenceForChat(
+async function preloadCurrentAppEvidenceForChat(
   message: string,
   baseSystemBlocks: Anthropic.TextBlockParam[],
   userTurnId: string,
 ): Promise<{ systemBlocks: Anthropic.TextBlockParam[]; trace: DataAnalystTrace | null }> {
+  const nflTeamIds = currentNflEvidenceTeamIds(message, defaultNflEvidenceTeamId());
+  const nflScope = currentNflEvidenceScopeForQuestion(message);
+  if (nflTeamIds.length > 0 && nflScope) {
+    const evidence = await buildCurrentNflEvidence(message, {
+      teamIds: nflTeamIds,
+      scope: nflScope,
+      consumer: 'chat',
+    });
+    if (!evidence) return { systemBlocks: baseSystemBlocks, trace: null };
+    return {
+      systemBlocks: [
+        ...baseSystemBlocks,
+        { type: 'text', text: evidence.systemBlock },
+      ],
+      trace: currentNflEvidenceToDataAnalystTrace(
+        evidence,
+        `preloaded_current_nfl_evidence_${userTurnId}`,
+      ),
+    };
+  }
+
   const teamIds = currentNbaEvidenceTeamIds(message, null);
   if (teamIds.length === 0) return { systemBlocks: baseSystemBlocks, trace: null };
   const scope = currentNbaEvidenceScopeForQuestion(message);
   if (!scope) return { systemBlocks: baseSystemBlocks, trace: null };
-
   const evidence = await buildCurrentNbaEvidence(message, {
     teamIds,
     scope,

@@ -102,6 +102,58 @@ trade_dna:
       counterparties: [PHI]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: buyer_hold
+    confidence: high
+    evidence: Giants should be treated as the buyer in this scenario; current cap rows make Jon Runyan the cleanest salary-out lever before premium DB or core edge pieces.
+    source: https://overthecap.com/salary-cap/giants
+  position_group_stance:
+    - group: OL
+      stance: Jon Runyan is the first salary-out conversation because his one-year ledger gives clean 2026 trade room, but moving him thins the interior offensive line.
+      core_players: [Andrew Thomas, Jermaine Eluemunor, Francis Mauigoa]
+      movable_players: [Jon Runyan]
+      seller_depth_notes: Current roster/cap rows leave roughly 15 offensive-line bodies after a Runyan move, with Thomas, Eluemunor, and Mauigoa as the named higher-cap anchors.
+      sell_threshold: Only move Runyan if the acquired interior defender is a true pressure upgrade or if a separate low-cost OL replacement is identified.
+      confidence: high
+      source: https://overthecap.com/salary-cap/giants
+    - group: DB
+      stance: Paulson Adebo, Jevon Holland, and Greg Newsome II create cap room, but trading a starting-grade DB is higher football cost than moving Runyan.
+      core_players: [Paulson Adebo, Jevon Holland, Tyler Nubin]
+      movable_players: [Greg Newsome II]
+      seller_depth_notes: DB is one of the richer Giants position groups, but the top names are real defensive starters rather than painless cap ballast.
+      sell_threshold: Use a DB only if the DT return is materially better than the Runyan-plus-pick path and the staff accepts the secondary depth hit.
+      confidence: high
+      source: https://overthecap.com/salary-cap/giants
+  market_preferences:
+    desired_return_types:
+      - Expiring veteran interior defender
+      - Pick-led rental structure
+      - Salary-out only from lower-pain contracts
+    avoided_deal_types:
+      - Extension required at acquisition
+      - Restructure that pushes money into 2027
+      - Cap-relief trade involving Burns, Thomas, Carter, or Nabers
+    division_rivalry_friction: NFC East deals should carry extra price and politics; do not treat PHI or WAS targets as easy lanes without stronger seller evidence.
+    confidence: high
+    source: https://overthecap.com/salary-cap/giants
+  trade_triggers:
+    - trigger: A seller values a middle-round pick over holding an expiring interior defender.
+      implication: Move from monitor to check-call if the DT does not require new money beyond 2026.
+      confidence: high
+      source: https://overthecap.com/salary-cap/giants
+  availability_validation:
+    - check: Confirm the seller would move the target without requiring an extension, restructure, or 2027 salary commitment.
+      owner: cap
+      source: https://overthecap.com/salary-cap/giants
+    - check: Confirm Runyan replacement plan before using him as the salary-out piece.
+      owner: pro_personnel
+      source: https://www.giants.com/team/players-roster/
+  no_trade_guardrails:
+    - guardrail: Do not use Brian Burns, Andrew Thomas, Abdul Carter, or Malik Nabers as cap relief; current rows show bad economics or core-player cost.
+      confidence: high
+      source: https://overthecap.com/salary-cap/giants
+
 cultural_signals:
   stability:
     value: medium

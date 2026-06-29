@@ -102,6 +102,48 @@ trade_dna:
       counterparties: [SF]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: selective_seller
+    confidence: medium
+    evidence: Seattle has several veteran defensive-front contracts with positive trade room, but the seller case should be tied to role overlap rather than assuming a broad sell posture.
+    source: https://overthecap.com/salary-cap/seahawks
+  position_group_stance:
+    - group: DL
+      stance: Jarran Reed or a similar veteran interior role is a cleaner check-call than Leonard Williams because Reed shows positive trade room with less top-of-room cost.
+      core_players: [Leonard Williams]
+      movable_players: [Jarran Reed]
+      seller_depth_notes: A Williams move costs Seattle a premium front player; Reed is more plausible only if the staff trusts younger interior depth.
+      sell_threshold: Call if Seattle wants a pick for veteran rotation salary and the offer does not ask them to weaken the defensive spine.
+      confidence: high
+      source: https://overthecap.com/salary-cap/seahawks
+  market_preferences:
+    desired_return_types:
+      - Draft capital for veteran role players
+      - Short-term cap flexibility without sacrificing core defensive-front identity
+    avoided_deal_types:
+      - Selling Leonard Williams as a generic rental
+      - Taking back long-tail salary for a role-player exit
+    division_rivalry_friction: No division issue with NYG; front-seven starter pricing remains meaningful.
+    confidence: medium
+    source: https://www.nfl.com/teams/seahawks/roster
+  trade_triggers:
+    - trigger: Seattle's younger interior defenders earn enough trust to make a veteran role expendable.
+      implication: Reed-style calls become check-call rather than monitor.
+      confidence: medium
+      source: https://www.nfl.com/teams/seahawks/roster
+  availability_validation:
+    - check: Confirm whether the target is a weekly starter or a rotational veteran Seattle can replace internally.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/seahawks/roster
+    - check: Confirm seller trade savings and the buyer's 2027-clean acquisition structure.
+      owner: cap
+      source: https://overthecap.com/salary-cap/seahawks
+  no_trade_guardrails:
+    - guardrail: Do not lead with Leonard Williams unless Seattle's posture changes from selective hold to seller.
+      confidence: high
+      source: https://overthecap.com/salary-cap/seahawks
+
 cultural_signals:
   stability:
     value: medium

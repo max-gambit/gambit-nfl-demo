@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { inferBriefModeFromQuestion, stripBriefModePrefix } from '@shared/briefMode';
+import { inferBriefTemplateFromQuestion } from '@shared/briefTemplates';
 import { loadCbaCorpusSeed } from '../../src/cba/seed.js';
 import type { CurrentPlayerStatViewRow } from '../../src/nba_player_stats/seed.js';
 import {
@@ -30,6 +31,14 @@ test('brief mode parsing honors explicit data command and conservative heuristic
     inferBriefModeFromQuestion('We are the Giants. Should we cut, restructure, extend, or tag a veteran contract to open cap room?'),
     'data_analyst',
   );
+  assert.equal(
+    inferBriefModeFromQuestion('Audit the Giants offseason roster. Which position groups look over- or under-invested by 2026 cap number, and where is the data incomplete?'),
+    'data_analyst',
+  );
+  assert.equal(
+    inferBriefTemplateFromQuestion('Audit the Giants offseason roster. Which position groups look over- or under-invested by 2026 cap number, and where is the data incomplete?'),
+    'data_table',
+  );
   assert.equal(inferBriefModeFromQuestion('Should we trade for a veteran edge rusher?'), 'brief');
 });
 
@@ -41,13 +50,17 @@ test('data analyst tool catalog exposes read-only app data tools and structured 
     'query_brief_workspace',
   ]);
   const nflSchema = dataAnalystTools.find((tool) => tool.name === 'query_nfl_data')?.input_schema as {
-    properties?: { datasets?: { items?: { enum?: string[] } } };
+    properties?: { datasets?: { items?: { enum?: string[] } }; trade_goal?: unknown };
   };
   assert.ok(nflSchema.properties?.datasets?.items?.enum?.includes('rules'));
+  assert.ok(nflSchema.properties?.datasets?.items?.enum?.includes('trade_screen'));
+  assert.ok(nflSchema.properties?.datasets?.items?.enum?.includes('coverage'));
+  assert.ok(nflSchema.properties?.trade_goal);
   const querySchema = dataAnalystTools.find((tool) => tool.name === 'query_nba_data')?.input_schema as {
-    properties?: { datasets?: { items?: { enum?: string[] } } };
+    properties?: { datasets?: { items?: { enum?: string[] } }; trade_goal?: unknown };
   };
   assert.ok(querySchema.properties?.datasets?.items?.enum?.includes('cba_articles'));
+  assert.equal(querySchema.properties?.trade_goal, undefined);
 
   assert.equal(submitDataAnalysisTool.name, 'submit_data_analysis');
 
@@ -76,6 +89,7 @@ test('data analyst dataset catalog advertises NFL demo data instead of legacy NB
   assert.ok(datasetIds.includes('nfl_rosters_current'));
   assert.ok(datasetIds.includes('nfl_cap_sheets_current'));
   assert.ok(datasetIds.includes('nfl_player_metrics_current'));
+  assert.ok(datasetIds.includes('nfl_coverage_current'));
   assert.ok(datasetIds.includes('nfl_context_graph'));
   assert.ok(datasetIds.includes('nfl_rules_static'));
   assert.equal(datasetIds.some((datasetId) => datasetId.startsWith('nba_')), false);
@@ -92,27 +106,100 @@ test('data analyst NFL tool defaults omitted team scope to Giants and returns ca
   assert.equal(result.datasets.some((dataset) => dataset.dataset_id === 'nfl_cap_sheets_current'), true);
   assert.equal(result.datasets.some((dataset) => dataset.dataset_id === 'nfl_rules_static'), true);
   assert.deepEqual(result.datasets.find((dataset) => dataset.dataset_id === 'nfl_cap_sheets_current')?.team_ids, ['NYG']);
-  const capRows = (result.data.cap_sheets as { rows: Array<{ player_name: string; restructure_savings_estimate_2026: number | null }> }).rows;
+  const capRows = (result.data.cap_sheets as {
+    rows: Array<{
+      player_name: string;
+      restructure_savings_estimate_2026: number | null;
+      post_june_1_cut_savings_2026: number | null;
+      trade_savings_2026: number | null;
+      contract_years_remaining: number | null;
+      contract_ledger_confidence: string;
+    }>;
+  }).rows;
   assert.equal(capRows[0]?.player_name, 'Andrew Thomas');
   assert.equal(typeof capRows[0]?.restructure_savings_estimate_2026, 'number');
+  assert.equal(typeof capRows[0]?.post_june_1_cut_savings_2026, 'number');
+  assert.equal(typeof capRows[0]?.trade_savings_2026, 'number');
+  assert.equal(typeof capRows[0]?.contract_years_remaining, 'number');
+  assert.notEqual(capRows[0]?.contract_ledger_confidence, 'source-needed');
   const rules = (result.data.rules as { rows: Array<{ rule_family: string }> }).rows;
   assert.equal(rules.some((row) => row.rule_family === 'restructure_conversion'), true);
 });
 
 test('data analyst NFL tool supports Giants cut restructure tag prompt evidence shape', async () => {
   const result = await handleDataAnalystToolUse('query_nfl_data', {
-    datasets: ['cap_sheets', 'rosters', 'player_metrics', 'context_graph', 'rules'],
+    datasets: ['cap_sheets', 'rosters', 'player_metrics', 'coverage', 'context_graph', 'rules'],
     limit: 12,
   });
 
   assert.equal(result.ok, true);
   assert.deepEqual(result.datasets.find((dataset) => dataset.dataset_id === 'nfl_cap_sheets_current')?.team_ids, ['NYG']);
+  assert.equal(result.datasets.some((dataset) => dataset.dataset_id === 'nfl_coverage_current'), true);
+  const coverage = result.data.coverage as {
+    teams: Array<{ team_id: string; readiness: Array<{ key: string; status: string }> }>;
+  };
+  assert.equal(coverage.teams[0]?.team_id, 'NYG');
+  assert.equal(coverage.teams[0]?.readiness.some((item) => item.key === 'player_quality' && item.status === 'directional'), true);
   const capRows = (result.data.cap_sheets as { rows: Array<{ player_name: string; restructure_savings_estimate_2026: number | null; tag_eligible_2027: boolean }> }).rows;
   assert.ok(capRows.some((row) => row.player_name === 'Andrew Thomas' && typeof row.restructure_savings_estimate_2026 === 'number'));
   assert.ok(capRows.some((row) => row.tag_eligible_2027));
   const rules = (result.data.rules as { rows: Array<{ rule_family: string; summary: string }> }).rows;
   assert.ok(rules.some((row) => row.rule_family === 'post_june_1_accounting'));
   assert.ok(rules.some((row) => row.rule_family === 'franchise_transition_tag'));
+});
+
+test('data analyst NFL trade screen returns construction guardrails and named target lanes', async () => {
+  const result = await handleDataAnalystToolUse('query_nfl_data', {
+    datasets: ['rosters', 'cap_sheets', 'trade_screen'],
+    trade_goal: 'add interior pass-rush juice without creating a 2027 cap problem',
+    limit: 20,
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.datasets.some((dataset) => dataset.dataset_id === 'nfl_trade_screen_current'), true);
+  assert.equal(result.datasets.some((dataset) => dataset.dataset_id === 'nfl_context_graph'), true);
+  const screen = (result.data.trade_screen as {
+    screens: Array<{
+      subject_team_id: string;
+      outgoing_hierarchy: string[];
+      depth_after_trade: string[];
+      named_target_lanes: string[];
+      target_lanes: Array<{
+        target_player_name: string;
+        target_team_id: string;
+        motivation_tier: string;
+        recommended_action: string;
+        seller_case: string;
+        seller_objection: string;
+        validation_trigger: string;
+        motivation_confidence: string;
+        reasons: string[];
+        blockers: string[];
+        seller_depth_consequence: string;
+      }>;
+      counterparty_intel_team_ids: string[];
+      bad_cap_relief_trades: string[];
+      answer_requirements: string[];
+    }>;
+  }).screens[0];
+  assert.equal(screen.subject_team_id, 'NYG');
+  assert.ok(screen.outgoing_hierarchy.some((line) => /Greg Newsome II/.test(line)));
+  assert.ok(screen.outgoing_hierarchy.some((line) => /Jon Runyan/.test(line)));
+  assert.ok(screen.depth_after_trade.some((line) => /(CB|S) after trade/.test(line)));
+  assert.ok(screen.named_target_lanes.some((line) => /(Vita Vea|Grover Stewart|A'Shawn Robinson|Harrison Phillips|Tedarrell Slaton)/.test(line)));
+  assert.ok(screen.named_target_lanes.some((line) => /recommended_action=/.test(line)));
+  assert.equal(screen.named_target_lanes.some((line) => /motivation_tier=/.test(line)), false);
+  assert.ok(screen.counterparty_intel_team_ids.includes('TB'));
+  const vea = screen.target_lanes.find((lane) => lane.target_team_id === 'TB' && lane.target_player_name === 'Vita Vea');
+  assert.ok(vea);
+  assert.equal(vea.motivation_tier, 'long_shot_unless_posture_changes');
+  assert.equal(vea.recommended_action, 'posture_change_only');
+  assert.match(vea.seller_case, /high-impact, low-probability target/i);
+  assert.match(vea.seller_objection, /Do not headline Vita Vea/i);
+  assert.match(vea.validation_trigger, /Confirm whether Tampa/i);
+  assert.ok(vea.blockers.some((blocker) => /contend|top-priced|top-of-room/i.test(blocker)));
+  assert.ok(screen.bad_cap_relief_trades.some((line) => /Brian Burns.*bad 2026 cap-relief trade/.test(line)));
+  assert.ok(screen.answer_requirements.some((line) => /salary-out construction/.test(line)));
 });
 
 test('data analyst NBA tool defaults omitted team scope to Warriors POV', () => {

@@ -83,6 +83,43 @@ trade_dna:
       summary: Arizona acquired Player Alpha from Atlanta Falcons in a pick deal.
   confidence: high
 
+trade_market_intel:
+  seller_posture:
+    value: selective_seller
+    confidence: high
+    evidence: Fixture seller posture is intentionally specific for validation coverage.
+    source: https://example.com/trade-market-b
+  position_group_stance:
+    - group: DL
+      stance: Fixture defensive-line stance names a specific sell condition for test coverage.
+      core_players: [Player Beta]
+      movable_players: [Player Gamma]
+      seller_depth_notes: Fixture depth note names the consequence of losing the movable player.
+      sell_threshold: Fixture sale requires a pick premium and replacement depth.
+      confidence: high
+      source: https://example.com/dl-stance-b
+  market_preferences:
+    desired_return_types:
+      - Fixture pick premium.
+    avoided_deal_types:
+      - Fixture low-return player dump.
+    division_rivalry_friction: Fixture team has no division friction with the test counterparty.
+    confidence: high
+    source: https://example.com/market-pref-b
+  trade_triggers:
+    - trigger: Fixture roster surplus appears at the same position.
+      implication: Fixture trade lane moves from monitor to check-call.
+      confidence: high
+      source: https://example.com/trigger-b
+  availability_validation:
+    - check: Fixture pro personnel confirms role and replacement depth.
+      owner: pro_personnel
+      source: https://example.com/validation-b
+  no_trade_guardrails:
+    - guardrail: Fixture guardrail prevents inferring availability from cap fit alone.
+      confidence: high
+      source: https://example.com/guardrail-b
+
 cultural_signals:
   stability:
     value: high

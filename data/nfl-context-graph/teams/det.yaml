@@ -102,6 +102,48 @@ trade_dna:
       counterparties: [GB]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: buyer_hold
+    confidence: high
+    evidence: Detroit's best defensive-front names are core contention-window pieces; trade logic should screen for hold posture before treating cap fit as availability.
+    source: https://overthecap.com/salary-cap/lions
+  position_group_stance:
+    - group: DL
+      stance: Alim McNeill is a high-impact, low-probability target because Detroit would be selling a top interior piece during a hold window.
+      core_players: [Alim McNeill, Aidan Hutchinson]
+      movable_players: []
+      seller_depth_notes: The Lions lose a central defensive-front player, not just salary, so the seller objection overwhelms ordinary rental math.
+      sell_threshold: Do not lead unless Detroit's competitive posture changes or a premium overpay is explicitly on the table.
+      confidence: high
+      source: https://overthecap.com/salary-cap/lions
+  market_preferences:
+    desired_return_types:
+      - Deals that preserve the current window
+      - Premium capital only for unexpected core-player conversations
+    avoided_deal_types:
+      - Moving young defensive-front anchors as cap relief
+      - Helping NFC competitors with core talent
+    division_rivalry_friction: No division issue with NYG; NFC contender pricing still applies.
+    confidence: high
+    source: https://www.nfl.com/teams/lions/roster
+  trade_triggers:
+    - trigger: Detroit suffers a posture change or decides a premium offer is worth weakening the front.
+      implication: Core DL names move from do-not-lead to posture-change watch.
+      confidence: low
+      source: https://www.nfl.com/teams/lions/roster
+  availability_validation:
+    - check: Confirm whether Detroit would even discuss core defensive-front talent in season.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/lions/roster
+    - check: Confirm seller dead-money and future-cap impact before pricing any premium-player call.
+      owner: cap
+      source: https://overthecap.com/salary-cap/lions
+  no_trade_guardrails:
+    - guardrail: Do not recommend Alim McNeill as a realistic lead lane without a Detroit sell signal.
+      confidence: high
+      source: https://overthecap.com/salary-cap/lions
+
 cultural_signals:
   stability:
     value: medium

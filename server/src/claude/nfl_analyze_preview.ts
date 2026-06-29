@@ -46,8 +46,18 @@ export async function buildNflGiantsAnalyzePreview(
         rows: playerRows.map((row) => ({
           player: row.player_name,
           cap_number_2026: row.cap_number_2026,
+          contract_years_remaining: row.contract_years_remaining,
+          contract_end_year: row.contract_end_year,
+          guaranteed_remaining: row.guaranteed_remaining,
+          dead_money_if_cut_2026: row.dead_money_if_cut_2026,
           cut_savings_2026: row.cut_savings_2026,
+          post_june_1_cut_savings_2026: row.post_june_1_cut_savings_2026,
+          trade_savings_2026: row.trade_savings_2026,
+          void_year_count: row.void_year_count,
+          void_years_source_status: row.void_years_source_status,
           restructure_savings_estimate_2026: row.restructure_savings_estimate_2026,
+          extension_savings_estimate_2026: row.extension_savings_estimate_2026,
+          contract_ledger_confidence: row.contract_ledger_confidence,
           tag_eligible_2027: row.tag_eligible_2027,
           source_url: row.source_url,
         })),
@@ -90,13 +100,13 @@ export async function buildNflGiantsAnalyzePreview(
 
   const payload: SubmitDataAnalysisInput = {
     answer: [
-      'Use restructure/extension work as the first Giants cap-room lever, not a straight cut.',
+      'Use restructure/extension work as the first Giants cap-room lever, not a broad straight-cut list.',
       bestRestructure
-        ? `${bestRestructure.player_name} is the clearest modeled restructure candidate in the static app data at ${formatCompactMoney(bestRestructure.restructure_savings_estimate_2026)} of estimated 2026 room.`
+        ? `${bestRestructure.player_name} is the clearest priced restructure candidate at ${formatCompactMoney(bestRestructure.restructure_savings_estimate_2026)} of estimated 2026 room.`
         : 'The static app data does not identify a modeled restructure candidate.',
       tagCandidate
-        ? `${tagCandidate.player_name} is the only tagged-lever candidate in the loaded NYG cap rows, so tag analysis should stay player-specific rather than generic.`
-        : 'The loaded NYG cap rows do not identify a 2027 tag-eligible veteran.',
+        ? `${tagCandidate.player_name} is the only tagged-lever candidate in the current NYG contract file, so tag analysis should stay player-specific rather than generic.`
+        : 'The current NYG contract file does not identify a 2027 tag-eligible veteran.',
     ].join(' '),
     key_findings: [
       {
@@ -106,7 +116,7 @@ export async function buildNflGiantsAnalyzePreview(
       },
       {
         label: 'Cut path needs player-specific dead-money review',
-        body: 'The leading veteran rows carry dead-money fields, so a cut recommendation should not be made from headline cap number alone.',
+        body: 'The leading veteran rows carry dead-money, post-June, trade, years-remaining, and confidence fields, so a cut recommendation should use player-specific contract mechanics rather than headline cap number alone.',
         source_refs: [1, 3],
       },
       {
@@ -118,14 +128,18 @@ export async function buildNflGiantsAnalyzePreview(
     tables: [
       {
         title: 'NYG cap levers from app data',
-        columns: ['Player', 'Pos', '2026 cap', 'Cut savings', 'Restructure est.', 'Tag 2027', 'Lever'],
+        columns: ['Player', 'Pos', '2026 cap', 'Years', 'Guarantees', 'Dead cut', 'Post-June cut', 'Trade room', 'Restructure est.', 'Confidence', 'Lever'],
         rows: playerRows.map((row) => [
           row.player_name,
           row.position,
           moneyCell(row.cap_number_2026),
-          moneyCell(row.cut_savings_2026),
+          String(row.contract_years_remaining ?? 'source needed'),
+          moneyCell(row.guaranteed_remaining),
+          moneyCell(row.dead_money_if_cut_2026),
+          moneyCell(row.post_june_1_cut_savings_2026),
+          moneyCell(row.trade_savings_2026),
           moneyCell(row.restructure_savings_estimate_2026),
-          row.tag_eligible_2027 ? 'Yes' : 'No',
+          labelize(row.contract_ledger_confidence),
           labelize(row.contract_lever),
         ]),
         source_refs: [1],
@@ -149,6 +163,7 @@ export async function buildNflGiantsAnalyzePreview(
     caveats: [
       'This is a deterministic local acceptance preview, not a live Anthropic model response.',
       'NFL demo data is a static checked-in snapshot, not a live cap feed.',
+      'Contract confidence is row-level; rows needing source review are caveats rather than blockers.',
       'Rule rows are bounded summaries from the loaded demo corpus, not a full legal/CBA parser.',
       `Question under test: ${question}`,
     ],

@@ -102,6 +102,48 @@ trade_dna:
       counterparties: [ATL]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: selective_seller
+    confidence: medium
+    evidence: Carolina's roster/cap file creates veteran trade-room names, but Derrick Brown and Jaycee Horn should be treated as core holds rather than cap-fit targets.
+    source: https://overthecap.com/salary-cap/panthers
+  position_group_stance:
+    - group: DL
+      stance: Tershawn Wharton or Bobby Brown III can be checked as veteran front levers; Derrick Brown is a high-impact, low-probability core hold.
+      core_players: [Derrick Brown]
+      movable_players: [Tershawn Wharton, Bobby Brown III]
+      seller_depth_notes: Carolina loses proven defensive-front depth if it sells a veteran, so the call needs a pick return and a clear internal replacement.
+      sell_threshold: Check-call only if Carolina is prioritizing draft capital or cap flexibility over veteran defensive-line continuity.
+      confidence: high
+      source: https://overthecap.com/salary-cap/panthers
+  market_preferences:
+    desired_return_types:
+      - Draft capital for non-core veteran contracts
+      - Moves that keep young core defenders and quarterback protection intact
+    avoided_deal_types:
+      - Selling Derrick Brown as cap relief
+      - Deals that weaken offensive-line investment around the quarterback
+    division_rivalry_friction: No division issue with NYG; Carolina should still price core defensive players as hold assets.
+    confidence: medium
+    source: https://www.nfl.com/teams/panthers/roster
+  trade_triggers:
+    - trigger: Carolina wants to convert a veteran defensive-line contract into draft value after younger depth proves playable.
+      implication: Wharton/Brown III style calls become realistic check-calls.
+      confidence: medium
+      source: https://www.nfl.com/teams/panthers/roster
+  availability_validation:
+    - check: Confirm whether the target is rotational or essential to Carolina's front plan.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/panthers/roster
+    - check: Confirm trade savings and whether any guarantee accelerates into seller pain.
+      owner: cap
+      source: https://overthecap.com/salary-cap/panthers
+  no_trade_guardrails:
+    - guardrail: Do not lead with Derrick Brown solely because he upgrades the buyer; the seller objection is too large without a posture change.
+      confidence: high
+      source: https://overthecap.com/salary-cap/panthers
+
 cultural_signals:
   stability:
     value: medium

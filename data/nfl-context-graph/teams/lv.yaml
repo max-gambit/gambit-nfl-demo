@@ -102,6 +102,44 @@ trade_dna:
       counterparties: [KC]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: selective_seller
+    confidence: medium
+    evidence: Las Vegas has a depth-priced expiring DT lane in Thomas Booker, but the likely seller case is roster churn rather than a major football upgrade.
+    source: https://overthecap.com/salary-cap/raiders
+  position_group_stance:
+    - group: DL
+      stance: Thomas Booker is a low-cost check-call if Las Vegas has a roster crunch; he should not be presented as the main answer to a real interior-pressure need.
+      core_players: [Maxx Crosby]
+      movable_players: [Thomas Booker]
+      seller_depth_notes: Booker is cheap, expiring, and trade-positive, making availability more plausible than impact.
+      sell_threshold: Only spend a minor pick if pro scouting grades the player as a real rotation upgrade.
+      confidence: medium
+      source: https://overthecap.com/player/thomas-booker/10195/
+  market_preferences:
+    desired_return_types:
+      - Late pick for depth-contract churn
+      - Roster flexibility
+    avoided_deal_types:
+      - Moving premium edge pieces as cap relief
+    division_rivalry_friction: No division issue with NYG.
+    confidence: medium
+    source: https://www.raiders.com/team/players-roster/
+  trade_triggers:
+    - trigger: Booker is outside the preferred game-day rotation.
+      implication: He becomes a low-cost check-call, not a lead lane.
+      confidence: medium
+      source: https://www.raiders.com/team/players-roster/
+  availability_validation:
+    - check: Confirm Booker is not just available but a pressure upgrade over Giants in-house depth.
+      owner: scouting
+      source: https://www.raiders.com/team/players-roster/
+  no_trade_guardrails:
+    - guardrail: Do not let Booker's seller plausibility outrank football-impact concerns.
+      confidence: medium
+      source: https://overthecap.com/player/thomas-booker/10195/
+
 cultural_signals:
   stability:
     value: medium

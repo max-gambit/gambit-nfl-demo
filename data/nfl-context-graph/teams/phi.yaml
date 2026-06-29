@@ -102,6 +102,44 @@ trade_dna:
       counterparties: [DAL]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: buyer_hold
+    confidence: high
+    evidence: Philadelphia is an NFC East counterparty with buyer-hold posture, so even cheap expiring depth should not be treated as easy for the Giants.
+    source: https://overthecap.com/salary-cap/eagles
+  position_group_stance:
+    - group: DL
+      stance: Moro Ojomo is a low-cost monitor lane only; divisional friction and Philadelphia's front-building identity make a Giants deal hard to lead with.
+      core_players: []
+      movable_players: [Moro Ojomo]
+      seller_depth_notes: The contract is cheap and expiring, but Philadelphia would need a roster-crunch reason to help a division rival.
+      sell_threshold: Require a clear cutdown signal and division-premium price; otherwise look elsewhere.
+      confidence: high
+      source: https://overthecap.com/player/moro-ojomo/11073/
+  market_preferences:
+    desired_return_types:
+      - Division premium
+      - Roster spot relief during cutdown
+    avoided_deal_types:
+      - Helping the Giants solve a defensive-line need cheaply
+    division_rivalry_friction: NFC East friction is high and should cap the lane below non-division options.
+    confidence: high
+    source: https://www.philadelphiaeagles.com/team/players-roster/
+  trade_triggers:
+    - trigger: Ojomo is squeezed out by roster math and Philadelphia is willing to take a division premium.
+      implication: Lane moves from posture-change watch to monitor, not call-now.
+      confidence: medium
+      source: https://www.philadelphiaeagles.com/team/players-roster/
+  availability_validation:
+    - check: Confirm Philadelphia would discuss an NFC East depth deal before evaluating price.
+      owner: pro_personnel
+      source: https://www.philadelphiaeagles.com/team/players-roster/
+  no_trade_guardrails:
+    - guardrail: Do not rank an Eagles DL target ahead of comparable non-division sellers without a strong public roster-crunch signal.
+      confidence: high
+      source: https://overthecap.com/salary-cap/eagles
+
 cultural_signals:
   stability:
     value: medium

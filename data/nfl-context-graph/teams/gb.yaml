@@ -102,6 +102,44 @@ trade_dna:
       counterparties: [CHI]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: buyer_hold
+    confidence: medium
+    evidence: Green Bay's current file includes clean one-year DT rows, but the team profile is not a natural seller unless a depth player is blocked.
+    source: https://overthecap.com/salary-cap/packers
+  position_group_stance:
+    - group: DL
+      stance: Karl Brooks is a monitor lane because the contract is low-cost and expiring; Devonte Wyatt should be treated as higher-impact and harder to extract.
+      core_players: [Devonte Wyatt]
+      movable_players: [Karl Brooks]
+      seller_depth_notes: Brooks is a lower-price depth call, not a premium acquisition answer; Wyatt requires a stronger seller thesis.
+      sell_threshold: Only call if Green Bay has surplus interior depth or values a pick over the final contract year.
+      confidence: medium
+      source: https://overthecap.com/player/karl-brooks/11003/
+  market_preferences:
+    desired_return_types:
+      - Draft capital for blocked depth
+      - Short-money roster churn
+    avoided_deal_types:
+      - Moving young or premium trench contributors during a buyer window
+    division_rivalry_friction: No division issue with NYG.
+    confidence: medium
+    source: https://www.nfl.com/teams/packers/roster
+  trade_triggers:
+    - trigger: Younger or cheaper defensive linemen pass Brooks on the depth chart.
+      implication: Brooks becomes a check-call depth trade.
+      confidence: medium
+      source: https://www.nfl.com/teams/packers/roster
+  availability_validation:
+    - check: Confirm whether Brooks is blocked depth or still part of the active rotation.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/packers/roster
+  no_trade_guardrails:
+    - guardrail: Do not treat a Packers DT as a lead answer unless the player is depth-priced and replacement is clear.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/packers
+
 cultural_signals:
   stability:
     value: medium

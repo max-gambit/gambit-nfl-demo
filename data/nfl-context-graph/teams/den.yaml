@@ -102,6 +102,48 @@ trade_dna:
       counterparties: [KC]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: selective_seller
+    confidence: medium
+    evidence: Denver has enough veteran contract levers to listen on expensive non-core players, but the front should be treated as a hold on top defensive anchors unless the return clearly improves flexibility.
+    source: https://overthecap.com/salary-cap/broncos
+  position_group_stance:
+    - group: DL
+      stance: D.J. Jones is a check-call interior target because he shows positive 2026 trade room; Zach Allen is a hold/core defensive-front piece with negative seller economics.
+      core_players: [Zach Allen]
+      movable_players: [D.J. Jones]
+      seller_depth_notes: A Jones move weakens the interior rotation but is more financeable than touching the higher-impact Allen contract.
+      sell_threshold: Call only if Denver is prioritizing cap room or younger defensive-line snaps over veteran interior continuity.
+      confidence: high
+      source: https://overthecap.com/salary-cap/broncos
+  market_preferences:
+    desired_return_types:
+      - Day-three or conditional draft capital for veteran rotation contracts
+      - Deals that avoid dead-money pain on core defensive starters
+    avoided_deal_types:
+      - Moving Zach Allen-type core defensive-front talent as pure cap relief
+      - Taking back 2027 salary in a veteran-for-veteran swap
+    division_rivalry_friction: No division issue with NYG; AFC contender posture still raises the price on defensive starters.
+    confidence: medium
+    source: https://www.nfl.com/teams/broncos/roster
+  trade_triggers:
+    - trigger: Denver needs short-term room or decides younger defensive linemen can absorb Jones' role.
+      implication: Jones becomes a credible check-call; Allen remains a high-cost hold.
+      confidence: medium
+      source: https://www.nfl.com/teams/broncos/roster
+  availability_validation:
+    - check: Confirm whether Jones is viewed as expendable rotation salary or a necessary run-front starter.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/broncos/roster
+    - check: Confirm 2026 trade savings and post-June treatment before making the offer.
+      owner: cap
+      source: https://overthecap.com/salary-cap/broncos
+  no_trade_guardrails:
+    - guardrail: Do not lead with Zach Allen unless Denver's posture changes; the current cap file points to a core-player hold, not a seller lane.
+      confidence: high
+      source: https://overthecap.com/salary-cap/broncos
+
 cultural_signals:
   stability:
     value: medium

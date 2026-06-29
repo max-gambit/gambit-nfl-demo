@@ -102,6 +102,44 @@ trade_dna:
       counterparties: [PIT]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: buyer_hold
+    confidence: medium
+    evidence: Baltimore's roster posture and top-heavy core imply holding useful trench depth unless a player is clearly outside the rotation.
+    source: https://overthecap.com/salary-cap/ravens
+  position_group_stance:
+    - group: DL
+      stance: Broderick Washington is a monitor lane, not a lead target, because he is affordable interior depth behind a higher-priced front.
+      core_players: [Nnamdi Madubuike]
+      movable_players: [Broderick Washington]
+      seller_depth_notes: The Giants should assume Baltimore values line depth until the Ravens show roster crunch or younger replacements.
+      sell_threshold: A pick must beat Baltimore's depth value and game-day role for Washington.
+      confidence: medium
+      source: https://overthecap.com/player/broderick-washington/8910/
+  market_preferences:
+    desired_return_types:
+      - Depth-for-pick value only when the roster has a surplus
+      - Cap-neutral deal structures
+    avoided_deal_types:
+      - Weakening contender trench depth
+    division_rivalry_friction: No division issue with NYG.
+    confidence: medium
+    source: https://www.baltimoreravens.com/team/players-roster/
+  trade_triggers:
+    - trigger: Baltimore needs a roster spot or younger DL depth passes Washington.
+      implication: Washington can become a check-call depth lane.
+      confidence: medium
+      source: https://www.baltimoreravens.com/team/players-roster/
+  availability_validation:
+    - check: Confirm whether Washington is active rotation depth or a cutdown/cap casualty candidate.
+      owner: pro_personnel
+      source: https://www.baltimoreravens.com/team/players-roster/
+  no_trade_guardrails:
+    - guardrail: Do not call Baltimore a natural seller while its posture is buyer-hold.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/ravens
+
 cultural_signals:
   stability:
     value: medium

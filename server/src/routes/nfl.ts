@@ -14,46 +14,53 @@ import type {
 } from '@shared/types';
 import {
   groupNflTeams,
-  loadNflDemoSeed,
+  loadCurrentNflDataWithMode,
   nflTeamDetail,
 } from '../nfl_data/seed.js';
+import { buildNflCoverageMatrix, buildNflCoverageTeam } from '../nfl_coverage/index.js';
 import { loadNflRulesCorpus, type NflRuleRow } from '../nfl_rules/seed.js';
 
 export const nflRoutes = new Hono();
 
 nflRoutes.get('/rosters/current', async (c) => {
-  const seed = await loadNflDemoSeed();
+  const { seed, source_mode, fallback_reason } = await loadCurrentNflDataWithMode();
   return c.json({
     ...groupNflTeams(seed),
+    source_mode,
+    fallback_reason,
     rows: seed.roster_entries,
   });
 });
 
 nflRoutes.get('/cap-sheets/current', async (c) => {
-  const seed = await loadNflDemoSeed();
+  const { seed, source_mode, fallback_reason } = await loadCurrentNflDataWithMode();
   return c.json({
     ...groupNflTeams(seed),
+    source_mode,
+    fallback_reason,
     rows: seed.cap_rows,
   });
 });
 
 nflRoutes.get('/cap-sheets/current/:teamId', async (c) => {
-  const seed = await loadNflDemoSeed();
+  const { seed, source_mode, fallback_reason } = await loadCurrentNflDataWithMode();
   const detail = nflTeamDetail(seed, c.req.param('teamId').toUpperCase());
   if (!detail) return c.json({ error: 'nfl_team_not_found' }, 404);
-  return c.json(detail);
+  return c.json({ ...detail, source_mode, fallback_reason });
 });
 
 nflRoutes.get('/player-stats/current', async (c) => {
-  const seed = await loadNflDemoSeed();
+  const { seed, source_mode, fallback_reason } = await loadCurrentNflDataWithMode();
   return c.json({
     ...groupNflTeams(seed),
+    source_mode,
+    fallback_reason,
     rows: seed.player_metrics,
   });
 });
 
 nflRoutes.get('/player-stats/current/:teamId', async (c) => {
-  const seed = await loadNflDemoSeed();
+  const { seed, source_mode, fallback_reason } = await loadCurrentNflDataWithMode();
   const detail = nflTeamDetail(seed, c.req.param('teamId').toUpperCase());
   if (!detail) return c.json({ error: 'nfl_team_not_found' }, 404);
   return c.json({
@@ -62,7 +69,19 @@ nflRoutes.get('/player-stats/current/:teamId', async (c) => {
     rows: detail.player_metrics,
     source_refs: detail.source_refs,
     notes: detail.notes,
+    source_mode,
+    fallback_reason,
   });
+});
+
+nflRoutes.get('/coverage/current', async (c) => {
+  return c.json(await buildNflCoverageMatrix());
+});
+
+nflRoutes.get('/coverage/current/:teamId', async (c) => {
+  const detail = await buildNflCoverageTeam(c.req.param('teamId').toUpperCase());
+  if (!detail.team) return c.json({ error: 'nfl_team_not_found' }, 404);
+  return c.json(detail);
 });
 
 nflRoutes.get('/rules', async (c) => {

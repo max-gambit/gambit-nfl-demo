@@ -10,16 +10,20 @@ import type {
   NbaRosterTeam,
   GetCurrentNflTeamResponse,
   NflCapRow,
+  NflCoverageDomain,
+  NflCoverageMatrixResponse,
+  NflCoverageStatus,
+  NflCoverageTeamRow,
   NflPlayerMetricRow,
   NflRosterEntry,
 } from '@shared/types';
-import { getCurrentNflCapSheet } from '../api/nfl';
+import { getCurrentNflCapSheet, getCurrentNflCoverage } from '../api/nfl';
 import { listContextGraphPreferences } from '../api/contextGraph';
 import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
 import { useUi } from '../store';
 import { ContextGraphSettings } from '../settings/ContextGraphSettings';
 
-type DatabaseView = 'context' | 'cap' | 'stats' | 'roster';
+type DatabaseView = 'coverage' | 'context' | 'cap' | 'stats' | 'roster';
 
 type FinancialSummaryModel = {
   payroll: number | null;
@@ -51,6 +55,11 @@ type DetailLoadState =
 type ContextGraphTeamsLoadState =
   | { status: 'loading'; data: null; error: null }
   | { status: 'ready'; data: ListContextGraphPreferencesResponse; error: null }
+  | { status: 'error'; data: null; error: string };
+
+type NflCoverageLoadState =
+  | { status: 'loading'; data: null; error: null }
+  | { status: 'ready'; data: NflCoverageMatrixResponse; error: null }
   | { status: 'error'; data: null; error: string };
 
 function useContextGraphTeams(): ContextGraphTeamsLoadState {
@@ -90,6 +99,24 @@ function useNflTeamDetail(teamId: string | null): DetailLoadState {
       });
     return () => { cancelled = true; };
   }, [teamId]);
+
+  return state;
+}
+
+function useNflCoverage(): NflCoverageLoadState {
+  const [state, setState] = useState<NflCoverageLoadState>({ status: 'loading', data: null, error: null });
+
+  useEffect(() => {
+    let cancelled = false;
+    getCurrentNflCoverage()
+      .then((data) => {
+        if (!cancelled) setState({ status: 'ready', data, error: null });
+      })
+      .catch((err) => {
+        if (!cancelled) setState({ status: 'error', data: null, error: err instanceof Error ? err.message : String(err) });
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   return state;
 }
@@ -179,11 +206,12 @@ export function NbaRosterLeftPanel() {
 
 export function NbaRosterDatabase() {
   const graphTeams = useContextGraphTeams();
+  const coverage = useNflCoverage();
   const {
     databaseTeamId, databaseCapRowId, databaseStatKey, databasePlayerId,
     setDatabaseTeamId, setDatabaseCapRowId, setDatabasePlayerId, setDatabaseStatKey,
   } = useUi();
-  const [view, setView] = useState<DatabaseView>('context');
+  const [view, setView] = useState<DatabaseView>('coverage');
 
   const teams = graphTeams.status === 'ready' ? graphTeams.data.teams : [];
   const selectedSummary = useMemo(
@@ -202,11 +230,14 @@ export function NbaRosterDatabase() {
   }, [selectedSummary, databaseTeamId, setDatabaseTeamId]);
 
   useEffect(() => {
-    setView('context');
+    setView('coverage');
   }, [databaseTeamId]);
 
   const nflDetail = detail.status === 'ready' ? detail.data : null;
+  const coverageData = coverage.status === 'ready' ? coverage.data : null;
+  const selectedCoverage = coverageData?.teams.find((team) => team.team_id === selectedSummary?.team_id) ?? null;
   const snapshot = detail.status === 'ready' ? detail.data.snapshot : null;
+  const sourceNeededCapRows = nflDetail?.cap_rows.filter((row) => row.player_id && row.source_status === 'source-needed').length ?? null;
   const selectedRow = nflDetail
     ? selectedNflCapRow(nflDetail.cap_rows, databaseCapRowId, databasePlayerId)
     : null;
@@ -260,9 +291,11 @@ export function NbaRosterDatabase() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: SPACE.sm, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           <SourceChip label="Snapshot" value={snapshot?.as_of_date ?? selectedSummary.as_of_date ?? 'None'} />
+          <SourceChip label="Coverage" value={selectedCoverage?.status.toUpperCase() ?? (coverage.status === 'loading' ? 'LOADING' : 'OFF')} />
           <SourceChip label="Validation" value={selectedSummary.validation.status.toUpperCase()} />
           <SourceChip label="Overrides" value={selectedSummary.has_overrides ? 'On' : 'Off'} />
           <SourceChip label="Unknowns" value={String(selectedSummary.validation.error_count + selectedSummary.validation.warning_count)} />
+          <SourceChip label="Cap gaps" value={sourceNeededCapRows == null ? '...' : String(sourceNeededCapRows)} />
         </div>
       </div>
 
@@ -277,6 +310,7 @@ export function NbaRosterDatabase() {
         alignItems: 'center',
         gap: SPACE.sm,
       }}>
+        <SegmentButton active={view === 'coverage'} onClick={() => setView('coverage')}>Coverage</SegmentButton>
         <SegmentButton active={view === 'context'} onClick={() => setView('context')}>Intel</SegmentButton>
         <SegmentButton active={view === 'cap'} onClick={() => setView('cap')}>Cap sheet</SegmentButton>
         <SegmentButton active={view === 'stats'} onClick={() => setView('stats')}>Player metrics</SegmentButton>
@@ -284,7 +318,19 @@ export function NbaRosterDatabase() {
       </div>
 
       <div className="gd-scroll" style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
-        {view === 'context' ? (
+        {view === 'coverage' ? (
+          coverage.status === 'loading' ? (
+            <EmptyState>Loading NFL coverage matrix...</EmptyState>
+          ) : coverage.status === 'error' ? (
+            <EmptyState>{coverage.error}</EmptyState>
+          ) : (
+            <NflCoverageView
+              matrix={coverage.data}
+              selectedTeamId={selectedSummary.team_id}
+              onSelectTeam={(teamId) => setDatabaseTeamId(teamId)}
+            />
+          )
+        ) : view === 'context' ? (
           <ContextGraphSettings key={selectedSummary.team_id} teamId={selectedSummary.team_id} embedded />
         ) : nflDetail && view === 'cap' ? (
           <NflCapSheetView
@@ -323,7 +369,7 @@ export function NbaRosterDatabase() {
         )}
       </div>
 
-      {nflDetail && view !== 'context' && (
+      {nflDetail && view !== 'context' && view !== 'coverage' && (
         <div style={{
           padding: `${SPACE.sm}px ${SPACE.xl}px`,
           borderTop: `1px solid ${F.border}`,
@@ -349,6 +395,7 @@ export function NbaRosterDatabase() {
 }
 
 function databaseViewKicker(view: DatabaseView): string {
+  if (view === 'coverage') return 'Database / Coverage';
   if (view === 'context') return 'Database / Intel';
   if (view === 'stats') return 'Database / player metrics';
   if (view === 'roster') return 'Database / offseason roster';
@@ -356,7 +403,9 @@ function databaseViewKicker(view: DatabaseView): string {
 }
 
 function MilestoneTwoPlaceholder({ view, teamName }: { view: DatabaseView; teamName: string }) {
-  const label = view === 'cap'
+  const label = view === 'coverage'
+    ? 'NFL coverage matrix'
+    : view === 'cap'
     ? 'NFL cap sheets'
     : view === 'stats'
       ? 'NFL player metrics'
@@ -365,6 +414,188 @@ function MilestoneTwoPlaceholder({ view, teamName }: { view: DatabaseView; teamN
     <EmptyState>
       {label} for {teamName} land in Milestone 2. The current Database slice is intentionally limited to NFL Intel.
     </EmptyState>
+  );
+}
+
+function NflCoverageView({
+  matrix,
+  selectedTeamId,
+  onSelectTeam,
+}: {
+  matrix: NflCoverageMatrixResponse;
+  selectedTeamId: string;
+  onSelectTeam: (teamId: string) => void;
+}) {
+  const selected = matrix.teams.find((team) => team.team_id === selectedTeamId) ?? matrix.teams[0] ?? null;
+  return (
+    <div style={{ minWidth: 1180 }}>
+      <div style={{
+        padding: `${SPACE.lg}px ${SPACE.xl}px`,
+        borderBottom: `1px solid ${F.border}`,
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        gap: SPACE.sm,
+      }}>
+        <CoverageSummaryTile label="League readiness" status={matrix.league.status} value={matrix.league.status} />
+        <CoverageSummaryTile label="Rows" value={`${matrix.league.roster_row_count} roster / ${matrix.league.cap_row_count} cap`} />
+        <CoverageSummaryTile label="Contract fields" value={`${matrix.league.contract_field_coverage.rows_with_years}/${matrix.league.contract_field_coverage.total_player_cap_rows}`} />
+        <CoverageSummaryTile label="Source mode" status={matrix.source_mode === 'checked_in_snapshot_fallback' ? 'directional' : 'strong'} value={formatCoverageSourceMode(matrix.source_mode)} />
+        <CoverageSummaryTile label="Seller thesis teams" value={`${matrix.league.seller_thesis_team_count}/32`} />
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(620px, 1fr) minmax(360px, 0.72fr)', minHeight: 0 }}>
+        <div style={{ borderRight: `1px solid ${F.border}`, minWidth: 0 }}>
+          <table style={{
+            width: '100%',
+            borderCollapse: 'collapse',
+            fontFamily: 'var(--font-sans)',
+            fontSize: TYPE.body.sm,
+            color: F.ink,
+          }}>
+            <thead>
+              <tr>
+                {['Team', 'Overall', 'Roster', 'Cap', 'Metrics', 'Intel', 'Seller', 'Cap gaps'].map((head) => (
+                  <th key={head} style={{
+                    position: 'sticky', top: 0, zIndex: 1,
+                    padding: `${SPACE.sm}px ${SPACE.md}px`,
+                    background: F.paper,
+                    borderBottom: `1px solid ${F.borderStrong}`,
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: TYPE.meta.sm,
+                    color: F.fgMuted,
+                    textAlign: head === 'Team' ? 'left' : 'center',
+                    letterSpacing: TRACKING.micro,
+                    textTransform: 'uppercase',
+                    whiteSpace: 'nowrap',
+                  }}>{head}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {matrix.teams.map((team) => {
+                const active = team.team_id === selectedTeamId;
+                return (
+                  <tr
+                    key={team.team_id}
+                    onClick={() => onSelectTeam(team.team_id)}
+                    style={{ background: active ? F.fenwaySoft : 'transparent', cursor: 'pointer' }}
+                  >
+                    <td style={cellStyle('left', true)}>
+                      <span style={{ fontFamily: 'var(--font-mono)', color: F.fenway, marginRight: SPACE.sm }}>{team.team_id}</span>
+                      {team.full_name}
+                    </td>
+                    <td style={coverageCellStyle()}><CoverageStatusBadge status={team.status} /></td>
+                    <td style={coverageCellStyle()}><CoverageStatusBadge status={coverageDomainStatus(team, 'roster')} /></td>
+                    <td style={coverageCellStyle()}><CoverageStatusBadge status={coverageDomainStatus(team, 'cap_contracts')} /></td>
+                    <td style={coverageCellStyle()}><CoverageStatusBadge status={coverageDomainStatus(team, 'player_metrics')} /></td>
+                    <td style={coverageCellStyle()}><CoverageStatusBadge status={coverageDomainStatus(team, 'intel')} /></td>
+                    <td style={coverageCellStyle()}><CoverageStatusBadge status={coverageDomainStatus(team, 'seller_thesis')} /></td>
+                    <td style={coverageCellStyle(true)}>{team.source_needed_cap_row_count}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        <div style={{ minWidth: 0, padding: `${SPACE.lg}px ${SPACE.xl}px`, display: 'grid', gap: SPACE.lg, alignContent: 'start' }}>
+          {selected ? <NflCoverageTeamDetail team={selected} /> : <EmptyState>No coverage team selected.</EmptyState>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NflCoverageTeamDetail({ team }: { team: NflCoverageTeamRow }) {
+  return (
+    <>
+      <section style={{ display: 'grid', gap: SPACE.sm }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: SPACE.sm }}>
+          <FinancialLabel>{team.team_id} readiness</FinancialLabel>
+          <CoverageStatusBadge status={team.status} />
+        </div>
+        <div style={{ fontFamily: 'var(--font-sans)', fontSize: TYPE.body.sm, color: F.fgMuted, lineHeight: 1.45 }}>
+          Current app rows drive roster and cap coverage. Graph roster rows: {team.graph_roster_count}; they are Intel examples only.
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: SPACE.sm }}>
+          <Metric label="Roster" value={team.roster_count} />
+          <Metric label="Cap rows" value={team.cap_row_count} />
+          <Metric label="Metrics" value={team.player_metric_row_count} />
+        </div>
+      </section>
+
+      <section style={{ display: 'grid', gap: SPACE.sm }}>
+        <FinancialLabel>Question readiness</FinancialLabel>
+        {team.readiness.map((item) => (
+          <div key={item.key} style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr auto',
+            gap: SPACE.sm,
+            padding: `${SPACE.sm}px 0`,
+            borderBottom: `1px solid ${F.border}`,
+          }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontFamily: 'var(--font-sans)', fontSize: TYPE.body.sm, fontWeight: 700, color: F.ink }}>
+                {item.label}
+              </div>
+              <div style={{ marginTop: 2, fontFamily: 'var(--font-sans)', fontSize: TYPE.body.sm, color: F.fgMuted, lineHeight: 1.35 }}>
+                {item.detail}
+              </div>
+            </div>
+            <CoverageStatusBadge status={item.status} />
+          </div>
+        ))}
+      </section>
+
+      <section style={{ display: 'grid', gap: SPACE.sm }}>
+        <FinancialLabel>Position groups</FinancialLabel>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(128px, 1fr))', gap: SPACE.sm }}>
+          {team.position_groups.map((group) => (
+            <div key={group.group} style={{
+              padding: SPACE.sm,
+              border: `1px solid ${F.border}`,
+              borderRadius: RADIUS.md,
+              background: F.surface,
+              display: 'grid',
+              gap: 5,
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: SPACE.xs, alignItems: 'center' }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.sm, color: F.fenway, fontWeight: 800 }}>{group.group}</span>
+                <CoverageStatusDot status={group.status} />
+              </div>
+              <div style={{ fontFamily: 'var(--font-sans)', fontSize: TYPE.body.sm, color: F.ink, fontWeight: 700 }}>
+                {formatCompactMoney(group.total_cap_number_2026)}
+              </div>
+              <div style={{ fontFamily: 'var(--font-sans)', fontSize: TYPE.body.sm, color: F.fgMuted, lineHeight: 1.3 }}>
+                {group.roster_count} players · metrics {formatMetricValue(group.metric_source_status)}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section style={{ display: 'grid', gap: SPACE.sm }}>
+        <FinancialLabel>Top gaps</FinancialLabel>
+        {team.top_gaps.length ? team.top_gaps.map((gap) => (
+          <div key={gap.key} style={{
+            display: 'grid',
+            gridTemplateColumns: 'auto 1fr',
+            gap: SPACE.sm,
+            alignItems: 'start',
+            padding: `${SPACE.sm}px 0`,
+            borderBottom: `1px solid ${F.border}`,
+          }}>
+            <CoverageStatusDot status={gap.severity} />
+            <div>
+              <div style={{ fontFamily: 'var(--font-sans)', fontSize: TYPE.body.sm, fontWeight: 700, color: F.ink }}>{gap.label}</div>
+              <div style={{ marginTop: 2, fontFamily: 'var(--font-sans)', fontSize: TYPE.body.sm, color: F.fgMuted, lineHeight: 1.35 }}>{gap.detail}</div>
+            </div>
+          </div>
+        )) : (
+          <div style={{ fontFamily: 'var(--font-sans)', fontSize: TYPE.body.sm, color: F.fgMuted }}>No material coverage gaps for the current matrix.</div>
+        )}
+      </section>
+    </>
   );
 }
 
@@ -387,11 +618,11 @@ function NflCapSheetView({
         fontFamily: 'var(--font-sans)',
         fontSize: TYPE.body.sm,
         color: F.ink,
-        minWidth: 1180,
+        minWidth: 1480,
       }}>
         <thead>
           <tr>
-            {['Player', 'Pos', 'Cap 2026', 'Cash 2026', 'Total left', 'Years', 'Guarantees', 'Dead cut', 'Cut room', 'Restructure', 'Tag', 'Lever', 'Source'].map((head) => (
+            {['Player', 'Pos', 'Cap 2026', 'Cash 2026', 'Total left', 'Years', 'Voids', 'Guarantees', 'Dead cut', 'Cut room', 'Post-June', 'Trade room', 'Restructure', 'Confidence', 'Lever', 'Source'].map((head) => (
               <th key={head} style={{
                 position: 'sticky', top: 0, zIndex: 1,
                 padding: `${SPACE.sm}px ${SPACE.md}px`,
@@ -400,7 +631,7 @@ function NflCapSheetView({
                 fontFamily: 'var(--font-mono)',
                 fontSize: TYPE.meta.sm,
                 color: F.fgMuted,
-                textAlign: ['Player', 'Lever', 'Source'].includes(head) ? 'left' : 'right',
+                textAlign: ['Player', 'Confidence', 'Lever', 'Source'].includes(head) ? 'left' : 'right',
                 letterSpacing: TRACKING.micro,
                 textTransform: 'uppercase',
                 whiteSpace: 'nowrap',
@@ -422,17 +653,21 @@ function NflCapSheetView({
                 <td style={capSheetPlayerCellStyle()}>
                   <span style={{ display: 'block' }}>{row.player_name}</span>
                   <SmallStatus>{formatMetricValue(row.contract_lever)}</SmallStatus>
+                  {row.source_status === 'source-needed' && <SmallStatus>Source needed</SmallStatus>}
                 </td>
                 <td style={cellStyle('right')}>{row.position ?? '-'}</td>
                 <td style={cellStyle('right', Boolean(row.cap_number_2026))}>{formatMoney(row.cap_number_2026)}</td>
                 <td style={cellStyle('right')}>{formatMoney(row.cash_due_2026)}</td>
                 <td style={cellStyle('right')}>{formatMoney(row.total_value_remaining)}</td>
-                <td style={cellStyle('right')}>{row.years_remaining ?? '-'}</td>
+                <td style={cellStyle('right')}>{row.contract_years_remaining ?? row.years_remaining ?? '-'}</td>
+                <td style={cellStyle('right')}>{formatVoidYears(row)}</td>
                 <td style={cellStyle('right')}>{formatMoney(row.guaranteed_remaining)}</td>
                 <td style={cellStyle('right')}>{formatMoney(row.dead_money_if_cut_2026)}</td>
                 <td style={cellStyle('right', (row.cut_savings_2026 ?? 0) > 0)}>{formatMoney(row.cut_savings_2026)}</td>
+                <td style={cellStyle('right', (row.post_june_1_cut_savings_2026 ?? 0) > 0)}>{formatMoney(row.post_june_1_cut_savings_2026)}</td>
+                <td style={cellStyle('right', (row.trade_savings_2026 ?? 0) > 0)}>{formatMoney(row.trade_savings_2026)}</td>
                 <td style={cellStyle('right', (row.restructure_savings_estimate_2026 ?? 0) > 0)}>{formatMoney(row.restructure_savings_estimate_2026)}</td>
-                <td style={cellStyle('right')}>{row.tag_eligible_2027 ? '2027' : '-'}</td>
+                <td style={cellStyle('left')}>{formatMetricValue(row.contract_ledger_confidence)}</td>
                 <td style={cellStyle('left')}>{formatMetricValue(row.contract_lever)}</td>
                 <td style={cellStyle('left')}>
                   {row.source_url?.startsWith('http') ? (
@@ -496,7 +731,7 @@ function NflMetricsTable({
     }}>
       <thead>
         <tr>
-          {['Player', 'Pos', 'Snaps', 'Games', 'Availability', 'Role', 'Tier', 'Metric note', 'Source'].map((head) => (
+          {['Player', 'Pos', 'Snaps', 'Share', 'Games', 'Starts', 'Production', 'Status', 'Gap / note', 'Source'].map((head) => (
             <th key={head} style={{
               position: 'sticky', top: 0, zIndex: 1,
               padding: `${SPACE.sm}px ${SPACE.md}px`,
@@ -505,7 +740,7 @@ function NflMetricsTable({
               fontFamily: 'var(--font-mono)',
               fontSize: TYPE.meta.sm,
               color: F.fgMuted,
-              textAlign: ['Player', 'Availability', 'Role', 'Tier', 'Metric note', 'Source'].includes(head) ? 'left' : 'right',
+              textAlign: ['Player', 'Production', 'Status', 'Gap / note', 'Source'].includes(head) ? 'left' : 'right',
               letterSpacing: TRACKING.micro,
               textTransform: 'uppercase',
               whiteSpace: 'nowrap',
@@ -525,15 +760,21 @@ function NflMetricsTable({
               <td style={cellStyle('left', true)}>{row.player_name}</td>
               <td style={cellStyle('right')}>{row.position ?? '-'}</td>
               <td style={cellStyle('right', true)}>{formatNumber(row.snaps_2025, 0)}</td>
+              <td style={cellStyle('right')}>{formatUnitPct(row.snap_share_2025)}</td>
               <td style={cellStyle('right')}>{formatNumber(row.games_2025, 0)}</td>
-              <td style={cellStyle('left')}>{formatMetricValue(row.availability_risk)}</td>
-              <td style={cellStyle('left')}>{formatMetricValue(row.role)}</td>
-              <td style={cellStyle('left')}>{formatMetricValue(row.value_tier)}</td>
-              <td style={cellStyle('left')}>{row.metric_note}</td>
+              <td style={cellStyle('right')}>{formatNumber(row.starts_2025, 0)}</td>
+              <td style={cellStyle('left')}>{nflMetricProductionSummary(row)}</td>
+              <td style={cellStyle('left')}>
+                <div style={{ display: 'flex', gap: SPACE.xs, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <SmallStatus>{row.source_status === 'captured' ? 'Captured public' : 'Needs context'}</SmallStatus>
+                  <span>{formatMetricValue(row.role)}</span>
+                </div>
+              </td>
+              <td style={cellStyle('left')}>{row.metric_gap_reason ? formatMetricValue(row.metric_gap_reason) : row.metric_note}</td>
               <td style={cellStyle('left')}>
                 {row.source_url?.startsWith('http') ? (
                   <a href={row.source_url} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()} style={{ color: F.fenway, textDecoration: 'none', fontWeight: 600 }}>
-                    Roster source
+                    {row.source_status === 'captured' ? 'Metric source' : 'Roster source'}
                   </a>
                 ) : 'Static snapshot'}
               </td>
@@ -1064,6 +1305,9 @@ function NflFinancialSummaryStrip({ detail }: { detail: GetCurrentNflTeamRespons
   const restructureRoom = sumNumbers(playerRows.map((row) => row.restructure_savings_estimate_2026));
   const cutRoom = sumNumbers(playerRows.map((row) => row.cut_savings_2026));
   const tagCandidates = playerRows.filter((row) => row.tag_eligible_2027).length;
+  const sourceNeededRows = playerRows.filter((row) => row.source_status === 'source-needed').length;
+  const estimatedRows = playerRows.filter((row) => row.source_status === 'estimated').length;
+  const capturedMetricRows = detail.player_metrics.filter((row) => row.source_status === 'captured').length;
   const primaryLever = playerRows
     .slice()
     .sort((a, b) => (b.restructure_savings_estimate_2026 ?? 0) - (a.restructure_savings_estimate_2026 ?? 0))[0] ?? null;
@@ -1110,7 +1354,9 @@ function NflFinancialSummaryStrip({ detail }: { detail: GetCurrentNflTeamRespons
         />
         <FinancialDetailGrid>
           <FinancialGridItem label="Sources" value={String(detail.source_refs.length)} />
-          <FinancialGridItem label="Metrics" value={String(detail.player_metrics.length)} />
+          <FinancialGridItem label="Cap gaps" value={String(sourceNeededRows)} />
+          <FinancialGridItem label="Est. cap rows" value={String(estimatedRows)} />
+          <FinancialGridItem label="Metrics" value={`${capturedMetricRows}/${detail.player_metrics.length}`} />
         </FinancialDetailGrid>
       </FinancialPanel>
     </div>
@@ -1301,6 +1547,123 @@ function FinancialGridItem({
 function formatMetricValue(value: string): string {
   if (!value.includes('_')) return value;
   return labelize(value);
+}
+
+function nflMetricProductionSummary(row: NflPlayerMetricRow): string {
+  const parts = [
+    row.passing_yards_2025 ? `Pass ${formatNumber(row.passing_yards_2025, 0)}` : null,
+    row.rushing_yards_2025 ? `Rush ${formatNumber(row.rushing_yards_2025, 0)}` : null,
+    row.receiving_yards_2025 ? `Rec ${formatNumber(row.receiving_yards_2025, 0)}` : null,
+    row.tackles_2025 ? `Tk ${formatNumber(row.tackles_2025, 0)}` : null,
+    row.sacks_2025 ? `Sk ${formatNumber(row.sacks_2025, 1)}` : null,
+    row.interceptions_2025 ? `Int ${formatNumber(row.interceptions_2025, 0)}` : null,
+    row.touchdowns_2025 ? `TD ${formatNumber(row.touchdowns_2025, 0)}` : null,
+  ].filter(Boolean);
+  return parts.length ? parts.join(' · ') : '—';
+}
+
+function CoverageSummaryTile({
+  label,
+  value,
+  status,
+}: {
+  label: string;
+  value: string;
+  status?: NflCoverageStatus;
+}) {
+  return (
+    <div style={{
+      minWidth: 0,
+      padding: `${SPACE.sm}px ${SPACE.md}px`,
+      background: F.surface,
+      border: `1px solid ${F.border}`,
+      borderRadius: RADIUS.md,
+      display: 'grid',
+      gap: 5,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: SPACE.sm }}>
+        <FinancialLabel>{label}</FinancialLabel>
+        {status && <CoverageStatusDot status={status} />}
+      </div>
+      <div style={{
+        fontFamily: 'var(--font-sans)',
+        fontSize: TYPE.body.md,
+        color: F.ink,
+        fontWeight: 700,
+        overflowWrap: 'anywhere',
+      }}>
+        {formatMetricValue(value)}
+      </div>
+    </div>
+  );
+}
+
+function CoverageStatusBadge({ status }: { status: NflCoverageStatus }) {
+  const tone = coverageTone(status);
+  return (
+    <span style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minWidth: 86,
+      padding: `3px ${SPACE.sm}px`,
+      borderRadius: RADIUS.pill,
+      background: tone.bg,
+      color: tone.fg,
+      fontFamily: 'var(--font-mono)',
+      fontSize: TYPE.meta.xs,
+      fontWeight: 800,
+      letterSpacing: TRACKING.micro,
+      textTransform: 'uppercase',
+      whiteSpace: 'nowrap',
+    }}>
+      {status}
+    </span>
+  );
+}
+
+function CoverageStatusDot({ status }: { status: NflCoverageStatus }) {
+  return (
+    <span style={{
+      width: 8,
+      height: 8,
+      flexShrink: 0,
+      borderRadius: RADIUS.pill,
+      background: coverageTone(status).fg,
+      boxShadow: `0 0 0 3px ${coverageTone(status).bg}`,
+    }} />
+  );
+}
+
+function coverageTone(status: NflCoverageStatus): { fg: string; bg: string } {
+  if (status === 'strong') return { fg: F.fenway, bg: F.fenwaySoft };
+  if (status === 'directional') return { fg: F.amber, bg: F.amberSoft };
+  if (status === 'weak') return { fg: F.red, bg: F.redSoft };
+  return { fg: F.fgMuted, bg: F.cream50 };
+}
+
+function coverageCellStyle(strong = false): CSSProperties {
+  return {
+    padding: `${SPACE.sm}px ${SPACE.md}px`,
+    borderBottom: `1px solid ${F.border}`,
+    textAlign: 'center',
+    verticalAlign: 'middle',
+    fontFamily: 'var(--font-sans)',
+    fontSize: TYPE.body.sm,
+    color: F.ink,
+    fontWeight: strong ? 700 : 500,
+    whiteSpace: 'nowrap',
+  };
+}
+
+function coverageDomainStatus(team: NflCoverageTeamRow, domain: NflCoverageDomain): NflCoverageStatus {
+  return team.domains.find((item) => item.domain === domain)?.status ?? 'blocked';
+}
+
+function formatCoverageSourceMode(mode: NflCoverageMatrixResponse['source_mode']): string {
+  if (mode === 'supabase_current_views') return 'Supabase current views';
+  if (mode === 'checked_in_snapshot_fallback') return 'Snapshot fallback';
+  return 'Checked-in snapshot';
 }
 
 function databaseFinancialSummary(sheet: NbaCapSheet): FinancialSummaryModel {
@@ -1627,6 +1990,15 @@ function nflCapRowId(row: NflCapRow): string {
 
 function nflMetricKey(row: NflPlayerMetricRow): string {
   return `${row.team_id}:${row.player_id}`;
+}
+
+function formatVoidYears(row: NflCapRow): string {
+  if (row.void_year_count == null) return '—';
+  if (row.void_year_count === 0) return '0';
+  const status = row.void_years_source_status && row.void_years_source_status !== 'captured'
+    ? ` ${formatMetricValue(row.void_years_source_status)}`
+    : '';
+  return `${row.void_year_count}${status}`;
 }
 
 function sumNumbers(values: Array<number | null | undefined>): number {

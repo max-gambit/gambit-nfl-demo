@@ -102,6 +102,44 @@ trade_dna:
       counterparties: [HOU]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: posture_change_only
+    confidence: medium
+    evidence: Indianapolis has clean one-year DT trade economics, but the top interior defenders are important enough that availability should require a competitive-direction signal.
+    source: https://overthecap.com/salary-cap/colts
+  position_group_stance:
+    - group: DL
+      stance: Grover Stewart is a high-impact, low-probability rental unless the Colts choose draft value over a veteran interior starter.
+      core_players: [DeForest Buckner, Grover Stewart]
+      movable_players: []
+      seller_depth_notes: The cap file makes Stewart attractive to NYG, but Indianapolis loses a top interior body rather than spare depth.
+      sell_threshold: Needs a clear sell signal or premium pick; normal rental pricing should not assume availability.
+      confidence: medium
+      source: https://overthecap.com/player/grover-stewart/5730/
+  market_preferences:
+    desired_return_types:
+      - Premium pick if a top interior defender is discussed
+      - Future flexibility only after competitive posture changes
+    avoided_deal_types:
+      - Selling top-of-room trench players without replacement
+    division_rivalry_friction: No division issue with NYG.
+    confidence: medium
+    source: https://www.colts.com
+  trade_triggers:
+    - trigger: Colts fall out of contention or decide not to carry an expiring veteran DT.
+      implication: Stewart changes from posture-change watch to check-call.
+      confidence: medium
+      source: https://overthecap.com/salary-cap/colts
+  availability_validation:
+    - check: Confirm whether Stewart is part of the competitive spine or a contract-year asset.
+      owner: pro_personnel
+      source: https://www.colts.com
+  no_trade_guardrails:
+    - guardrail: Do not present Stewart as likely available from cap fit alone.
+      confidence: medium
+      source: https://overthecap.com/player/grover-stewart/5730/
+
 cultural_signals:
   stability:
     value: medium

@@ -102,6 +102,48 @@ trade_dna:
       counterparties: [PHI]
   confidence: medium
 
+trade_market_intel:
+  seller_posture:
+    value: buyer_hold
+    confidence: high
+    evidence: Dallas shows headline cap-fit names, but Quinnen Williams and CeeDee Lamb profile as core hold players rather than seller inventory.
+    source: https://overthecap.com/salary-cap/cowboys
+  position_group_stance:
+    - group: DL
+      stance: Quinnen Williams is a high-impact, low-probability name; the current cap fit is attractive to the buyer but Dallas loses a top-of-room interior defender.
+      core_players: [Quinnen Williams, Kenny Clark]
+      movable_players: []
+      seller_depth_notes: The seller objection is football value, not just cap math; Dallas would be weakening the defensive interior around a premium player.
+      sell_threshold: Treat as posture-change only unless Dallas explicitly pivots away from holding premium defensive talent.
+      confidence: high
+      source: https://overthecap.com/salary-cap/cowboys
+  market_preferences:
+    desired_return_types:
+      - Premium draft capital only if a core player is discussed
+      - Deals that strengthen the current competitive window
+    avoided_deal_types:
+      - Selling top-of-room defensive or receiver talent for ordinary rental pricing
+      - NFC East trades that create optics or competitive blowback
+    division_rivalry_friction: NFC East friction is high with NYG; assume Dallas charges a premium or avoids direct help.
+    confidence: high
+    source: https://www.nfl.com/teams/cowboys/roster
+  trade_triggers:
+    - trigger: Dallas' posture changes from buyer/hold to asset accumulation.
+      implication: Premium-player calls can be revisited, but not treated as a normal current lane.
+      confidence: medium
+      source: https://www.nfl.com/teams/cowboys/roster
+  availability_validation:
+    - check: Confirm whether Dallas would even trade a premium defender inside the division.
+      owner: pro_personnel
+      source: https://www.nfl.com/teams/cowboys/roster
+    - check: Confirm buyer cost includes division premium and not only contract transfer.
+      owner: cap
+      source: https://overthecap.com/salary-cap/cowboys
+  no_trade_guardrails:
+    - guardrail: Do not present Quinnen Williams as a lead lane for NYG unless Dallas' posture changes and the division premium is acknowledged.
+      confidence: high
+      source: https://overthecap.com/salary-cap/cowboys
+
 cultural_signals:
   stability:
     value: medium
