@@ -1,0 +1,978 @@
+{
+  "meta": {
+    "schema_version": 1,
+    "corpus_id": "nba-trade-corpus-v0",
+    "generated_at": "2026-06-29T00:00:00.000Z",
+    "scenario_count": 50,
+    "source_data_version": {
+      "season": "2025-26",
+      "as_of_date": "2026-05-03",
+      "source_name": "Reviewed NBA cap sheet snapshot",
+      "source_url": "data/nba-cap-sheets/2026-05-03.public-sources.json",
+      "retrieved_at": "2026-05-03T16:54:39.896Z"
+    },
+    "generation_policy": {
+      "subject_team_id": "GSW",
+      "realgm_policy": "Small-batch manual/computer-use queue only; no CAPTCHA bypass, no scaled scraping, cache labels as evidence.",
+      "notes": [
+        "V0 uses public/demo NBA cap-sheet seed data only.",
+        "RealGM labels remain manual_pending until screenshot and page-text evidence are imported.",
+        "Expected labels are heuristic unless label_confidence is realgm or human_reviewed."
+      ]
+    }
+  },
+  "policy": {
+    "max_batch_size": 5,
+    "min_delay_seconds": 2,
+    "no_captcha_bypass": true,
+    "no_scaled_scraping": true
+  },
+  "items": [
+    {
+      "scenario_id": "trade_eval_v0_001_clean-mil",
+      "title": "Clean control salary swap with MIL",
+      "teams": [
+        "GSW",
+        "MIL"
+      ],
+      "rule_tags": [
+        "clean_control",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_002_clean-okc",
+      "title": "Clean control salary swap with OKC",
+      "teams": [
+        "GSW",
+        "OKC"
+      ],
+      "rule_tags": [
+        "clean_control",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_003_clean-cha",
+      "title": "Clean control salary swap with CHA",
+      "teams": [
+        "GSW",
+        "CHA"
+      ],
+      "rule_tags": [
+        "clean_control",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_004_clean-por",
+      "title": "Clean control salary swap with POR",
+      "teams": [
+        "GSW",
+        "POR"
+      ],
+      "rule_tags": [
+        "clean_control",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_005_clean-sas",
+      "title": "Clean control salary swap with SAS",
+      "teams": [
+        "GSW",
+        "SAS"
+      ],
+      "rule_tags": [
+        "clean_control",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_006_clean-chi",
+      "title": "Clean control salary swap with CHI",
+      "teams": [
+        "GSW",
+        "CHI"
+      ],
+      "rule_tags": [
+        "clean_control",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_007_clean-atl",
+      "title": "Clean control salary swap with ATL",
+      "teams": [
+        "GSW",
+        "ATL"
+      ],
+      "rule_tags": [
+        "clean_control",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_008_clean-mem",
+      "title": "Clean control salary swap with MEM",
+      "teams": [
+        "GSW",
+        "MEM"
+      ],
+      "rule_tags": [
+        "clean_control",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_009_salary-mismatch-lal",
+      "title": "Salary-matching stress test with LAL",
+      "teams": [
+        "GSW",
+        "LAL"
+      ],
+      "rule_tags": [
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_010_salary-mismatch-orl",
+      "title": "Salary-matching stress test with ORL",
+      "teams": [
+        "GSW",
+        "ORL"
+      ],
+      "rule_tags": [
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_011_salary-mismatch-por",
+      "title": "Salary-matching stress test with POR",
+      "teams": [
+        "GSW",
+        "POR"
+      ],
+      "rule_tags": [
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_012_salary-mismatch-okc",
+      "title": "Salary-matching stress test with OKC",
+      "teams": [
+        "GSW",
+        "OKC"
+      ],
+      "rule_tags": [
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_013_salary-mismatch-mil",
+      "title": "Salary-matching stress test with MIL",
+      "teams": [
+        "GSW",
+        "MIL"
+      ],
+      "rule_tags": [
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_014_salary-close-sac",
+      "title": "Near-band salary match with SAC",
+      "teams": [
+        "GSW",
+        "SAC"
+      ],
+      "rule_tags": [
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_015_salary-close-mil",
+      "title": "Near-band salary match with MIL",
+      "teams": [
+        "GSW",
+        "MIL"
+      ],
+      "rule_tags": [
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_016_salary-close-bos",
+      "title": "Near-band salary match with BOS",
+      "teams": [
+        "GSW",
+        "BOS"
+      ],
+      "rule_tags": [
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_017_salary-close-okc",
+      "title": "Near-band salary match with OKC",
+      "teams": [
+        "GSW",
+        "OKC"
+      ],
+      "rule_tags": [
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_018_salary-close-hou",
+      "title": "Near-band salary match with HOU",
+      "teams": [
+        "GSW",
+        "HOU"
+      ],
+      "rule_tags": [
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_019_second-apron-bos",
+      "title": "Second-apron aggregation check with BOS",
+      "teams": [
+        "GSW",
+        "BOS"
+      ],
+      "rule_tags": [
+        "second_apron",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_020_second-apron-cle",
+      "title": "Second-apron aggregation check with CLE",
+      "teams": [
+        "GSW",
+        "CLE"
+      ],
+      "rule_tags": [
+        "second_apron",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_021_second-apron-hou",
+      "title": "Second-apron aggregation check with HOU",
+      "teams": [
+        "GSW",
+        "HOU"
+      ],
+      "rule_tags": [
+        "second_apron",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_022_second-apron-lal",
+      "title": "Second-apron aggregation check with LAL",
+      "teams": [
+        "GSW",
+        "LAL"
+      ],
+      "rule_tags": [
+        "second_apron",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_023_second-apron-orl",
+      "title": "Second-apron aggregation check with ORL",
+      "teams": [
+        "GSW",
+        "ORL"
+      ],
+      "rule_tags": [
+        "second_apron",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_024_second-apron-okc",
+      "title": "Second-apron aggregation check with OKC",
+      "teams": [
+        "GSW",
+        "OKC"
+      ],
+      "rule_tags": [
+        "second_apron",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_025_second-apron-was",
+      "title": "Second-apron aggregation check with WAS",
+      "teams": [
+        "GSW",
+        "WAS"
+      ],
+      "rule_tags": [
+        "second_apron",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_026_second-apron-den",
+      "title": "Second-apron aggregation check with DEN",
+      "teams": [
+        "GSW",
+        "DEN"
+      ],
+      "rule_tags": [
+        "second_apron",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_027_sign-trade-hard-cap-sac",
+      "title": "Sign-and-trade hard-cap check with SAC",
+      "teams": [
+        "GSW",
+        "SAC"
+      ],
+      "rule_tags": [
+        "hard_cap",
+        "sign_and_trade"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_028_sign-trade-hard-cap-mil",
+      "title": "Sign-and-trade hard-cap check with MIL",
+      "teams": [
+        "GSW",
+        "MIL"
+      ],
+      "rule_tags": [
+        "hard_cap",
+        "sign_and_trade"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_029_sign-trade-hard-cap-cha",
+      "title": "Sign-and-trade hard-cap check with CHA",
+      "teams": [
+        "GSW",
+        "CHA"
+      ],
+      "rule_tags": [
+        "hard_cap",
+        "sign_and_trade"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_030_sign-trade-hard-cap-atl",
+      "title": "Sign-and-trade hard-cap check with ATL",
+      "teams": [
+        "GSW",
+        "ATL"
+      ],
+      "rule_tags": [
+        "hard_cap",
+        "sign_and_trade"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_031_sign-trade-hard-cap-nop",
+      "title": "Sign-and-trade hard-cap check with NOP",
+      "teams": [
+        "GSW",
+        "NOP"
+      ],
+      "rule_tags": [
+        "hard_cap",
+        "sign_and_trade"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_032_sign-trade-hard-cap-por",
+      "title": "Sign-and-trade hard-cap check with POR",
+      "teams": [
+        "GSW",
+        "POR"
+      ],
+      "rule_tags": [
+        "hard_cap",
+        "sign_and_trade"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_033_sign-trade-hard-cap-sas",
+      "title": "Sign-and-trade hard-cap check with SAS",
+      "teams": [
+        "GSW",
+        "SAS"
+      ],
+      "rule_tags": [
+        "hard_cap",
+        "sign_and_trade"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_034_sign-trade-hard-cap-phi",
+      "title": "Sign-and-trade hard-cap check with PHI",
+      "teams": [
+        "GSW",
+        "PHI"
+      ],
+      "rule_tags": [
+        "hard_cap",
+        "sign_and_trade"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_035_trade-exception-bos",
+      "title": "Trade-exception source check with BOS",
+      "teams": [
+        "GSW",
+        "BOS"
+      ],
+      "rule_tags": [
+        "trade_exception",
+        "source_needed"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_036_trade-exception-cle",
+      "title": "Trade-exception source check with CLE",
+      "teams": [
+        "GSW",
+        "CLE"
+      ],
+      "rule_tags": [
+        "trade_exception",
+        "source_needed"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_037_trade-exception-lal",
+      "title": "Trade-exception source check with LAL",
+      "teams": [
+        "GSW",
+        "LAL"
+      ],
+      "rule_tags": [
+        "trade_exception",
+        "source_needed"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_038_trade-exception-mem",
+      "title": "Trade-exception source check with MEM",
+      "teams": [
+        "GSW",
+        "MEM"
+      ],
+      "rule_tags": [
+        "trade_exception",
+        "source_needed"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_039_trade-exception-phx",
+      "title": "Trade-exception source check with PHX",
+      "teams": [
+        "GSW",
+        "PHX"
+      ],
+      "rule_tags": [
+        "trade_exception",
+        "source_needed"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_040_trade-exception-uta",
+      "title": "Trade-exception source check with UTA",
+      "teams": [
+        "GSW",
+        "UTA"
+      ],
+      "rule_tags": [
+        "trade_exception",
+        "source_needed"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_041_trade-exception-was",
+      "title": "Trade-exception source check with WAS",
+      "teams": [
+        "GSW",
+        "WAS"
+      ],
+      "rule_tags": [
+        "trade_exception",
+        "source_needed"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_042_trade-exception-chi",
+      "title": "Trade-exception source check with CHI",
+      "teams": [
+        "GSW",
+        "CHI"
+      ],
+      "rule_tags": [
+        "trade_exception",
+        "source_needed"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_043_multi-team-bos-uta",
+      "title": "Three-team routing check with BOS and UTA",
+      "teams": [
+        "GSW",
+        "BOS",
+        "UTA"
+      ],
+      "rule_tags": [
+        "multi_team",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_044_multi-team-cle-mem",
+      "title": "Three-team routing check with CLE and MEM",
+      "teams": [
+        "GSW",
+        "CLE",
+        "MEM"
+      ],
+      "rule_tags": [
+        "multi_team",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_045_multi-team-hou-por",
+      "title": "Three-team routing check with HOU and POR",
+      "teams": [
+        "GSW",
+        "HOU",
+        "POR"
+      ],
+      "rule_tags": [
+        "multi_team",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_046_multi-team-lal-atl",
+      "title": "Three-team routing check with LAL and ATL",
+      "teams": [
+        "GSW",
+        "LAL",
+        "ATL"
+      ],
+      "rule_tags": [
+        "multi_team",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_047_multi-team-sac-was",
+      "title": "Three-team routing check with SAC and WAS",
+      "teams": [
+        "GSW",
+        "SAC",
+        "WAS"
+      ],
+      "rule_tags": [
+        "multi_team",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_048_multi-team-orl-chi",
+      "title": "Three-team routing check with ORL and CHI",
+      "teams": [
+        "GSW",
+        "ORL",
+        "CHI"
+      ],
+      "rule_tags": [
+        "multi_team",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "check_in_realgm",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_049_source-needed-det",
+      "title": "Source-needed salary gate with DET",
+      "teams": [
+        "GSW",
+        "DET"
+      ],
+      "rule_tags": [
+        "source_needed",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "skip_until_salary_source",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    },
+    {
+      "scenario_id": "trade_eval_v0_050_source-needed-mia",
+      "title": "Source-needed salary gate with MIA",
+      "teams": [
+        "GSW",
+        "MIA"
+      ],
+      "rule_tags": [
+        "source_needed",
+        "salary_matching"
+      ],
+      "realgm_url": "https://basketball.realgm.com/tradechecker",
+      "recommended_action": "skip_until_salary_source",
+      "stop_conditions": [
+        "Stop if RealGM shows CAPTCHA, Cloudflare challenge, account wall, or terms uncertainty.",
+        "Stop if the batch would exceed 5 scenarios or requires bypassing site protections.",
+        "Record screenshot_path and page_text_path before marking a label as realgm."
+      ]
+    }
+  ]
+}

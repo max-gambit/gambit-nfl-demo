@@ -12,6 +12,8 @@
     "seed:nba-rosters": "tsx src/db/seed-nba-rosters.ts",
     "refresh:nba-rosters": "tsx src/nba_rosters/refresh.ts",
     "build:nba-cap-sheets": "node --import tsx src/nba_cap_sheets/build_reviewed_snapshot.ts",
+    "build:trade-eval-corpus": "tsx src/trade_eval/build_corpus.ts",
+    "score:trade-eval-corpus": "tsx src/trade_eval/score_answers.ts",
     "refresh:nba-cap-sheets": "node --import tsx src/nba_cap_sheets/refresh.ts",
     "build:nba-player-stats": "node --import tsx src/nba_player_stats/build_reviewed_snapshot.ts",
     "build:nfl-data": "tsx src/nfl_data/build_reviewed_snapshot.ts",
