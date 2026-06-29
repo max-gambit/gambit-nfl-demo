@@ -342,8 +342,9 @@ export function NbaRosterDatabase() {
             }}
           />
         ) : nflDetail && view === 'stats' ? (
-          <NflMetricsTable
+          <NflMetricsView
             rows={nflDetail.player_metrics}
+            selectedRow={selectedStats}
             selectedStatKey={selectedStats ? nflMetricKey(selectedStats) : databaseStatKey}
             onSelectRow={(row) => {
               setDatabaseStatKey(nflMetricKey(row));
@@ -711,6 +712,31 @@ function NflCapSheetView({
   );
 }
 
+function NflMetricsView({
+  rows,
+  selectedRow,
+  selectedStatKey,
+  onSelectRow,
+}: {
+  rows: NflPlayerMetricRow[];
+  selectedRow: NflPlayerMetricRow | null;
+  selectedStatKey: string | null;
+  onSelectRow: (row: NflPlayerMetricRow) => void;
+}) {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(780px, 1fr) minmax(340px, 0.48fr)', minHeight: '100%' }}>
+      <div style={{ minWidth: 0, overflow: 'auto', borderRight: `1px solid ${F.border}` }}>
+        <NflMetricsTable
+          rows={rows}
+          selectedStatKey={selectedStatKey}
+          onSelectRow={onSelectRow}
+        />
+      </div>
+      <NflMetricDetail row={selectedRow} />
+    </div>
+  );
+}
+
 function NflMetricsTable({
   rows,
   selectedStatKey,
@@ -727,11 +753,11 @@ function NflMetricsTable({
       fontFamily: 'var(--font-sans)',
       fontSize: TYPE.body.sm,
       color: F.ink,
-      minWidth: 900,
+      minWidth: 1040,
     }}>
       <thead>
         <tr>
-          {['Player', 'Pos', 'Snaps', 'Share', 'Games', 'Starts', 'Production', 'Status', 'Gap / note', 'Source'].map((head) => (
+          {['Player', 'Pos', 'Usage', 'Production', 'Coverage', 'Scorecard', 'Flags', 'Source'].map((head) => (
             <th key={head} style={{
               position: 'sticky', top: 0, zIndex: 1,
               padding: `${SPACE.sm}px ${SPACE.md}px`,
@@ -740,7 +766,7 @@ function NflMetricsTable({
               fontFamily: 'var(--font-mono)',
               fontSize: TYPE.meta.sm,
               color: F.fgMuted,
-              textAlign: ['Player', 'Production', 'Status', 'Gap / note', 'Source'].includes(head) ? 'left' : 'right',
+              textAlign: ['Player', 'Production', 'Coverage', 'Scorecard', 'Flags', 'Source'].includes(head) ? 'left' : 'right',
               letterSpacing: TRACKING.micro,
               textTransform: 'uppercase',
               whiteSpace: 'nowrap',
@@ -759,18 +785,21 @@ function NflMetricsTable({
             >
               <td style={cellStyle('left', true)}>{row.player_name}</td>
               <td style={cellStyle('right')}>{row.position ?? '-'}</td>
-              <td style={cellStyle('right', true)}>{formatNumber(row.snaps_2025, 0)}</td>
-              <td style={cellStyle('right')}>{formatUnitPct(row.snap_share_2025)}</td>
-              <td style={cellStyle('right')}>{formatNumber(row.games_2025, 0)}</td>
-              <td style={cellStyle('right')}>{formatNumber(row.starts_2025, 0)}</td>
+              <td style={cellStyle('right', true)}>
+                {formatNumber(row.snaps_2025, 0)}
+                <div style={{ color: F.fgMuted, fontWeight: 500, whiteSpace: 'nowrap' }}>
+                  {formatUnitPct(row.snap_share_2025)} · {formatNumber(row.games_2025, 0)}g / {formatNumber(row.starts_2025, 0)}st
+                </div>
+              </td>
               <td style={cellStyle('left')}>{nflMetricProductionSummary(row)}</td>
               <td style={cellStyle('left')}>
                 <div style={{ display: 'flex', gap: SPACE.xs, alignItems: 'center', flexWrap: 'wrap' }}>
-                  <SmallStatus>{row.source_status === 'captured' ? 'Captured public' : 'Needs context'}</SmallStatus>
-                  <span>{formatMetricValue(row.role)}</span>
+                  <SmallStatus>{formatMetricValue(row.metric_coverage_level ?? (row.source_status === 'captured' ? 'directional' : 'gap'))}</SmallStatus>
+                  <span>{formatMetricValue(row.metric_confidence ?? (row.source_status === 'captured' ? 'derived' : 'source-needed'))}</span>
                 </div>
               </td>
-              <td style={cellStyle('left')}>{row.metric_gap_reason ? formatMetricValue(row.metric_gap_reason) : row.metric_note}</td>
+              <td style={cellStyle('left')}>{row.position_metric_summary ?? (row.metric_gap_reason ? formatMetricValue(row.metric_gap_reason) : row.metric_note)}</td>
+              <td style={cellStyle('left')}>{nflMetricFlags(row)}</td>
               <td style={cellStyle('left')}>
                 {row.source_url?.startsWith('http') ? (
                   <a href={row.source_url} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()} style={{ color: F.fenway, textDecoration: 'none', fontWeight: 600 }}>
@@ -783,6 +812,61 @@ function NflMetricsTable({
         })}
       </tbody>
     </table>
+  );
+}
+
+function NflMetricDetail({ row }: { row: NflPlayerMetricRow | null }) {
+  if (!row) {
+    return <EmptyState>Select a player metric row.</EmptyState>;
+  }
+  const metricEntries = Object.entries(row.position_metrics ?? {})
+    .filter(([, value]) => value != null)
+    .slice(0, 24);
+  return (
+    <aside style={{
+      minWidth: 0,
+      padding: `${SPACE.lg}px ${SPACE.xl}px`,
+      display: 'grid',
+      alignContent: 'start',
+      gap: SPACE.md,
+      background: F.surface,
+    }}>
+      <div>
+        <FinancialLabel>Selected scorecard</FinancialLabel>
+        <h3 style={{ margin: `${SPACE.xs}px 0 0`, fontFamily: 'var(--font-display)', fontSize: TYPE.display.sm, color: F.ink, letterSpacing: 0 }}>
+          {row.player_name}
+        </h3>
+        <div style={{ marginTop: SPACE.xs, color: F.fgMuted, fontFamily: 'var(--font-sans)', fontSize: TYPE.body.sm }}>
+          {row.position ?? 'UNK'} · {formatMetricValue(row.metric_coverage_level ?? 'gap')} · {(row.metric_families ?? []).join(' + ') || row.metric_source_family || 'No captured metric family'}
+        </div>
+      </div>
+      <div style={{ fontFamily: 'var(--font-sans)', fontSize: TYPE.body.md, lineHeight: 1.5, color: F.ink }}>
+        {row.position_metric_summary ?? row.metric_note}
+      </div>
+      <FinancialDetailGrid>
+        <FinancialGridItem label="Snaps" value={formatNumber(row.snaps_2025, 0)} caption={formatUnitPct(row.snap_share_2025)} />
+        <FinancialGridItem label="Games" value={formatNumber(row.games_2025, 0)} caption={`${formatNumber(row.starts_2025, 0)} starts`} />
+        <FinancialGridItem label="Production" value={nflMetricProductionSummary(row)} />
+        <FinancialGridItem label="Flags" value={nflMetricFlags(row)} />
+      </FinancialDetailGrid>
+      <div>
+        <FinancialLabel>Raw public scorecard fields</FinancialLabel>
+        {metricEntries.length ? (
+          <div style={{ marginTop: SPACE.sm, display: 'grid', gap: 6 }}>
+            {metricEntries.map(([key, value]) => (
+              <div key={key} style={{ display: 'flex', justifyContent: 'space-between', gap: SPACE.md, borderBottom: `1px solid ${F.border}`, paddingBottom: 5 }}>
+                <span style={{ color: F.fgMuted, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.sm }}>{formatMetricValue(key)}</span>
+                <span style={{ color: F.ink, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.md, fontWeight: 700 }}>{String(value)}</span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ marginTop: SPACE.sm, color: F.fgMuted, fontFamily: 'var(--font-sans)', fontSize: TYPE.body.sm }}>
+            {row.metric_gap_reason ? formatMetricValue(row.metric_gap_reason) : 'No position-quality fields captured for this row.'}
+          </div>
+        )}
+      </div>
+    </aside>
   );
 }
 
@@ -1560,6 +1644,13 @@ function nflMetricProductionSummary(row: NflPlayerMetricRow): string {
     row.touchdowns_2025 ? `TD ${formatNumber(row.touchdowns_2025, 0)}` : null,
   ].filter(Boolean);
   return parts.length ? parts.join(' · ') : '—';
+}
+
+function nflMetricFlags(row: NflPlayerMetricRow): string {
+  const flags = row.quality_flags ?? [];
+  if (flags.length) return flags.slice(0, 3).map(formatMetricValue).join(' · ');
+  if (row.metric_gap_reason) return formatMetricValue(row.metric_gap_reason);
+  return row.metric_coverage_level === 'strong' ? 'Source-backed' : 'Directional';
 }
 
 function CoverageSummaryTile({

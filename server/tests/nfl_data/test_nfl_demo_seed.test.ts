@@ -20,11 +20,15 @@ test('NFL demo seed validates all-32 static roster cap and metric rows', async (
   assert.equal(seed.source_refs.some((source) => source.id === 'overthecap_contract_ledger_v1'), true);
   assert.equal(seed.source_refs.some((source) => source.id === 'nflverse_snap_counts_2025'), true);
   assert.equal(seed.source_refs.some((source) => source.id === 'nflverse_stats_player_2025'), true);
+  assert.equal(seed.source_refs.some((source) => source.id === 'nflverse_pfr_advstats_2025'), true);
+  assert.equal(seed.source_refs.some((source) => source.id === 'nflverse_nextgen_stats_2025'), true);
   assert.equal(seed.cap_rows.filter((row) => row.contract_ledger_status).length, summary.roster_row_count);
   assert.equal(seed.cap_rows.filter((row) => row.contract_ledger_confidence).length, summary.roster_row_count);
   assert.equal(seed.cap_rows.filter((row) => row.contract_years_remaining != null).length, 2_840);
   assert.equal(seed.cap_rows.filter((row) => row.source_status === 'estimated').length, 13);
   assert.equal(capturedMetrics.length > 1_500, true);
+  assert.equal(seed.player_metrics.filter((row) => row.metric_coverage_level === 'strong').length > 1_000, true);
+  assert.equal(seed.player_metrics.every((row) => Array.isArray(row.metric_families ?? [])), true);
   assert.equal(seed.player_metrics.length, summary.roster_row_count);
 });
 
@@ -47,6 +51,9 @@ test('NFL demo seed exposes full Giants roster and cap levers', async () => {
   assert.equal(detail?.cap_rows.some((row) => row.player_name === 'Brian Burns' && row.contract_years_remaining === 3), true);
   assert.equal(detail?.cap_rows.some((row) => row.player_name === 'Brian Burns' && row.contract_ledger_confidence === 'captured'), true);
   assert.equal((detail?.player_metrics.filter((row) => row.source_status === 'captured').length ?? 0) > 50, true);
+  assert.equal(detail?.player_metrics.some((row) => row.player_name === 'Brian Burns' && row.metric_coverage_level === 'strong' && row.position_metrics?.pressures != null), true);
+  assert.equal(detail?.player_metrics.some((row) => row.player_name === 'Andrew Thomas' && row.metric_coverage_level === 'directional' && row.quality_flags?.includes('ol_continuity_only_no_public_blocking_grade')), true);
+  assert.equal(detail?.player_metrics.some((row) => row.player_name === 'Malik Nabers' && row.position_metric_summary?.includes('targets=')), true);
 });
 
 test('NFL contract ledger covers high-cap rows with post-June trade and confidence data', async () => {

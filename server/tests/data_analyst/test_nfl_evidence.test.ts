@@ -39,8 +39,9 @@ test('NFL evidence block uses full NYG app roster and cap data ahead of Intel', 
   assert.match(evidence.systemBlock, /Source-needed cap rows: 1/);
   assert.match(evidence.systemBlock, /Contract field coverage: guarantees=92\/92; dead\/cut=91\/92; post-June=91\/92; trade=91\/92; contract_years=91\/92; void_years=91\/92/);
   assert.match(evidence.systemBlock, /current NFL player metrics/);
-  assert.match(evidence.systemBlock, /Player metric coverage: captured_public_metrics=58\/92/);
-  assert.match(evidence.systemBlock, /Top captured player metrics:/);
+  assert.match(evidence.systemBlock, /Player metric coverage: captured_public_metrics=65\/92; strong_position_scorecards=46\/92/);
+  assert.match(evidence.systemBlock, /Top position scorecards:/);
+  assert.match(evidence.systemBlock, /Player Quality Metrics v2 is position-specific evidence/);
   assert.match(evidence.systemBlock, /post_june_cut_savings=/);
   assert.match(evidence.systemBlock, /trade_savings=/);
   assert.match(evidence.systemBlock, /evidence_quality=high confidence/);
@@ -48,7 +49,7 @@ test('NFL evidence block uses full NYG app roster and cap data ahead of Intel', 
   assert.match(evidence.systemBlock, /Position-group cap rollups:/);
   assert.match(evidence.systemBlock, /NFL coverage matrix/);
   assert.match(evidence.systemBlock, /Question readiness:/);
-  assert.match(evidence.systemBlock, /player_quality=directional/);
+  assert.match(evidence.systemBlock, /player_quality=weak/);
   assert.match(evidence.systemBlock, /current NFL roster\/cap file is authoritative/i);
   assert.match(evidence.systemBlock, /Intel\/context graph is lower-precedence posture context only/i);
   assert.match(evidence.systemBlock, /Visible answer style/i);

@@ -126,6 +126,7 @@ test('public player metric parser joins snap counts and player production', () =
     'game_id,pfr_game_id,season,game_type,week,player,pfr_player_id,position,team,opponent,offense_snaps,offense_pct,defense_snaps,defense_pct,st_snaps,st_pct',
     '2025_01_NYG_DAL,202509010nyg,2025,REG,1,Sample Defender,TestSa00,DT,NYG,DAL,0,0%,44,73%,2,8%',
     '2025_02_NYG_PHI,202509080nyg,2025,REG,2,Sample Defender,TestSa00,DT,NYG,PHI,0,0%,36,60%,1,4%',
+    '2025_POST_NYG_PHI,202601120nyg,2025,POST,19,Sample Defender,TestSa00,DT,NYG,PHI,0,0%,99,100%,9,30%',
   ].join('\n');
 
   const index = buildPublicMetricIndex(statsCsv, snapsCsv);
@@ -134,6 +135,7 @@ test('public player metric parser joins snap counts and player production', () =
   assert.ok(row);
   assert.equal(row.defense_snaps_2025, 80);
   assert.equal(row.special_teams_snaps_2025, 3);
+  assert.equal(row.snap_game_ids_2025.size, 2);
   assert.equal(row.games_2025, 17);
   assert.equal(row.tackles_2025, 33);
   assert.equal(row.sacks_2025, 6.5);
@@ -141,4 +143,51 @@ test('public player metric parser joins snap counts and player production', () =
   assert.equal(row.touchdowns_2025, 1);
   assert.equal(row.source_families.has('nflverse_snap_counts'), true);
   assert.equal(row.source_families.has('nflverse_stats_player'), true);
+});
+
+test('public player metric parser attaches PFR and NGS position scorecard fields', () => {
+  const statsCsv = [
+    'player_id,player_name,player_display_name,position,season,season_type,recent_team,games,passing_yards,rushing_yards,receiving_yards,def_tackles_solo,def_tackles_with_assist,def_sacks,def_interceptions,passing_tds,rushing_tds,receiving_tds,def_tds',
+    '00-TEST,Sample Receiver,Sample Receiver,WR,2025,REG,NYG,17,0,0,780,0,0,0,0,0,0,5,0',
+    '00-DEF,Sample Rusher,Sample Rusher,LB,2025,REG,NYG,17,0,0,0,20,18,8.5,0,0,0,0,0',
+  ].join('\n');
+  const snapsCsv = [
+    'game_id,pfr_game_id,season,game_type,week,player,pfr_player_id,position,team,opponent,offense_snaps,offense_pct,defense_snaps,defense_pct,st_snaps,st_pct',
+    '2025_01_NYG_DAL,202509010nyg,2025,REG,1,Sample Receiver,ReceSa00,WR,NYG,DAL,60,90%,0,0%,0,0%',
+    '2025_02_NYG_PHI,202509080nyg,2025,REG,2,Sample Receiver,ReceSa00,WR,NYG,PHI,55,82%,0,0%,0,0%',
+    '2025_01_NYG_DAL,202509010nyg,2025,REG,1,Sample Rusher,RushSa00,LB,NYG,DAL,0,0%,44,73%,2,8%',
+  ].join('\n');
+  const pfrRecCsv = [
+    'season,player,pfr_id,tm,age,pos,g,gs,tgt,rec,yds,td,x1d,ybc,ybc_r,yac,yac_r,adot,brk_tkl,rec_br,drop,drop_percent,int,rat,loaded',
+    '2025,Sample Receiver,ReceSa00,NYG,24,WR,17,14,90,62,780,5,41,470,7.6,310,5.0,9.4,7,8.9,4,4.4,2,96.2,2026-02-11',
+  ].join('\n');
+  const pfrDefCsv = [
+    'season,player,pfr_id,tm,age,pos,g,gs,int,tgt,cmp,cmp_percent,yds,yds_cmp,yds_tgt,td,rat,dadot,air,yac,bltz,hrry,qbkd,sk,prss,comb,m_tkl,m_tkl_percent,loaded,bats',
+    '2025,Sample Rusher,RushSa00,NYG,25,LB,17,17,0,8,5,62.5,42,8.4,5.3,0,72.0,2.4,19,23,35,12,16,8.5,45,38,3,7.9,2026-02-11,4',
+  ].join('\n');
+  const ngsReceivingCsv = [
+    'season,season_type,week,player_display_name,player_position,team_abbr,avg_cushion,avg_separation,avg_intended_air_yards,percent_share_of_intended_air_yards,receptions,targets,catch_percentage,yards,rec_touchdowns,avg_yac,avg_expected_yac,avg_yac_above_expectation,player_gsis_id,player_first_name,player_last_name,player_jersey_number,player_short_name',
+    '2025,REG,0,Sample Receiver,WR,NYG,6.2,3.1,10.4,26.5,62,90,68.9,780,5,5.2,4.7,0.5,00-TEST,Sample,Receiver,1,S.Receiver',
+  ].join('\n');
+
+  const index = buildPublicMetricIndex(statsCsv, snapsCsv, {
+    pfrReceivingCsv: pfrRecCsv,
+    pfrDefenseCsv: pfrDefCsv,
+    ngsReceivingCsv,
+  });
+  const receiver = index.byTeamName.get('NYG:samplereceiver');
+  const rusher = index.byTeamName.get('NYG:samplerusher');
+
+  assert.ok(receiver);
+  assert.equal(receiver.position_metrics.targets, 90);
+  assert.equal(receiver.position_metrics.ngs_avg_separation, 3.1);
+  assert.equal(receiver.source_families.has('nflverse_pfr_advstats_rec'), true);
+  assert.equal(receiver.source_families.has('nflverse_nextgen_receiving'), true);
+  assert.equal(receiver.snap_game_ids_2025.size, 2);
+
+  assert.ok(rusher);
+  assert.equal(rusher.position_metrics.pressures, 45);
+  assert.equal(rusher.position_metrics.hurries, 12);
+  assert.equal(rusher.position_metrics.qb_knockdowns, 16);
+  assert.equal(rusher.source_families.has('nflverse_pfr_advstats_def'), true);
 });

@@ -218,6 +218,9 @@ interface PlayerMetricCompleteness {
   roster_derived_count: number;
   snap_count: number;
   production_count: number;
+  strong_scorecard_count: number;
+  directional_scorecard_count: number;
+  gap_scorecard_count: number;
   gap_counts: Record<string, number>;
 }
 
@@ -436,6 +439,7 @@ function renderCurrentNflEvidenceBlock(
     'NFL Intel/context graph is lower-precedence posture context only. Do not use Intel roster narrative to override, replace, or count the current roster/cap file.',
     'Do not say the Giants have only 4 rostered players, or that a NYG cap audit is blocked on ingestion, when the current file below has matching roster and cap coverage.',
     'Rows needing source review are caveats inside the audit, not a reason to reject the whole audit when current roster/cap coverage matches.',
+    'Player Quality Metrics v2 is position-specific evidence, not a universal grade. Cite scorecards before claims like disruptive, coverage liability, separation, run-stopping, or replaceable. Cap hit, roster membership, and snaps alone are not player quality. OL public evidence is continuity/availability only unless a reviewed OL quality source is present.',
     'Coverage matrix status is mandatory readiness context: strong means the current app can support the claim; directional means caveat it; weak/blocked means do not make a strong claim without explicitly limiting the answer.',
     'Visible answer style: translate data-quality labels into front-office language. Say "high confidence", "directional", "needs source review", "one unpriced row", or "priced in the current cap file"; avoid leading with product/schema terms like "Contract Ledger v1", "captured", "derived", "estimated", "source-needed", "row parity", "app rows", or "source status".',
     'Trade-goal answers must run four checks before recommending a move: depth after trading the outgoing player; lower-pain outgoing hierarchy before premium starters; named target/counterparty lanes from the current cap file; and clean caveat logic for negative trade economics.',
@@ -485,7 +489,7 @@ function renderTeamAppEvidence(team: TeamEvidence): string {
     lines.push(`[${team.metricRefIndex}] ANALYST_DATA - ${team.team_id} current NFL player metrics`);
     lines.push(`Player metric rows: ${team.playerMetrics.length}`);
     lines.push(`Player metric coverage: ${formatPlayerMetricCompleteness(playerMetricCompleteness(team.playerMetrics))}`);
-    lines.push(`Top captured player metrics: ${topMetricRows(team.playerMetrics).join(' | ') || 'none'}`);
+    lines.push(`Top position scorecards: ${topMetricRows(team.playerMetrics).join(' | ') || 'none'}`);
   }
   if (team.coverage && team.coverageRefIndex) {
     lines.push(`[${team.coverageRefIndex}] ANALYST_DATA - ${team.team_id} NFL coverage matrix`);
@@ -585,8 +589,8 @@ function metricSourceForTeam(
         { k: 'Team', v: `${team.team_id} - ${team.team.full_name}` },
         { k: 'Metric rows', v: String(team.playerMetrics.length) },
         { k: 'Metric coverage', v: formatPlayerMetricCompleteness(completeness) },
-        { k: 'Top captured metrics', v: topMetricRows(team.playerMetrics).join(' | ') || 'None' },
-        { k: 'Metric precedence', v: 'Use captured public snap/stat rows for player-quality claims; caveat rows with no 2025 public sample.' },
+        { k: 'Top position scorecards', v: topMetricRows(team.playerMetrics).join(' | ') || 'None' },
+        { k: 'Metric precedence', v: 'Use position scorecards for player-quality claims. Do not treat cap hit, roster membership, or snaps alone as quality. OL rows are continuity/availability only unless a reviewed public OL quality source is present.' },
       ],
       current_nfl_evidence: {
         dataset_id: 'nfl_player_metrics_current',
@@ -1650,6 +1654,9 @@ function playerMetricCompleteness(rows: NflPlayerMetricRow[]): PlayerMetricCompl
       row.interceptions_2025,
       row.touchdowns_2025,
     ].some((value) => value != null && value !== 0)).length,
+    strong_scorecard_count: rows.filter((row) => row.metric_coverage_level === 'strong').length,
+    directional_scorecard_count: rows.filter((row) => row.metric_coverage_level === 'directional').length,
+    gap_scorecard_count: rows.filter((row) => row.metric_coverage_level === 'gap').length,
     gap_counts: gapCounts,
   };
 }
@@ -1663,6 +1670,9 @@ function formatPlayerMetricCompleteness(completeness: PlayerMetricCompleteness):
     .join(', ');
   return [
     `captured_public_metrics=${completeness.captured_count}/${denominator}`,
+    `strong_position_scorecards=${completeness.strong_scorecard_count}/${denominator}`,
+    `directional_scorecards=${completeness.directional_scorecard_count}/${denominator}`,
+    `scorecard_gaps=${completeness.gap_scorecard_count}/${denominator}`,
     `snap_rows=${completeness.snap_count}/${denominator}`,
     `production_rows=${completeness.production_count}/${denominator}`,
     `needs_metric_context=${completeness.source_needed_count}/${denominator}`,
@@ -1686,7 +1696,10 @@ function topMetricRows(rows: NflPlayerMetricRow[], limit = 8): string[] {
         row.interceptions_2025 ? `int=${row.interceptions_2025}` : null,
         row.touchdowns_2025 ? `td=${row.touchdowns_2025}` : null,
       ].filter(Boolean).join(', ');
-      return `${row.player_name} (${row.position ?? 'UNK'}; snaps=${row.snaps_2025 ?? 0}; games=${row.games_2025 ?? 'unknown'}; ${production || 'production=n/a'}; source=${row.metric_source_family ?? 'public metrics'})`;
+      const scorecard = row.position_metric_summary ? `scorecard=${row.position_metric_summary}` : 'scorecard=not captured';
+      const families = (row.metric_families ?? []).length ? row.metric_families?.join('+') : row.metric_source_family;
+      const flags = (row.quality_flags ?? []).length ? `; flags=${row.quality_flags?.join(',')}` : '';
+      return `${row.player_name} (${row.position ?? 'UNK'}; coverage=${row.metric_coverage_level ?? 'directional'}; snaps=${row.snaps_2025 ?? 0}; games=${row.games_2025 ?? 'unknown'}; ${production || 'production=n/a'}; ${scorecard}; source=${families ?? 'public metrics'}${flags})`;
     });
 }
 

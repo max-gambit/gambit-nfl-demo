@@ -209,6 +209,10 @@ function playerMetricsCoverage(rosterRows: NflRosterEntry[], metricRows: NflPlay
   const statuses = metricRows.map((row) => row.source_status ?? 'roster-derived');
   const captured = statuses.filter((status) => status === 'captured').length;
   const sourceNeeded = metricRows.filter((row) => row.source_status === 'source-needed');
+  const contributors = metricRows.filter(isMetricContributor);
+  const strongScorecards = contributors.filter((row) => row.metric_coverage_level === 'strong');
+  const directionalScorecards = contributors.filter((row) => row.metric_coverage_level === 'directional');
+  const gapContributors = contributors.filter((row) => row.metric_coverage_level === 'gap' || row.source_status === 'source-needed');
   if (metricRows.length === 0) {
     gaps.push(gap('metrics_missing', 'Player metrics missing', 'blocked', 'No player metric rows are loaded for this team.'));
   }
@@ -223,16 +227,36 @@ function playerMetricsCoverage(rosterRows: NflRosterEntry[], metricRows: NflPlay
       'metric_rows_need_context',
       'Some player metrics need context',
       'directional',
-      `${captured}/${metricRows.length} rows have captured public 2025 snap/stat metrics; ${sourceNeeded.length} rows are rookies, no-snap/offseason bodies, or unmatched public rows.`,
+      `${captured}/${metricRows.length} rows have captured public 2025 scorecard/snap metrics; ${sourceNeeded.length} rows are rookies, no-snap/offseason bodies, or unmatched public rows.`,
       sourceNeeded.length,
       sourceNeeded.map((row) => row.player_name).slice(0, 8),
+    ));
+  }
+  if (gapContributors.length > 0) {
+    gaps.push(gap(
+      'contributor_metric_gaps',
+      'Contributor metric gaps',
+      'weak',
+      `${gapContributors.length}/${Math.max(contributors.length, 1)} likely contributors lack source-backed public player-quality scorecards.`,
+      gapContributors.length,
+      gapContributors.map((row) => row.player_name).slice(0, 8),
+    ));
+  }
+  if (directionalScorecards.length > 0) {
+    gaps.push(gap(
+      'directional_position_scorecards',
+      'Directional position scorecards',
+      'directional',
+      `${directionalScorecards.length}/${Math.max(contributors.length, 1)} likely contributors are usage/continuity-only, most often offensive linemen or limited-sample rows.`,
+      directionalScorecards.length,
+      directionalScorecards.map((row) => row.player_name).slice(0, 8),
     ));
   }
   const status: NflCoverageStatus = gaps.some((item) => item.severity === 'blocked')
     ? 'blocked'
     : gaps.some((item) => item.severity === 'weak')
       ? 'weak'
-      : captured === metricRows.length && metricRows.length > 0
+      : contributors.length > 0 && strongScorecards.length === contributors.length
         ? 'strong'
         : 'directional';
   return domain(
@@ -241,9 +265,9 @@ function playerMetricsCoverage(rosterRows: NflRosterEntry[], metricRows: NflPlay
     metricRows.length,
     statuses.filter((item) => item === 'source-needed').length,
     gaps,
-    captured === metricRows.length
-      ? 'Captured public player metric feed is loaded for every current roster row.'
-      : `${captured}/${metricRows.length} rows have captured public 2025 snap/stat metrics; player-quality claims should cite captured rows and caveat no-sample rows.`,
+    contributors.length > 0
+      ? `${strongScorecards.length}/${contributors.length} likely contributors have strong public position scorecards; ${directionalScorecards.length} are directional and ${gapContributors.length} need player-quality source context.`
+      : `${captured}/${metricRows.length} rows have captured public 2025 scorecard/snap metrics; player-quality claims should cite captured rows and caveat no-sample rows.`,
   );
 }
 
@@ -327,9 +351,12 @@ function buildPositionGroups(
     if (!rosterCapParity.matches) topGaps.push(gap(`${group}_parity`, `${group} roster/cap mismatch`, 'weak', rosterCapParity.detail, rosterCapParity.affected_count, rosterCapParity.affected_players));
     if (!metricParity.matches) topGaps.push(gap(`${group}_metric_parity`, `${group} metric mismatch`, 'weak', metricParity.detail, metricParity.affected_count, metricParity.affected_players));
     if (cap.length > 0 && contractCount / cap.length < 0.95) topGaps.push(gap(`${group}_contract_fields`, `${group} contract fields directional`, 'directional', `${contractCount}/${cap.length} rows have core contract fields.`));
-    if (metricStatus !== 'captured') {
-      const capturedMetrics = metrics.filter((row) => row.source_status === 'captured').length;
-      topGaps.push(gap(`${group}_metrics_directional`, `${group} metrics directional`, 'directional', `${capturedMetrics}/${metrics.length} rows have captured public 2025 snap/stat metrics.`));
+    const metricScorecardStatus = metricScorecardStatusForRows(metrics);
+    if (metricScorecardStatus !== 'strong') {
+      const contributors = metrics.filter(isMetricContributor);
+      const sample = contributors.length > 0 ? contributors : metrics;
+      const strongScorecards = sample.filter((row) => row.metric_coverage_level === 'strong').length;
+      topGaps.push(gap(`${group}_metrics_directional`, `${group} metrics directional`, metricScorecardStatus, `${strongScorecards}/${Math.max(sample.length, 1)} ${contributors.length > 0 ? 'likely contributors' : 'rows'} have source-backed public position scorecards.`));
     }
     if (sellerStatus !== 'strong') topGaps.push(gap(`${group}_seller_thesis`, `${group} seller thesis limited`, sellerStatus, 'Seller-thesis coverage is not strong for this group.'));
     return {
@@ -339,7 +366,7 @@ function buildPositionGroups(
         rosterCapParity.matches ? 'strong' : 'weak',
         metricParity.matches ? 'strong' : 'weak',
         cap.length > 0 && contractCount / cap.length >= 0.95 ? 'strong' : 'directional',
-        metricStatus === 'captured' ? 'strong' : 'directional',
+        metricScorecardStatus,
       ]),
       roster_count: roster.length,
       cap_row_count: cap.length,
@@ -379,7 +406,7 @@ function buildReadiness(domains: NflCoverageDomainSummary[]): NflCoverageQuestio
     readiness('cut_restructure', 'Cut/restructure mechanics', ['cap_contracts', 'rules'], 'Supports player-specific cap levers with NFL rules caveats.'),
     readiness('trade_outgoing', 'Outgoing trade screen', ['roster', 'cap_contracts'], 'Supports salary-out and depth-after-trade checks.'),
     readiness('seller_trade', 'Seller trade thesis', ['cap_contracts', 'intel', 'seller_thesis'], 'Supports counterparty seller reasoning only where graph-backed seller theses exist.'),
-    readiness('player_quality', 'Player-quality evaluation', ['player_metrics'], 'Directional only until captured performance/snap sources are loaded.'),
+    readiness('player_quality', 'Player-quality evaluation', ['player_metrics'], 'Supports position-specific public scorecards where loaded; OL remains continuity-only unless a reviewed OL quality source exists.'),
     readiness('rules_question', 'NFL rules question', ['rules'], 'Supports loaded NFL transaction-rule families.'),
   ];
 }
@@ -548,6 +575,24 @@ function metricSourceStatus(rows: NflPlayerMetricRow[]): NflCoveragePositionGrou
   const statuses = new Set(rows.map((row) => row.source_status ?? 'roster-derived'));
   if (statuses.size === 1) return [...statuses][0] as NflCoveragePositionGroupSummary['metric_source_status'];
   return 'mixed';
+}
+
+function metricScorecardStatusForRows(rows: NflPlayerMetricRow[]): NflCoverageStatus {
+  const contributors = rows.filter(isMetricContributor);
+  const sample = contributors.length > 0 ? contributors : rows;
+  if (sample.length === 0) return 'weak';
+  const strong = sample.filter((row) => row.metric_coverage_level === 'strong').length;
+  const gaps = sample.filter((row) => row.metric_coverage_level === 'gap' || row.source_status === 'source-needed').length;
+  if (gaps > 0 && contributors.length > 0) return 'weak';
+  if (strong === sample.length) return 'strong';
+  return 'directional';
+}
+
+function isMetricContributor(row: NflPlayerMetricRow): boolean {
+  return (row.snaps_2025 ?? 0) >= 250
+    || (row.starts_2025 ?? 0) >= 4
+    || (row.games_2025 ?? 0) >= 10
+    || ['core_or_high_cap', 'rotation_or_specialist'].includes(row.role);
 }
 
 export function normalizePositionGroup(position: string | null | undefined): string {

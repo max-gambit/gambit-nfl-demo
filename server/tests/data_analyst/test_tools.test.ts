@@ -139,7 +139,7 @@ test('data analyst NFL tool supports Giants cut restructure tag prompt evidence 
     teams: Array<{ team_id: string; readiness: Array<{ key: string; status: string }> }>;
   };
   assert.equal(coverage.teams[0]?.team_id, 'NYG');
-  assert.equal(coverage.teams[0]?.readiness.some((item) => item.key === 'player_quality' && item.status === 'directional'), true);
+  assert.equal(coverage.teams[0]?.readiness.some((item) => item.key === 'player_quality' && item.status === 'weak'), true);
   const capRows = (result.data.cap_sheets as { rows: Array<{ player_name: string; restructure_savings_estimate_2026: number | null; tag_eligible_2027: boolean }> }).rows;
   assert.ok(capRows.some((row) => row.player_name === 'Andrew Thomas' && typeof row.restructure_savings_estimate_2026 === 'number'));
   assert.ok(capRows.some((row) => row.tag_eligible_2027));

@@ -105,6 +105,12 @@ export interface NflPlayerMetricRow {
   metric_note: string;
   metric_source_family?: string | null;
   metric_gap_reason?: string | null;
+  metric_coverage_level?: 'strong' | 'directional' | 'gap';
+  metric_confidence?: 'captured' | 'derived' | 'source-needed';
+  metric_families?: string[];
+  position_metric_summary?: string | null;
+  position_metrics?: Record<string, unknown>;
+  quality_flags?: string[];
   source_url: string | null;
   source_status?: 'captured' | 'roster-derived' | 'source-needed';
   source_data?: Record<string, unknown>;
@@ -387,6 +393,12 @@ export async function seedNflDemoData(seed: NflDemoSeed): Promise<NflDemoSummary
     metric_note: row.metric_note,
     metric_source_family: row.metric_source_family ?? null,
     metric_gap_reason: row.metric_gap_reason ?? null,
+    metric_coverage_level: row.metric_coverage_level ?? (row.source_status === 'captured' ? 'directional' : 'gap'),
+    metric_confidence: row.metric_confidence ?? (row.source_status === 'captured' ? 'derived' : 'source-needed'),
+    metric_families: row.metric_families ?? (row.metric_source_family ? row.metric_source_family.split('+') : []),
+    position_metric_summary: row.position_metric_summary ?? null,
+    position_metrics: objectRecord(row.position_metrics),
+    quality_flags: row.quality_flags ?? [],
     source_url: row.source_url,
     source_status: row.source_status ?? 'roster-derived',
     source_data: row,
@@ -610,9 +622,15 @@ function capSalaryCellsFromPlayerRows(
 async function loadCurrentNflDataFromDb(): Promise<NflDemoSeed> {
   const [teamRows, rosterRowsRaw, capRowsRaw, metricRowsRaw] = await Promise.all([
     fetchAllRows('nfl_teams', [{ column: 'team_id' }]),
-    fetchAllRows('nfl_current_roster_entries', [{ column: 'team_id' }, { column: 'source_order' }]),
-    fetchAllRows('nfl_current_cap_sheet_player_rows', [{ column: 'team_id' }, { column: 'source_order' }]),
-    fetchAllRows('nfl_current_player_metric_rows', [{ column: 'team_id' }, { column: 'player_name' }]),
+    fetchAllRows('nfl_current_roster_entries', [{ column: 'team_id' }, { column: 'source_order' }], {
+      selectColumns: NFL_CURRENT_ROSTER_ENTRY_SELECT,
+    }),
+    fetchAllRows('nfl_current_cap_sheet_player_rows', [{ column: 'team_id' }, { column: 'source_order' }], {
+      selectColumns: NFL_CURRENT_CAP_PLAYER_SELECT,
+    }),
+    fetchAllRows('nfl_current_player_metric_rows', [{ column: 'team_id' }, { column: 'player_name' }], {
+      selectColumns: NFL_CURRENT_PLAYER_METRIC_SELECT,
+    }),
   ]);
   const rosterRows = rosterRowsRaw as CurrentNflRosterEntryRow[];
   if (rosterRows.length === 0) throw new Error('no current NFL roster rows found in Supabase current views');
@@ -637,12 +655,14 @@ async function loadCurrentNflDataFromDb(): Promise<NflDemoSeed> {
 async function fetchAllRows(
   table: string,
   orderBy: Array<{ column: string; ascending?: boolean }>,
-  pageSize = 1000,
+  options: { pageSize?: number; selectColumns?: string } = {},
 ): Promise<unknown[]> {
   const { db } = await import('../db/client.js');
   const rows: unknown[] = [];
+  const pageSize = options.pageSize ?? 1000;
+  const selectColumns = options.selectColumns ?? '*';
   for (let offset = 0; ; offset += pageSize) {
-    let query = db.from(table).select('*') as any;
+    let query = db.from(table).select(selectColumns) as any;
     for (const order of orderBy) {
       query = query.order(order.column, { ascending: order.ascending ?? true });
     }
@@ -653,6 +673,138 @@ async function fetchAllRows(
     if (page.length < pageSize) return rows;
   }
 }
+
+const NFL_CURRENT_ROSTER_ENTRY_SELECT = [
+  'snapshot_id',
+  'season',
+  'as_of_date',
+  'source_name',
+  'source_url',
+  'retrieved_at',
+  'snapshot_team_count',
+  'snapshot_player_count',
+  'snapshot_notes',
+  'snapshot_source_meta',
+  'team_id',
+  'abbreviation',
+  'full_name',
+  'conference',
+  'division',
+  'official_roster_count',
+  'player_id',
+  'player_name',
+  'source_order',
+  'jersey_number',
+  'position',
+  'age',
+  'roster_status',
+  'contract_status',
+  'height_inches',
+  'weight_lbs',
+  'experience',
+  'college',
+  'player_source_url',
+  'entry_source_url',
+  'source_note',
+].join(',');
+
+const NFL_CURRENT_CAP_PLAYER_SELECT = [
+  'snapshot_id',
+  'season',
+  'as_of_date',
+  'source_name',
+  'snapshot_source_url',
+  'retrieved_at',
+  'snapshot_team_count',
+  'snapshot_player_count',
+  'snapshot_notes',
+  'snapshot_source_meta',
+  'team_id',
+  'abbreviation',
+  'full_name',
+  'conference',
+  'division',
+  'id',
+  'player_id',
+  'player_name',
+  'source_order',
+  'position',
+  'cap_number_2026',
+  'cash_due_2026',
+  'total_value_remaining',
+  'years_remaining',
+  'contract_end_year',
+  'contract_years_remaining',
+  'void_year_count',
+  'void_years_source_status',
+  'guaranteed_remaining',
+  'dead_money_if_cut_2026',
+  'cut_savings_2026',
+  'post_june_1_dead_money_2026',
+  'post_june_1_cut_savings_2026',
+  'trade_dead_money_2026',
+  'trade_savings_2026',
+  'post_june_1_trade_dead_money_2026',
+  'post_june_1_trade_savings_2026',
+  'restructure_savings_estimate_2026',
+  'extension_savings_estimate_2026',
+  'contract_ledger_status',
+  'contract_ledger_confidence',
+  'tag_eligible_2027',
+  'contract_lever',
+  'source_url',
+  'source_status',
+].join(',');
+
+const NFL_CURRENT_PLAYER_METRIC_SELECT = [
+  'snapshot_id',
+  'season',
+  'as_of_date',
+  'source_name',
+  'snapshot_source_url',
+  'retrieved_at',
+  'snapshot_team_count',
+  'snapshot_row_count',
+  'snapshot_notes',
+  'snapshot_source_meta',
+  'team_id',
+  'abbreviation',
+  'full_name',
+  'conference',
+  'division',
+  'player_id',
+  'player_name',
+  'position',
+  'snaps_2025',
+  'offense_snaps_2025',
+  'defense_snaps_2025',
+  'special_teams_snaps_2025',
+  'snap_share_2025',
+  'games_2025',
+  'starts_2025',
+  'passing_yards_2025',
+  'rushing_yards_2025',
+  'receiving_yards_2025',
+  'scrimmage_yards_2025',
+  'tackles_2025',
+  'sacks_2025',
+  'interceptions_2025',
+  'touchdowns_2025',
+  'availability_risk',
+  'role',
+  'value_tier',
+  'metric_note',
+  'metric_source_family',
+  'metric_gap_reason',
+  'source_url',
+  'source_status',
+  'metric_coverage_level',
+  'metric_confidence',
+  'metric_families',
+  'position_metric_summary',
+  'position_metrics',
+  'quality_flags',
+].join(',');
 
 function dbRosterRowToSeed(row: CurrentNflRosterEntryRow): NflRosterEntry {
   return {
@@ -742,6 +894,12 @@ function dbMetricRowToSeed(row: CurrentNflMetricRow): NflPlayerMetricRow {
     metric_note: row.metric_note,
     metric_source_family: row.metric_source_family,
     metric_gap_reason: row.metric_gap_reason,
+    metric_coverage_level: row.metric_coverage_level,
+    metric_confidence: row.metric_confidence,
+    metric_families: arrayOfStrings(row.metric_families),
+    position_metric_summary: row.position_metric_summary,
+    position_metrics: objectRecord(row.position_metrics),
+    quality_flags: arrayOfStrings(row.quality_flags),
     source_url: row.source_url,
     source_status: row.source_status,
     source_data: objectRecord(row.source_data),
@@ -764,9 +922,17 @@ interface CurrentNflCapRow extends NflCapRow {
   source_order: number;
 }
 
-interface CurrentNflMetricRow extends Omit<NflPlayerMetricRow, 'source_data'> {
+interface CurrentNflMetricRow extends Omit<NflPlayerMetricRow, 'source_data' | 'metric_families' | 'position_metrics' | 'quality_flags'> {
   source_status: 'captured' | 'roster-derived' | 'source-needed';
+  metric_families: unknown;
+  position_metrics: unknown;
+  quality_flags: unknown;
   source_data: unknown;
+}
+
+function arrayOfStrings(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is string => typeof item === 'string');
 }
 
 async function insertChunks(table: string, rows: Record<string, unknown>[], size = 250) {

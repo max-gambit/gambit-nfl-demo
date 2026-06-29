@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gunzipSync } from 'node:zlib';
 import {
   DEFAULT_NFL_DEMO_SEED_PATH,
   type NflCapRow,
@@ -21,6 +22,13 @@ const DEFAULT_NFL_CONTRACT_LEDGER_REPORT_PATH = fileURLToPath(
 );
 const NFLVERSE_STATS_PLAYER_2025_URL = 'https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_reg_2025.csv';
 const NFLVERSE_SNAP_COUNTS_2025_URL = 'https://github.com/nflverse/nflverse-data/releases/download/snap_counts/snap_counts_2025.csv';
+const NFLVERSE_PFR_ADV_DEF_2025_URL = 'https://github.com/nflverse/nflverse-data/releases/download/pfr_advstats/advstats_season_def.csv';
+const NFLVERSE_PFR_ADV_PASS_2025_URL = 'https://github.com/nflverse/nflverse-data/releases/download/pfr_advstats/advstats_season_pass.csv';
+const NFLVERSE_PFR_ADV_REC_2025_URL = 'https://github.com/nflverse/nflverse-data/releases/download/pfr_advstats/advstats_season_rec.csv';
+const NFLVERSE_PFR_ADV_RUSH_2025_URL = 'https://github.com/nflverse/nflverse-data/releases/download/pfr_advstats/advstats_season_rush.csv';
+const NFLVERSE_NGS_PASSING_2025_URL = 'https://github.com/nflverse/nflverse-data/releases/download/nextgen_stats/ngs_passing.csv.gz';
+const NFLVERSE_NGS_RECEIVING_2025_URL = 'https://github.com/nflverse/nflverse-data/releases/download/nextgen_stats/ngs_receiving.csv.gz';
+const NFLVERSE_NGS_RUSHING_2025_URL = 'https://github.com/nflverse/nflverse-data/releases/download/nextgen_stats/ngs_rushing.csv.gz';
 
 interface TeamConfig extends NflDemoTeam {
   nfl_slug: string;
@@ -143,6 +151,11 @@ interface PublicMetricAggregate {
   offense_snaps_2025: number;
   defense_snaps_2025: number;
   special_teams_snaps_2025: number;
+  snap_game_ids_2025: Set<string>;
+  offense_snap_game_ids_2025: Set<string>;
+  defense_snap_game_ids_2025: Set<string>;
+  special_teams_snap_game_ids_2025: Set<string>;
+  near_full_snap_game_ids_2025: Set<string>;
   snap_share_samples: number[];
   games_2025: number | null;
   starts_2025: number | null;
@@ -156,6 +169,8 @@ interface PublicMetricAggregate {
   touchdowns_2025: number | null;
   source_families: Set<string>;
   source_urls: Set<string>;
+  position_metrics: Record<string, number>;
+  quality_flags: Set<string>;
   source_rows: Record<string, unknown>[];
 }
 
@@ -163,6 +178,16 @@ interface PublicMetricIndex {
   byTeamName: Map<string, PublicMetricAggregate>;
   byName: Map<string, PublicMetricAggregate[]>;
   fixture: Record<string, unknown>;
+}
+
+interface PublicMetricExtraCsvs {
+  pfrDefenseCsv?: string;
+  pfrPassingCsv?: string;
+  pfrReceivingCsv?: string;
+  pfrRushingCsv?: string;
+  ngsPassingCsv?: string;
+  ngsReceivingCsv?: string;
+  ngsRushingCsv?: string;
 }
 
 async function main() {
@@ -315,7 +340,8 @@ async function main() {
       'Cap rows are joined from OverTheCap team salary-cap pages where names match the official roster row.',
       'Contract Ledger v1 captures 2026 cap mechanics, future-year contract rows, post-June-1/trade/restructure/extension values, void-year indicators, and confidence flags from team salary-cap pages.',
       'Every roster player has a cap row; unmatched low-cap/offseason rows are marked estimated with confidence flags, while unresolved rows stay source-needed.',
-      'Player metric rows join public nflverse 2025 snap counts and player stats where a reviewed name/team or unique-name match exists; rookies and no-snap offseason bodies keep explicit gap reasons.',
+      'Player metric rows join public nflverse 2025 snap counts, player stats, PFR advanced stat releases, and Next Gen Stats releases where a reviewed name/team or unique-name match exists; rookies and no-snap offseason bodies keep explicit gap reasons.',
+      'Player Quality Metrics v2 exposes position scorecards from public data; offensive-line quality remains limited to snaps/starts/continuity until a reviewed public OL quality source is added.',
     ],
     teams,
     roster_entries: rosterEntries,
@@ -326,6 +352,8 @@ async function main() {
       { id: 'overthecap_contract_ledger_v1', name: 'OverTheCap team salary-cap pages - Contract Ledger v1', url: 'https://overthecap.com/salary-cap/' },
       { id: 'nflverse_snap_counts_2025', name: 'nflverse snap_counts 2025 regular season release', url: NFLVERSE_SNAP_COUNTS_2025_URL },
       { id: 'nflverse_stats_player_2025', name: 'nflverse stats_player 2025 regular season release', url: NFLVERSE_STATS_PLAYER_2025_URL },
+      { id: 'nflverse_pfr_advstats_2025', name: 'nflverse PFR advanced stats season releases', url: 'https://github.com/nflverse/nflverse-data/releases/tag/pfr_advstats' },
+      { id: 'nflverse_nextgen_stats_2025', name: 'nflverse Next Gen Stats season releases', url: 'https://github.com/nflverse/nflverse-data/releases/tag/nextgen_stats' },
     ],
   };
 
@@ -342,11 +370,36 @@ async function main() {
 
 async function loadPublicMetricIndex(): Promise<PublicMetricIndex> {
   try {
-    const [statsCsv, snapCsv] = await Promise.all([
+    const [
+      statsCsv,
+      snapCsv,
+      pfrDefenseCsv,
+      pfrPassingCsv,
+      pfrReceivingCsv,
+      pfrRushingCsv,
+      ngsPassingCsv,
+      ngsReceivingCsv,
+      ngsRushingCsv,
+    ] = await Promise.all([
       fetchText(NFLVERSE_STATS_PLAYER_2025_URL),
       fetchText(NFLVERSE_SNAP_COUNTS_2025_URL),
+      fetchText(NFLVERSE_PFR_ADV_DEF_2025_URL),
+      fetchText(NFLVERSE_PFR_ADV_PASS_2025_URL),
+      fetchText(NFLVERSE_PFR_ADV_REC_2025_URL),
+      fetchText(NFLVERSE_PFR_ADV_RUSH_2025_URL),
+      fetchText(NFLVERSE_NGS_PASSING_2025_URL),
+      fetchText(NFLVERSE_NGS_RECEIVING_2025_URL),
+      fetchText(NFLVERSE_NGS_RUSHING_2025_URL),
     ]);
-    return buildPublicMetricIndex(statsCsv, snapCsv);
+    return buildPublicMetricIndex(statsCsv, snapCsv, {
+      pfrDefenseCsv,
+      pfrPassingCsv,
+      pfrReceivingCsv,
+      pfrRushingCsv,
+      ngsPassingCsv,
+      ngsReceivingCsv,
+      ngsRushingCsv,
+    });
   } catch (error) {
     const existingFixture = await readExistingMetricFixture();
     if (existingFixture) return existingFixture;
@@ -354,21 +407,35 @@ async function loadPublicMetricIndex(): Promise<PublicMetricIndex> {
   }
 }
 
-export function buildPublicMetricIndex(statsPlayerCsv: string, snapCountsCsv: string): PublicMetricIndex {
+export function buildPublicMetricIndex(
+  statsPlayerCsv: string,
+  snapCountsCsv: string,
+  extra: PublicMetricExtraCsvs = {},
+): PublicMetricIndex {
   const aggregates = new Map<string, PublicMetricAggregate>();
   const byName = new Map<string, PublicMetricAggregate[]>();
   const byTeamName = new Map<string, PublicMetricAggregate>();
 
   for (const row of parseCsvRecords(snapCountsCsv)) {
+    if (!isRegularSeasonSnapCountRow(row)) continue;
     const teamId = normalizeMetricTeam(String(row.team ?? ''));
     const playerName = String(row.player ?? '').trim();
     if (!teamId || !playerName) continue;
     const aggregate = metricAggregate(aggregates, byTeamName, byName, teamId, playerName, String(row.position ?? '') || null);
-    aggregate.offense_snaps_2025 += integer(row.offense_snaps) ?? 0;
-    aggregate.defense_snaps_2025 += integer(row.defense_snaps) ?? 0;
-    aggregate.special_teams_snaps_2025 += integer(row.st_snaps) ?? 0;
+    const offenseSnaps = integer(row.offense_snaps) ?? 0;
+    const defenseSnaps = integer(row.defense_snaps) ?? 0;
+    const specialTeamsSnaps = integer(row.st_snaps) ?? 0;
+    aggregate.offense_snaps_2025 += offenseSnaps;
+    aggregate.defense_snaps_2025 += defenseSnaps;
+    aggregate.special_teams_snaps_2025 += specialTeamsSnaps;
+    const gameId = String(row.game_id ?? row.pfr_game_id ?? '').trim();
+    if (gameId && offenseSnaps + defenseSnaps + specialTeamsSnaps > 0) aggregate.snap_game_ids_2025.add(gameId);
+    if (gameId && offenseSnaps > 0) aggregate.offense_snap_game_ids_2025.add(gameId);
+    if (gameId && defenseSnaps > 0) aggregate.defense_snap_game_ids_2025.add(gameId);
+    if (gameId && specialTeamsSnaps > 0) aggregate.special_teams_snap_game_ids_2025.add(gameId);
     const share = primarySnapShare(row, aggregate.position);
     if (share != null) aggregate.snap_share_samples.push(share);
+    if (gameId && (share ?? 0) >= 0.8) aggregate.near_full_snap_game_ids_2025.add(gameId);
     aggregate.source_families.add('nflverse_snap_counts');
     aggregate.source_urls.add(NFLVERSE_SNAP_COUNTS_2025_URL);
   }
@@ -397,6 +464,178 @@ export function buildPublicMetricIndex(statsPlayerCsv: string, snapCountsCsv: st
     aggregate.source_urls.add(NFLVERSE_STATS_PLAYER_2025_URL);
   }
 
+  for (const row of parseCsvRecords(extra.pfrDefenseCsv ?? '')) {
+    if (String(row.season ?? '') !== '2025') continue;
+    const teamId = normalizeMetricTeam(String(row.tm ?? ''));
+    const playerName = String(row.player ?? '').trim();
+    if (!teamId || !playerName) continue;
+    const aggregate = metricAggregate(aggregates, byTeamName, byName, teamId, playerName, String(row.pos ?? '') || null);
+    aggregate.games_2025 = Math.max(aggregate.games_2025 ?? 0, integer(row.g) ?? 0);
+    aggregate.starts_2025 = Math.max(aggregate.starts_2025 ?? 0, integer(row.gs) ?? 0);
+    addMetricFamily(aggregate, 'nflverse_pfr_advstats_def', NFLVERSE_PFR_ADV_DEF_2025_URL, {
+      coverage_targets: integer(row.tgt),
+      coverage_completions: integer(row.cmp),
+      coverage_completion_pct: number(row.cmp_percent),
+      coverage_yards: integer(row.yds),
+      coverage_yards_per_target: number(row.yds_tgt),
+      coverage_touchdowns: integer(row.td),
+      coverage_rating_allowed: number(row.rat),
+      avg_depth_of_target_allowed: number(row.dadot),
+      coverage_air_yards: integer(row.air),
+      coverage_yac: integer(row.yac),
+      blitzes: integer(row.bltz),
+      hurries: integer(row.hrry),
+      qb_knockdowns: integer(row.qbkd),
+      pressures: integer(row.prss),
+      missed_tackles: integer(row.m_tkl),
+      missed_tackle_pct: number(row.m_tkl_percent),
+      passes_batted: integer(row.bats),
+    });
+  }
+
+  for (const row of parseCsvRecords(extra.pfrPassingCsv ?? '')) {
+    if (String(row.season ?? '') !== '2025') continue;
+    const teamId = normalizeMetricTeam(String(row.team ?? ''));
+    const playerName = String(row.player ?? '').trim();
+    if (!teamId || !playerName) continue;
+    const aggregate = metricAggregate(aggregates, byTeamName, byName, teamId, playerName, 'QB');
+    addMetricFamily(aggregate, 'nflverse_pfr_advstats_pass', NFLVERSE_PFR_ADV_PASS_2025_URL, {
+      pass_attempts: integer(row.pass_attempts),
+      throwaways: integer(row.throwaways),
+      drops_on_passes: integer(row.drops),
+      drop_pct_on_passes: number(row.drop_pct),
+      bad_throws: integer(row.bad_throws),
+      bad_throw_pct: number(row.bad_throw_pct),
+      pocket_time: number(row.pocket_time),
+      times_blitzed: integer(row.times_blitzed),
+      times_hurried: integer(row.times_hurried),
+      times_hit: integer(row.times_hit),
+      times_pressured: integer(row.times_pressured),
+      pressure_pct: number(row.pressure_pct),
+      batted_balls: integer(row.batted_balls),
+      on_target_throws: integer(row.on_tgt_throws),
+      on_target_pct: number(row.on_tgt_pct),
+      intended_air_yards: integer(row.intended_air_yards),
+      intended_air_yards_per_attempt: number(row.intended_air_yards_per_pass_attempt),
+      completed_air_yards: integer(row.completed_air_yards),
+      pass_yards_after_catch: integer(row.pass_yards_after_catch),
+      scrambles: integer(row.scrambles),
+    });
+  }
+
+  for (const row of parseCsvRecords(extra.pfrReceivingCsv ?? '')) {
+    if (String(row.season ?? '') !== '2025') continue;
+    const teamId = normalizeMetricTeam(String(row.tm ?? ''));
+    const playerName = String(row.player ?? '').trim();
+    if (!teamId || !playerName) continue;
+    const aggregate = metricAggregate(aggregates, byTeamName, byName, teamId, playerName, String(row.pos ?? '') || null);
+    aggregate.games_2025 = Math.max(aggregate.games_2025 ?? 0, integer(row.g) ?? 0);
+    aggregate.starts_2025 = Math.max(aggregate.starts_2025 ?? 0, integer(row.gs) ?? 0);
+    addMetricFamily(aggregate, 'nflverse_pfr_advstats_rec', NFLVERSE_PFR_ADV_REC_2025_URL, {
+      targets: integer(row.tgt),
+      receptions: integer(row.rec),
+      receiving_yards: integer(row.yds),
+      receiving_touchdowns: integer(row.td),
+      receiving_first_downs: integer(row.x1d),
+      yards_before_catch: integer(row.ybc),
+      yards_before_catch_per_reception: number(row.ybc_r),
+      yards_after_catch: integer(row.yac),
+      yards_after_catch_per_reception: number(row.yac_r),
+      average_depth_of_target: number(row.adot),
+      broken_tackles: integer(row.brk_tkl),
+      receptions_per_broken_tackle: number(row.rec_br),
+      drops: integer(row.drop),
+      drop_pct: number(row.drop_percent),
+      interceptions_on_targets: integer(row.int),
+      receiver_rating: number(row.rat),
+    });
+  }
+
+  for (const row of parseCsvRecords(extra.pfrRushingCsv ?? '')) {
+    if (String(row.season ?? '') !== '2025') continue;
+    const teamId = normalizeMetricTeam(String(row.tm ?? ''));
+    const playerName = String(row.player ?? '').trim();
+    if (!teamId || !playerName) continue;
+    const aggregate = metricAggregate(aggregates, byTeamName, byName, teamId, playerName, String(row.pos ?? '') || null);
+    aggregate.games_2025 = Math.max(aggregate.games_2025 ?? 0, integer(row.g) ?? 0);
+    aggregate.starts_2025 = Math.max(aggregate.starts_2025 ?? 0, integer(row.gs) ?? 0);
+    addMetricFamily(aggregate, 'nflverse_pfr_advstats_rush', NFLVERSE_PFR_ADV_RUSH_2025_URL, {
+      rushing_attempts: integer(row.att),
+      rushing_yards: integer(row.yds),
+      rushing_touchdowns: integer(row.td),
+      rushing_first_downs: integer(row.x1d),
+      rushing_yards_before_contact: integer(row.ybc),
+      rushing_yards_before_contact_per_attempt: number(row.ybc_att),
+      rushing_yards_after_contact: integer(row.yac),
+      rushing_yards_after_contact_per_attempt: number(row.yac_att),
+      rushing_broken_tackles: integer(row.brk_tkl),
+      rushing_attempts_per_broken_tackle: number(row.att_br),
+    });
+  }
+
+  for (const row of parseCsvRecords(extra.ngsPassingCsv ?? '')) {
+    if (!isNgsSeasonRow(row)) continue;
+    const teamId = normalizeMetricTeam(String(row.team_abbr ?? ''));
+    const playerName = String(row.player_display_name ?? '').trim();
+    if (!teamId || !playerName) continue;
+    const aggregate = metricAggregate(aggregates, byTeamName, byName, teamId, playerName, 'QB');
+    addMetricFamily(aggregate, 'nflverse_nextgen_passing', NFLVERSE_NGS_PASSING_2025_URL, {
+      ngs_avg_time_to_throw: number(row.avg_time_to_throw),
+      ngs_avg_completed_air_yards: number(row.avg_completed_air_yards),
+      ngs_avg_intended_air_yards: number(row.avg_intended_air_yards),
+      ngs_air_yards_differential: number(row.avg_air_yards_differential),
+      ngs_aggressiveness_pct: number(row.aggressiveness),
+      ngs_attempts: integer(row.attempts),
+      ngs_passer_rating: number(row.passer_rating),
+      ngs_completion_pct: number(row.completion_percentage),
+      ngs_expected_completion_pct: number(row.expected_completion_percentage),
+      ngs_completion_pct_above_expectation: number(row.completion_percentage_above_expectation),
+    });
+  }
+
+  for (const row of parseCsvRecords(extra.ngsReceivingCsv ?? '')) {
+    if (!isNgsSeasonRow(row)) continue;
+    const teamId = normalizeMetricTeam(String(row.team_abbr ?? ''));
+    const playerName = String(row.player_display_name ?? '').trim();
+    if (!teamId || !playerName) continue;
+    const aggregate = metricAggregate(aggregates, byTeamName, byName, teamId, playerName, String(row.player_position ?? '') || null);
+    addMetricFamily(aggregate, 'nflverse_nextgen_receiving', NFLVERSE_NGS_RECEIVING_2025_URL, {
+      ngs_avg_cushion: number(row.avg_cushion),
+      ngs_avg_separation: number(row.avg_separation),
+      ngs_avg_intended_air_yards: number(row.avg_intended_air_yards),
+      ngs_intended_air_yards_share_pct: number(row.percent_share_of_intended_air_yards),
+      ngs_targets: integer(row.targets),
+      ngs_receptions: integer(row.receptions),
+      ngs_catch_pct: number(row.catch_percentage),
+      ngs_receiving_yards: integer(row.yards),
+      ngs_receiving_touchdowns: integer(row.rec_touchdowns),
+      ngs_avg_yac: number(row.avg_yac),
+      ngs_expected_yac: number(row.avg_expected_yac),
+      ngs_yac_above_expectation: number(row.avg_yac_above_expectation),
+    });
+  }
+
+  for (const row of parseCsvRecords(extra.ngsRushingCsv ?? '')) {
+    if (!isNgsSeasonRow(row)) continue;
+    const teamId = normalizeMetricTeam(String(row.team_abbr ?? ''));
+    const playerName = String(row.player_display_name ?? '').trim();
+    if (!teamId || !playerName) continue;
+    const aggregate = metricAggregate(aggregates, byTeamName, byName, teamId, playerName, String(row.player_position ?? '') || null);
+    addMetricFamily(aggregate, 'nflverse_nextgen_rushing', NFLVERSE_NGS_RUSHING_2025_URL, {
+      ngs_rush_efficiency: number(row.efficiency),
+      ngs_box_8_pct: number(row.percent_attempts_gte_eight_defenders),
+      ngs_avg_time_to_los: number(row.avg_time_to_los),
+      ngs_rush_attempts: integer(row.rush_attempts),
+      ngs_rush_yards: integer(row.rush_yards),
+      ngs_avg_rush_yards: number(row.avg_rush_yards),
+      ngs_rush_touchdowns: integer(row.rush_touchdowns),
+      ngs_expected_rush_yards: number(row.expected_rush_yards),
+      ngs_rush_yards_over_expected: number(row.rush_yards_over_expected),
+      ngs_ryoe_per_attempt: number(row.rush_yards_over_expected_per_att),
+      ngs_rush_pct_over_expected: number(row.rush_pct_over_expected),
+    });
+  }
+
   return {
     byTeamName,
     byName,
@@ -422,6 +661,11 @@ function metricAggregate(
       offense_snaps_2025: 0,
       defense_snaps_2025: 0,
       special_teams_snaps_2025: 0,
+      snap_game_ids_2025: new Set<string>(),
+      offense_snap_game_ids_2025: new Set<string>(),
+      defense_snap_game_ids_2025: new Set<string>(),
+      special_teams_snap_game_ids_2025: new Set<string>(),
+      near_full_snap_game_ids_2025: new Set<string>(),
       snap_share_samples: [],
       games_2025: null,
       starts_2025: null,
@@ -435,6 +679,8 @@ function metricAggregate(
       touchdowns_2025: null,
       source_families: new Set<string>(),
       source_urls: new Set<string>(),
+      position_metrics: {},
+      quality_flags: new Set<string>(),
       source_rows: [],
     };
     aggregates.set(key, aggregate);
@@ -447,6 +693,23 @@ function metricAggregate(
   if (!aggregate.position && position) aggregate.position = position;
   if (!aggregate.team_ids.includes(teamId)) aggregate.team_ids.push(teamId);
   return aggregate;
+}
+
+function addMetricFamily(
+  aggregate: PublicMetricAggregate,
+  family: string,
+  sourceUrl: string,
+  metrics: Record<string, number | null>,
+) {
+  const compact = Object.entries(metrics)
+    .filter((entry): entry is [string, number] => typeof entry[1] === 'number' && Number.isFinite(entry[1]))
+    .map(([key, value]) => [key, Number.isInteger(value) ? value : Number(value.toFixed(3))] as const);
+  if (compact.length === 0) return;
+  aggregate.source_families.add(family);
+  aggregate.source_urls.add(sourceUrl);
+  for (const [key, value] of compact) {
+    aggregate.position_metrics[key] = value;
+  }
 }
 
 function buildMetricRow(
@@ -489,6 +752,12 @@ function buildMetricRow(
       metric_note: `No reviewed 2025 public snap/stat match in nflverse for this current-roster row (${gapReason}).`,
       metric_source_family: null,
       metric_gap_reason: gapReason,
+      metric_coverage_level: 'gap',
+      metric_confidence: 'source-needed',
+      metric_families: [],
+      position_metric_summary: `No reviewed 2025 public player-quality sample (${gapReason}).`,
+      position_metrics: {},
+      quality_flags: [gapReason],
       source_url: roster.source_url,
       source_status: 'source-needed',
       source_data: { match_status: 'missing', roster_player_name: roster.player_name, team_id: team.team_id },
@@ -497,6 +766,16 @@ function buildMetricRow(
   const sourceFamilies = [...metric.source_families].sort();
   const sourceUrls = [...metric.source_urls].sort();
   const snapShare = average(metric.snap_share_samples);
+  const gameCount = Math.max(metric.games_2025 ?? 0, metric.snap_game_ids_2025.size || 0) || null;
+  const usageMetrics = publicUsageMetrics(metric);
+  const positionMetrics = {
+    ...usageMetrics,
+    ...filteredPositionMetrics(roster.position, metric.position_metrics),
+  };
+  const qualityFlags = metricQualityFlags(team.team_id, roster, metric, snaps, positionMetrics);
+  const coverageLevel = metricCoverageLevel(roster.position, metric, positionMetrics);
+  const confidence = coverageLevel === 'strong' ? 'captured' : 'derived';
+  const scorecardSummary = positionMetricSummary(roster.position, metric, snaps, positionMetrics, qualityFlags);
   return {
     team_id: team.team_id,
     player_id: roster.player_id,
@@ -507,7 +786,7 @@ function buildMetricRow(
     defense_snaps_2025: metric.defense_snaps_2025,
     special_teams_snaps_2025: metric.special_teams_snaps_2025,
     snap_share_2025: snapShare == null ? null : Number(snapShare.toFixed(3)),
-    games_2025: metric.games_2025,
+    games_2025: gameCount,
     starts_2025: metric.starts_2025,
     passing_yards_2025: metric.passing_yards_2025,
     rushing_yards_2025: metric.rushing_yards_2025,
@@ -520,9 +799,15 @@ function buildMetricRow(
     availability_risk: snaps && snaps > 0 ? 'played_2025_public_sample' : 'stats_only_public_sample',
     role: rosterRole(otc, estimatedLedger),
     value_tier: valueTier(otc, estimatedLedger),
-    metric_note: `Captured 2025 public metrics from ${sourceFamilies.join(' + ')}; current team join may include prior-team 2025 production for offseason additions.`,
+    metric_note: `${scorecardSummary} Sources: ${sourceFamilies.join(' + ')}. Current team join may include prior-team 2025 production for offseason additions.`,
     metric_source_family: sourceFamilies.join('+'),
     metric_gap_reason: null,
+    metric_coverage_level: coverageLevel,
+    metric_confidence: confidence,
+    metric_families: sourceFamilies,
+    position_metric_summary: scorecardSummary,
+    position_metrics: positionMetrics,
+    quality_flags: qualityFlags,
     source_url: sourceUrls[0] ?? NFLVERSE_STATS_PLAYER_2025_URL,
     source_status: 'captured',
     source_data: {
@@ -531,8 +816,27 @@ function buildMetricRow(
       matched_2025_team_ids: metric.team_ids,
       source_families: sourceFamilies,
       source_urls: sourceUrls,
+      snap_game_count_2025: metric.snap_game_ids_2025.size,
+      position_metrics: positionMetrics,
+      quality_flags: qualityFlags,
     },
   };
+}
+
+function publicUsageMetrics(metric: PublicMetricAggregate): Record<string, number> {
+  return compactNumberRecord({
+    snap_games_2025: metric.snap_game_ids_2025.size,
+    offense_snap_games_2025: metric.offense_snap_game_ids_2025.size,
+    defense_snap_games_2025: metric.defense_snap_game_ids_2025.size,
+    special_teams_snap_games_2025: metric.special_teams_snap_game_ids_2025.size,
+    near_full_snap_games_2025: metric.near_full_snap_game_ids_2025.size,
+  });
+}
+
+function compactNumberRecord(values: Record<string, number | null | undefined>): Record<string, number> {
+  return Object.fromEntries(
+    Object.entries(values).filter((entry): entry is [string, number] => typeof entry[1] === 'number' && Number.isFinite(entry[1]) && entry[1] > 0),
+  );
 }
 
 function lookupPublicMetric(
@@ -544,7 +848,175 @@ function lookupPublicMetric(
   if (exact && positionsCompatible(roster.position, exact.position)) return exact;
   const candidates = publicMetrics.byName.get(normalizeName(roster.player_name)) ?? [];
   const compatible = candidates.filter((candidate) => positionsCompatible(roster.position, candidate.position));
+  const multiTeamAggregate = compatible.filter((candidate) => candidate.team_ids.includes('2TM'));
+  if (multiTeamAggregate.length === 1) return multiTeamAggregate[0];
   return compatible.length === 1 ? compatible[0] : null;
+}
+
+function filteredPositionMetrics(position: string | null, metrics: Record<string, number>): Record<string, number> {
+  const family = positionFamily(position ?? '');
+  const allowed = metricKeysForFamily(family);
+  const entries = Object.entries(metrics)
+    .filter(([key]) => allowed.some((prefix) => key === prefix || key.startsWith(`${prefix}_`) || key.startsWith(prefix)))
+    .sort(([a], [b]) => a.localeCompare(b));
+  return Object.fromEntries(entries);
+}
+
+function metricKeysForFamily(family: string): string[] {
+  if (family === 'QB') {
+    return [
+      'pass',
+      'drops_on_passes',
+      'drop_pct_on_passes',
+      'bad_throws',
+      'bad_throw_pct',
+      'pocket_time',
+      'times_blitzed',
+      'times_hurried',
+      'times_hit',
+      'times_pressured',
+      'pressure_pct',
+      'batted_balls',
+      'on_target_throws',
+      'on_target_pct',
+      'intended_air_yards',
+      'completed_air_yards',
+      'scrambles',
+      'ngs',
+      'rushing',
+    ];
+  }
+  if (['WR', 'TE'].includes(family)) {
+    return ['targets', 'receptions', 'receiving', 'yards_', 'average_depth_of_target', 'broken_tackles', 'drops', 'drop_pct', 'receiver_rating', 'ngs'];
+  }
+  if (family === 'RB') {
+    return ['rushing', 'receiving', 'targets', 'receptions', 'yards_', 'broken_tackles', 'ngs'];
+  }
+  if (['DL', 'EDGE', 'LB', 'CB', 'DB', 'S'].includes(family)) {
+    return [
+      'coverage',
+      'avg_depth_of_target_allowed',
+      'blitzes',
+      'hurries',
+      'qb_knockdowns',
+      'pressures',
+      'missed_tackles',
+      'missed_tackle_pct',
+      'passes_batted',
+    ];
+  }
+  return [];
+}
+
+function metricCoverageLevel(
+  position: string | null,
+  metric: PublicMetricAggregate,
+  positionMetrics: Record<string, number>,
+): NflPlayerMetricRow['metric_coverage_level'] {
+  const family = positionFamily(position ?? metric.position ?? '');
+  const snaps = metric.offense_snaps_2025 + metric.defense_snaps_2025 + metric.special_teams_snaps_2025;
+  if (family === 'OL') return snaps > 0 ? 'directional' : 'gap';
+  if (hasNonUsageMetric(positionMetrics)) return 'strong';
+  return snaps > 0 || (metric.games_2025 ?? 0) > 0 ? 'directional' : 'gap';
+}
+
+function metricQualityFlags(
+  currentTeamId: string,
+  roster: ParsedRosterRow,
+  metric: PublicMetricAggregate,
+  snaps: number | null,
+  positionMetrics: Record<string, number>,
+): string[] {
+  const flags = new Set<string>(metric.quality_flags);
+  const family = positionFamily(roster.position ?? metric.position ?? '');
+  if (!metric.team_ids.includes(currentTeamId)) flags.add('prior_team_2025_sample');
+  if ((snaps ?? 0) > 0 && (snaps ?? 0) < 250) flags.add('limited_snap_sample');
+  if (family === 'OL') flags.add('ol_continuity_only_no_public_blocking_grade');
+  if (family === 'TE' && hasNonUsageMetric(positionMetrics)) flags.add('te_receiving_usage_only_no_blocking_grade');
+  if (!hasNonUsageMetric(positionMetrics) && (snaps ?? 0) > 0) flags.add('snap_usage_only_no_position_quality_fields');
+  if (metric.source_families.has('nflverse_nextgen_receiving') || metric.source_families.has('nflverse_nextgen_passing') || metric.source_families.has('nflverse_nextgen_rushing')) {
+    flags.add('nextgen_public_aggregate');
+  }
+  if ([...metric.source_families].some((familyName) => familyName.startsWith('nflverse_pfr_advstats'))) {
+    flags.add('pfr_advanced_public_aggregate');
+  }
+  return [...flags].sort();
+}
+
+function positionMetricSummary(
+  position: string | null,
+  metric: PublicMetricAggregate,
+  snaps: number | null,
+  positionMetrics: Record<string, number>,
+  flags: string[],
+): string {
+  const family = positionFamily(position ?? metric.position ?? '');
+  const games = Math.max(metric.games_2025 ?? 0, positionMetrics.snap_games_2025 ?? 0) || null;
+  const usage = (snaps ?? 0) > 0
+    ? `${snaps ?? 0} public 2025 snaps${games != null ? `, ${games} games` : ''}`
+    : games != null
+      ? `${games} public 2025 games; snap count not captured in this metric family`
+      : 'public 2025 sample';
+  const parts: string[] = [];
+  if (family === 'QB') {
+    addSummaryPart(parts, 'pressure', pctMetric(positionMetrics.pressure_pct));
+    addSummaryPart(parts, 'on-target', pctMetric(positionMetrics.on_target_pct));
+    addSummaryPart(parts, 'bad throw', pctMetric(positionMetrics.bad_throw_pct));
+    addSummaryPart(parts, 'NGS CPOE', signedNumber(positionMetrics.ngs_completion_pct_above_expectation, 1));
+  } else if (['WR', 'TE'].includes(family)) {
+    addSummaryPart(parts, 'targets', whole(positionMetrics.targets ?? positionMetrics.ngs_targets));
+    addSummaryPart(parts, 'drops', whole(positionMetrics.drops));
+    addSummaryPart(parts, 'YAC', whole(positionMetrics.yards_after_catch ?? positionMetrics.ngs_avg_yac));
+    addSummaryPart(parts, 'separation', numberWithUnit(positionMetrics.ngs_avg_separation, 'yd'));
+    addSummaryPart(parts, 'YAC above exp', signedNumber(positionMetrics.ngs_yac_above_expectation, 2));
+  } else if (family === 'RB') {
+    addSummaryPart(parts, 'carries', whole(positionMetrics.rushing_attempts ?? positionMetrics.ngs_rush_attempts));
+    addSummaryPart(parts, 'YAC/att', numberWithUnit(positionMetrics.rushing_yards_after_contact_per_attempt, ''));
+    addSummaryPart(parts, 'broken tackles', whole(positionMetrics.rushing_broken_tackles ?? positionMetrics.broken_tackles));
+    addSummaryPart(parts, 'RYOE/att', signedNumber(positionMetrics.ngs_ryoe_per_attempt, 2));
+  } else if (['DL', 'EDGE', 'LB'].includes(family)) {
+    addSummaryPart(parts, 'pressures', whole(positionMetrics.pressures));
+    addSummaryPart(parts, 'hurries', whole(positionMetrics.hurries));
+    addSummaryPart(parts, 'QB knockdowns', whole(positionMetrics.qb_knockdowns));
+    addSummaryPart(parts, 'missed tackles', whole(positionMetrics.missed_tackles));
+  } else if (['CB', 'DB', 'S'].includes(family)) {
+    addSummaryPart(parts, 'targets allowed', whole(positionMetrics.coverage_targets));
+    addSummaryPart(parts, 'yards allowed', whole(positionMetrics.coverage_yards));
+    addSummaryPart(parts, 'rating allowed', numberWithUnit(positionMetrics.coverage_rating_allowed, ''));
+    addSummaryPart(parts, 'missed tackles', whole(positionMetrics.missed_tackles));
+  } else if (family === 'OL') {
+    return `OL continuity only: ${usage}; no reviewed public pressure-allowed/blocking-grade source in v2.`;
+  }
+  const scorecard = parts.length ? parts.join('; ') : 'usage only';
+  const caveat = flags.includes('prior_team_2025_sample') ? ' Prior-team 2025 sample.' : '';
+  return `${scorecard}; ${usage}.${caveat}`;
+}
+
+function addSummaryPart(parts: string[], label: string, value: string | null) {
+  if (value) parts.push(`${label}=${value}`);
+}
+
+function whole(value: number | undefined): string | null {
+  return typeof value === 'number' ? String(Math.round(value)) : null;
+}
+
+function pctMetric(value: number | undefined): string | null {
+  if (typeof value !== 'number') return null;
+  return `${value.toFixed(1)}%`;
+}
+
+function signedNumber(value: number | undefined, digits: number): string | null {
+  if (typeof value !== 'number') return null;
+  return `${value > 0 ? '+' : ''}${value.toFixed(digits)}`;
+}
+
+function numberWithUnit(value: number | undefined, unit: string): string | null {
+  if (typeof value !== 'number') return null;
+  return `${value.toFixed(value >= 10 ? 1 : 2)}${unit}`;
+}
+
+function hasNonUsageMetric(metrics: Record<string, number>): boolean {
+  return Object.keys(metrics).some((key) => !key.endsWith('_games_2025'));
 }
 
 function uniqueGlobalOtcLedger(
@@ -828,6 +1300,9 @@ export function summarizeContractLedger(rows: ParsedOtcYearRow[]): ContractLedge
 async function fetchText(url: string): Promise<string> {
   const res = await fetch(url, { headers: { 'user-agent': 'gambit-nfl-demo-reviewed-snapshot/1.0' } });
   if (!res.ok) throw new Error(`GET ${url} failed: ${res.status}`);
+  if (url.endsWith('.gz')) {
+    return gunzipSync(Buffer.from(await res.arrayBuffer())).toString('utf8');
+  }
   return res.text();
 }
 
@@ -1017,6 +1492,22 @@ function primarySnapShare(row: Record<string, unknown>, position: string | null)
   return parsePercent(row.st_pct) ?? parsePercent(row.offense_pct) ?? parsePercent(row.defense_pct);
 }
 
+function isNgsSeasonRow(row: Record<string, unknown>): boolean {
+  return String(row.season ?? '') === '2025'
+    && String(row.season_type ?? '').toUpperCase() === 'REG'
+    && String(row.week ?? '') === '0';
+}
+
+function isRegularSeasonSnapCountRow(row: Record<string, unknown>): boolean {
+  const season = String(row.season ?? '2025').trim();
+  if (season && season !== '2025') return false;
+  const seasonType = String(row.season_type ?? row.game_type ?? '').trim().toUpperCase();
+  if (seasonType && seasonType !== 'REG' && seasonType !== 'REGULAR') return false;
+  const week = integer(row.week);
+  if (week != null && week > 18) return false;
+  return true;
+}
+
 function average(values: number[]): number | null {
   if (values.length === 0) return null;
   return values.reduce((sum, value) => sum + value, 0) / values.length;
@@ -1056,7 +1547,7 @@ function positionFamily(position: string): string {
   if (['DE', 'EDGE', 'OLB'].includes(pos)) return 'EDGE';
   if (['LB', 'ILB', 'MLB'].includes(pos)) return 'LB';
   if (['CB'].includes(pos)) return 'CB';
-  if (['S', 'FS', 'SS', 'DB'].includes(pos)) return 'DB';
+  if (['S', 'FS', 'SS', 'SAF', 'DB'].includes(pos)) return 'DB';
   if (['K', 'P', 'LS'].includes(pos)) return 'ST';
   return pos;
 }
@@ -1116,6 +1607,13 @@ function publicMetricFixture(aggregates: PublicMetricAggregate[]): Record<string
     source_refs: [
       { id: 'nflverse_snap_counts_2025', url: NFLVERSE_SNAP_COUNTS_2025_URL },
       { id: 'nflverse_stats_player_2025', url: NFLVERSE_STATS_PLAYER_2025_URL },
+      { id: 'nflverse_pfr_advstats_def_2025', url: NFLVERSE_PFR_ADV_DEF_2025_URL },
+      { id: 'nflverse_pfr_advstats_pass_2025', url: NFLVERSE_PFR_ADV_PASS_2025_URL },
+      { id: 'nflverse_pfr_advstats_rec_2025', url: NFLVERSE_PFR_ADV_REC_2025_URL },
+      { id: 'nflverse_pfr_advstats_rush_2025', url: NFLVERSE_PFR_ADV_RUSH_2025_URL },
+      { id: 'nflverse_nextgen_passing_2025', url: NFLVERSE_NGS_PASSING_2025_URL },
+      { id: 'nflverse_nextgen_receiving_2025', url: NFLVERSE_NGS_RECEIVING_2025_URL },
+      { id: 'nflverse_nextgen_rushing_2025', url: NFLVERSE_NGS_RUSHING_2025_URL },
     ],
     row_count: aggregates.length,
     rows: aggregates.map((row) => ({
@@ -1125,8 +1623,15 @@ function publicMetricFixture(aggregates: PublicMetricAggregate[]): Record<string
       offense_snaps_2025: row.offense_snaps_2025,
       defense_snaps_2025: row.defense_snaps_2025,
       special_teams_snaps_2025: row.special_teams_snaps_2025,
+      snap_game_count_2025: row.snap_game_ids_2025.size,
+      offense_snap_game_count_2025: row.offense_snap_game_ids_2025.size,
+      defense_snap_game_count_2025: row.defense_snap_game_ids_2025.size,
+      special_teams_snap_game_count_2025: row.special_teams_snap_game_ids_2025.size,
+      near_full_snap_game_count_2025: row.near_full_snap_game_ids_2025.size,
       games_2025: row.games_2025,
       source_families: [...row.source_families].sort(),
+      position_metrics: row.position_metrics,
+      quality_flags: [...row.quality_flags].sort(),
     })),
   };
 }
@@ -1141,8 +1646,15 @@ async function readExistingMetricFixture(): Promise<PublicMetricIndex | null> {
         offense_snaps_2025?: number;
         defense_snaps_2025?: number;
         special_teams_snaps_2025?: number;
+        snap_game_count_2025?: number;
+        offense_snap_game_count_2025?: number;
+        defense_snap_game_count_2025?: number;
+        special_teams_snap_game_count_2025?: number;
+        near_full_snap_game_count_2025?: number;
         games_2025?: number | null;
         source_families?: string[];
+        position_metrics?: Record<string, number>;
+        quality_flags?: string[];
       }>;
     };
     const aggregates = new Map<string, PublicMetricAggregate>();
@@ -1155,15 +1667,32 @@ async function readExistingMetricFixture(): Promise<PublicMetricIndex | null> {
         aggregate.offense_snaps_2025 = row.offense_snaps_2025 ?? 0;
         aggregate.defense_snaps_2025 = row.defense_snaps_2025 ?? 0;
         aggregate.special_teams_snaps_2025 = row.special_teams_snaps_2025 ?? 0;
+        hydrateCountSet(aggregate.snap_game_ids_2025, row.snap_game_count_2025);
+        hydrateCountSet(aggregate.offense_snap_game_ids_2025, row.offense_snap_game_count_2025);
+        hydrateCountSet(aggregate.defense_snap_game_ids_2025, row.defense_snap_game_count_2025);
+        hydrateCountSet(aggregate.special_teams_snap_game_ids_2025, row.special_teams_snap_game_count_2025);
+        hydrateCountSet(aggregate.near_full_snap_game_ids_2025, row.near_full_snap_game_count_2025);
         aggregate.games_2025 = row.games_2025 ?? null;
         for (const family of row.source_families ?? []) aggregate.source_families.add(family);
         if (aggregate.source_families.has('nflverse_snap_counts')) aggregate.source_urls.add(NFLVERSE_SNAP_COUNTS_2025_URL);
         if (aggregate.source_families.has('nflverse_stats_player')) aggregate.source_urls.add(NFLVERSE_STATS_PLAYER_2025_URL);
+        for (const [key, value] of Object.entries(row.position_metrics ?? {})) {
+          if (typeof value === 'number') aggregate.position_metrics[key] = value;
+        }
+        for (const flag of row.quality_flags ?? []) aggregate.quality_flags.add(flag);
+        if ([...aggregate.source_families].some((family) => family.startsWith('nflverse_pfr_advstats'))) aggregate.source_urls.add('https://github.com/nflverse/nflverse-data/releases/tag/pfr_advstats');
+        if ([...aggregate.source_families].some((family) => family.startsWith('nflverse_nextgen'))) aggregate.source_urls.add('https://github.com/nflverse/nflverse-data/releases/tag/nextgen_stats');
       }
     }
     return { byTeamName, byName, fixture: parsed as Record<string, unknown> };
   } catch {
     return null;
+  }
+}
+
+function hydrateCountSet(target: Set<string>, count: number | undefined) {
+  for (let index = 0; index < (count ?? 0); index += 1) {
+    target.add(`fixture-${index}`);
   }
 }
 

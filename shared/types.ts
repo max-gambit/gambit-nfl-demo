@@ -1845,6 +1845,12 @@ export interface NflPlayerMetricRow {
   metric_note: string;
   metric_source_family?: string | null;
   metric_gap_reason?: string | null;
+  metric_coverage_level?: 'strong' | 'directional' | 'gap';
+  metric_confidence?: 'captured' | 'derived' | 'source-needed';
+  metric_families?: string[];
+  position_metric_summary?: string | null;
+  position_metrics?: Record<string, unknown>;
+  quality_flags?: string[];
   source_url: string | null;
   source_status?: string;
   source_data?: Record<string, unknown>;

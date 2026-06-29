@@ -29,9 +29,10 @@ test('NFL coverage uses app roster/cap rows instead of context graph mini-roster
   assert.equal(team.cap_row_count, 92);
   assert.equal(team.graph_roster_count, 4);
   assert.equal(team.readiness.find((item) => item.key === 'roster_cap_audit')?.status, 'strong');
-  assert.equal(team.readiness.find((item) => item.key === 'player_quality')?.status, 'directional');
-  assert.equal(team.domains.find((domain) => domain.domain === 'player_metrics')?.status, 'directional');
-  assert.equal(team.domains.find((domain) => domain.domain === 'player_metrics')?.detail.includes('58/92 rows have captured public 2025 snap/stat metrics'), true);
+  assert.equal(team.readiness.find((item) => item.key === 'player_quality')?.status, 'weak');
+  assert.equal(team.domains.find((domain) => domain.domain === 'player_metrics')?.status, 'weak');
+  assert.equal(team.domains.find((domain) => domain.domain === 'player_metrics')?.detail.includes('likely contributors have strong public position scorecards'), true);
+  assert.equal(team.domains.find((domain) => domain.domain === 'player_metrics')?.gaps.some((gap) => gap.key === 'contributor_metric_gaps'), true);
   assert.equal(team.domains.find((domain) => domain.domain === 'player_metrics')?.gaps.some((gap) => gap.key === 'metric_rows_need_context'), true);
   assert.equal(team.domains.find((domain) => domain.domain === 'seller_thesis')?.status, 'strong');
 });
