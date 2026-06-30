@@ -53,18 +53,19 @@ export function buildNflContextComposerForDataAnalyst(
   traces: DataAnalystTrace[],
   messages: Anthropic.MessageParam[] = [],
 ): ComposedNflContext | null {
-  const datasets = traces
+  const datasetEntries = traces
     .filter((trace) => trace.errors.length === 0 && trace.tool_name === 'query_nfl_data')
-    .flatMap((trace) => trace.datasets)
-    .filter((dataset) => dataset.dataset_id.startsWith('nfl_'));
-  if (datasets.length === 0) return null;
+    .flatMap((trace) => trace.datasets
+      .filter((dataset) => dataset.dataset_id.startsWith('nfl_'))
+      .map((dataset) => ({ trace, dataset })));
+  if (datasetEntries.length === 0) return null;
 
   const rowsByDataset = sourceRowsByDatasetFromDataAnalystMessages(messages);
-  const teamIds = [...new Set(datasets.flatMap((dataset) => dataset.team_ids))]
+  const teamIds = [...new Set(datasetEntries.flatMap(({ dataset }) => dataset.team_ids))]
     .filter((teamId) => /^[A-Z]{2,3}$/.test(teamId));
   const rowsByRef = new Map<number, SourceRow[]>();
-  datasets.forEach((dataset, index) => {
-    rowsByRef.set(index + 1, rowsByDataset.get(dataset.dataset_id) ?? [
+  datasetEntries.forEach(({ trace, dataset }, index) => {
+    rowsByRef.set(index + 1, rowsByDataset.get(toolResultDatasetKey(trace.tool_use_id, dataset.dataset_id)) ?? [
       { k: 'Dataset', v: dataset.dataset_id },
       { k: 'Label', v: dataset.label },
       { k: 'Teams', v: dataset.team_ids.join(', ') || 'all/bounded' },
@@ -77,7 +78,7 @@ export function buildNflContextComposerForDataAnalyst(
     question,
     teamIds,
     rowsByRef,
-    traceDatasets: datasets.map((dataset) => dataset.dataset_id),
+    traceDatasets: datasetEntries.map(({ dataset }) => dataset.dataset_id),
     refsAreReserved: false,
   });
 }
@@ -91,11 +92,15 @@ function sourceRowsByDatasetFromDataAnalystMessages(messages: Anthropic.MessageP
       const parsed = parseToolResult(block.content);
       if (!parsed || parsed.tool_name !== 'query_nfl_data') continue;
       for (const [datasetId, rows] of sourceRowsFromNflToolResult(parsed)) {
-        rowsByDataset.set(datasetId, rows);
+        rowsByDataset.set(toolResultDatasetKey(stringValue(block.tool_use_id) ?? '', datasetId), rows);
       }
     }
   }
   return rowsByDataset;
+}
+
+function toolResultDatasetKey(toolUseId: string, datasetId: string): string {
+  return `${toolUseId}:${datasetId}`;
 }
 
 function sourceRowsFromNflToolResult(result: Record<string, unknown>): Map<string, SourceRow[]> {

@@ -220,6 +220,22 @@ test('trade eval scorer distinguishes correctness, weak diagnosis, and source-ne
   assert.ok(legalPrompt);
   const legalLabel = labelsByScenario.get(legalPrompt.scenario_id);
   assert.ok(legalLabel);
+  const forbiddenLegal = scoreTradeEvalAnswer(
+    {
+      ...legalPrompt,
+      expected: {
+        ...legalPrompt.expected,
+        must_not_claim: ['rubber stamp'],
+      },
+    },
+    legalLabel,
+    'This trade is legal using current salary, salary matching, the CBA, the cap sheet, and RealGM or internal solver confirmation. rubber stamp.',
+  );
+  assert.equal(forbiddenLegal.subscores.legality, 1);
+  assert.equal(forbiddenLegal.total_score, 0.833);
+  assert.equal(forbiddenLegal.status, 'fail');
+  assert.ok(forbiddenLegal.failure_modes.includes('forbidden_claim'));
+
   const negatedLegal = scoreTradeEvalAnswer(
     legalPrompt,
     legalLabel,

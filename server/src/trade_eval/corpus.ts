@@ -210,7 +210,8 @@ export function scoreTradeEvalAnswer(
   const operatorUsefulness = prompt.prompt_type === 'decision_support'
     ? scoreOperatorUsefulness(text)
     : 1;
-  const forbiddenClaimPenalty = prompt.expected.must_not_claim.some((claim) => text.includes(normalizeText(claim))) ? 0 : 1;
+  const hasForbiddenClaim = prompt.expected.must_not_claim.some((claim) => text.includes(normalizeText(claim)));
+  const forbiddenClaimPenalty = hasForbiddenClaim ? 0 : 1;
   const subscores = {
     legality,
     rule_diagnosis: ruleDiagnosis,
@@ -225,7 +226,7 @@ export function scoreTradeEvalAnswer(
     prompt_id: prompt.id,
     scenario_id: prompt.scenario_id,
     prompt_type: prompt.prompt_type,
-    status: scoreStatus(totalScore, subscores),
+    status: scoreStatus(totalScore, subscores, hasForbiddenClaim),
     total_score: totalScore,
     subscores,
     failure_modes: failureModes,
@@ -932,7 +933,9 @@ function scoreLegality(expected: TradeEvalLegality, text: string): number {
 function scoreStatus(
   totalScore: number,
   subscores: TradeEvalAnswerScore['subscores'],
+  hasForbiddenClaim: boolean,
 ): TradeEvalAnswerScore['status'] {
+  if (hasForbiddenClaim) return 'fail';
   if (subscores.legality < 1) return 'fail';
   return totalScore >= 0.82 ? 'pass' : totalScore >= 0.62 ? 'warning' : 'fail';
 }

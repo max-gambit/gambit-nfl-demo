@@ -141,6 +141,71 @@ test('NFL context composer can build from data analyst traces without NBA bleed-
   assert.equal(nbaTraceWithNflDataset, null);
 });
 
+test('data analyst composer keeps same dataset ids separate across tool results', () => {
+  const traces: DataAnalystTrace[] = [{
+    tool_use_id: 'trace_nyg',
+    tool_name: 'query_nfl_data',
+    datasets: [{
+      dataset_id: 'nfl_rosters_current',
+      label: 'NFL offseason rosters',
+      source_name: 'Reviewed NFL snapshot',
+      as_of_date: '2026-06-29',
+      team_ids: ['NYG'],
+      row_count: 1,
+    }],
+    errors: [],
+  }, {
+    tool_use_id: 'trace_tb',
+    tool_name: 'query_nfl_data',
+    datasets: [{
+      dataset_id: 'nfl_rosters_current',
+      label: 'NFL offseason rosters',
+      source_name: 'Reviewed NFL snapshot',
+      as_of_date: '2026-06-29',
+      team_ids: ['TB'],
+      row_count: 1,
+    }],
+    errors: [],
+  }];
+  const messages = traces.map((trace) => ({
+    role: 'user',
+    content: [{
+      type: 'tool_result',
+      tool_use_id: trace.tool_use_id,
+      is_error: false,
+      content: JSON.stringify({
+        ok: true,
+        tool_name: 'query_nfl_data',
+        datasets: trace.datasets,
+        errors: [],
+        data: {
+          rosters: {
+            rows: [{
+              team_id: trace.datasets[0].team_ids[0],
+              player_name: trace.datasets[0].team_ids[0] === 'NYG' ? 'Dexter Lawrence' : 'Vita Vea',
+              position: 'DT',
+            }],
+          },
+        },
+      }),
+    }],
+  }));
+
+  const context = buildNflContextComposerForDataAnalyst(
+    'Compare the Giants and Buccaneers defensive tackle rooms.',
+    traces,
+    messages as never,
+  );
+
+  assert.ok(context);
+  assert.deepEqual(context.source_ref_map, [
+    'trace 1: nfl_rosters_current (NYG)',
+    'trace 2: nfl_rosters_current (TB)',
+  ]);
+  assert.match(context.system_block, /trace 1: Team: NYG/);
+  assert.match(context.system_block, /trace 2: Team: TB/);
+});
+
 test('private critic flags a Tampa/Vita Vea lead-lane overclaim', async () => {
   const evidence = await buildCurrentNflEvidence(TRADE_PROMPT);
   const context = buildNflContextComposerForEvidence(TRADE_PROMPT, evidence);
