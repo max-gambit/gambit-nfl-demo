@@ -62,7 +62,7 @@ const NFL_EVIDENCE_TEAM_ALIASES: Record<string, NflEvidenceTeamId> = {
 };
 
 const TRANSACTION_NFL_EVIDENCE_RE =
-  /\b(cap|cap room|cap space|cap sheet|cap number|cap hit|cap ledger|contract|contracts|contract lever|guarantees?|cash due|dead money|cut|cuts|release|post[-\s]?june 1|cut savings|restructure|convert salary|signing bonus|extension|extend|tag|franchise tag|transition tag|tender|trade|audit|position[-\s]?group|spend share|over[-\s]?invested|under[-\s]?invested|roster\/cap|salary)\b/i;
+  /\b(cap|cap room|cap space|cap sheet|cap number|cap hit|cap ledger|contract|contracts|contract lever|guarantees?|cash due|dead money|cut|cuts|release|post[-\s]?june 1|cut savings|restructure|convert salary|signing bonus|extension|extend|tag|franchise tag|transition tag|tender|trade|audit|position[-\s]?group|spend share|over[-\s]?invested|under[-\s]?invested|roster\/cap|salary|clean\s+2026\s+room|create\s+room|open\s+room|clear\s+room|2027\s+hangover|future[-\s]?(?:cap|year))\b/i;
 
 const ROSTER_NFL_EVIDENCE_RE =
   /\b(roster|current players?|offseason roster|depth chart|position groups?|who do we have|player-team membership|active roster|practice squad|injury|availability)\b/i;

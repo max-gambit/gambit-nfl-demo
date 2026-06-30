@@ -36,8 +36,8 @@ test('NFL evidence block uses full NYG app roster and cap data ahead of Intel', 
   assert.match(evidence.systemBlock, /CURRENT NFL APP EVIDENCE \(MANDATORY\)/);
   assert.match(evidence.systemBlock, /Roster rows: 92/);
   assert.match(evidence.systemBlock, /Cap rows: 92/);
-  assert.match(evidence.systemBlock, /Source-needed cap rows: 1/);
-  assert.match(evidence.systemBlock, /Contract field coverage: guarantees=92\/92; dead\/cut=91\/92; post-June=91\/92; trade=91\/92; contract_years=91\/92; void_years=91\/92/);
+  assert.match(evidence.systemBlock, /Source-needed cap rows: 0/);
+  assert.match(evidence.systemBlock, /Contract field coverage: guarantees=91\/92; dead\/cut=92\/92; post-June=92\/92; trade=92\/92; contract_years=92\/92; void_years=92\/92/);
   assert.match(evidence.systemBlock, /current NFL player metrics/);
   assert.match(evidence.systemBlock, /Player metric coverage: captured_public_metrics=72\/92; strong_position_scorecards=43\/92/);
   assert.match(evidence.systemBlock, /Top position scorecards:/);

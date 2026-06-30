@@ -40,6 +40,15 @@ import {
   isNflTradeGoalQuestion,
 } from '../claude/nfl_evidence.js';
 import {
+  buildNflContextComposerForDataAnalyst,
+  buildNflContextComposerForEvidence,
+  type ComposedNflContext,
+} from '../claude/nfl_context_composer.js';
+import {
+  buildNflPrivateCriticRevisionBlock,
+  runNflPrivateCritic,
+} from '../claude/private_critic.js';
+import {
   enrichSpecificMoveCandidates,
   sanitizeSubmitBriefMoveCandidates,
 } from '../claude/move_candidates.js';
@@ -662,6 +671,9 @@ export async function generateBrief(brief: Brief) {
       })
       : null;
     const currentAppEvidence = currentNflEvidence ?? currentNbaEvidence;
+    const composedNflContext = currentNflEvidence
+      ? buildNflContextComposerForEvidence(brief.question, currentNflEvidence)
+      : null;
     const runContextGraphLookup = shouldRunContextGraphLookup(brief.question, !!currentAppEvidence);
     const currentEvidenceSourceCount = currentAppEvidence?.sources.length ?? 0;
     await progress.mark(
@@ -680,6 +692,9 @@ export async function generateBrief(brief: Brief) {
       { type: 'text', text: buildBriefTemplateSystemBlock(templateSelection), cache_control: { type: 'ephemeral' } },
       ...(currentAppEvidence
         ? [{ type: 'text' as const, text: currentAppEvidence.systemBlock }]
+        : []),
+      ...(composedNflContext
+        ? [{ type: 'text' as const, text: composedNflContext.system_block }]
         : []),
       ...(contextGraphBlock
         ? [{ type: 'text' as const, text: contextGraphBlock, cache_control: { type: 'ephemeral' as const } }]
@@ -878,6 +893,45 @@ export async function generateBrief(brief: Brief) {
       existingSources = [...existingSources, enrichedCandidates.candidatePoolSource];
     }
 
+    const criticResult = await maybeRunNflBriefPrivateCritic({
+      brief,
+      input,
+      composedNflContext,
+      templateSelection,
+      system,
+      messages: contextGraphLookup.messages,
+      allowServerProvidedSources,
+      availableSources: existingSources,
+    });
+    if (criticResult?.input) {
+      const supplementalSources = enrichedCandidates.candidatePoolSource ? [enrichedCandidates.candidatePoolSource] : [];
+      input = criticResult.input;
+      generatedSources = reserveGeneratedSourceRefs(
+        input.sources,
+        currentAppEvidence?.reserved_max_ref_index ?? 0,
+      );
+      maxSourceRefIndex = [...reservedSources, ...generatedSources].reduce(
+        (max, source) => Math.max(max, source.ref_index),
+        0,
+      );
+      contextGraphSources = currentAppEvidence
+        ? []
+        : contextGraphTracesToBriefSources(
+          contextGraphLookup.traces,
+          maxSourceRefIndex + 1,
+        );
+      existingSources = [...reservedSources, ...generatedSources, ...contextGraphSources, ...supplementalSources];
+      presentation = coerceBriefPresentation(input, templateSelection, existingSources);
+      presentationValidation = validatePresentationForTemplate(
+        effectiveBriefTemplateId(templateSelection),
+        presentation,
+      );
+      if (!presentationValidation.ok) {
+        presentation = buildFallbackBriefPresentation(input, templateSelection, existingSources);
+        input = withTemplateFallbackWatch(input);
+      }
+    }
+
     const optionRows = input.options.map((o) => ({ ...o, brief_id: brief.id }));
     await progress.mark(
       'matching_sources',
@@ -1025,6 +1079,116 @@ async function repairSubmitBriefTemplate(args: {
   }
 }
 
+async function maybeRunNflBriefPrivateCritic(args: {
+  brief: Brief;
+  input: SubmitBriefInput;
+  composedNflContext: ComposedNflContext | null;
+  templateSelection: ReturnType<typeof templateSelectionForBrief>;
+  system: Anthropic.TextBlockParam[];
+  messages: Anthropic.MessageParam[];
+  allowServerProvidedSources: boolean;
+  availableSources: SubmitBriefInput['sources'];
+}): Promise<{ input: SubmitBriefInput } | null> {
+  if (!args.composedNflContext) return null;
+  try {
+    const critique = await runNflPrivateCritic({
+      question: args.brief.question,
+      composedContext: args.composedNflContext,
+      draftKind: 'brief',
+      draft: args.input,
+    });
+    if (critique.verdict !== 'revise') return null;
+
+    const response = await createClaudeMessage({
+      model: BRIEF_MODEL,
+      max_tokens: 8192,
+      system: [
+        ...args.system,
+        { type: 'text', text: buildNflPrivateCriticRevisionBlock(critique) },
+      ],
+      tools: [buildSubmitBriefTool(args.templateSelection, { repair: true })],
+      tool_choice: { type: 'tool', name: 'submit_brief' },
+      messages: [
+        ...args.messages,
+        {
+          role: 'user',
+          content: [
+            'Revise this submit_brief payload using the private critic instructions.',
+            'Return exactly one corrected submit_brief tool call.',
+            'Previous payload:',
+            JSON.stringify(args.input),
+          ].join('\n\n'),
+        },
+      ],
+    });
+
+    const toolUse = response.content.find((block) => block.type === 'tool_use' && block.name === 'submit_brief');
+    if (!toolUse || toolUse.type !== 'tool_use') return null;
+    const input = normalizeSubmitBriefInput(toolUse.input, args.allowServerProvidedSources);
+    const missing = missingSubmitBriefFields(input, args.templateSelection);
+    if (missing.length > 0) return null;
+    const presentation = coerceBriefPresentation(input, args.templateSelection, args.availableSources);
+    const validation = validatePresentationForTemplate(effectiveBriefTemplateId(args.templateSelection), presentation);
+    if (!validation.ok) return null;
+    return { input };
+  } catch (error) {
+    if (process.env.NFL_PRIVATE_CRITIC_STRICT === '1') throw error;
+    console.warn('[briefs] NFL private critic failed open for brief', args.brief.id, error);
+    return null;
+  }
+}
+
+async function maybeRunNflDataAnalysisPrivateCritic(args: {
+  brief: Brief;
+  input: SubmitDataAnalysisInput;
+  composedNflContext: ComposedNflContext | null;
+  system: Anthropic.TextBlockParam[];
+  messages: Anthropic.MessageParam[];
+}): Promise<{ input: SubmitDataAnalysisInput } | null> {
+  if (!args.composedNflContext) return null;
+  try {
+    const critique = await runNflPrivateCritic({
+      question: args.brief.question,
+      composedContext: args.composedNflContext,
+      draftKind: 'data_analysis',
+      draft: args.input,
+    });
+    if (critique.verdict !== 'revise') return null;
+
+    const response = await createClaudeMessage({
+      model: BRIEF_MODEL,
+      max_tokens: 8192,
+      system: [
+        ...args.system,
+        { type: 'text', text: buildNflPrivateCriticRevisionBlock(critique) },
+      ],
+      tools: [submitDataAnalysisTool],
+      tool_choice: { type: 'tool', name: 'submit_data_analysis' },
+      messages: [
+        ...args.messages,
+        {
+          role: 'user',
+          content: [
+            'Revise this submit_data_analysis payload using the private critic instructions.',
+            'Return exactly one corrected submit_data_analysis tool call.',
+            'Previous payload:',
+            JSON.stringify(args.input),
+          ].join('\n\n'),
+        },
+      ],
+    });
+
+    const toolUse = response.content.find((block) => block.type === 'tool_use' && block.name === 'submit_data_analysis');
+    if (!toolUse || toolUse.type !== 'tool_use') return null;
+    const input = normalizeSubmitDataAnalysisInput(toolUse.input);
+    return input ? { input } : null;
+  } catch (error) {
+    if (process.env.NFL_PRIVATE_CRITIC_STRICT === '1') throw error;
+    console.warn('[briefs] NFL private critic failed open for data analysis', args.brief.id, error);
+    return null;
+  }
+}
+
 export async function generateDataAnalysisBrief(brief: Brief) {
   const startedAt = Date.now();
   const heartbeat = startBriefGenerationHeartbeat(brief);
@@ -1052,6 +1216,10 @@ export async function generateDataAnalysisBrief(brief: Brief) {
       ],
     });
     dataLookup = await ensureNflRosterCapDataLookup(brief.question, dataLookup);
+    const composedNflContext = buildNflContextComposerForDataAnalyst(brief.question, dataLookup.traces, dataLookup.messages);
+    const finalSystem = composedNflContext
+      ? [...system, { type: 'text' as const, text: composedNflContext.system_block }]
+      : system;
     if (dataLookup.traces.length === 0) {
       throw new Error('Data analyst generation did not call an app-data tool.');
     }
@@ -1066,7 +1234,7 @@ export async function generateDataAnalysisBrief(brief: Brief) {
     const response = await createClaudeMessage({
       model: BRIEF_MODEL,
       max_tokens: 16384,
-      system,
+      system: finalSystem,
       tools: [submitDataAnalysisTool],
       tool_choice: { type: 'tool', name: 'submit_data_analysis' },
       messages: dataLookup.messages,
@@ -1089,7 +1257,17 @@ export async function generateDataAnalysisBrief(brief: Brief) {
       throw new Error('submit_data_analysis input missing required fields');
     }
 
-    const input = normalizedInput;
+    let input = normalizedInput;
+    const criticResult = await maybeRunNflDataAnalysisPrivateCritic({
+      brief,
+      input,
+      composedNflContext,
+      system: finalSystem,
+      messages: dataLookup.messages,
+    });
+    if (criticResult?.input) {
+      input = criticResult.input;
+    }
     await progress.mark(
       'matching_sources',
       88,
