@@ -10,6 +10,7 @@ dist
 # build artifacts
 *.tsbuildinfo
 test-results/
+data/evals/nba-trade-corpus/reports/
 
 # Runtime context graph preference overrides
 data/nba-context-graph/overrides/*.local.json

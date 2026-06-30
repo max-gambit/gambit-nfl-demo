@@ -15,7 +15,7 @@ test('NFL demo seed validates all-32 static roster cap and metric rows', async (
   assert.equal(summary.player_metric_row_count, summary.roster_row_count);
   assert.equal(summary.cap_row_parity, true);
   assert.equal(Math.min(...rosterCounts) >= 70, true);
-  assert.equal(summary.source_needed_cap_row_count, 55);
+  assert.equal(summary.source_needed_cap_row_count, 3);
   assert.equal(seed.source_refs.some((source) => source.id === 'nfl_official_rosters'), true);
   assert.equal(seed.source_refs.some((source) => source.id === 'overthecap_contract_ledger_v1'), true);
   assert.equal(seed.source_refs.some((source) => source.id === 'nflverse_snap_counts_2025'), true);
@@ -26,8 +26,9 @@ test('NFL demo seed validates all-32 static roster cap and metric rows', async (
   assert.equal(seed.source_refs.some((source) => source.id === 'nflverse_depth_charts_2026'), true);
   assert.equal(seed.cap_rows.filter((row) => row.contract_ledger_status).length, summary.roster_row_count);
   assert.equal(seed.cap_rows.filter((row) => row.contract_ledger_confidence).length, summary.roster_row_count);
-  assert.equal(seed.cap_rows.filter((row) => row.contract_years_remaining != null).length, 2_847);
-  assert.equal(seed.cap_rows.filter((row) => row.source_status === 'estimated').length, 11);
+  assert.equal(seed.cap_rows.filter((row) => row.contract_years_remaining != null).length, 2_899);
+  assert.equal(seed.cap_rows.filter((row) => row.source_status === 'estimated').length, 9);
+  assert.equal(seed.cap_rows.filter((row) => row.contract_lever === 'non_active_cap_charge').length, 20);
   assert.equal(seed.cap_rows.filter((row) => row.source_status === 'captured' && row.contract_lever === 'source_needed').length, 0);
   assert.equal(capturedMetrics.length > 2_000, true);
   assert.equal(seed.player_metrics.filter((row) => row.metric_coverage_level === 'strong').length > 1_000, true);
@@ -45,12 +46,26 @@ test('NFL demo seed exposes full Giants roster and cap levers', async () => {
   assert.equal(detail?.roster_entries.some((row) => row.player_name === 'Andrew Thomas'), true);
   assert.equal(detail?.cap_rows.some((row) => row.player_name === 'Andrew Thomas' && row.restructure_savings_estimate_2026 !== null), true);
   assert.equal(detail?.cap_rows.some((row) => row.player_name === 'Brian Burns' && row.cap_number_2026 !== null), true);
-  assert.equal(detail?.cap_rows.some((row) => row.player_name === 'Gunner Olszewski' && row.source_status === 'source-needed'), true);
+  const gunner = detail?.cap_rows.find((row) => row.player_name === 'Gunner Olszewski');
+  assert.ok(gunner);
+  assert.equal(gunner.source_status, 'captured');
+  assert.equal(gunner.contract_lever, 'non_active_cap_charge');
+  assert.equal(gunner.cap_number_2026, 1_262_500);
+  assert.equal(gunner.cash_due_2026, null);
+  assert.equal(gunner.guaranteed_remaining, null);
+  assert.equal(gunner.total_value_remaining, null);
+  assert.deepEqual(gunner.source_data?.source_needed_fields, [
+    'cash_due_2026',
+    'total_value_remaining',
+    'guaranteed_remaining',
+    'restructure_savings_estimate_2026',
+    'extension_savings_estimate_2026',
+  ]);
   assert.equal(detail?.roster_entries.length, 92);
   assert.equal(detail?.cap_rows.filter((row) => row.contract_ledger_status).length, 92);
-  assert.equal(detail?.cap_rows.filter((row) => row.contract_years_remaining != null).length, 91);
-  assert.equal(detail?.cap_rows.filter((row) => row.post_june_1_cut_savings_2026 != null).length, 91);
-  assert.equal(detail?.cap_rows.filter((row) => row.trade_savings_2026 != null).length, 91);
+  assert.equal(detail?.cap_rows.filter((row) => row.contract_years_remaining != null).length, 92);
+  assert.equal(detail?.cap_rows.filter((row) => row.post_june_1_cut_savings_2026 != null).length, 92);
+  assert.equal(detail?.cap_rows.filter((row) => row.trade_savings_2026 != null).length, 92);
   assert.equal(detail?.cap_rows.some((row) => row.player_name === 'Brian Burns' && row.contract_years_remaining === 3), true);
   assert.equal(detail?.cap_rows.some((row) => row.player_name === 'Brian Burns' && row.contract_ledger_confidence === 'captured'), true);
   assert.equal((detail?.player_metrics.filter((row) => row.source_status === 'captured').length ?? 0) > 50, true);
@@ -86,13 +101,16 @@ test('NFL routes return current all-team summaries and NYG detail', async () => 
   const detailBody = await detail.json() as {
     team: { team_id: string };
     roster_entries: Array<{ player_name: string }>;
-    cap_rows: Array<{ player_name: string; source_status: string }>;
+    cap_rows: Array<{ player_name: string; source_status: string; contract_lever?: string | null; cap_number_2026?: number | null }>;
   };
   assert.equal(detailBody.team.team_id, 'NYG');
   assert.equal(detailBody.roster_entries.length >= 90, true);
   assert.equal(detailBody.cap_rows.length, detailBody.roster_entries.length);
   assert.equal(detailBody.cap_rows.some((row) => row.player_name === 'Brian Burns'), true);
-  assert.equal(detailBody.cap_rows.some((row) => row.player_name === 'Gunner Olszewski' && row.source_status === 'source-needed'), true);
+  assert.equal(
+    detailBody.cap_rows.some((row) => row.player_name === 'Gunner Olszewski' && row.source_status === 'captured' && row.contract_lever === 'non_active_cap_charge' && row.cap_number_2026 === 1_262_500),
+    true,
+  );
 
   const missing = await nflRoutes.request('/cap-sheets/current/NOPE');
   assert.equal(missing.status, 404);

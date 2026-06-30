@@ -119,6 +119,14 @@ interface ParsedOtcLedger {
   rows: ParsedOtcYearRow[];
 }
 
+interface ParsedNonActiveCapCharge {
+  player_name: string;
+  source_team_id: string;
+  source_url: string;
+  section_label: string;
+  cap_number: number;
+}
+
 interface ContractLedgerSummary {
   contract_end_year: number | null;
   contract_years_remaining: number | null;
@@ -144,6 +152,20 @@ interface EstimatedContractLedger extends ContractLedgerSummary {
   post_june_1_trade_savings_2026: number;
   source_url: string;
   estimated_fields: string[];
+}
+
+interface DerivedNonActiveContractLedger extends ContractLedgerSummary {
+  cap_number_2026: number;
+  dead_money_if_cut_2026: number;
+  cut_savings_2026: number;
+  post_june_1_dead_money_2026: number;
+  post_june_1_cut_savings_2026: number;
+  trade_dead_money_2026: number;
+  trade_savings_2026: number;
+  post_june_1_trade_dead_money_2026: number;
+  post_june_1_trade_savings_2026: number;
+  source_url: string;
+  section_label: string;
 }
 
 interface PublicMetricAggregate {
@@ -194,6 +216,11 @@ interface PublicMetricExtraCsvs {
   depthChartsCsv?: string;
 }
 
+interface OtcContractSnapshot {
+  ledgers: ParsedOtcLedger[];
+  nonActiveCharges: ParsedNonActiveCapCharge[];
+}
+
 async function main() {
   const existing = await readExistingSeed();
   const existingCap = new Map(existing?.cap_rows.map((row) => [`${row.team_id}:${normalizeName(row.player_name)}`, row]) ?? []);
@@ -203,11 +230,11 @@ async function main() {
   const capRows: NflCapRow[] = [];
   const metricRows: NflPlayerMetricRow[] = [];
   const teamSnapshots = await Promise.all(TEAMS.map(async (team) => {
-    const [rosterRows, otcLedgers] = await Promise.all([
+    const [rosterRows, otcSnapshot] = await Promise.all([
       fetchOfficialRoster(team),
-      fetchOtcContractLedgers(team),
+      fetchOtcContractSnapshot(team),
     ]);
-    return { team, rosterRows, otcLedgers };
+    return { team, rosterRows, otcLedgers: otcSnapshot.ledgers, nonActiveCharges: otcSnapshot.nonActiveCharges };
   }));
   const globalOtcByName = new Map<string, ParsedOtcLedger[]>();
   for (const snapshot of teamSnapshots) {
@@ -219,9 +246,15 @@ async function main() {
     }
   }
 
-  for (const { team, rosterRows, otcLedgers } of teamSnapshots) {
+  for (const { team, rosterRows, otcLedgers, nonActiveCharges } of teamSnapshots) {
     const otcByName = new Map<string, ParsedOtcLedger>();
     for (const ledger of otcLedgers) otcByName.set(normalizeName(ledger.player_name), ledger);
+    const nonActiveByName = new Map<string, ParsedNonActiveCapCharge>();
+    for (const charge of nonActiveCharges) {
+      const key = normalizeName(charge.player_name);
+      const existing = nonActiveByName.get(key);
+      if (!existing || charge.cap_number > existing.cap_number) nonActiveByName.set(key, charge);
+    }
 
     for (const roster of rosterRows) {
       const rosterEntry: NflRosterEntry = {
@@ -248,51 +281,62 @@ async function main() {
       const otcLedger = globalOtcLedger;
       const otcTeamMismatch = Boolean(otcLedger && !teamOtcLedger && otcLedger.source_team_id !== team.team_id);
       const otc = otcLedger?.current ?? null;
+      const nonActiveCharge = otc ? null : lookupNonActiveCharge(nonActiveByName, roster.player_name);
       const oldCap = existingCap.get(`${team.team_id}:${normalizeName(roster.player_name)}`) ?? null;
       const publicMetric = lookupPublicMetric(publicMetrics, team.team_id, roster);
-      const estimatedLedger = otc || !shouldEstimateLowCapContract(roster, publicMetric)
+      const estimatedLedger = otc || nonActiveCharge || !shouldEstimateLowCapContract(roster, publicMetric)
         ? null
         : estimateLowCapContractLedger(roster, team);
-      const sourceStatus: NflCapRow['source_status'] = otc ? 'captured' : estimatedLedger ? 'estimated' : 'source-needed';
-      const ledger = otc ? summarizeContractLedger(otcLedger?.rows ?? []) : estimatedLedger ?? summarizeContractLedger([]);
+      const sourceStatus: NflCapRow['source_status'] = otc || nonActiveCharge ? 'captured' : estimatedLedger ? 'estimated' : 'source-needed';
+      const nonActiveLedger = nonActiveCharge ? deriveNonActiveContractLedger(nonActiveCharge) : null;
+      const ledger = otc ? summarizeContractLedger(otcLedger?.rows ?? []) : nonActiveLedger ?? estimatedLedger ?? summarizeContractLedger([]);
       const cashDue = otc
         ? sumNumbers([otc.base_salary, otc.roster_bonus_regular, otc.roster_bonus_per_game, otc.workout_bonus, otc.other_bonus])
         : estimatedLedger?.cash_due_2026 ?? null;
+      const nonActiveSourceNeededFields = [
+        'cash_due_2026',
+        'total_value_remaining',
+        'guaranteed_remaining',
+        'restructure_savings_estimate_2026',
+        'extension_savings_estimate_2026',
+      ];
       capRows.push({
         team_id: team.team_id,
         player_id: roster.player_id,
         player_name: roster.player_name,
         position: roster.position,
-        cap_number_2026: otc?.cap_number ?? estimatedLedger?.cap_number_2026 ?? null,
+        cap_number_2026: otc?.cap_number ?? nonActiveLedger?.cap_number_2026 ?? estimatedLedger?.cap_number_2026 ?? null,
         cash_due_2026: cashDue,
-        total_value_remaining: ledger.total_value_remaining ?? oldCap?.total_value_remaining ?? null,
+        total_value_remaining: nonActiveLedger ? null : ledger.total_value_remaining ?? oldCap?.total_value_remaining ?? null,
         years_remaining: ledger.contract_years_remaining,
         contract_end_year: ledger.contract_end_year,
         contract_years_remaining: ledger.contract_years_remaining,
         void_year_count: ledger.void_year_count,
         void_years_source_status: ledger.void_years_source_status,
-        guaranteed_remaining: otc?.guaranteed_salary ?? estimatedLedger?.guaranteed_remaining ?? oldCap?.guaranteed_remaining ?? null,
-        dead_money_if_cut_2026: otc?.dead_money_cut ?? estimatedLedger?.dead_money_if_cut_2026 ?? null,
-        cut_savings_2026: otc?.cut_savings ?? estimatedLedger?.cut_savings_2026 ?? null,
-        post_june_1_dead_money_2026: otc?.post_june_1_dead_money_cut ?? estimatedLedger?.post_june_1_dead_money_2026 ?? null,
-        post_june_1_cut_savings_2026: otc?.post_june_1_cut_savings ?? estimatedLedger?.post_june_1_cut_savings_2026 ?? null,
-        trade_dead_money_2026: otc?.trade_dead_money ?? estimatedLedger?.trade_dead_money_2026 ?? null,
-        trade_savings_2026: otc?.trade_savings ?? estimatedLedger?.trade_savings_2026 ?? null,
-        post_june_1_trade_dead_money_2026: otc?.post_june_1_trade_dead_money ?? estimatedLedger?.post_june_1_trade_dead_money_2026 ?? null,
-        post_june_1_trade_savings_2026: otc?.post_june_1_trade_savings ?? estimatedLedger?.post_june_1_trade_savings_2026 ?? null,
+        guaranteed_remaining: nonActiveLedger ? null : otc?.guaranteed_salary ?? estimatedLedger?.guaranteed_remaining ?? oldCap?.guaranteed_remaining ?? null,
+        dead_money_if_cut_2026: otc?.dead_money_cut ?? nonActiveLedger?.dead_money_if_cut_2026 ?? estimatedLedger?.dead_money_if_cut_2026 ?? null,
+        cut_savings_2026: otc?.cut_savings ?? nonActiveLedger?.cut_savings_2026 ?? estimatedLedger?.cut_savings_2026 ?? null,
+        post_june_1_dead_money_2026: otc?.post_june_1_dead_money_cut ?? nonActiveLedger?.post_june_1_dead_money_2026 ?? estimatedLedger?.post_june_1_dead_money_2026 ?? null,
+        post_june_1_cut_savings_2026: otc?.post_june_1_cut_savings ?? nonActiveLedger?.post_june_1_cut_savings_2026 ?? estimatedLedger?.post_june_1_cut_savings_2026 ?? null,
+        trade_dead_money_2026: otc?.trade_dead_money ?? nonActiveLedger?.trade_dead_money_2026 ?? estimatedLedger?.trade_dead_money_2026 ?? null,
+        trade_savings_2026: otc?.trade_savings ?? nonActiveLedger?.trade_savings_2026 ?? estimatedLedger?.trade_savings_2026 ?? null,
+        post_june_1_trade_dead_money_2026: otc?.post_june_1_trade_dead_money ?? nonActiveLedger?.post_june_1_trade_dead_money_2026 ?? estimatedLedger?.post_june_1_trade_dead_money_2026 ?? null,
+        post_june_1_trade_savings_2026: otc?.post_june_1_trade_savings ?? nonActiveLedger?.post_june_1_trade_savings_2026 ?? estimatedLedger?.post_june_1_trade_savings_2026 ?? null,
         restructure_savings_estimate_2026: otc ? Math.max(otc.restructure_savings ?? 0, 0) : null,
         extension_savings_estimate_2026: otc ? Math.max(otc.extension_savings ?? 0, 0) : null,
         contract_ledger_status: ledger.contract_ledger_status,
         contract_ledger_confidence: ledger.contract_ledger_confidence,
         tag_eligible_2027: oldCap?.tag_eligible_2027 ?? false,
-        contract_lever: contractLever(otc, estimatedLedger),
-        source_url: otc?.source_url ?? estimatedLedger?.source_url ?? team.source_url,
+        contract_lever: contractLever(otc, estimatedLedger, nonActiveLedger),
+        source_url: otc?.source_url ?? nonActiveLedger?.source_url ?? estimatedLedger?.source_url ?? team.source_url,
         source_status: sourceStatus,
         source_order: roster.source_order,
         source_note: otc
           ? otcTeamMismatch
             ? `Captured from a unique OverTheCap ${otcLedger?.source_team_id} contract row and joined to NFL.com ${team.team_id} roster row; team/source mismatch needs review before external use.`
             : 'Captured from OverTheCap team salary-cap table Contract Ledger v1 and joined to NFL.com roster row.'
+          : nonActiveLedger
+            ? `Captured from OverTheCap ${nonActiveLedger.section_label} non-active cap-charge table and joined to NFL.com roster row; transaction mechanics are conservatively derived as no current-year cap relief because the row is not in the contracted-player table.`
           : estimatedLedger
             ? 'Estimated low-cap/offseason contract placeholder from NFL.com roster row because no matching OverTheCap row was found; use for coverage and directional cap math, not exact legal modeling.'
             : 'Roster player present on NFL.com; matching OverTheCap row not found in this snapshot.',
@@ -301,7 +345,7 @@ async function main() {
           otc_source_team_id: otcLedger?.source_team_id ?? null,
           otc_team_mismatch: otcTeamMismatch,
           roster_player_name: roster.player_name,
-          source_needed_fields: otc || estimatedLedger ? [] : [
+          source_needed_fields: otc || estimatedLedger ? [] : nonActiveLedger ? nonActiveSourceNeededFields : [
             'cap_number_2026',
             'cash_due_2026',
             'contract_end_year',
@@ -317,6 +361,21 @@ async function main() {
             'restructure_savings_estimate_2026',
           ],
           estimated_fields: estimatedLedger ? estimatedLedger.estimated_fields : [],
+          non_active_cap_charge: nonActiveCharge ? {
+            section_label: nonActiveCharge.section_label,
+            cap_number_2026: nonActiveCharge.cap_number,
+            source_url: nonActiveCharge.source_url,
+            derived_transaction_fields: [
+              'dead_money_if_cut_2026',
+              'cut_savings_2026',
+              'post_june_1_dead_money_2026',
+              'post_june_1_cut_savings_2026',
+              'trade_dead_money_2026',
+              'trade_savings_2026',
+              'post_june_1_trade_dead_money_2026',
+              'post_june_1_trade_savings_2026',
+            ],
+          } : null,
           contract_years: ledger.contract_years,
           contract_ledger: {
             status: ledger.contract_ledger_status,
@@ -1113,6 +1172,17 @@ function lookupLedgerByName(
   return null;
 }
 
+function lookupNonActiveCharge(
+  byName: Map<string, ParsedNonActiveCapCharge>,
+  playerName: string,
+): ParsedNonActiveCapCharge | null {
+  for (const nameKey of nameLookupKeys(playerName)) {
+    const found = byName.get(nameKey);
+    if (found) return found;
+  }
+  return null;
+}
+
 function uniqueLedgerCandidates(rows: ParsedOtcLedger[]): ParsedOtcLedger[] {
   const seen = new Set<string>();
   const out: ParsedOtcLedger[] = [];
@@ -1207,6 +1277,39 @@ function estimateLowCapContractLedger(roster: ParsedRosterRow, team: TeamConfig)
   };
 }
 
+function deriveNonActiveContractLedger(charge: ParsedNonActiveCapCharge): DerivedNonActiveContractLedger {
+  const cap = charge.cap_number;
+  const contractYear = {
+    season: '2026',
+    cap_number: cap,
+    cash_due: null,
+    guaranteed_salary: null,
+    void_year_candidate: false,
+    source_status: 'captured_non_active_cap_charge',
+  };
+  return {
+    contract_end_year: 2026,
+    contract_years_remaining: 1,
+    void_year_count: 0,
+    void_years_source_status: 'not-available',
+    total_value_remaining: null,
+    contract_ledger_status: 'captured',
+    contract_ledger_confidence: 'derived',
+    contract_years: [contractYear],
+    cap_number_2026: cap,
+    dead_money_if_cut_2026: cap,
+    cut_savings_2026: 0,
+    post_june_1_dead_money_2026: cap,
+    post_june_1_cut_savings_2026: 0,
+    trade_dead_money_2026: cap,
+    trade_savings_2026: 0,
+    post_june_1_trade_dead_money_2026: cap,
+    post_june_1_trade_savings_2026: 0,
+    source_url: charge.source_url,
+    section_label: charge.section_label,
+  };
+}
+
 function estimateMinimumSalary2026(experience: string | null): number {
   const years = experience === 'R' || experience == null ? 0 : Number(experience);
   if (!Number.isFinite(years) || years <= 0) return 860_000;
@@ -1286,10 +1389,11 @@ function rosterRow(rowHtml: string, team: TeamConfig, sourceOrder: number): Pars
   };
 }
 
-async function fetchOtcContractLedgers(team: TeamConfig): Promise<ParsedOtcLedger[]> {
+async function fetchOtcContractSnapshot(team: TeamConfig): Promise<OtcContractSnapshot> {
   const url = `https://overthecap.com/salary-cap/${team.otc_slug}`;
   const html = await fetchText(url);
   const rows = parseOtcCapYearsFromHtml(html, url);
+  const nonActiveCharges = parseOtcNonActiveCapChargesFromHtml(html, url, team.team_id);
   const currentRows = rows.filter((row) => row.season === '2026');
   if (currentRows.length === 0) throw new Error(`${team.team_id} OverTheCap page missing y2026 contracted player rows`);
 
@@ -1301,7 +1405,7 @@ async function fetchOtcContractLedgers(team: TeamConfig): Promise<ParsedOtcLedge
     byName.set(key, existing);
   }
 
-  return [...byName.values()].map((playerRows) => {
+  const ledgers = [...byName.values()].map((playerRows) => {
     const sorted = playerRows.slice().sort((a, b) => Number(a.season) - Number(b.season));
     const current = sorted.find((row) => row.season === '2026') ?? null;
     return {
@@ -1312,6 +1416,7 @@ async function fetchOtcContractLedgers(team: TeamConfig): Promise<ParsedOtcLedge
       rows: sorted,
     };
   }).filter((ledger) => ledger.current !== null);
+  return { ledgers, nonActiveCharges };
 }
 
 export function parseOtcCapYearsFromHtml(html: string, teamUrl: string): ParsedOtcYearRow[] {
@@ -1330,6 +1435,36 @@ export function parseOtcCapYearsFromHtml(html: string, teamUrl: string): ParsedO
     rows.push(...[...tbody.matchAll(/<tr>([\s\S]*?)<\/tr>/g)]
       .map((rowMatch) => otcYearRow(rowMatch[1], teamUrl, season))
       .filter((row): row is ParsedOtcYearRow => Boolean(row)));
+  }
+  return rows;
+}
+
+export function parseOtcNonActiveCapChargesFromHtml(
+  html: string,
+  teamUrl: string,
+  teamId = 'UNK',
+): ParsedNonActiveCapCharge[] {
+  const tableMatches = [...html.matchAll(/<div class="[^"]*\bnon-active-table\b[^"]*">\s*<h5>([\s\S]*?)<\/h5>\s*<table[\s\S]*?<tbody>([\s\S]*?)<\/tbody>\s*<\/table>\s*<\/div>/g)];
+  const rows: ParsedNonActiveCapCharge[] = [];
+  for (const tableMatch of tableMatches) {
+    const sectionLabel = cleanText(tableMatch[1]) || 'Non-Active Roster Cap Charges';
+    const tbody = tableMatch[2];
+    for (const rowMatch of tbody.matchAll(/<tr>([\s\S]*?)<\/tr>/g)) {
+      const rowHtml = rowMatch[1];
+      if (rowHtml.includes('<strong>')) continue;
+      const cells = [...rowHtml.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map((match) => match[1]);
+      const nameMatch = cells[0]?.match(/<a[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/);
+      const capNumber = money(cells[1]);
+      if (!nameMatch || capNumber == null) continue;
+      const sourceUrl = nameMatch[1].startsWith('http') ? nameMatch[1] : `https://overthecap.com${nameMatch[1]}`;
+      rows.push({
+        player_name: cleanText(nameMatch[2]),
+        source_team_id: teamId,
+        source_url: sourceUrl || teamUrl,
+        section_label: sectionLabel,
+        cap_number: capNumber,
+      });
+    }
   }
   return rows;
 }
@@ -1458,12 +1593,45 @@ function normalizeName(name: string): string {
 function nameLookupKeys(name: string): string[] {
   const key = normalizeName(name);
   const aliases: Record<string, string[]> = {
+    bamknight: ['zonovanknight'],
+    camrobertson: ['cameronrobertson'],
+    michaeljerrell: ['mikejerrell'],
+    demetriusweatherspoon: ['dametriusweatherspoon'],
+    mikejackson: ['michaeljackson'],
+    camjackson: ['camronjackson'],
+    camlewis: ['cameronlewis'],
+    cameronross: ['camross'],
+    chrisbrooks: ['christopherbrooks'],
+    mattheworzech: ['mattorzech'],
+    louishansen: ['louiehansen'],
+    jacobhummel: ['jakehummel'],
+    camrynbynum: ['cambynum'],
+    foyeoluokun: ['foyesadeoluokun'],
+    gregorydesrosiers: ['gregdesrosiers'],
+    alzillionhamiltonon: ['alzillionhamilton'],
+    eliasneal: ['elineal'],
+    dreynorwood: ['dreydennorwood'],
+    djglaze: ['delmarglaze'],
+    christhomas: ['christianthomas'],
+    andyborregales: ['andresborregales'],
+    mikeonwenu: ['michaelonwenu'],
     matthewstafford: ['mattstafford'],
     kamcurl: ['kamrencurl'],
     cjgardnerjohnson: ['chaunceygardnerjohnson'],
     gregrousseau: ['gregoryrousseau'],
     michaeldanna: ['mikedanna'],
-    demetriusweatherspoon: ['demetriusweatherspoon'],
+    olumuyiwafashanu: ['olufashanu'],
+    mikejordan: ['michaeljordan'],
+    riqwoolen: ['tariqwoolen'],
+    gaberubio: ['gabrielrubio'],
+    benskowronek: ['bennettskowronek'],
+    oluoluwatimi: ['olusegunoluwatimi'],
+    zachthomas: ['zacharythomas'],
+    benjaminchukwuma: ['benchukwuma'],
+    kennygainwell: ['kennethgainwell'],
+    haggaindubuisi: ['haggaichisomndubuisi'],
+    nicholassingleton: ['nicksingleton'],
+    trentscott: ['trentonscott'],
     patssurtain: ['patricksurtain'],
     patsurtain: ['patricksurtain'],
     saucegardner: ['ahmadgardner'],
@@ -1479,7 +1647,12 @@ function playerSlug(href: string, playerName: string): string {
   return parts.at(-1) ?? normalizeName(playerName);
 }
 
-function contractLever(row: ParsedOtcYearRow | null, estimatedLedger: EstimatedContractLedger | null = null): string {
+function contractLever(
+  row: ParsedOtcYearRow | null,
+  estimatedLedger: EstimatedContractLedger | null = null,
+  nonActiveLedger: DerivedNonActiveContractLedger | null = null,
+): string {
+  if (nonActiveLedger) return 'non_active_cap_charge';
   if (estimatedLedger) return 'estimated_low_cap';
   if (!row) return 'source_needed';
   const restructure = row.restructure_savings ?? 0;

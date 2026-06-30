@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { buildPublicMetricIndex, parseOtcCapYearsFromHtml, summarizeContractLedger } from '../../src/nfl_data/build_reviewed_snapshot.js';
+import {
+  buildPublicMetricIndex,
+  parseOtcCapYearsFromHtml,
+  parseOtcNonActiveCapChargesFromHtml,
+  summarizeContractLedger,
+} from '../../src/nfl_data/build_reviewed_snapshot.js';
 
 const OTC_FIXTURE = `
   <div class="salary-cap-container" id="y2026">
@@ -115,6 +120,29 @@ test('OTC contract ledger summarizer computes years voids value and confidence',
   assert.equal(summary.contract_ledger_confidence, 'captured');
   assert.equal(summary.contract_years.length, 3);
   assert.equal(summary.contract_years.some((row) => row.void_year_candidate === true), true);
+});
+
+test('OTC non-active cap parser captures injured reserve cap charges', () => {
+  const html = `
+    <div class="non-active-table">
+      <h5>Injured Reserve</h5>
+      <table class="salary-cap-table non-active">
+        <tbody>
+          <tr><td><a href="/player/sample-ir/9999/">Sample IR</a></td><td>$1,262,500</td></tr>
+          <tr><td><strong>TOTAL</strong></td><td><strong>$1,262,500</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  const rows = parseOtcNonActiveCapChargesFromHtml(html, 'https://overthecap.com/salary-cap/test', 'NYG');
+
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].player_name, 'Sample IR');
+  assert.equal(rows[0].section_label, 'Injured Reserve');
+  assert.equal(rows[0].cap_number, 1_262_500);
+  assert.equal(rows[0].source_team_id, 'NYG');
+  assert.equal(rows[0].source_url, 'https://overthecap.com/player/sample-ir/9999/');
 });
 
 test('public player metric parser joins snap counts and player production', () => {
