@@ -1,0 +1,42 @@
+{
+  "schema": "codex_task_orchestrator_intent.v1",
+  "task_id": "nyg-demo-transaction-market-20260902-run9-red-team",
+  "objective_summary": "Independently red-team the live NFL transaction-market capability for reproducible math, novel-query behavior, and football-operations demo quality.",
+  "durable_recovery": true,
+  "requires_live_dirty_state": false,
+  "nodes": [
+    {
+      "id": "transaction_data_recompute",
+      "goal": "parent_id=root. Independently audit the governed NFL transaction snapshot, deterministic analyzer, migrations, seed, and tests against plans/nfl-transaction-market-analysis-20260902.md. Recompute representative mobility, transaction-share, premium-pick, contract-price, sample, identity, and leave-one-out values. Inspect idempotence, stable pagination, stale/ambiguous identity handling, source provenance, and the isolated-event mutation proof. Report only reproducible BLOCKER/HIGH/MEDIUM/LOW findings with exact file references and return codex_task_worker_result.v1.",
+      "dependencies": [],
+      "worker_class": "sandboxed_read",
+      "reservation": { "mode": "read", "paths": ["plans/nfl-transaction-market-analysis-20260902.md", "data/nfl-transactions", "server/src/nfl_transactions", "server/src/nfl_coverage", "server/tests/nfl_transactions", "supabase/migrations/20260902000200_nfl_transaction_market.sql", "supabase/migrations/20260902000300_nfl_transaction_event_provenance.sql", "supabase/migrations/20260902000400_nfl_transaction_event_provenance_view.sql"] },
+      "expected_output": "Independent reconciliation report with PASS only if the material calculations, provenance, identity boundaries, and DB behavior reconcile.",
+      "verification": "Recompute from source rows or fixtures and cite exact implementation/test locations for every finding.",
+      "stop_condition": "Stop after all material calculations and acceptance boundaries are classified; do not repair data by assumption.",
+      "public_web_search": false
+    },
+    {
+      "id": "novel_question_red_team",
+      "goal": "parent_id=root. Audit the Analysis tool loop, request parser, brief attachment, follow-up inheritance, private critic, deterministic fallback, evidence cards, and tests. Exercise Ty's question, all four specified follow-ups, and the two unplanned variations conceptually against the code. Look for any stored conclusion, missing requery, filter leakage, unsupported numeric prose, invented comparable/citation, or fail-open path. Report only reproducible BLOCKER/HIGH/MEDIUM/LOW findings with exact file references and return codex_task_worker_result.v1.",
+      "dependencies": [],
+      "worker_class": "sandboxed_read",
+      "reservation": { "mode": "read", "paths": ["shared/types.ts", "shared/briefTemplates.ts", "server/src/claude/data_analyst.ts", "server/src/claude/nfl_transaction_market_guardrails.ts", "server/src/claude/private_critic.ts", "server/src/routes/briefs.ts", "server/src/routes/chat.ts", "server/tests/data_analyst", "server/tests/nfl_transactions/question.test.ts"] },
+      "expected_output": "Novel-question and governance review with exact reproduction steps and PASS only if every answer is query-time and artifact-bound.",
+      "verification": "Trace initial and follow-up request construction through persistence, critic, and fallback without relying on expected prose.",
+      "stop_condition": "Stop after the seven required question shapes and failure modes are classified; do not request a scripted page or fixture.",
+      "public_web_search": false
+    },
+    {
+      "id": "football_ops_analysis_ux",
+      "goal": "parent_id=root. Review the active Analysis UI and evidence rail as a skeptical Giants football-operations presenter. Confirm Analysis remains the main workspace, the artifact exposes filters/series/method/comparables/influence/sources/limitations/strategy implications, and responsive behavior is credible. Distinguish implementation issues from speculative redesign. Report reproducible BLOCKER/HIGH/MEDIUM/LOW findings with exact file references and return codex_task_worker_result.v1.",
+      "dependencies": [],
+      "worker_class": "sandboxed_read",
+      "reservation": { "mode": "read", "paths": ["src/App.tsx", "src/fenway", "src/api", "shared/types.ts", "plans/nfl-transaction-market-analysis-20260902.md"] },
+      "expected_output": "Meeting-risk UX review focused on the live Analysis workflow, not a separate demo route.",
+      "verification": "Trace rendered states and responsive layout from active imports and identify exact reproduction conditions.",
+      "stop_condition": "Stop after all visible acceptance elements and meeting-risk defects are classified; do not expand scope beyond Analysis.",
+      "public_web_search": false
+    }
+  ]
+}
