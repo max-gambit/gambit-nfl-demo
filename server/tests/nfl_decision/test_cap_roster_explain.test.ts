@@ -6,6 +6,7 @@ import type { NflCapRosterNarrativeDraft } from '../../src/claude/private_critic
 import { buildCapRosterDecision } from '../../src/nfl_decision/cap_roster.js';
 import { explainCapRosterDecision } from '../../src/nfl_decision/explain.js';
 import { loadNflDemoSeed } from '../../src/nfl_data/seed.js';
+import type { NflTransactionMarketDataHealth } from '../../src/nfl_transactions/seed.js';
 
 const generatedAt = new Date('2026-09-02T18:00:00.000Z');
 
@@ -22,11 +23,39 @@ async function fixture() {
     protected_position_groups: ['QB'],
     allowed_levers: ['hold', 'pre_june_cut', 'post_june_cut', 'trade'],
   };
-  const options = { data: { seed, source_mode: 'supabase_current_views' as const, fallback_reason: null }, generatedAt };
+  const options = { data: { seed, source_mode: 'supabase_current_views' as const, fallback_reason: null }, generatedAt, transactionMarket: transactionMarketHealth() };
   const decision = await buildCapRosterDecision(request, options);
   const branch = decision.branches.find((candidate) => candidate.id === decision.recommended_branch_id);
   assert.ok(branch);
   return { request, options, branch };
+}
+
+function transactionMarketHealth(): NflTransactionMarketDataHealth {
+  return {
+    source_mode: 'supabase_current_views',
+    snapshot_id: 'fixture-transaction-market',
+    as_of_date: '2026-09-02',
+    retrieved_at: '2026-09-02T12:15:00.000Z',
+    row_count: 100,
+    coverage: {
+      start_year: 2016,
+      end_year: 2025,
+      event_count: 100,
+      trade_event_count: 50,
+      contract_event_count: 50,
+      trade_asset_count: 75,
+      contract_term_count: 50,
+      matched_position_count: 96,
+      directional_position_count: 2,
+      unmatched_position_count: 2,
+      position_match_basis_points: 9_600,
+      compensation_coverage_basis_points: 9_600,
+      contract_term_coverage_basis_points: 9_600,
+      transaction_types: { trade: 50, free_agent_signing: 50 },
+    },
+    sources: [],
+    fallback_reason: null,
+  };
 }
 
 function validDraft(branch: Awaited<ReturnType<typeof fixture>>['branch']): NflCapRosterNarrativeDraft {

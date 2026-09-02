@@ -171,11 +171,12 @@ export function analyzeNflTransactionMarketSnapshot(
   const capByYear = leagueCapMap(snapshot);
   const leagueEvents = snapshot.events.filter((event) => matchesLeagueScope(event, query));
   const cohortEvents = leagueEvents.filter((event) => matchesCohort(event, query));
+  const identityAuditEvents = leagueEvents.filter((event) => matchesIdentityAuditCohort(event, query));
   const yearlySeries = buildYearlySeries(snapshot, query, leagueEvents, cohortEvents, capByYear);
   const positionTrends = query.position_groups.map((position) => buildPositionTrend(
-    position, snapshot, query, leagueEvents, cohortEvents, capByYear, thresholds,
+    position, snapshot, query, leagueEvents, cohortEvents, identityAuditEvents, capByYear, thresholds,
   ));
-  const coverage = buildCoverage(snapshot, query, cohortEvents, capByYear);
+  const coverage = buildCoverage(snapshot, query, cohortEvents, identityAuditEvents, capByYear);
   const comparables = [...cohortEvents]
     .sort((a, b) => compareComparableEvents(a, b, query, capByYear))
     .slice(0, query.max_comparables)
@@ -199,7 +200,7 @@ export function analyzeNflTransactionMarketSnapshot(
     comparables,
     influential_transactions: influentialTransactions,
     source_refs: usedSourceRefs(snapshot, query, cohortEvents),
-    limitations: limitations(snapshot, query, cohortEvents, capByYear, status),
+    limitations: limitations(snapshot, query, cohortEvents, identityAuditEvents, capByYear, status),
   };
 }
 
@@ -249,8 +250,12 @@ export function resolveNflTransactionMarketQuery(
     throw new Error('max_comparables must be an integer from 1 through 50');
   }
 
+  const completedEndYear = includeYtd ? endYear - 1 : endYear;
+  if (startYear >= completedEndYear) {
+    throw new Error('transaction-market comparisons require at least two completed league years');
+  }
   const [baselineYears, recentYears] = resolvePeriods(
-    startYear, endYear, request.analysis_mode, comparisonYear,
+    startYear, completedEndYear, request.analysis_mode, comparisonYear,
   );
   return {
     analysis_mode: request.analysis_mode,
@@ -321,12 +326,15 @@ function buildPositionTrend(
   query: NflTransactionMarketResolvedQuery,
   leagueEvents: NflTransactionMarketEvent[],
   cohortEvents: NflTransactionMarketEvent[],
+  identityAuditEvents: NflTransactionMarketEvent[],
   capByYear: ReadonlyMap<number, number>,
   thresholds: Readonly<NflTransactionMarketThresholds>,
 ): NflPositionMarketTrend {
   const events = cohortEvents.filter((event) => event.position_group === position);
   const baselineEvents = events.filter((event) => inPeriod(event.event_year, query.baseline_years));
   const recentEvents = events.filter((event) => inPeriod(event.event_year, query.recent_years));
+  const baselineIdentityEvents = identityAuditEvents.filter((event) => inPeriod(event.event_year, query.baseline_years));
+  const recentIdentityEvents = identityAuditEvents.filter((event) => inPeriod(event.event_year, query.recent_years));
   const baselineLeagueCount = leagueEvents.filter((event) => inPeriod(event.event_year, query.baseline_years)).length;
   const recentLeagueCount = leagueEvents.filter((event) => inPeriod(event.event_year, query.recent_years)).length;
   const baselineDenominator = periodRosterDenominator(snapshot, query, position, query.baseline_years);
@@ -338,6 +346,9 @@ function buildPositionTrend(
     baselineEvents,
     recentEvents,
     overallEvents: events,
+    identityOverallEvents: identityAuditEvents,
+    identityBaselineEvents: baselineIdentityEvents,
+    identityRecentEvents: recentIdentityEvents,
     minimumOverall: thresholds.minimum_events_overall,
     minimumPerPeriod: thresholds.minimum_events_per_period,
     unit: 'events_per_100_player_seasons',
@@ -351,6 +362,9 @@ function buildPositionTrend(
     baselineEvents,
     recentEvents,
     overallEvents: events,
+    identityOverallEvents: identityAuditEvents,
+    identityBaselineEvents: baselineIdentityEvents,
+    identityRecentEvents: recentIdentityEvents,
     minimumOverall: thresholds.minimum_events_overall,
     minimumPerPeriod: thresholds.minimum_events_per_period,
     unit: 'transaction_share_basis_points',
@@ -358,8 +372,8 @@ function buildPositionTrend(
     thresholds,
     detail: `League move denominators are ${baselineLeagueCount} and ${recentLeagueCount} events.`,
   });
-  const contractPrice = buildContractSignal(events, baselineEvents, recentEvents, capByYear, thresholds);
-  const tradeCompensation = buildCompensationSignal(events, baselineEvents, recentEvents, thresholds);
+  const contractPrice = buildContractSignal(events, baselineEvents, recentEvents, identityAuditEvents, baselineIdentityEvents, recentIdentityEvents, capByYear, thresholds);
+  const tradeCompensation = buildCompensationSignal(events, baselineEvents, recentEvents, identityAuditEvents, baselineIdentityEvents, recentIdentityEvents, thresholds);
   const classification = classifySignals([mobility, transactionShare, contractPrice, tradeCompensation]);
 
   return {
@@ -380,6 +394,9 @@ interface StandardSignalArgs {
   baselineEvents: NflTransactionMarketEvent[];
   recentEvents: NflTransactionMarketEvent[];
   overallEvents: NflTransactionMarketEvent[];
+  identityOverallEvents?: NflTransactionMarketEvent[];
+  identityBaselineEvents?: NflTransactionMarketEvent[];
+  identityRecentEvents?: NflTransactionMarketEvent[];
   minimumOverall: number;
   minimumPerPeriod: number;
   unit: NflTransactionMarketSignal['unit'];
@@ -396,6 +413,7 @@ function buildStandardSignal(args: StandardSignalArgs): NflTransactionMarketSign
     args.minimumOverall,
     args.minimumPerPeriod,
     args.thresholds,
+    args.identityOverallEvents,
   );
   const comparable = args.baselineValue != null && args.recentValue != null;
   const status = comparable ? gate : 'insufficient_evidence';
@@ -410,7 +428,7 @@ function buildStandardSignal(args: StandardSignalArgs): NflTransactionMarketSign
     relative_change_basis_points: comparable ? relativeChangeBasisPoints(args.baselineValue!, args.recentValue!) : null,
     sample_size: args.baselineEvents.length + args.recentEvents.length,
     unit: args.unit,
-    explanation: `${args.label} uses ${args.baselineEvents.length} baseline and ${args.recentEvents.length} recent observations. ${args.detail} Exact identity coverage is ${formatBps(identityBasisPoints(args.baselineEvents))} and ${formatBps(identityBasisPoints(args.recentEvents))}.`,
+    explanation: `${args.label} uses ${args.baselineEvents.length} baseline and ${args.recentEvents.length} recent observations. ${args.detail} Exact identity coverage across the scoped identity-audit cohort is ${formatBps(identityBasisPoints(args.identityBaselineEvents ?? args.baselineEvents))} and ${formatBps(identityBasisPoints(args.identityRecentEvents ?? args.recentEvents))}.`,
   };
 }
 
@@ -418,6 +436,9 @@ function buildContractSignal(
   allEvents: NflTransactionMarketEvent[],
   baselineEvents: NflTransactionMarketEvent[],
   recentEvents: NflTransactionMarketEvent[],
+  identityOverallEvents: NflTransactionMarketEvent[],
+  baselineIdentityEvents: NflTransactionMarketEvent[],
+  recentIdentityEvents: NflTransactionMarketEvent[],
   capByYear: ReadonlyMap<number, number>,
   thresholds: Readonly<NflTransactionMarketThresholds>,
 ): NflTransactionMarketSignal {
@@ -436,6 +457,7 @@ function buildContractSignal(
     thresholds.minimum_priced_contracts_per_period * 2,
     thresholds.minimum_priced_contracts_per_period,
     thresholds,
+    identityOverallEvents,
   );
   const guaranteeGate = signalGate(
     allEvents.filter((event) => guaranteedShareBasisPoints(event) != null),
@@ -443,6 +465,7 @@ function buildContractSignal(
     thresholds.minimum_priced_contracts_per_period * 2,
     thresholds.minimum_priced_contracts_per_period,
     thresholds,
+    identityOverallEvents,
   );
   const hasApyComparison = baselineValue != null && recentValue != null;
   let status: NflTransactionMarketStatus = hasApyComparison ? apyGate : 'insufficient_evidence';
@@ -479,6 +502,9 @@ function buildCompensationSignal(
   allEvents: NflTransactionMarketEvent[],
   baselineEvents: NflTransactionMarketEvent[],
   recentEvents: NflTransactionMarketEvent[],
+  identityOverallEvents: NflTransactionMarketEvent[],
+  baselineIdentityEvents: NflTransactionMarketEvent[],
+  recentIdentityEvents: NflTransactionMarketEvent[],
   thresholds: Readonly<NflTransactionMarketThresholds>,
 ): NflTransactionMarketSignal {
   const allTrades = allEvents.filter((event) => allocableCompensationBand(event) != null);
@@ -492,6 +518,9 @@ function buildCompensationSignal(
     baselineEvents: baselineTrades,
     recentEvents: recentTrades,
     overallEvents: allTrades,
+    identityOverallEvents,
+    identityBaselineEvents: baselineIdentityEvents,
+    identityRecentEvents: recentIdentityEvents,
     minimumOverall: thresholds.minimum_allocable_trades_per_period * 2,
     minimumPerPeriod: thresholds.minimum_allocable_trades_per_period,
     unit: 'compensation_band_mix',
@@ -528,11 +557,12 @@ function buildCoverage(
   snapshot: NflTransactionMarketSnapshot,
   query: NflTransactionMarketResolvedQuery,
   events: NflTransactionMarketEvent[],
+  identityAuditEvents: NflTransactionMarketEvent[],
   capByYear: ReadonlyMap<number, number>,
 ): NflTransactionMarketAnalysis['coverage'] {
   const typeCoverage: Partial<Record<NflTransactionType, number>> = {};
   for (const event of events) typeCoverage[event.transaction_type] = (typeCoverage[event.transaction_type] ?? 0) + 1;
-  const matched = events.filter((event) => event.identity_confidence === 'matched').length;
+  const matched = identityAuditEvents.filter((event) => event.identity_confidence === 'matched').length;
   const dated = events.map((event) => event.event_date).filter(isString).sort();
   return {
     event_count: events.length,
@@ -542,7 +572,7 @@ function buildCoverage(
       total + periodRosterDenominator(snapshot, query, position, [query.start_year, query.end_year])
     ), 0),
     matched_position_count: matched,
-    position_match_basis_points: events.length === 0 ? 0 : Math.round((matched / events.length) * 10_000),
+    position_match_basis_points: identityAuditEvents.length === 0 ? 0 : Math.round((matched / identityAuditEvents.length) * 10_000),
     allocable_trade_count: events.filter((event) => allocableCompensationBand(event) != null).length,
     priced_contract_count: events.filter((event) => contractApyCapBasisPoints(event, capByYear) != null).length,
     latest_event_date: dated.at(-1) ?? null,
@@ -763,6 +793,27 @@ function matchesCohort(event: NflTransactionMarketEvent, query: NflTransactionMa
     || (event.to_team_id != null && selected.has(event.to_team_id.toUpperCase()));
 }
 
+function matchesIdentityAuditCohort(event: NflTransactionMarketEvent, query: NflTransactionMarketResolvedQuery): boolean {
+  if (query.team_ids.length > 0) {
+    const selected = new Set(query.team_ids);
+    if ((event.from_team_id == null || !selected.has(event.from_team_id.toUpperCase()))
+      && (event.to_team_id == null || !selected.has(event.to_team_id.toUpperCase()))) return false;
+  }
+  if (event.position_group != null) return query.position_groups.includes(event.position_group);
+  if (query.position_groups.length === ALL_POSITION_GROUPS.size) return true;
+  const raw = (event.raw_position ?? '').toUpperCase().trim();
+  const possible = new Set<NflPositionMarketGroup>();
+  if (raw === 'DE' || raw === 'OLB') possible.add('EDGE');
+  if (raw === 'DL') { possible.add('EDGE'); possible.add('IDL'); }
+  if (raw === 'OL') { possible.add('OT'); possible.add('IOL'); }
+  if (raw === 'DB') { possible.add('CB'); possible.add('S'); }
+  if (raw === 'SAF') possible.add('S');
+  // Fully missing roles are rare, but remain in every requested audit cohort
+  // because silently assigning them away would inflate confidence.
+  if (possible.size === 0) return true;
+  return query.position_groups.some((position) => possible.has(position));
+}
+
 function signalGate(
   overallEvents: NflTransactionMarketEvent[],
   baselineEvents: NflTransactionMarketEvent[],
@@ -770,11 +821,12 @@ function signalGate(
   minimumOverall: number,
   minimumPerPeriod: number,
   thresholds: Readonly<NflTransactionMarketThresholds>,
+  identityEvents: NflTransactionMarketEvent[] = overallEvents,
 ): NflTransactionMarketStatus {
   if (overallEvents.length < minimumOverall
     || baselineEvents.length < minimumPerPeriod
     || recentEvents.length < minimumPerPeriod) return 'insufficient_evidence';
-  const identity = identityBasisPoints(overallEvents);
+  const identity = identityBasisPoints(identityEvents);
   if (identity >= thresholds.supported_identity_basis_points) return 'supported';
   if (identity >= thresholds.directional_identity_basis_points) return 'directional';
   return 'insufficient_evidence';
@@ -851,6 +903,7 @@ function limitations(
   snapshot: NflTransactionMarketSnapshot,
   query: NflTransactionMarketResolvedQuery,
   events: NflTransactionMarketEvent[],
+  identityAuditEvents: NflTransactionMarketEvent[],
   capByYear: ReadonlyMap<number, number>,
   status: NflTransactionMarketStatus,
 ): string[] {
@@ -878,7 +931,7 @@ function limitations(
       || (event.from_team_id != null && query.team_ids.includes(event.from_team_id.toUpperCase()))
       || (event.to_team_id != null && query.team_ids.includes(event.to_team_id.toUpperCase())))).length;
   if (unallocatedPositions > 0) result.push(`${unallocatedPositions} in-scope events lack an allocated position group and are excluded from position numerators.`);
-  const identityGaps = events.filter((event) => event.identity_confidence !== 'matched').length;
+  const identityGaps = identityAuditEvents.filter((event) => event.identity_confidence !== 'matched').length;
   if (identityGaps > 0) result.push(`${identityGaps} cohort events lack exact identity matches and lower the applicable evidence gates.`);
   const yearlyCounts = Array.from({ length: query.end_year - query.start_year + 1 }, (_, index) => {
     const year = query.start_year + index;
@@ -927,18 +980,20 @@ function analysisId(
   const eventSignature = [...snapshot.events]
     .sort((a, b) => a.event_id.localeCompare(b.event_id))
     .map((event) => [event.event_id, event.event_year, event.event_date, event.date_precision,
-      event.transaction_type, event.player_id, event.position_group, event.from_team_id, event.to_team_id,
+      event.transaction_type, event.player_id, event.player_name, event.raw_position, event.position_group,
+      event.normalization_basis, event.from_team_id, event.to_team_id,
       event.identity_confidence, event.contract_value_dollars, event.contract_apy_dollars,
       event.guaranteed_dollars, event.league_cap_dollars, event.trade_player_asset_count,
       [...(event.compensation_pick_rounds ?? [])].sort((a, b) => a - b),
-      event.compensation_includes_player, event.compensation_band]);
+      event.compensation_includes_player, event.compensation_band, event.compensation_summary,
+      [...event.source_ref_ids].sort(), event.raw_source_record]);
   const rosterSignature = [...snapshot.roster_player_seasons]
     .sort((a, b) => a.year - b.year || (a.team_id ?? '').localeCompare(b.team_id ?? '') || a.position_group.localeCompare(b.position_group))
     .map((row) => [row.year, row.team_id, row.position_group, row.roster_player_seasons]);
   const capSignature = [...snapshot.league_caps].sort((a, b) => a.year - b.year)
     .map((row) => [row.year, row.league_cap_dollars]);
   const hash = fnv1a(JSON.stringify([
-    snapshot.snapshot_id, query, thresholds, eventSignature, rosterSignature, capSignature,
+    snapshot.snapshot_id, query, thresholds, eventSignature, rosterSignature, capSignature, snapshot.source_refs,
   ]));
   return `nfl-market-${hash}`;
 }

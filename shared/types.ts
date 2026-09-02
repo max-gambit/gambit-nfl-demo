@@ -2246,6 +2246,9 @@ export interface NflTransactionMarketSourceRef {
   as_of_date: string;
   checksum_sha256: string;
   coverage_note: string;
+  row_count?: number;
+  coverage_start_date?: string | null;
+  coverage_end_date?: string | null;
 }
 
 export interface NflTransactionMarketMethodology {

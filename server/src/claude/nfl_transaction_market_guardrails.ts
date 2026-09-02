@@ -156,6 +156,7 @@ export function deterministicMarketSourceRows(
     title: `NFL transaction market · ${source.name}`,
     updated_at: source.as_of_date,
     data: {
+      source_url: source.url,
       rows: [
         { k: 'Source URL', v: source.url },
         { k: 'Attribution', v: source.upstream_attribution },
@@ -163,6 +164,8 @@ export function deterministicMarketSourceRows(
         { k: 'As of', v: source.as_of_date },
         { k: 'Checksum', v: source.checksum_sha256 },
         { k: 'Coverage', v: source.coverage_note },
+        { k: 'Rows', v: source.row_count?.toLocaleString() ?? 'not supplied' },
+        { k: 'Coverage range', v: source.coverage_start_date && source.coverage_end_date ? `${source.coverage_start_date}–${source.coverage_end_date}` : 'not supplied' },
       ],
       snapshot_id: analysis.snapshot_id,
       analysis_id: analysis.analysis_id,

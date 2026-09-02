@@ -3,15 +3,35 @@ import type {
   NflTransactionComparable,
   NflTransactionMarketAnalysis,
   NflTransactionMarketSignal,
+  NflTransactionMarketYearPoint,
 } from '@shared/types';
+import { fire } from '../lib/events';
+import { useBriefs, useUi } from '../store';
 import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
 
 export function NflTransactionMarketAnalysisView({ analysis }: { analysis: NflTransactionMarketAnalysis }) {
-  const trendRows = analysis.position_trends.filter((trend) => trend.event_count > 0);
+  const trendRows = analysis.position_trends;
+  const { activeBriefId, sourcesByBrief } = useBriefs();
+  const { setSelectedSourceRef, setSourceFilterRefs, setHighlightedSourceRef } = useUi();
+  const eventSourceRefs = new Map(
+    (activeBriefId ? sourcesByBrief[activeBriefId] ?? [] : [])
+      .flatMap((source) => {
+        const eventId = transactionEventId(source.data);
+        return eventId ? [[eventId, source.ref_index] as const] : [];
+      }),
+  );
   const maxMobility = Math.max(1, ...trendRows.flatMap((trend) => [
     trend.mobility.baseline_value ?? 0,
     trend.mobility.recent_value ?? 0,
   ]));
+  const openComparableEvidence = (row: NflTransactionComparable) => {
+    const ref = eventSourceRefs.get(row.event_id);
+    if (ref == null) return;
+    setSourceFilterRefs([ref]);
+    setHighlightedSourceRef(ref);
+    setSelectedSourceRef(ref);
+    fire('v6d3cf:open-evidence', { ref });
+  };
 
   return (
     <div style={{ display: 'grid', gap: SPACE.lg }} data-testid="nfl-transaction-market-analysis">
@@ -45,31 +65,25 @@ export function NflTransactionMarketAnalysisView({ analysis }: { analysis: NflTr
         </div>
       </section>
 
+      <AnnualSeriesChart analysis={analysis} />
+
       <section>
         <SectionLabel>Signal comparison</SectionLabel>
-        <div style={{ overflowX: 'auto', border: `1px solid ${F.border}`, borderRadius: RADIUS.md }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 720, fontSize: TYPE.body.sm }}>
-            <thead>
-              <tr>
-                {['Position', 'Read', 'Mobility', 'Move share', 'Contract price', 'Trade price', 'Sample'].map((column) => (
-                  <th key={column} style={tableHeaderStyle}>{column}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {trendRows.map((trend, index) => (
-                <tr key={trend.position_group}>
-                  <td style={tableCellStyle(index, trendRows.length)}><strong>{trend.position_group}</strong></td>
-                  <td style={tableCellStyle(index, trendRows.length)}><DirectionBadge direction={trend.direction} status={trend.status} /></td>
-                  <td style={tableCellStyle(index, trendRows.length)}>{signalCell(trend.mobility)}</td>
-                  <td style={tableCellStyle(index, trendRows.length)}>{signalCell(trend.transaction_share)}</td>
-                  <td style={tableCellStyle(index, trendRows.length)}>{signalCell(trend.contract_price)}</td>
-                  <td style={tableCellStyle(index, trendRows.length)}>{signalCell(trend.trade_compensation)}</td>
-                  <td style={tableCellStyle(index, trendRows.length)}>{trend.event_count.toLocaleString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div style={{ display: 'grid', gap: SPACE.sm }}>
+          {trendRows.map((trend) => (
+            <article key={trend.position_group} style={{ padding: SPACE.md, border: `1px solid ${F.border}`, borderRadius: RADIUS.md, background: F.surface }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: SPACE.sm }}>
+                <strong style={{ color: F.ink }}>{trend.position_group} · <DirectionBadge direction={trend.direction} status={trend.status} /></strong>
+                <span style={{ color: F.fgMuted, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs }}>{trend.event_count.toLocaleString()} material events</span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))', gap: SPACE.sm, marginTop: SPACE.sm }}>
+                <SignalMetric label="Mobility" signal={trend.mobility} />
+                <SignalMetric label="Move share" signal={trend.transaction_share} />
+                <SignalMetric label="Contract price" signal={trend.contract_price} />
+                <SignalMetric label="Trade price" signal={trend.trade_compensation} />
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
@@ -94,10 +108,10 @@ export function NflTransactionMarketAnalysisView({ analysis }: { analysis: NflTr
       </section>
 
       {analysis.comparables.length > 0 && (
-        <ComparableSection title="Supporting transactions and comparables" rows={analysis.comparables} />
+        <ComparableSection title="Supporting transactions and comparables" rows={analysis.comparables} sourceRefs={eventSourceRefs} onOpen={openComparableEvidence} />
       )}
       {analysis.influential_transactions.length > 0 && (
-        <ComparableSection title="What drove this result" rows={analysis.influential_transactions} showInfluence />
+        <ComparableSection title="Largest leave-one-out sensitivities" rows={analysis.influential_transactions} sourceRefs={eventSourceRefs} onOpen={openComparableEvidence} showInfluence />
       )}
 
       <section>
@@ -230,15 +244,76 @@ function Bar({ value, max, color }: { value: number; max: number; color: string 
   </div>;
 }
 
-function ComparableSection({ title, rows, showInfluence = false }: { title: string; rows: NflTransactionComparable[]; showInfluence?: boolean }) {
+function AnnualSeriesChart({ analysis }: { analysis: NflTransactionMarketAnalysis }) {
+  const years = [...new Set(analysis.yearly_series.map((point) => point.year))].sort((a, b) => a - b);
+  const grouped = new Map<NflPositionMarketTrend['position_group'], NflTransactionMarketYearPoint[]>();
+  for (const trend of analysis.position_trends) grouped.set(trend.position_group, []);
+  for (const point of analysis.yearly_series) grouped.get(point.position_group)?.push(point);
+  const max = Math.max(1, ...analysis.yearly_series.map((point) => point.mobility_per_100_basis_points ?? 0));
+  const width = 600;
+  const height = 42;
+  const chartRows = [...grouped.entries()];
+  if (!years.length || !chartRows.length) return null;
+
+  return <section>
+    <SectionLabel>Full annual mobility series</SectionLabel>
+    <div style={{ border: `1px solid ${F.border}`, borderRadius: RADIUS.md, background: F.surface, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', gap: SPACE.sm, padding: `${SPACE.sm}px ${SPACE.md}px`, borderBottom: `1px solid ${F.border}`, color: F.fgMuted, fontSize: TYPE.meta.md }}>
+        <span>Question-time calculation · material moves per 100 player-seasons</span>
+        <span>{years[0]}–{years.at(-1)}</span>
+      </div>
+      {chartRows.map(([position, points]) => {
+        const byYear = new Map(points.map((point) => [point.year, point]));
+        const values = years.map((year) => byYear.get(year)?.mobility_per_100_basis_points ?? null);
+        const plotted = values.flatMap((value, index) => value == null ? [] : [{
+          x: years.length === 1 ? width / 2 : (index / (years.length - 1)) * width,
+          y: height - 4 - ((value / max) * (height - 8)),
+          value,
+        }]);
+        const first = plotted[0]?.value ?? null;
+        const last = plotted.at(-1)?.value ?? null;
+        return <div key={position} style={{ display: 'grid', gridTemplateColumns: '46px minmax(150px, 1fr) 92px', gap: SPACE.sm, alignItems: 'center', padding: `${SPACE.xs + 2}px ${SPACE.md}px`, borderBottom: `1px solid ${F.border}` }}>
+          <strong style={{ color: F.ink, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.md }}>{position}</strong>
+          <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" role="img" aria-label={`${position} annual mobility from ${years[0]} to ${years.at(-1)}`} style={{ width: '100%', height, overflow: 'visible' }}>
+            <line x1="0" x2={width} y1={height - 4} y2={height - 4} stroke={F.border} strokeWidth="1" />
+            {plotted.length > 1 && <polyline fill="none" stroke={F.fenway} strokeWidth="2.5" vectorEffect="non-scaling-stroke" points={plotted.map((point) => `${point.x},${point.y}`).join(' ')} />}
+            {plotted.map((point, index) => <circle key={`${position}-${index}`} cx={point.x} cy={point.y} r="2.5" fill={F.fenway} vectorEffect="non-scaling-stroke" />)}
+          </svg>
+          <span style={{ justifySelf: 'end', color: F.inkSoft, fontVariantNumeric: 'tabular-nums', fontSize: TYPE.meta.md }}>{first == null || last == null ? 'No annual rate' : `${formatRate(first)} → ${formatRate(last)}`}</span>
+        </div>;
+      })}
+      <div style={{ display: 'flex', justifyContent: 'space-between', padding: `${SPACE.xs}px ${SPACE.md}px ${SPACE.sm}px 70px`, color: F.fgMuted, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs }}>
+        {years.map((year) => <span key={year}>{year}</span>)}
+      </div>
+    </div>
+  </section>;
+}
+
+function SignalMetric({ label, signal }: { label: string; signal: NflTransactionMarketSignal }) {
+  return <div style={{ minWidth: 0 }}>
+    <span style={{ display: 'block', color: F.fgMuted, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs, textTransform: 'uppercase', letterSpacing: TRACKING.micro }}>{label}</span>
+    <strong style={{ display: 'block', marginTop: 3, color: F.inkSoft, fontSize: TYPE.body.sm, fontWeight: 650, overflowWrap: 'anywhere' }}>{signalCell(signal)}</strong>
+    <span style={{ color: F.fgMuted, fontSize: TYPE.meta.xs }}>n={signal.sample_size.toLocaleString()} · {signal.status.replaceAll('_', ' ')}</span>
+  </div>;
+}
+
+function ComparableSection({ title, rows, sourceRefs, onOpen, showInfluence = false }: {
+  title: string;
+  rows: NflTransactionComparable[];
+  sourceRefs: Map<string, number>;
+  onOpen: (row: NflTransactionComparable) => void;
+  showInfluence?: boolean;
+}) {
   return (
     <section>
       <SectionLabel>{title}</SectionLabel>
       <div style={{ display: 'grid', gap: SPACE.sm }}>
-        {rows.map((row) => (
-          <article key={row.event_id} style={{
+        {rows.map((row) => {
+          const sourceRef = sourceRefs.get(row.event_id);
+          return <button type="button" key={row.event_id} disabled={sourceRef == null} onClick={() => onOpen(row)} aria-label={`Open evidence for ${row.player_name}`} style={{
             display: 'grid', gap: SPACE.xs, padding: SPACE.md,
             border: `1px solid ${F.border}`, borderRadius: RADIUS.md, background: F.surface,
+            width: '100%', textAlign: 'left', color: 'inherit', cursor: sourceRef == null ? 'default' : 'pointer',
           }}>
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: SPACE.sm }}>
               <strong style={{ color: F.ink, fontSize: TYPE.body.sm }}>{row.player_name}</strong>
@@ -258,8 +333,11 @@ function ComparableSection({ title, rows, showInfluence = false }: { title: stri
               {row.normalization_basis ? ` · Normalized via ${row.normalization_basis}` : ''}
               {showInfluence && row.influence_explanation ? ` · ${row.influence_explanation}` : ''}
             </div>
-          </article>
-        ))}
+            <div style={{ color: sourceRef == null ? F.fgMuted : F.fenway, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs, fontWeight: 700 }}>
+              {sourceRef == null ? 'Evidence detail unavailable for this saved result' : `Open exact evidence [${sourceRef}] →`}
+            </div>
+          </button>;
+        })}
       </div>
     </section>
   );
@@ -341,6 +419,14 @@ function formatDate(value: string): string {
   return Number.isFinite(parsed)
     ? new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(parsed))
     : value;
+}
+
+function transactionEventId(data: unknown): string | null {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
+  const transaction = (data as Record<string, unknown>).transaction;
+  if (!transaction || typeof transaction !== 'object' || Array.isArray(transaction)) return null;
+  const eventId = (transaction as Record<string, unknown>).event_id;
+  return typeof eventId === 'string' && eventId ? eventId : null;
 }
 
 function SectionLabel({ children }: { children: string }) {

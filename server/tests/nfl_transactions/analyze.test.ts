@@ -67,6 +67,22 @@ test('post-2020 period comparison resolves non-overlapping cohorts and recompute
   assert.equal(result.position_trends.find((trend) => trend.position_group === 'IOL')?.direction, 'shrinking');
 });
 
+test('2026 YTD is returned as context but excluded from completed-year comparison windows', () => {
+  const snapshot = fixtureSnapshot();
+  snapshot.events.push(...positionYearEvents('EDGE', 2026, 20, 'recent'));
+  const result = analyzeNflTransactionMarketSnapshot({
+    ...defaultRequest(),
+    include_ytd: true,
+    end_year: 2026,
+  }, snapshot, { generatedAt: GENERATED_AT });
+
+  assert.deepEqual(result.query.recent_years, [2023, 2025]);
+  assert.equal(result.query.end_year, 2026);
+  assert.equal(result.position_trends.find((trend) => trend.position_group === 'EDGE')?.mobility.recent_value, 600);
+  assert.equal(result.yearly_series.find((row) => row.year === 2026 && row.position_group === 'EDGE')?.event_count, 20);
+  assert.equal(result.yearly_series.find((row) => row.year === 2026 && row.position_group === 'EDGE')?.mobility_per_100_basis_points, null);
+});
+
 test('trades-only filtering removes contract price observations without changing the governed roster denominator', () => {
   const result = analyzeNflTransactionMarketSnapshot({
     ...defaultRequest(),
@@ -196,6 +212,27 @@ test('identity coverage below 85 percent is insufficient even with adequate samp
   assert.equal(result.status, 'insufficient_evidence');
 });
 
+test('unallocated in-scope identities lower the confidence gate instead of disappearing before it', () => {
+  const snapshot = fixtureSnapshot();
+  for (let index = 0; index < 12; index += 1) {
+    snapshot.events.push({
+      ...releaseEvent(`ambiguous-${index}`, 2024, 'EDGE'),
+      position_group: null,
+      raw_position: 'DE',
+      identity_confidence: 'unmatched',
+      normalization_basis: 'ambiguous DE/OLB mapping excluded from precise EDGE comparison',
+    });
+  }
+  const result = analyzeNflTransactionMarketSnapshot({
+    ...defaultRequest(),
+    position_groups: ['EDGE'],
+  }, snapshot, { generatedAt: GENERATED_AT });
+
+  assert.ok(result.coverage.position_match_basis_points < 8_500);
+  assert.equal(result.status, 'insufficient_evidence');
+  assert.ok(result.limitations.some((item) => item.includes('12 in-scope events lack an allocated position')));
+});
+
 test('fractional contract, guarantee, APY, and cap dollars are rejected', () => {
   for (const mutate of [
     (snapshot: NflTransactionMarketSnapshot) => { snapshot.events[0].contract_value_dollars = 1_000.25; },
@@ -232,6 +269,15 @@ test('an isolated inserted transaction changes computed statistics and the deter
   const beforeMobility = before.position_trends.find((trend) => trend.position_group === 'EDGE')!.mobility.recent_value;
   const afterMobility = after.position_trends.find((trend) => trend.position_group === 'EDGE')!.mobility.recent_value;
   assert.notEqual(afterMobility, beforeMobility);
+  assert.notEqual(after.analysis_id, before.analysis_id);
+});
+
+test('analysis identity changes when returned provenance or normalization detail changes', () => {
+  const beforeSnapshot = fixtureSnapshot();
+  const before = analyzeNflTransactionMarketSnapshot(defaultRequest(), beforeSnapshot, { generatedAt: GENERATED_AT });
+  const afterSnapshot = structuredClone(beforeSnapshot);
+  afterSnapshot.events[0].normalization_basis = 'revised provider mapping boundary';
+  const after = analyzeNflTransactionMarketSnapshot(defaultRequest(), afterSnapshot, { generatedAt: GENERATED_AT });
   assert.notEqual(after.analysis_id, before.analysis_id);
 });
 

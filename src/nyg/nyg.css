@@ -34,12 +34,18 @@
 .analysis-workspace{height:calc(100% - 58px);background:#f7f9fc}
 .analysis-workspace-canvas{height:100%;display:flex;min-height:0}
 .analysis-workspace-main{flex:1;display:flex;flex-direction:column;min-width:0;position:relative;background:#f7f9fc}
+.analysis-evidence-rail{display:flex;flex:none;min-height:0}
+.analysis-evidence-trigger,.analysis-evidence-backdrop{display:none}
+.analysis-right-panel{max-width:min(42vw,600px)}
 .analysis-loading{height:calc(100% - 58px);display:grid;place-content:center;text-align:center;gap:7px;background:#f7f9fc}
 .analysis-loading strong{font:600 20px 'Chakra Petch'}
 .analysis-loading span{color:#6b7079;font-size:13px}
 
 @media(max-width:1100px){
-  .analysis-workspace-canvas>nav{display:none!important}
+  .analysis-evidence-rail{position:absolute;inset:0 auto 0 0;z-index:42;transform:translateX(-105%);transition:transform .18s ease;filter:drop-shadow(8px 0 18px rgba(15,24,39,.18))}
+  .analysis-evidence-rail.open{transform:translateX(0)}
+  .analysis-evidence-backdrop{display:block;position:absolute;inset:0;z-index:41;border:0;background:rgba(15,24,39,.28);cursor:pointer}
+  .analysis-evidence-trigger{display:block;position:absolute;right:16px;top:9px;z-index:12;border:1px solid #c7c2b7;background:#fff;color:#20242c;border-radius:5px;padding:7px 10px;font:700 11px 'DM Sans',sans-serif;cursor:pointer}
 }
 
 @media(max-width:760px){
@@ -50,4 +56,6 @@
   .analysis-modebar>div:last-child{width:100%}
   .analysis-modebar button{flex:1}
   .analysis-workspace{height:calc(100% - 108px)}
+  .analysis-right-panel{position:absolute!important;inset:0 0 0 auto;z-index:35;width:min(86vw,360px)!important;max-width:none;box-shadow:-8px 0 24px rgba(15,24,39,.18)}
+  .analysis-right-panel-handle{position:absolute!important;right:0;top:0;bottom:0;z-index:20;height:100%}
 }

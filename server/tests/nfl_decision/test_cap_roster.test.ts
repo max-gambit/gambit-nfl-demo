@@ -3,6 +3,7 @@ import test from 'node:test';
 import type { NflCapRosterDecisionRequest } from '@shared/types';
 import { buildCapRosterDecision } from '../../src/nfl_decision/cap_roster.js';
 import { loadNflDemoSeed } from '../../src/nfl_data/seed.js';
+import type { NflTransactionMarketDataHealth } from '../../src/nfl_transactions/seed.js';
 
 async function fixtureRequest(overrides: Partial<NflCapRosterDecisionRequest> = {}) {
   const seed = structuredClone(await loadNflDemoSeed());
@@ -19,6 +20,7 @@ async function fixtureRequest(overrides: Partial<NflCapRosterDecisionRequest> = 
   return buildCapRosterDecision(request, {
     data: { seed, source_mode: 'supabase_current_views', fallback_reason: null },
     generatedAt: new Date('2026-09-02T18:00:00.000Z'),
+    transactionMarket: transactionMarketHealth(),
   });
 }
 
@@ -54,7 +56,7 @@ test('source-needed performance cannot grade depth or enter the preserve-depth b
   seed.retrieved_at = '2026-09-02T12:15:00.000Z';
   const baseline = await buildCapRosterDecision({
     team_id: 'NYG', target_relief_dollars: 12_000_000, protected_player_ids: [], protected_position_groups: [], allowed_levers: ['pre_june_cut', 'post_june_cut', 'trade'],
-  }, { data: { seed, source_mode: 'supabase_current_views', fallback_reason: null }, generatedAt: new Date('2026-09-02T18:00:00.000Z') });
+  }, { data: { seed, source_mode: 'supabase_current_views', fallback_reason: null }, generatedAt: new Date('2026-09-02T18:00:00.000Z'), transactionMarket: transactionMarketHealth() });
   const candidate = baseline.branches.find((branch) => branch.id === 'preserve_depth')?.actions[0];
   assert.ok(candidate);
   const metric = seed.player_metrics.find((row) => row.player_id === candidate.player_id);
@@ -64,7 +66,7 @@ test('source-needed performance cannot grade depth or enter the preserve-depth b
   metric.metric_gap_reason = 'test fixture has no public sample';
   const result = await buildCapRosterDecision({
     team_id: 'NYG', target_relief_dollars: 12_000_000, protected_player_ids: [], protected_position_groups: [], allowed_levers: ['pre_june_cut', 'post_june_cut', 'trade'],
-  }, { data: { seed, source_mode: 'supabase_current_views', fallback_reason: null }, generatedAt: new Date('2026-09-02T18:00:00.000Z') });
+  }, { data: { seed, source_mode: 'supabase_current_views', fallback_reason: null }, generatedAt: new Date('2026-09-02T18:00:00.000Z'), transactionMarket: transactionMarketHealth() });
   const action = result.branches.find((branch) => branch.id === 'maximize_relief')?.actions.find((item) => item.player_id === candidate.player_id);
   assert.equal(action?.depth_effect, 'unknown');
   assert.equal(action?.depth_evidence.source_status, 'source-needed');
@@ -82,7 +84,7 @@ test('arithmetic-invalid or term-incomplete rows cannot enter any branch', async
   row.contract_end_year = null;
   const result = await buildCapRosterDecision({
     team_id: 'NYG', target_relief_dollars: 1_000_000, protected_player_ids: [], protected_position_groups: [], allowed_levers: ['trade'],
-  }, { data: { seed, source_mode: 'supabase_current_views', fallback_reason: null }, generatedAt: new Date('2026-09-02T18:00:00.000Z') });
+  }, { data: { seed, source_mode: 'supabase_current_views', fallback_reason: null }, generatedAt: new Date('2026-09-02T18:00:00.000Z'), transactionMarket: transactionMarketHealth() });
   assert.equal(result.branches.flatMap((branch) => branch.actions).some((action) => action.player_id === playerId), false);
   assert.equal(result.status, 'blocked');
 });
@@ -109,8 +111,37 @@ test('manual assumptions stay labeled and stale fallback blocks recommendation',
   }, {
     data: { seed, source_mode: 'checked_in_snapshot_fallback', fallback_reason: 'database unavailable' },
     generatedAt: new Date('2026-09-02T18:00:00.000Z'),
+    transactionMarket: transactionMarketHealth(),
   });
   assert.equal(result.assumptions[0]?.source, 'user_entered');
   assert.equal(result.status, 'blocked');
   assert.equal(result.recommended_branch_id, null);
 });
+
+function transactionMarketHealth(): NflTransactionMarketDataHealth {
+  return {
+    source_mode: 'supabase_current_views',
+    snapshot_id: 'fixture-transaction-market',
+    as_of_date: '2026-09-02',
+    retrieved_at: '2026-09-02T12:15:00.000Z',
+    row_count: 100,
+    coverage: {
+      start_year: 2016,
+      end_year: 2025,
+      event_count: 100,
+      trade_event_count: 50,
+      contract_event_count: 50,
+      trade_asset_count: 75,
+      contract_term_count: 50,
+      matched_position_count: 96,
+      directional_position_count: 2,
+      unmatched_position_count: 2,
+      position_match_basis_points: 9_600,
+      compensation_coverage_basis_points: 9_600,
+      contract_term_coverage_basis_points: 9_600,
+      transaction_types: { trade: 50, free_agent_signing: 50 },
+    },
+    sources: [],
+    fallback_reason: null,
+  };
+}

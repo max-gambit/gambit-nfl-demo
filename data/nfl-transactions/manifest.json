@@ -1,12 +1,12 @@
 {
   "schema_version": "nfl_transaction_snapshot_manifest.v1",
-  "snapshot_id": "nfltm_0ff4ab3a1a362d511198a08a",
+  "snapshot_id": "nfltm_06a7e62b44b72d8f31e31c54",
   "snapshot_file": "nfl-transaction-market-2026-09-02.json.gz",
-  "snapshot_checksum_sha256": "f4ce826eff5d317b7ec9205a7e7c4b1e0883b5711de91d46b85dc21fd4fe2936",
-  "generated_at": "2026-09-02T23:04:01.817Z",
-  "retrieved_at": "2026-09-02T23:04:01.817Z",
+  "snapshot_checksum_sha256": "8054b128047281335a4d83cf431587e3c5772f0c3265fccbba39e759b8eafac9",
+  "generated_at": "2026-09-02T23:28:35.554Z",
+  "retrieved_at": "2026-09-02T23:28:35.554Z",
   "as_of_date": "2026-09-02",
-  "transformation_version": "nfl-transaction-normalization.v6",
+  "transformation_version": "nfl-transaction-normalization.v7",
   "coverage": {
     "start_year": 2016,
     "end_year": 2025,
@@ -20,7 +20,7 @@
     "unmatched_position_count": 387,
     "position_match_basis_points": 9789,
     "compensation_coverage_basis_points": 7209,
-    "contract_term_coverage_basis_points": 9992,
+    "contract_term_coverage_basis_points": 9993,
     "transaction_types": {
       "free_agent_signing": 15805,
       "re_signing": 1189,
@@ -35,130 +35,169 @@
       "name": "nflverse historical contracts (OverTheCap-derived)",
       "url": "https://github.com/nflverse/nflverse-data/releases/download/contracts/historical_contracts.parquet",
       "upstream_attribution": "nflverse; historical contract data derived from OverTheCap.",
-      "retrieved_at": "2026-09-02T23:04:01.817Z",
+      "retrieved_at": "2026-09-02T23:28:35.554Z",
       "as_of_date": "2026-09-02",
       "checksum_sha256": "c1288ab75f2af2d5d23020a157adb9f7487a6c5626919b7b51e917891e5f9756",
-      "coverage_note": "Release asset dictionary: https://nflreadr.nflverse.com/articles/dictionary_contracts.html. Public-data prototype; underlying data remains subject to upstream ownership terms."
+      "coverage_note": "Release asset dictionary: https://nflreadr.nflverse.com/articles/dictionary_contracts.html. Public-data prototype; underlying data remains subject to upstream ownership terms.",
+      "row_count": 52585,
+      "coverage_start_date": "1983-01-01",
+      "coverage_end_date": "2026-12-31"
     },
     {
       "id": "players",
       "name": "nflverse players",
       "url": "https://github.com/nflverse/nflverse-data/releases/download/players/players.csv.gz",
       "upstream_attribution": "nflverse public release; underlying data ownership terms apply.",
-      "retrieved_at": "2026-09-02T23:04:01.817Z",
+      "retrieved_at": "2026-09-02T23:28:35.554Z",
       "as_of_date": "2026-09-02",
       "checksum_sha256": "08c603ee491247cf99bb601b5eb7eceef6fb11a35d235ba3a18409dca0e3f5e8",
-      "coverage_note": "Release asset dictionary: https://nflreadr.nflverse.com/articles/dictionary_players.html. Public-data prototype; underlying data remains subject to upstream ownership terms."
+      "coverage_note": "Release asset dictionary: https://nflreadr.nflverse.com/articles/dictionary_players.html. Public-data prototype; underlying data remains subject to upstream ownership terms.",
+      "row_count": 25065,
+      "coverage_start_date": "1974-01-01",
+      "coverage_end_date": "2026-12-31"
     },
     {
       "id": "rosters-2016",
       "name": "nflverse roster 2016",
       "url": "https://github.com/nflverse/nflverse-data/releases/download/rosters/roster_2016.csv",
       "upstream_attribution": "nflverse public release; underlying data ownership terms apply.",
-      "retrieved_at": "2026-09-02T23:04:01.817Z",
+      "retrieved_at": "2026-09-02T23:28:35.554Z",
       "as_of_date": "2023-09-13",
       "checksum_sha256": "c7a57a4816d05ef651f4c56b8209c38b98e3d60582ddd60cb8048ef657472ca1",
-      "coverage_note": "Season 2016 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html"
+      "coverage_note": "Season 2016 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html",
+      "row_count": 3061,
+      "coverage_start_date": "2016-01-01",
+      "coverage_end_date": "2016-12-31"
     },
     {
       "id": "rosters-2017",
       "name": "nflverse roster 2017",
       "url": "https://github.com/nflverse/nflverse-data/releases/download/rosters/roster_2017.csv",
       "upstream_attribution": "nflverse public release; underlying data ownership terms apply.",
-      "retrieved_at": "2026-09-02T23:04:01.817Z",
+      "retrieved_at": "2026-09-02T23:28:35.554Z",
       "as_of_date": "2023-09-13",
       "checksum_sha256": "22584ad80445611edff6dcbc6dce9ab596bdc484430d8aac298725da15697fd4",
-      "coverage_note": "Season 2017 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html"
+      "coverage_note": "Season 2017 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html",
+      "row_count": 3082,
+      "coverage_start_date": "2017-01-01",
+      "coverage_end_date": "2017-12-31"
     },
     {
       "id": "rosters-2018",
       "name": "nflverse roster 2018",
       "url": "https://github.com/nflverse/nflverse-data/releases/download/rosters/roster_2018.csv",
       "upstream_attribution": "nflverse public release; underlying data ownership terms apply.",
-      "retrieved_at": "2026-09-02T23:04:01.817Z",
+      "retrieved_at": "2026-09-02T23:28:35.554Z",
       "as_of_date": "2023-09-13",
       "checksum_sha256": "60c7f1dabb508acc800ef81b4f69892511b1f78246bdb2cca6115a506c523b0a",
-      "coverage_note": "Season 2018 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html"
+      "coverage_note": "Season 2018 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html",
+      "row_count": 3142,
+      "coverage_start_date": "2018-01-01",
+      "coverage_end_date": "2018-12-31"
     },
     {
       "id": "rosters-2019",
       "name": "nflverse roster 2019",
       "url": "https://github.com/nflverse/nflverse-data/releases/download/rosters/roster_2019.csv",
       "upstream_attribution": "nflverse public release; underlying data ownership terms apply.",
-      "retrieved_at": "2026-09-02T23:04:01.817Z",
+      "retrieved_at": "2026-09-02T23:28:35.554Z",
       "as_of_date": "2023-09-13",
       "checksum_sha256": "b00259cfddf2146512569423275dc17e142d31ddb13bfba6b0b826c9d3d810da",
-      "coverage_note": "Season 2019 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html"
+      "coverage_note": "Season 2019 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html",
+      "row_count": 3114,
+      "coverage_start_date": "2019-01-01",
+      "coverage_end_date": "2019-12-31"
     },
     {
       "id": "rosters-2020",
       "name": "nflverse roster 2020",
       "url": "https://github.com/nflverse/nflverse-data/releases/download/rosters/roster_2020.csv",
       "upstream_attribution": "nflverse public release; underlying data ownership terms apply.",
-      "retrieved_at": "2026-09-02T23:04:01.817Z",
+      "retrieved_at": "2026-09-02T23:28:35.554Z",
       "as_of_date": "2023-09-13",
       "checksum_sha256": "dcf25143db7b54ac488d042b6c24142340effced1d6c8599b2084a9f412b3ed2",
-      "coverage_note": "Season 2020 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html"
+      "coverage_note": "Season 2020 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html",
+      "row_count": 3068,
+      "coverage_start_date": "2020-01-01",
+      "coverage_end_date": "2020-12-31"
     },
     {
       "id": "rosters-2021",
       "name": "nflverse roster 2021",
       "url": "https://github.com/nflverse/nflverse-data/releases/download/rosters/roster_2021.csv",
       "upstream_attribution": "nflverse public release; underlying data ownership terms apply.",
-      "retrieved_at": "2026-09-02T23:04:01.817Z",
+      "retrieved_at": "2026-09-02T23:28:35.554Z",
       "as_of_date": "2023-09-13",
       "checksum_sha256": "a95e57ebe1df25224a4d19ed43aaffc5c2097a8b369954178b8592537ff77d34",
-      "coverage_note": "Season 2021 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html"
+      "coverage_note": "Season 2021 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html",
+      "row_count": 2961,
+      "coverage_start_date": "2021-01-01",
+      "coverage_end_date": "2021-12-31"
     },
     {
       "id": "rosters-2022",
       "name": "nflverse roster 2022",
       "url": "https://github.com/nflverse/nflverse-data/releases/download/rosters/roster_2022.csv",
       "upstream_attribution": "nflverse public release; underlying data ownership terms apply.",
-      "retrieved_at": "2026-09-02T23:04:01.817Z",
+      "retrieved_at": "2026-09-02T23:28:35.554Z",
       "as_of_date": "2023-09-13",
       "checksum_sha256": "864719595d14909c73bd14110adcdcfc304c6621de9ba34feafb83666fac43c9",
-      "coverage_note": "Season 2022 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html"
+      "coverage_note": "Season 2022 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html",
+      "row_count": 3134,
+      "coverage_start_date": "2022-01-01",
+      "coverage_end_date": "2022-12-31"
     },
     {
       "id": "rosters-2023",
       "name": "nflverse roster 2023",
       "url": "https://github.com/nflverse/nflverse-data/releases/download/rosters/roster_2023.csv",
       "upstream_attribution": "nflverse public release; underlying data ownership terms apply.",
-      "retrieved_at": "2026-09-02T23:04:01.817Z",
+      "retrieved_at": "2026-09-02T23:28:35.554Z",
       "as_of_date": "2024-03-14",
       "checksum_sha256": "f98283e6ef420babc597092b5483109a4570f9b5f63b7bfcce69643290960b6c",
-      "coverage_note": "Season 2023 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html"
+      "coverage_note": "Season 2023 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html",
+      "row_count": 3090,
+      "coverage_start_date": "2023-01-01",
+      "coverage_end_date": "2023-12-31"
     },
     {
       "id": "rosters-2024",
       "name": "nflverse roster 2024",
       "url": "https://github.com/nflverse/nflverse-data/releases/download/rosters/roster_2024.csv",
       "upstream_attribution": "nflverse public release; underlying data ownership terms apply.",
-      "retrieved_at": "2026-09-02T23:04:01.817Z",
+      "retrieved_at": "2026-09-02T23:28:35.554Z",
       "as_of_date": "2025-03-14",
       "checksum_sha256": "97721aa9092edb15c1357f2dac359dba72f63c81cc0e69408c65c229c91f50c1",
-      "coverage_note": "Season 2024 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html"
+      "coverage_note": "Season 2024 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html",
+      "row_count": 3216,
+      "coverage_start_date": "2024-01-01",
+      "coverage_end_date": "2024-12-31"
     },
     {
       "id": "rosters-2025",
       "name": "nflverse roster 2025",
       "url": "https://github.com/nflverse/nflverse-data/releases/download/rosters/roster_2025.csv",
       "upstream_attribution": "nflverse public release; underlying data ownership terms apply.",
-      "retrieved_at": "2026-09-02T23:04:01.817Z",
+      "retrieved_at": "2026-09-02T23:28:35.554Z",
       "as_of_date": "2026-03-14",
       "checksum_sha256": "531ee5de386037bb17de3e3e3d50f7b4ed08789526bbaae9876fdd3dfb4d04ad",
-      "coverage_note": "Season 2025 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html"
+      "coverage_note": "Season 2025 roster rows provide unique player-season position denominators. https://nflverse.nflverse.com/index.html",
+      "row_count": 3137,
+      "coverage_start_date": "2025-01-01",
+      "coverage_end_date": "2025-12-31"
     },
     {
       "id": "trades",
       "name": "nflverse trades",
       "url": "https://github.com/nflverse/nflverse-data/releases/download/trades/trades.csv",
       "upstream_attribution": "nflverse; trade data credits Lee Sharpe and Pro Football Reference.",
-      "retrieved_at": "2026-09-02T23:04:01.817Z",
+      "retrieved_at": "2026-09-02T23:28:35.554Z",
       "as_of_date": "2026-05-19",
       "checksum_sha256": "cb9169eaa155036158ca6e9522ededaea0ee9fee95198f4fde15dc1ae7a33afe",
-      "coverage_note": "Release asset dictionary: https://nflreadr.nflverse.com/articles/dictionary_trades.html. Public-data prototype; underlying data remains subject to upstream ownership terms."
+      "coverage_note": "Release asset dictionary: https://nflreadr.nflverse.com/articles/dictionary_trades.html. Public-data prototype; underlying data remains subject to upstream ownership terms.",
+      "row_count": 4975,
+      "coverage_start_date": "2002-03-04",
+      "coverage_end_date": "2026-04-17"
     }
   ],
   "licensing_boundary": "Public-data prototype. nflverse attribution and upstream ownership caveats apply; review production data rights before commercial database use."

@@ -146,6 +146,10 @@ function collectUrls(value: unknown, urls = new Set<string>()): string[] {
   if (isRecord(value)) {
     for (const [key, item] of Object.entries(value)) {
       if (URL_KEYS.has(key) && typeof item === 'string' && isSafeUrl(item)) urls.add(item);
+      else if ((key === 'k' || key === 'key') && /(?:source|upstream).*url|upstream source/i.test(String(item))) {
+        const candidate = value.v ?? value.value;
+        if (typeof candidate === 'string' && isSafeUrl(candidate)) urls.add(candidate);
+      }
       else collectUrls(item, urls);
     }
   } else if (Array.isArray(value)) {

@@ -21,7 +21,12 @@ export async function buildCapRosterDecision(
   const data = options.data ?? await loadCurrentNflTeamDataWithMode(teamId);
   const rules = options.rules ?? await loadNflRulesCorpus();
   const generatedAt = options.generatedAt ?? new Date();
-  const health = await buildNflDataHealth(teamId, { data, rules, generatedAt });
+  const health = await buildNflDataHealth(teamId, {
+    data,
+    rules,
+    generatedAt,
+    transactionMarket: options.transactionMarket,
+  });
   const detail = teamSeed(data.seed, teamId);
   if (!detail.teamExists) throw new Error(`Unknown NFL team ${teamId}`);
   const protectedPlayers = new Set(input.protected_player_ids);

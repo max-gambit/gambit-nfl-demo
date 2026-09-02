@@ -120,12 +120,13 @@ briefRoutes.post('/', async (c) => {
     return c.json({ error: 'question required' }, 400);
   }
   const explicitMode = normalizeBriefMode(body.mode);
-  const requestedMode = explicitMode ?? parsedQuestion.mode;
+  const transactionMarketQuestion = isNflTransactionMarketQuestion(question);
+  const requestedMode = transactionMarketQuestion ? 'data_analyst' : explicitMode ?? parsedQuestion.mode;
   const templateParse = parseBriefTemplateSelection(body.template, body.question);
   if (templateParse.errors.length > 0) {
     return c.json({ error: 'invalid_template', detail: templateParse.errors }, 400);
   }
-  const templateSelection = body.template == null && requestedMode === 'data_analyst'
+  const templateSelection = transactionMarketQuestion || (body.template == null && requestedMode === 'data_analyst')
     ? { template_id: 'data_table' as const }
     : templateParse.selection;
   const mode = briefModeForTemplate(templateSelection)

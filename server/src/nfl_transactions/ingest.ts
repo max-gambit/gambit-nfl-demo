@@ -17,7 +17,7 @@ import type {
   NflTransactionRosterPlayerSeason,
 } from './analyze.js';
 
-const TRANSFORMATION_VERSION = 'nfl-transaction-normalization.v6';
+const TRANSFORMATION_VERSION = 'nfl-transaction-normalization.v7';
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const DEFAULT_OUTPUT_DIR = path.join(REPO_ROOT, 'data/nfl-transactions');
 const COMPLETED_YEARS = Array.from({ length: 10 }, (_, index) => 2016 + index);
@@ -190,7 +190,17 @@ export async function buildReviewedNflTransactionSnapshot(
   // denominator and do not attach a noisy row-level cap to each event.
   const governedContractEvents = contractEvents.map((event) => ({ ...event, league_cap_dollars: null }));
   const events = [...tradeEvents, ...governedContractEvents].sort(compareEvents);
-  const sourceRefs = sourceReferences(options.assets, retrievedAt);
+  const sourceStats = new Map<string, SourceStats>([
+    ['trades.csv', statsForDates(tradeRows.length, tradeRows.map((row) => row.trade_date))],
+    ['players.csv.gz', statsForYearRange(playerRows.length, playerRows.flatMap((row) => [row.first_season, row.last_season]))],
+    ['historical_contracts.parquet', statsForYearRange(contractRows.length, contractRows.map((row) => row.year_signed))],
+    ...COMPLETED_YEARS.map((year, index) => [`rosters/roster_${year}.csv`, {
+      row_count: rosterRows[index].length,
+      coverage_start_date: `${year}-01-01`,
+      coverage_end_date: `${year}-12-31`,
+    }] as const),
+  ]);
+  const sourceRefs = sourceReferences(options.assets, retrievedAt, sourceStats);
   const snapshotId = `nfltm_${hashJson({
     transformation: TRANSFORMATION_VERSION,
     retrieved_at: retrievedAt,
@@ -602,6 +612,7 @@ function buildSnapshotCoverage(
   const allocable = trades.filter((event) => event.trade_player_asset_count === 1 && compensationBand(event.compensation_pick_rounds ?? [], event.compensation_includes_player ?? false) !== 'unknown').length;
   const types: Partial<Record<NflTransactionType, number>> = {};
   for (const event of scoped) types[event.transaction_type] = (types[event.transaction_type] ?? 0) + 1;
+  const scopedTerms = terms.filter((row) => row.year_signed >= 2016 && row.year_signed <= 2025);
   return {
     start_year: Math.min(...scoped.map((event) => event.event_year)),
     end_year: Math.max(...scoped.map((event) => event.event_year)),
@@ -609,39 +620,45 @@ function buildSnapshotCoverage(
     trade_event_count: trades.length,
     contract_event_count: scoped.length - trades.length,
     trade_asset_count: assets.filter((row) => row.event_year >= 2016 && row.event_year <= 2025).length,
-    contract_term_count: terms.filter((row) => row.year_signed >= 2016 && row.year_signed <= 2025).length,
+    contract_term_count: scopedTerms.length,
     matched_position_count: matched,
     directional_position_count: directional,
     unmatched_position_count: scoped.length - matched - directional,
     position_match_basis_points: scoped.length ? Math.round((matched / scoped.length) * 10_000) : 0,
     compensation_coverage_basis_points: trades.length ? Math.round((allocable / trades.length) * 10_000) : 0,
-    contract_term_coverage_basis_points: terms.length
-      ? Math.round((terms.filter((row) => row.guaranteed_dollars <= row.value_dollars).length / terms.length) * 10_000)
+    contract_term_coverage_basis_points: scopedTerms.length
+      ? Math.round((scopedTerms.filter((row) => row.guaranteed_dollars <= row.value_dollars).length / scopedTerms.length) * 10_000)
       : 0,
     transaction_types: types,
   };
 }
 
-function sourceReferences(assets: ReleaseAsset[], retrievedAt: string): NflTransactionMarketSourceRef[] {
+interface SourceStats {
+  row_count: number;
+  coverage_start_date: string | null;
+  coverage_end_date: string | null;
+}
+
+function sourceReferences(assets: ReleaseAsset[], retrievedAt: string, stats: Map<string, SourceStats>): NflTransactionMarketSourceRef[] {
   const grouped = groupBy(assets, (asset) => asset.tag);
   const refs: NflTransactionMarketSourceRef[] = [];
   for (const [tag, rows] of grouped) {
     if (tag === 'rosters') {
       for (const row of rows) {
         const year = row.name.match(/(20\d{2})/)?.[1] ?? 'unknown';
-        refs.push(sourceRef(`rosters-${year}`, `nflverse roster ${year}`, row, retrievedAt, `Season ${year} roster rows provide unique player-season position denominators. ${SOURCE_DICTIONARIES.project}`));
+        refs.push(sourceRef(`rosters-${year}`, `nflverse roster ${year}`, row, retrievedAt, `Season ${year} roster rows provide unique player-season position denominators. ${SOURCE_DICTIONARIES.project}`, stats.get(row.local_path)));
       }
       continue;
     }
     const row = rows[0];
     const dictionary = tag === 'trades' ? SOURCE_DICTIONARIES.trades : tag === 'players' ? SOURCE_DICTIONARIES.players : SOURCE_DICTIONARIES.contracts;
     const name = tag === 'contracts' ? 'nflverse historical contracts (OverTheCap-derived)' : `nflverse ${tag}`;
-    refs.push(sourceRef(tag, name, row, retrievedAt, `Release asset dictionary: ${dictionary}. Public-data prototype; underlying data remains subject to upstream ownership terms.`));
+    refs.push(sourceRef(tag, name, row, retrievedAt, `Release asset dictionary: ${dictionary}. Public-data prototype; underlying data remains subject to upstream ownership terms.`, stats.get(row.local_path)));
   }
   return refs.sort((a, b) => a.id.localeCompare(b.id));
 }
 
-function sourceRef(id: string, name: string, asset: ReleaseAsset, retrievedAt: string, note: string): NflTransactionMarketSourceRef {
+function sourceRef(id: string, name: string, asset: ReleaseAsset, retrievedAt: string, note: string, stats?: SourceStats): NflTransactionMarketSourceRef {
   return {
     id,
     name,
@@ -651,6 +668,23 @@ function sourceRef(id: string, name: string, asset: ReleaseAsset, retrievedAt: s
     as_of_date: asset.updated_at.slice(0, 10),
     checksum_sha256: asset.sha256,
     coverage_note: note,
+    row_count: stats?.row_count,
+    coverage_start_date: stats?.coverage_start_date ?? null,
+    coverage_end_date: stats?.coverage_end_date ?? null,
+  };
+}
+
+function statsForDates(rowCount: number, values: Array<string | null | undefined>): SourceStats {
+  const dates = values.filter((value): value is string => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)).sort();
+  return { row_count: rowCount, coverage_start_date: dates[0] ?? null, coverage_end_date: dates.at(-1) ?? null };
+}
+
+function statsForYearRange(rowCount: number, values: Array<string | number | null | undefined>): SourceStats {
+  const years = values.map(Number).filter((value) => Number.isInteger(value) && value >= 1900 && value <= 2100).sort((a, b) => a - b);
+  return {
+    row_count: rowCount,
+    coverage_start_date: years.length ? `${years[0]}-01-01` : null,
+    coverage_end_date: years.length ? `${years.at(-1)}-12-31` : null,
   };
 }
 

@@ -55,14 +55,19 @@ export async function seedNflTransactionMarketData(
   snapshot: ReviewedNflTransactionSnapshot,
   manifest: NflTransactionSnapshotManifest,
   client?: SupabaseClient,
-): Promise<{ snapshot_id: string; inserted_counts: Record<string, number> }> {
+): Promise<{
+  snapshot_id: string;
+  seed_status: 'inserted_and_published' | 'verified_existing';
+  inserted_counts: Record<string, number>;
+  verified_counts: Record<string, number>;
+}> {
   const database = client ?? (await import('../db/client.js')).db;
   validateReviewedSnapshot(snapshot);
   if (snapshot.snapshot_id !== manifest.snapshot_id) throw new Error('manifest and transaction snapshot IDs differ');
 
   const existing = await database
     .from('nfl_transaction_dataset_snapshots')
-    .select('snapshot_id,snapshot_checksum_sha256')
+    .select('snapshot_id,snapshot_checksum_sha256,published_at')
     .eq('snapshot_id', snapshot.snapshot_id)
     .maybeSingle();
   throwIfError(existing, 'transaction snapshot lookup');
@@ -81,6 +86,7 @@ export async function seedNflTransactionMarketData(
       snapshot_file: manifest.snapshot_file,
       coverage: snapshot.coverage,
       licensing_boundary: manifest.licensing_boundary,
+      published_at: null,
     }), 'transaction snapshot insert');
   }
 
@@ -95,6 +101,9 @@ export async function seedNflTransactionMarketData(
       as_of_date: source.as_of_date,
       checksum_sha256: source.checksum_sha256,
       coverage_note: source.coverage_note,
+      row_count: source.row_count ?? null,
+      coverage_start_date: source.coverage_start_date ?? null,
+      coverage_end_date: source.coverage_end_date ?? null,
     }))],
     ['nfl_transaction_events', snapshot.events.map((event) => ({ snapshot_id: snapshot.snapshot_id, ...event }))],
     ['nfl_trade_assets', snapshot.trade_assets.map((asset) => ({ snapshot_id: snapshot.snapshot_id, ...asset }))],
@@ -108,11 +117,31 @@ export async function seedNflTransactionMarketData(
     ['nfl_transaction_league_caps', snapshot.league_caps.map((cap) => ({ snapshot_id: snapshot.snapshot_id, ...cap }))],
   ];
   const insertedCounts: Record<string, number> = {};
+  const verifiedCounts: Record<string, number> = {};
+  const alreadyPublished = Boolean(existing.data && (existing.data as Record<string, unknown>).published_at);
   for (const [table, rows] of tables) {
-    await upsertChunks(database, table, rows);
-    insertedCounts[table] = rows.length;
+    if (!alreadyPublished) await upsertChunks(database, table, rows);
+    insertedCounts[table] = alreadyPublished ? 0 : rows.length;
+    const storedCount = await countSnapshotRows(database, table, snapshot.snapshot_id);
+    if (storedCount !== rows.length) {
+      throw new Error(`${table} snapshot verification failed: expected ${rows.length}, found ${storedCount}`);
+    }
+    verifiedCounts[table] = storedCount;
   }
-  return { snapshot_id: snapshot.snapshot_id, inserted_counts: insertedCounts };
+  if (!alreadyPublished) {
+    const published = await database
+      .from('nfl_transaction_dataset_snapshots')
+      .update({ published_at: new Date().toISOString() })
+      .eq('snapshot_id', snapshot.snapshot_id)
+      .is('published_at', null);
+    throwIfError(published, 'transaction snapshot publication');
+  }
+  return {
+    snapshot_id: snapshot.snapshot_id,
+    seed_status: alreadyPublished ? 'verified_existing' : 'inserted_and_published',
+    inserted_counts: insertedCounts,
+    verified_counts: verifiedCounts,
+  };
 }
 
 export async function loadCurrentNflTransactionMarketSnapshot(
@@ -122,15 +151,16 @@ export async function loadCurrentNflTransactionMarketSnapshot(
   const snapshotResult = await database.from('nfl_current_transaction_dataset_snapshot').select('*').single();
   throwIfError(snapshotResult, 'current transaction snapshot');
   const snapshotRow = snapshotResult.data as Record<string, unknown>;
+  const snapshotId = String(snapshotRow.snapshot_id);
   const [events, populations, caps, sources] = await Promise.all([
-    selectAll(database, 'nfl_current_transaction_events', ['event_id']),
-    selectAll(database, 'nfl_current_position_year_populations', ['year', 'team_id', 'position_group']),
-    selectAll(database, 'nfl_current_transaction_league_caps', ['year']),
-    selectAll(database, 'nfl_current_transaction_source_manifests', ['source_ref_id']),
+    selectAll(database, 'nfl_transaction_events', ['event_id'], snapshotId),
+    selectAll(database, 'nfl_position_year_populations', ['year', 'team_id', 'position_group'], snapshotId),
+    selectAll(database, 'nfl_transaction_league_caps', ['year'], snapshotId),
+    selectAll(database, 'nfl_transaction_source_manifests', ['source_ref_id'], snapshotId),
   ]);
   if (!events.length) throw new Error('current transaction snapshot has no events');
   return {
-    snapshot_id: String(snapshotRow.snapshot_id),
+    snapshot_id: snapshotId,
     events: events.map((row) => ({
       event_id: String(row.event_id),
       event_year: Number(row.event_year),
@@ -178,6 +208,9 @@ export async function loadCurrentNflTransactionMarketSnapshot(
       as_of_date: String(row.as_of_date),
       checksum_sha256: String(row.checksum_sha256),
       coverage_note: String(row.coverage_note),
+      row_count: nullableNumber(row.row_count) ?? undefined,
+      coverage_start_date: nullableString(row.coverage_start_date),
+      coverage_end_date: nullableString(row.coverage_end_date),
     })),
   };
 }
@@ -189,7 +222,7 @@ export async function loadNflTransactionMarketDataHealth(
   const result = await database.from('nfl_current_transaction_dataset_snapshot').select('*').single();
   throwIfError(result, 'current transaction snapshot health');
   const row = result.data as Record<string, unknown>;
-  const sources = await selectAll(database, 'nfl_current_transaction_source_manifests', ['source_ref_id']);
+  const sources = await selectAll(database, 'nfl_transaction_source_manifests', ['source_ref_id'], String(row.snapshot_id));
   return {
     source_mode: 'supabase_current_views',
     snapshot_id: String(row.snapshot_id),
@@ -206,6 +239,9 @@ export async function loadNflTransactionMarketDataHealth(
       as_of_date: String(source.as_of_date),
       checksum_sha256: String(source.checksum_sha256),
       coverage_note: String(source.coverage_note),
+      row_count: nullableNumber(source.row_count) ?? undefined,
+      coverage_start_date: nullableString(source.coverage_start_date),
+      coverage_end_date: nullableString(source.coverage_end_date),
     })),
     fallback_reason: null,
   };
@@ -218,14 +254,22 @@ async function upsertChunks(client: SupabaseClient, table: string, rows: Record<
   }
 }
 
+async function countSnapshotRows(client: SupabaseClient, table: string, snapshotId: string): Promise<number> {
+  const result = await client.from(table).select('*', { count: 'exact', head: true }).eq('snapshot_id', snapshotId);
+  throwIfError(result, `${table} count verification`);
+  return result.count ?? 0;
+}
+
 async function selectAll(
   client: SupabaseClient,
   table: string,
   orderColumns: string[],
+  snapshotId?: string,
 ): Promise<Record<string, unknown>[]> {
   const result: Record<string, unknown>[] = [];
   for (let start = 0; ; start += 1_000) {
     let query = client.from(table).select('*');
+    if (snapshotId) query = query.eq('snapshot_id', snapshotId);
     for (const column of orderColumns) query = query.order(column, { ascending: true });
     const response = await query.range(start, start + 999);
     throwIfError(response, `${table} load`);

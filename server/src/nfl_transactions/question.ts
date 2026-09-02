@@ -38,7 +38,7 @@ const DEFAULT_MATERIAL_TYPES: NflTransactionType[] = [
 export function isNflTransactionMarketQuestion(question: string): boolean {
   const value = question.trim().toLowerCase();
   if (!value) return false;
-  const marketLanguage = /\b(?:transaction|trade|traded|market|free agen|contract|extension|signing|comparables?|compensation|pick return|mobility|material move)/i.test(value);
+  const marketLanguage = /\b(?:transaction|trade|traded|market|free agen|contract|extension|signing|comparables?|compensation|pick return|mobility|material[- ]move)/i.test(value);
   const analysisLanguage = /\b(?:trend|grew|grown|growth|shrank|shrunk|shrinkage|changed|compare|versus|vs\.?|before|after|since|recent|influenc|most often|over the last|historical)/i.test(value);
   return marketLanguage && analysisLanguage;
 }
@@ -89,7 +89,14 @@ function analysisModeFromQuestion(
 ): NflTransactionAnalysisMode {
   if (/\b(?:most influenced|most influence|drove (?:this|the) result|what drove|recent transactions?)\b/i.test(question)) return 'recent_influence';
   if (/\b(?:comparables?|supporting transactions?|show (?:me )?(?:the )?trades?)\b/i.test(question)) return 'comparables';
-  if (/\b(?:before|after|versus|vs\.?|compare)\b/i.test(question)) return 'period_comparison';
+  if (/\b(?:before|after|versus|vs\.?)\b/i.test(question)) return 'period_comparison';
+  if (/\bcompare\b/i.test(question)) {
+    // “Compare EDGE with IOL” changes the position cohort, not the time
+    // windows. Preserve the prior analysis mode so follow-ups do not silently
+    // replace 2016–2018 vs 2023–2025 with a five-year split.
+    if (positionGroupsFromQuestion(question).length >= 2) return inherited ?? 'ten_year_trend';
+    return 'period_comparison';
+  }
   if (/\b(?:trend|grew|grown|growth|shrank|shrunk|shrinkage|over the last|market)\b/i.test(question)) return 'ten_year_trend';
   return inherited ?? 'ten_year_trend';
 }

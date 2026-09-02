@@ -24,6 +24,8 @@ test('reviewed transaction snapshot is checksum verified and covers completed ye
   assert.ok(snapshot.coverage.position_match_basis_points >= 9_500);
   assert.ok(snapshot.coverage.compensation_coverage_basis_points < 10_000);
   assert.ok(snapshot.coverage.contract_term_coverage_basis_points < 10_000);
+  assert.ok(snapshot.source_refs.every((source) => Number.isSafeInteger(source.row_count) && source.row_count! > 0));
+  assert.ok(snapshot.source_refs.every((source) => source.coverage_start_date && source.coverage_end_date));
   assert.equal(new Set(snapshot.roster_player_seasons.filter((row) => row.team_id == null).map((row) => row.year)).size, 10);
 });
 

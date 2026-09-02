@@ -21,6 +21,8 @@ export type GambitEventMap = {
   'v6d3cf:prefill-reply-composer': { text: string };
   /** Cite chip hover: ref is the source ref_index (or null on leave). LeftRail subscribes to glow the matching card. */
   'v6d3cf:cite-hover': { ref: number | null };
+  /** Open the responsive evidence drawer and focus the exact source card. */
+  'v6d3cf:open-evidence': { ref: number };
   /** Slash-command shortcut: regenerate the active brief. BriefActions listens. */
   'v6d3cf:slash-regenerate': void;
   /** Open the NYG workspace view and refresh its server-backed list. */

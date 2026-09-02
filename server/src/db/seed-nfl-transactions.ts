@@ -11,7 +11,9 @@ async function main(): Promise<void> {
     schema: 'nfl_transaction_seed.v1',
     status: 'pass',
     snapshot_id: result.snapshot_id,
+    seed_status: result.seed_status,
     inserted_counts: result.inserted_counts,
+    verified_counts: result.verified_counts,
   }, null, 2));
 }
 

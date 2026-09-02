@@ -520,6 +520,7 @@ function transactionMarketBriefSources(
       title: `Source snapshot · ${source.name}`,
       updated_at: source.as_of_date,
       data: {
+        source_url: source.url,
         rows: [
           { k: 'Upstream source', v: source.url },
           { k: 'Attribution', v: source.upstream_attribution },
@@ -527,6 +528,8 @@ function transactionMarketBriefSources(
           { k: 'As of', v: source.as_of_date },
           { k: 'Checksum', v: source.checksum_sha256 },
           { k: 'Coverage', v: source.coverage_note },
+          { k: 'Rows', v: source.row_count?.toLocaleString() ?? 'not supplied' },
+          { k: 'Coverage range', v: source.coverage_start_date && source.coverage_end_date ? `${source.coverage_start_date}–${source.coverage_end_date}` : 'not supplied' },
           { k: 'Used by', v: `Market analysis ${latest.analysis_id}` },
         ],
         source_ref: source,
@@ -534,7 +537,10 @@ function transactionMarketBriefSources(
       },
     });
   }
-  for (const comparable of latest.comparables.slice(0, 12)) {
+  const comparableRows = [...latest.comparables, ...latest.influential_transactions]
+    .filter((row, index, rows) => rows.findIndex((candidate) => candidate.event_id === row.event_id) === index);
+  for (const comparable of comparableRows) {
+    const upstream = latest.source_refs.find((source) => comparable.source_ref_ids.includes(source.id));
     result.push({
       ref_index: startRefIndex + result.length,
       kind: 'ANALYST_DATA',
@@ -542,6 +548,7 @@ function transactionMarketBriefSources(
       title: `Transaction · ${comparable.player_name}`,
       updated_at: comparable.event_date ?? String(comparable.event_year),
       data: {
+        ...(upstream ? { source_url: upstream.url } : {}),
         rows: [
           { k: 'Date', v: comparable.event_date ?? `${comparable.event_year} (${comparable.date_precision} precision)` },
           { k: 'Move', v: comparable.transaction_type.replaceAll('_', ' ') },

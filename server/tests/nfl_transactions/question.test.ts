@@ -28,7 +28,7 @@ test('explicit follow-up filters override inherited scope', () => {
 
   const positions = transactionMarketRequestFromQuestion('Compare edge rushers with interior offensive linemen.', inherited);
   assert.deepEqual(positions.position_groups, ['IOL', 'EDGE']);
-  assert.equal(positions.analysis_mode, 'period_comparison');
+  assert.equal(positions.analysis_mode, 'ten_year_trend');
 
   const period = transactionMarketRequestFromQuestion('What changed after 2020?', inherited);
   assert.equal(period.comparison_year, 2020);
@@ -47,4 +47,11 @@ test('parses unplanned trade and position variations', () => {
   assert.deepEqual(beforeAfter.position_groups, ['RB', 'S']);
   assert.equal(beforeAfter.comparison_year, 2020);
   assert.equal(beforeAfter.analysis_mode, 'period_comparison');
+});
+
+test('recognizes hyphenated material-move acceptance wording', () => {
+  assert.equal(
+    isNflTransactionMarketQuestion('Compare safety and running-back material-move rates before and after 2020.'),
+    true,
+  );
 });

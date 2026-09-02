@@ -1,11 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { RailChannels } from '../briefs/RailChannels';
 import { BriefRightPanel } from '../fenway/BriefRightPanel';
 import { ChannelHeader } from '../fenway/ChannelHeader';
 import { LeftRail } from '../fenway/LeftRail';
 import { SessionFeed } from '../fenway/SessionFeed';
 import { Toaster } from '../fenway/Toaster';
-import { fire } from '../lib/events';
+import { fire, on as onEvt } from '../lib/events';
 import { useNewChannel } from '../lib/useNewChannel';
 import {
   useBookmarks,
@@ -22,6 +22,7 @@ interface AnalysisWorkspaceProps {
 
 /** The primary question -> analysis -> evidence -> follow-up workspace. */
 export function AnalysisWorkspace({ presenter = false }: AnalysisWorkspaceProps) {
+  const [evidenceDrawerOpen, setEvidenceDrawerOpen] = useState(false);
   const { sessionsLoaded, loadSessions } = useSessions();
   const {
     activeBriefId,
@@ -109,6 +110,8 @@ export function AnalysisWorkspace({ presenter = false }: AnalysisWorkspaceProps)
     return () => window.removeEventListener('keydown', onKey);
   }, [startNewChannel]);
 
+  useEffect(() => onEvt('v6d3cf:open-evidence', () => setEvidenceDrawerOpen(true)), []);
+
   if (!sessionsLoaded) {
     return (
       <div className="analysis-loading" role="status">
@@ -121,12 +124,27 @@ export function AnalysisWorkspace({ presenter = false }: AnalysisWorkspaceProps)
   return (
     <div className="analysis-workspace" data-presenter={presenter ? 'true' : 'false'}>
       <div className="analysis-workspace-canvas">
-        <LeftRail
-          extra={<RailChannels readOnly={presenter} />}
-          collapsed={railCollapsed}
-          onToggle={toggleRailCollapsed}
-        />
+        {evidenceDrawerOpen && (
+          <button
+            type="button"
+            className="analysis-evidence-backdrop"
+            aria-label="Close evidence panel"
+            onClick={() => setEvidenceDrawerOpen(false)}
+          />
+        )}
+        <div className={`analysis-evidence-rail${evidenceDrawerOpen ? ' open' : ''}`}>
+          <LeftRail
+            extra={<RailChannels readOnly={presenter} />}
+            collapsed={railCollapsed}
+            onToggle={toggleRailCollapsed}
+          />
+        </div>
         <main className="analysis-workspace-main">
+          <button
+            type="button"
+            className="analysis-evidence-trigger"
+            onClick={() => setEvidenceDrawerOpen(true)}
+          >Evidence pack</button>
           <ChannelHeader readOnly={presenter} />
           <SessionFeed presenter={presenter} />
         </main>

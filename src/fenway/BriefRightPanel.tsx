@@ -78,7 +78,7 @@ export function BriefRightPanel() {
   // Collapsed handle — thin vertical strip with a chevron to reopen.
   if (!rightPanelOpen) {
     return (
-      <button onClick={() => setRightPanelOpen(true)} title="Open right panel"
+      <button className="analysis-right-panel-handle" onClick={() => setRightPanelOpen(true)} title="Open right panel"
         aria-label="Open right panel"
         style={{
           width: COLLAPSED_HANDLE_WIDTH, flexShrink: 0,
@@ -98,7 +98,7 @@ export function BriefRightPanel() {
   }
 
   return (
-    <div style={{
+    <div className="analysis-right-panel" style={{
       width: rightPanelWidth, flexShrink: 0,
       background: F.paper,
       borderLeft: `1px solid ${F.border}`,
