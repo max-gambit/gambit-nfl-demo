@@ -74,6 +74,52 @@ test('unsupported numbers are rejected twice before deterministic fallback', asy
   assert.ok(result.validation_issues.some((issue) => issue.includes('cap_math_mismatch')));
 });
 
+test('numeric guard rejects unsupported money written without a dollar sign', async () => {
+  const { request, options, branch } = await fixture();
+  const draft = validDraft(branch);
+  draft.summary = 'This creates 16 million dollars of relief with a low-risk roster path.';
+  const result = await explainCapRosterDecision(request, {
+    ...options,
+    apiKeyAvailable: true,
+    createMessage: async () => message(draft),
+  });
+  assert.equal(result.status, 'deterministic_fallback');
+  assert.ok(result.validation_issues.some((issue) => issue.includes('cap_math_mismatch')));
+  assert.ok(result.validation_issues.some((issue) => issue.includes('unsupported_player_quality')));
+});
+
+test('numeric guard rejects spelled-out dollar claims', async () => {
+  const { request, options, branch } = await fixture();
+  const draft = validDraft(branch);
+  draft.summary = 'This creates twenty million dollars of relief.';
+  const result = await explainCapRosterDecision(request, {
+    ...options,
+    apiKeyAvailable: true,
+    createMessage: async () => message(draft),
+  });
+  assert.equal(result.status, 'deterministic_fallback');
+  assert.ok(result.validation_issues.some((issue) => issue.includes('cap_math_mismatch')));
+});
+
+test('bare figures, undeclared player names, and partial rule sets fail closed', async () => {
+  const { request, options, branch } = await fixture();
+  const draft = validDraft(branch);
+  const named = branch.actions[0];
+  assert.ok(named);
+  draft.summary = `${named.player_name} creates 16123456 in relief.`;
+  draft.player_ids = draft.player_ids.filter((id) => id !== named.player_id);
+  draft.rule_ids = draft.rule_ids.slice(0, -1);
+  const result = await explainCapRosterDecision(request, {
+    ...options,
+    apiKeyAvailable: true,
+    createMessage: async () => message(draft),
+  });
+  assert.equal(result.status, 'deterministic_fallback');
+  assert.ok(result.validation_issues.some((issue) => issue.includes('cap_math_mismatch')));
+  assert.ok(result.validation_issues.some((issue) => issue.includes('unsupported_player_quality')));
+  assert.ok(result.validation_issues.some((issue) => issue.includes('missing_rule_citation')));
+});
+
 test('missing citations and invented private inputs fail closed', async () => {
   const { request, options, branch } = await fixture();
   const draft = validDraft(branch);
@@ -100,4 +146,16 @@ test('default presenter follow-up never requires a model provider', async () => 
   assert.equal(calls, 0);
   assert.equal(result.status, 'deterministic_fallback');
   assert.match(result.summary, /All figures are computed|maximum supported positive relief/);
+});
+
+test('blocked preflight explanation exposes no branch or player actions', async () => {
+  const { request, options } = await fixture();
+  const seed = structuredClone(options.data.seed);
+  const result = await explainCapRosterDecision({ ...request, use_live_model: false }, {
+    ...options,
+    data: { seed, source_mode: 'checked_in_snapshot_fallback', fallback_reason: 'database unavailable' },
+  });
+  assert.equal(result.branch_id, null);
+  assert.deepEqual(result.player_rows, []);
+  assert.match(result.rationale, /No branch can be explained/);
 });

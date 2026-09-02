@@ -29,7 +29,8 @@ export async function buildCapRosterDecision(
   const metricByPlayer = new Map(detail.metrics.map((row) => [row.player_id, row]));
   const ruleByFamily = new Map(rules.rules.map((rule) => [rule.rule_family, rule]));
   const allowed = new Set(input.allowed_levers);
-  const excludedDirectional = detail.cap.filter((row) => !isExact(row)).length;
+  const exactRows = detail.cap.filter(isExact);
+  const excludedDirectional = detail.cap.length - exactRows.length;
   const candidates = bestActionPerPlayer(detail.cap.flatMap((row) => {
     if (!row.player_id || protectedPlayers.has(row.player_id) || protectedGroups.has(normalizePosition(row.position))) return [];
     return actionCandidates(row, allowed, metricByPlayer.get(row.player_id), ruleByFamily);
@@ -74,9 +75,11 @@ export async function buildCapRosterDecision(
     data_health: health,
     evidence: {
       source_refs: data.seed.source_refs,
-      captured_contract_rows: detail.cap.filter((row) => row.contract_ledger_confidence === 'captured' && isExact(row)).length,
-      directional_contract_rows: detail.cap.filter((row) => row.contract_ledger_confidence === 'derived' || row.contract_ledger_confidence === 'estimated').length,
-      source_needed_contract_rows: detail.cap.filter((row) => !isExact(row)).length,
+      exact_contract_rows: exactRows.length,
+      captured_contract_rows: exactRows.filter((row) => row.contract_ledger_confidence === 'captured').length,
+      derived_contract_rows: exactRows.filter((row) => row.contract_ledger_confidence === 'derived').length,
+      directional_contract_rows: detail.cap.filter((row) => !isExact(row) && row.source_status === 'estimated').length,
+      source_needed_contract_rows: detail.cap.filter((row) => !isExact(row) && row.source_status !== 'estimated').length,
       rule_reference_count: new Set(branches.flatMap((branch) => branch.actions.flatMap((action) => action.rule_references.map((rule) => rule.rule_id)))).size,
     },
     baseline: {
@@ -145,6 +148,7 @@ function actionCandidates(
       dead_money_dollars: dead,
       cap_number_dollars: row.cap_number_2026!,
       depth_effect: depthEffect(metric),
+      depth_evidence: depthEvidence(metric),
       confidence: row.contract_ledger_confidence,
       source_status: row.source_status,
       source_url: row.source_url,
@@ -160,13 +164,15 @@ function isExact(row: NflCapRow): boolean {
     && (row.contract_ledger_confidence === 'captured' || row.contract_ledger_confidence === 'derived')
     && row.cap_number_2026 != null
     && row.guaranteed_remaining != null
+    && row.contract_end_year != null
     && row.contract_years_remaining != null
     && row.dead_money_if_cut_2026 != null
     && row.cut_savings_2026 != null
     && row.post_june_1_dead_money_2026 != null
     && row.post_june_1_cut_savings_2026 != null
     && row.trade_dead_money_2026 != null
-    && row.trade_savings_2026 != null;
+    && row.trade_savings_2026 != null
+    && rowArithmeticReconciles(row);
 }
 
 function bestActionPerPlayer(actions: NflCapRosterAction[]): NflCapRosterAction[] {
@@ -205,12 +211,34 @@ function actionSortBalanced(a: NflCapRosterAction, b: NflCapRosterAction): numbe
 }
 
 function depthEffect(metric: NflDemoSeed['player_metrics'][number] | undefined): NflCapRosterAction['depth_effect'] {
-  if (!metric) return 'unknown';
-  const role = `${metric.role} ${metric.value_tier}`.toLowerCase();
-  if (/core|starter|premium|high/.test(role) || (metric.snap_share_2025 ?? 0) >= 0.65) return 'high';
-  if (/rotation|contributor/.test(role) || (metric.snap_share_2025 ?? 0) >= 0.3) return 'medium';
-  if (/depth|reserve|development/.test(role)) return 'low';
-  return 'unknown';
+  if (!hasCapturedDepthEvidence(metric) || metric.snap_share_2025 == null) return 'unknown';
+  if (metric.snap_share_2025 >= 0.65) return 'high';
+  if (metric.snap_share_2025 >= 0.3) return 'medium';
+  return 'low';
+}
+
+function depthEvidence(metric: NflDemoSeed['player_metrics'][number] | undefined): NflCapRosterAction['depth_evidence'] {
+  if (!hasCapturedDepthEvidence(metric) || metric.snap_share_2025 == null) {
+    return {
+      source_status: 'source-needed',
+      as_of_season: '2025',
+      basis: 'No captured public 2025 snap-share sample is available; football impact remains unknown.',
+      source_url: metric?.source_url ?? null,
+    };
+  }
+  const percent = Math.round(metric.snap_share_2025 * 1000) / 10;
+  const starts = metric.starts_2025 == null ? 'starts not reported' : `${metric.starts_2025} starts`;
+  const games = metric.games_2025 == null ? 'games not reported' : `${metric.games_2025} games`;
+  return {
+    source_status: 'captured',
+    as_of_season: '2025',
+    basis: `${percent}% of team snaps across ${games}; ${starts}.`,
+    source_url: metric.source_url,
+  };
+}
+
+function hasCapturedDepthEvidence(metric: NflDemoSeed['player_metrics'][number] | undefined): metric is NflDemoSeed['player_metrics'][number] {
+  return metric?.source_status === 'captured' && metric.metric_confidence !== 'source-needed';
 }
 
 function ruleReference(rule: NflRuleRow): NflDecisionRuleReference {
@@ -220,11 +248,21 @@ function ruleReference(rule: NflRuleRow): NflDecisionRuleReference {
 function normalizePosition(position: string | null): string {
   const value = (position ?? 'Other').toUpperCase();
   if (['T', 'OT', 'G', 'OG', 'C', 'OL'].includes(value)) return 'OL';
-  if (['DE', 'OLB', 'EDGE'].includes(value)) return 'EDGE/LB';
+  if (['DE', 'OLB', 'EDGE', 'LB', 'MLB', 'ILB'].includes(value)) return 'EDGE/LB';
   if (['DT', 'NT', 'DL'].includes(value)) return 'DL';
-  if (['FS', 'SS', 'S'].includes(value)) return 'S';
+  if (['FS', 'SS', 'S', 'SAF'].includes(value)) return 'S';
+  if (['CB', 'DB'].includes(value)) return 'CB';
   if (['FB', 'HB', 'RB'].includes(value)) return 'RB';
   return value;
+}
+
+function rowArithmeticReconciles(row: NflCapRow): boolean {
+  if (row.cap_number_2026 == null) return false;
+  return [
+    [row.dead_money_if_cut_2026, row.cut_savings_2026],
+    [row.post_june_1_dead_money_2026, row.post_june_1_cut_savings_2026],
+    [row.trade_dead_money_2026, row.trade_savings_2026],
+  ].every(([dead, relief]) => dead != null && relief != null && row.cap_number_2026! - dead === relief);
 }
 
 function assertBranchInvariants(branches: NflCapRosterBranch[], input: NflCapRosterDecisionRequest): void {

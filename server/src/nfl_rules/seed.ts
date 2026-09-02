@@ -71,8 +71,8 @@ export function validateNflRulesCorpus(corpus: NflRulesCorpus): void {
     if (!['nflpaweb.blob.core.windows.net', 'operations.nfl.com'].includes(source.hostname)) {
       throw new Error(`NFL rule ${rule.rule_family} does not use an approved authoritative source`);
     }
-    if (rule.authority_type === 'executed_cba' && !rule.source_hash) {
-      throw new Error(`NFL rule ${rule.rule_family} is missing its executed-CBA source hash`);
+    if (rule.authority_type === 'executed_cba' && !/^sha256:[a-f0-9]{64}$/.test(rule.source_hash ?? '')) {
+      throw new Error(`NFL rule ${rule.rule_family} is missing a valid executed-CBA SHA-256 source hash`);
     }
     if (!/(Article|Section|page|heading)/i.test(rule.source_locator)) {
       throw new Error(`NFL rule ${rule.rule_family} lacks an exact authority locator`);

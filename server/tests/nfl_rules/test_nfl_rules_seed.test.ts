@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { loadNflRulesCorpus } from '../../src/nfl_rules/seed.js';
+import { loadNflRulesCorpus, validateNflRulesCorpus } from '../../src/nfl_rules/seed.js';
 import { nflRoutes } from '../../src/routes/nfl.js';
 
 test('NFL rules corpus loads bounded transaction rule families', async () => {
@@ -14,7 +14,15 @@ test('NFL rules corpus loads bounded transaction rule families', async () => {
   assert.ok(families.has('franchise_transition_tag'));
   assert.ok(families.has('salary_cap_accounting'));
   assert.ok(corpus.rules.every((rule) => rule.source_locator && rule.effective_date && rule.analysis_boundary));
-  assert.ok(corpus.rules.filter((rule) => rule.authority_type === 'executed_cba').every((rule) => rule.source_hash?.startsWith('sha256:')));
+  assert.ok(corpus.rules.filter((rule) => rule.authority_type === 'executed_cba').every((rule) => /^sha256:[a-f0-9]{64}$/.test(rule.source_hash ?? '')));
+});
+
+test('executed CBA authority rejects truncated or malformed content hashes', async () => {
+  const corpus = structuredClone(await loadNflRulesCorpus());
+  const executed = corpus.rules.find((rule) => rule.authority_type === 'executed_cba');
+  assert.ok(executed);
+  executed.source_hash = 'sha256:0ff491731e6ab8c21dd2b284b650b1f2a97d943a3850ebee';
+  assert.throws(() => validateNflRulesCorpus(corpus), /valid executed-CBA SHA-256/);
 });
 
 test('NFL rules routes expose corpus sections and Analyze handoff boundary', async () => {

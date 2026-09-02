@@ -2151,6 +2151,12 @@ export interface NflCapRosterAction {
   dead_money_dollars: number;
   cap_number_dollars: number;
   depth_effect: 'none' | 'low' | 'medium' | 'high' | 'unknown';
+  depth_evidence: {
+    source_status: 'captured' | 'source-needed';
+    as_of_season: string;
+    basis: string;
+    source_url: string | null;
+  };
   confidence: 'captured' | 'derived' | 'estimated' | 'source-needed';
   source_status: string;
   source_url: string | null;
@@ -2184,7 +2190,9 @@ export interface NflCapRosterDecisionResponse {
   data_health: NflDataHealthResponse;
   evidence: {
     source_refs: NflSourceRef[];
+    exact_contract_rows: number;
     captured_contract_rows: number;
+    derived_contract_rows: number;
     directional_contract_rows: number;
     source_needed_contract_rows: number;
     rule_reference_count: number;
@@ -2224,7 +2232,7 @@ export interface NflCapRosterExplanationResponse {
   rationale: string;
   risks: string[];
   next_actions: string[];
-  player_rows: Array<Pick<NflCapRosterAction, 'player_id' | 'player_name' | 'lever' | 'relief_dollars' | 'dead_money_dollars' | 'depth_effect' | 'confidence' | 'source_url' | 'rule_references'>>;
+  player_rows: Array<Pick<NflCapRosterAction, 'player_id' | 'player_name' | 'lever' | 'relief_dollars' | 'dead_money_dollars' | 'depth_effect' | 'depth_evidence' | 'confidence' | 'source_url' | 'rule_references'>>;
   validation_issues: string[];
 }
 

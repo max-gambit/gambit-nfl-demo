@@ -24,7 +24,6 @@ export const NYG_HERO_PROJECT = {
   inbound_player_id: null,
   trigger_summary: 'Recompute after any signing, release, extension, contract-ledger refresh, or change to a protected player or position group.',
   counterparty_context: {
-    apron_level: '',
     cap_room: 'Public-data model; exact club planning room remains team-only and unconnected.',
     aims: 'Create verified room while protecting the football plan.',
     pressure: 'Meeting demonstration using public sources only.',

@@ -917,7 +917,7 @@ function buildMetricRow(
     interceptions_2025: metric.interceptions_2025,
     touchdowns_2025: metric.touchdowns_2025,
     availability_risk: snaps && snaps > 0 ? 'played_2025_public_sample' : 'stats_only_public_sample',
-    role: rosterRole(otc, estimatedLedger),
+    role: publicRole(snapShare),
     value_tier: valueTier(otc, estimatedLedger),
     metric_note: `${scorecardSummary} Sources: ${sourceFamilies.join(' + ')}. Current team join may include prior-team 2025 production for offseason additions.`,
     metric_source_family: sourceFamilies.join('+'),
@@ -1701,6 +1701,13 @@ function rosterRole(row: ParsedOtcYearRow | null, estimatedLedger: EstimatedCont
   const cap = row?.cap_number ?? estimatedLedger?.cap_number_2026 ?? 0;
   if (cap >= 10_000_000) return 'core_or_high_cap';
   if (cap >= 2_000_000) return 'rotation_or_specialist';
+  return 'depth_or_development';
+}
+
+function publicRole(snapShare: number | null): string {
+  if (snapShare == null) return 'public_role_source_needed';
+  if (snapShare >= 0.65) return 'core_or_high_usage';
+  if (snapShare >= 0.3) return 'rotation_or_specialist';
   return 'depth_or_development';
 }
 

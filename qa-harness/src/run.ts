@@ -115,8 +115,9 @@ async function canonicalRehearsal(page: Page, rehearsal: number, viewport: { wid
   await check(page, `${prefix} · Changing target relief`, 'HIGH', async () => {
     const target = page.getByLabel('Target relief dollars');
     await target.fill('20000000');
+    assert(await page.locator('.branch-card').count() === 0, 'Edited target left stale branch cards visible before recompute.');
     await page.getByRole('button', { name: 'Recompute branches' }).click();
-    await page.waitForFunction(() => document.body.innerText.includes('$20M') || document.body.innerText.includes('$22M'), undefined, { timeout: 15_000 });
+    await page.locator('.branch-card').first().waitFor({ timeout: 15_000 });
     const response = await decision({ target_relief_dollars: 20_000_000, protected_position_groups: ['QB'] });
     assert(response.recommended_branch_id === 'balanced', `unexpected recommendation ${response.recommended_branch_id}`);
     assert(response.branches.find((item) => item.id === 'balanced')?.target_met === true, 'Balanced branch did not clear $20M.');
@@ -136,6 +137,11 @@ async function canonicalRehearsal(page: Page, rehearsal: number, viewport: { wid
     await page.locator('.action-table button.action-row').first().click();
     await expectText(page, 'Open player contract source');
     await expectText(page, 'Contract evidence');
+    await expectText(page, '2025 public role evidence');
+    await page.locator('.branch-card', { hasText: 'Hold' }).click();
+    await expectText(page, 'Every number opens its proof.');
+    await page.locator('.branch-card', { hasText: 'Balanced' }).click();
+    await page.locator('.action-table button.action-row').first().click();
     await page.locator('.rule-link').first().click();
     await expectText(page, 'Official locator');
     assert(await page.locator('.rule-detail a.source-link').count() === 1, 'Rule detail lacks an authoritative source link.');
@@ -161,7 +167,9 @@ async function canonicalRehearsal(page: Page, rehearsal: number, viewport: { wid
     await expectText(page, 'Contract mechanics, separated from football judgment');
     await expectText(page, 'Positive relief');
     await expectText(page, 'Dead money');
-    assert(await page.locator('.roster-row').count() > 20, 'Roster table did not render substantive Giants rows.');
+    await expectText(page, 'Active roster');
+    await expectText(page, '53');
+    assert(await page.locator('.roster-row').count() === 103, 'Roster table did not render all 102 Giants rows plus its header.');
   });
   await check(page, `${prefix} · Offline follow-up`, 'MEDIUM', async () => {
     await openPresenter(page);
@@ -184,6 +192,7 @@ async function canonicalRehearsal(page: Page, rehearsal: number, viewport: { wid
     await page.getByRole('button', { name: 'Reset presentation' }).click();
     await page.waitForTimeout(250);
     assert(await target.inputValue() === '15000000', 'Presentation reset did not restore the reviewed target.');
+    assert(await page.getByLabel('Follow-up question').inputValue() === '', 'Presentation reset did not clear follow-up state.');
     assert(await page.evaluate(() => window.scrollY) === 0, 'Presentation reset did not restore scroll position.');
   });
   await check(page, `${prefix} · Responsive layout`, 'MEDIUM', async () => {
@@ -213,8 +222,8 @@ async function adversarialRun(page: Page): Promise<void> {
     assert(response.status === 400, `negative target returned HTTP ${response.status}`);
   });
   await check(page, 'Protected-group invariant', 'BLOCKER', async () => {
-    const response = await decision({ target_relief_dollars: 15_000_000, protected_position_groups: ['QB', 'OL', 'WR', 'DL', 'EDGE/LB', 'CB', 'S'] });
-    const protectedGroups = new Set(['QB', 'OL', 'WR', 'DL', 'EDGE/LB', 'CB', 'S']);
+    const response = await decision({ target_relief_dollars: 15_000_000, protected_position_groups: ['QB', 'RB', 'TE', 'OL', 'WR', 'DL', 'EDGE/LB', 'CB', 'S'] });
+  const protectedGroups = new Set(['QB', 'RB', 'TE', 'OL', 'WR', 'DL', 'EDGE/LB', 'CB', 'S']);
     for (const branch of response.branches) for (const action of branch.actions) assert(!protectedGroups.has(normalizePosition(action.position)), `${action.player_name} violated protected group ${action.position}`);
   });
   await check(page, 'Branch arithmetic reconciliation', 'BLOCKER', async () => {
@@ -248,6 +257,14 @@ async function adversarialRun(page: Page): Promise<void> {
   });
   await check(page, 'Active-output contamination scan', 'BLOCKER', async () => {
     await assertNoContamination(page);
+  });
+  await check(page, 'Inactive legacy routes and assets', 'HIGH', async () => {
+    const nbaRoute = await fetch(`${serverUrl}/nba/rosters/current`);
+    assert(nbaRoute.status === 404, `legacy NBA API remains mounted with HTTP ${nbaRoute.status}`);
+    const nbaAsset = await fetch(`${appUrl}/assets/warriors-logo.png`);
+    assert(nbaAsset.status === 404, `legacy NBA asset remains served with HTTP ${nbaAsset.status}`);
+    const sourceAsset = await fetch(`${appUrl}/public/assets/warriors-logo.png`);
+    assert(sourceAsset.status === 404, `legacy NBA source asset remains served with HTTP ${sourceAsset.status}`);
   });
 }
 
@@ -318,9 +335,11 @@ async function expectText(page: Page, text: string): Promise<void> {
 function normalizePosition(position: string | null): string {
   const value = (position ?? 'OTHER').toUpperCase();
   if (['T', 'OT', 'G', 'OG', 'C', 'OL'].includes(value)) return 'OL';
-  if (['DE', 'OLB', 'EDGE'].includes(value)) return 'EDGE/LB';
+  if (['DE', 'OLB', 'EDGE', 'LB', 'MLB', 'ILB'].includes(value)) return 'EDGE/LB';
   if (['DT', 'NT', 'DL'].includes(value)) return 'DL';
-  if (['FS', 'SS', 'S'].includes(value)) return 'S';
+  if (['FS', 'SS', 'S', 'SAF'].includes(value)) return 'S';
+  if (['CB', 'DB'].includes(value)) return 'CB';
+  if (['FB', 'HB', 'RB'].includes(value)) return 'RB';
   return value;
 }
 

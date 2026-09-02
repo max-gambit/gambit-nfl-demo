@@ -9,3 +9,15 @@
 @media(prefers-reduced-motion:reduce){.nyg-app *{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 @media(forced-colors:active){.status-dot.ready,.status-dot.degraded,.status-dot.blocked{forced-color-adjust:auto}.branch-card.selected,.workspace-list button.selected{outline:2px solid ButtonText}}
 .model-toggle{display:grid!important;grid-template-columns:auto 1fr;gap:2px 9px!important;align-items:center;margin-top:13px;color:#555b65;font-size:12px}.model-toggle input{width:auto}.model-toggle small{grid-column:2;color:#747983}.follow-up-answer{display:grid!important;gap:5px!important;background:#f1eee8;border-left:3px solid #2d6a4f;margin-top:14px;padding:13px}.follow-up-answer p{padding:0;margin:0;background:transparent}.follow-up-answer small{color:#666b74;line-height:1.45}.follow-up-error{border-left:3px solid #a71930;color:#741b2a}
+
+/* Red-team state and evidence hardening. */
+.model-controls{grid-template-columns:200px minmax(320px,1fr) auto}
+.model-controls input,.model-controls select,.follow-up input,.rule-search{border:1px solid #bfb9ae;background:#fff;padding:11px 12px;font:600 14px 'JetBrains Mono';color:#171a20;border-radius:3px;width:100%}
+.model-controls select{font-size:11px}.assumption-control{grid-column:1/3}.assumption-control small{color:#747983;font:500 10px 'JetBrains Mono'}
+.chip:disabled{cursor:wait;opacity:.55}.branch-number{font-size:clamp(18px,1.8vw,27px);overflow-wrap:anywhere}
+.roster-row{grid-template-columns:1.45fr .3fr .55fr .7fr .7fr .7fr .8fr}
+.follow-up-answer{gap:8px!important}.answer-section,.answer-evidence{display:grid!important;gap:6px!important;border-top:1px solid #d4d0c7;padding-top:10px}
+.answer-section>span,.answer-evidence>span,.depth-proof>span{font:600 9px 'JetBrains Mono';text-transform:uppercase;color:#747983}.answer-section.warning{border-left:2px solid #b5781a;padding-left:10px}
+.answer-evidence article{display:grid;gap:5px;background:#fff;border:1px solid #d8d3c9;padding:10px}.answer-evidence a{font-size:11px;color:#243f6b}
+.depth-proof{background:#1b2941;border:1px solid #39475e;padding:12px;margin:14px 0}.depth-proof p{color:#d0d6df;font-size:12px;line-height:1.45}
+@media(max-width:760px){.model-controls{grid-template-columns:1fr}.assumption-control{grid-column:auto}.roster-row{min-width:880px}}

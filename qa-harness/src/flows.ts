@@ -26,4 +26,5 @@ export const ADVERSARIAL_FLOW_NAMES = [
   'Stale or fallback blocking state',
   'Private-input refusal',
   'Active-output contamination scan',
+  'Inactive legacy routes and assets',
 ] as const;

@@ -339,14 +339,38 @@ export function evaluateNflCapRosterNarrative(
   const branchPlayerIds = new Set(branch?.actions.map((action) => action.player_id) ?? []);
   const branchRuleIds = new Set(branch?.actions.flatMap((action) => action.rule_references.map((rule) => rule.rule_id)) ?? []);
   const unsupportedPlayerIds = draft.player_ids.filter((playerId) => !branchPlayerIds.has(playerId));
+  const declaredPlayerIds = new Set(draft.player_ids);
+  const namedPlayers = new Map(
+    decision.branches.flatMap((candidate) => candidate.actions).map((action) => [action.player_name, action.player_id]),
+  );
+  const undeclaredPlayerNames = [...namedPlayers]
+    .filter(([name, playerId]) => containsPhrase(text, name) && !declaredPlayerIds.has(playerId))
+    .map(([name]) => name);
 
-  if (unsupportedPlayerIds.length) {
+  if ((branch?.actions.length ?? 0) > 0 && draft.player_ids.length === 0) {
+    issues.push({
+      category: 'unsupported_player_quality',
+      severity: 'high',
+      claim: 'The explanation omits the player-row links behind the selected actions.',
+      evidence_boundary: 'Every material branch explanation must expose at least one supporting player row.',
+      fix: 'Include the player IDs used by the validated branch so the UI can render their sourced rows.',
+    });
+  } else if (unsupportedPlayerIds.length) {
     issues.push({
       category: 'unsupported_player_quality',
       severity: 'high',
       claim: `The explanation references players outside the validated branch: ${unsupportedPlayerIds.join(', ')}.`,
       evidence_boundary: 'Player references must be copied from the selected deterministic branch.',
       fix: 'Remove player references that are not present in the validated branch payload.',
+    });
+  }
+  if (undeclaredPlayerNames.length) {
+    issues.push({
+      category: 'unsupported_player_quality',
+      severity: 'high',
+      claim: `The prose names players without linking their validated rows: ${undeclaredPlayerNames.join(', ')}.`,
+      evidence_boundary: 'Every named player in a material recommendation must be declared by ID and resolve to the selected branch.',
+      fix: 'Add the selected-branch player ID for each named player or remove the unsupported name.',
     });
   }
 
@@ -356,17 +380,19 @@ export function evaluateNflCapRosterNarrative(
     ...(branch?.actions.flatMap((action) => [action.relief_dollars, action.dead_money_dollars, action.cap_number_dollars]) ?? []),
   ]);
   const unsupportedDollars = extractDollarAmounts(text).filter((value) => !allowedDollars.has(value));
-  if (unsupportedDollars.length) {
+  const spelledDollarClaims = [...text.matchAll(/\b(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred)(?:[-\s]+(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred))*\s+(?:million|thousand)\s+(?:dollars?|in\s+(?:relief|savings|dead\s+money))\b/gi)].map((match) => match[0]);
+  if (unsupportedDollars.length || spelledDollarClaims.length) {
     issues.push({
       category: 'cap_math_mismatch',
       severity: 'high',
-      claim: `The explanation introduces unsupported dollar figures: ${[...new Set(unsupportedDollars)].join(', ')}.`,
+      claim: `The explanation introduces unsupported or non-machine-verifiable dollar figures: ${[...new Set([...unsupportedDollars.map(String), ...spelledDollarClaims])].join(', ')}.`,
       evidence_boundary: 'All dollar values must already exist in the validated deterministic branch payload.',
       fix: 'Use only the exact target, branch totals, or per-player figures from the deterministic payload.',
     });
   }
 
   const unsupportedRules = draft.rule_ids.filter((ruleId) => !branchRuleIds.has(ruleId));
+  const missingBranchRules = [...branchRuleIds].filter((ruleId) => !draft.rule_ids.includes(ruleId));
   if ((branch?.actions.length ?? 0) > 0 && draft.rule_ids.length === 0) {
     issues.push({
       category: 'missing_rule_citation',
@@ -384,6 +410,15 @@ export function evaluateNflCapRosterNarrative(
       fix: 'Remove invented rule IDs and use only branch-attached rule references.',
     });
   }
+  if (missingBranchRules.length) {
+    issues.push({
+      category: 'missing_rule_citation',
+      severity: 'high',
+      claim: `The explanation omits selected-branch rule references: ${missingBranchRules.join(', ')}.`,
+      evidence_boundary: 'Every rule family used by the selected deterministic branch must remain attached to the explanation.',
+      fix: 'Include every rule ID carried by the selected branch.',
+    });
+  }
 
   if (/\b(private|confidential|internal (?:medical|scouting|board)|medical grade|coach(?:ing)? trust|owner pressure)\b/i.test(text)) {
     issues.push({
@@ -395,7 +430,7 @@ export function evaluateNflCapRosterNarrative(
     });
   }
 
-  if (/\b(elite|poor player|replacement[- ]level|locker room|scheme fit|medical risk|declining|ascending)\b/i.test(text)) {
+  if (/\b(elite|poor player|replacement[- ]level|locker room|scheme fit|medical risk|low[- ]risk|declining|ascending)\b/i.test(text)) {
     issues.push({
       category: 'unsupported_player_quality',
       severity: 'high',
@@ -421,14 +456,23 @@ export function evaluateNflCapRosterNarrative(
 
 function extractDollarAmounts(text: string): number[] {
   const values: number[] = [];
-  const pattern = /\$\s*([0-9]+(?:,[0-9]{3})*(?:\.[0-9]+)?)\s*([mk])?/gi;
-  for (const match of text.matchAll(pattern)) {
-    const base = Number(match[1].replace(/,/g, ''));
-    const multiplier = match[2]?.toLowerCase() === 'm' ? 1_000_000 : match[2]?.toLowerCase() === 'k' ? 1_000 : 1;
+  const add = (raw: string, unit = '') => {
+    const base = Number(raw.replace(/,/g, ''));
+    const normalized = unit.toLowerCase();
+    const multiplier = normalized === 'm' || normalized === 'million' ? 1_000_000 : normalized === 'k' || normalized === 'thousand' ? 1_000 : 1;
     const value = base * multiplier;
     if (Number.isSafeInteger(value)) values.push(value);
-  }
+  };
+  for (const match of text.matchAll(/\$\s*([0-9]+(?:,[0-9]{3})*(?:\.[0-9]+)?)\s*([mk])?/gi)) add(match[1], match[2]);
+  for (const match of text.matchAll(/\b([0-9]+(?:\.[0-9]+)?)\s*(million|thousand|m|k)\b/gi)) add(match[1], match[2]);
+  for (const match of text.matchAll(/\b([0-9]{1,3}(?:,[0-9]{3})+)\b/g)) add(match[1]);
+  for (const match of text.matchAll(/\b([0-9]{5,})\b/g)) add(match[1]);
   return values;
+}
+
+function containsPhrase(text: string, phrase: string): boolean {
+  const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`\\b${escaped}\\b`, 'i').test(text);
 }
 
 export function buildNflPrivateCriticRevisionBlock(critique: NflPrivateCriticResult): string {

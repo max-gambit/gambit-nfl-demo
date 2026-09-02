@@ -41,6 +41,52 @@ test('protected position groups never enter transaction branches', async () => {
   assert.equal(transactions.some((action) => ['G', 'C', 'T', 'OT', 'OG', 'OL'].includes(action.position ?? '')), false);
 });
 
+test('protected front-seven and secondary aliases normalize without leaks', async () => {
+  const frontSeven = await fixtureRequest({ protected_player_ids: [], protected_position_groups: ['EDGE/LB'] });
+  assert.equal(frontSeven.branches.flatMap((branch) => branch.actions).some((action) => ['DE', 'OLB', 'EDGE', 'LB', 'MLB', 'ILB'].includes(action.position ?? '')), false);
+  const secondary = await fixtureRequest({ protected_player_ids: [], protected_position_groups: ['S', 'CB'] });
+  assert.equal(secondary.branches.flatMap((branch) => branch.actions).some((action) => ['FS', 'SS', 'S', 'SAF', 'CB', 'DB'].includes(action.position ?? '')), false);
+});
+
+test('source-needed performance cannot grade depth or enter the preserve-depth branch', async () => {
+  const seed = structuredClone(await loadNflDemoSeed());
+  seed.as_of_date = '2026-09-02T12:00:00.000Z';
+  seed.retrieved_at = '2026-09-02T12:15:00.000Z';
+  const baseline = await buildCapRosterDecision({
+    team_id: 'NYG', target_relief_dollars: 12_000_000, protected_player_ids: [], protected_position_groups: [], allowed_levers: ['pre_june_cut', 'post_june_cut', 'trade'],
+  }, { data: { seed, source_mode: 'supabase_current_views', fallback_reason: null }, generatedAt: new Date('2026-09-02T18:00:00.000Z') });
+  const candidate = baseline.branches.find((branch) => branch.id === 'preserve_depth')?.actions[0];
+  assert.ok(candidate);
+  const metric = seed.player_metrics.find((row) => row.player_id === candidate.player_id);
+  assert.ok(metric);
+  metric.source_status = 'source-needed';
+  metric.metric_confidence = 'source-needed';
+  metric.metric_gap_reason = 'test fixture has no public sample';
+  const result = await buildCapRosterDecision({
+    team_id: 'NYG', target_relief_dollars: 12_000_000, protected_player_ids: [], protected_position_groups: [], allowed_levers: ['pre_june_cut', 'post_june_cut', 'trade'],
+  }, { data: { seed, source_mode: 'supabase_current_views', fallback_reason: null }, generatedAt: new Date('2026-09-02T18:00:00.000Z') });
+  const action = result.branches.find((branch) => branch.id === 'maximize_relief')?.actions.find((item) => item.player_id === candidate.player_id);
+  assert.equal(action?.depth_effect, 'unknown');
+  assert.equal(action?.depth_evidence.source_status, 'source-needed');
+  assert.equal(result.branches.find((branch) => branch.id === 'preserve_depth')?.actions.some((item) => item.player_id === candidate.player_id), false);
+});
+
+test('arithmetic-invalid or term-incomplete rows cannot enter any branch', async () => {
+  const seed = structuredClone(await loadNflDemoSeed());
+  seed.as_of_date = '2026-09-02T12:00:00.000Z';
+  seed.retrieved_at = '2026-09-02T12:15:00.000Z';
+  const row = seed.cap_rows.find((item) => item.team_id === 'NYG' && item.source_status === 'captured' && (item.trade_savings_2026 ?? 0) > 0 && item.contract_end_year != null);
+  assert.ok(row?.player_id);
+  const playerId = row.player_id;
+  row.trade_savings_2026! += 1;
+  row.contract_end_year = null;
+  const result = await buildCapRosterDecision({
+    team_id: 'NYG', target_relief_dollars: 1_000_000, protected_player_ids: [], protected_position_groups: [], allowed_levers: ['trade'],
+  }, { data: { seed, source_mode: 'supabase_current_views', fallback_reason: null }, generatedAt: new Date('2026-09-02T18:00:00.000Z') });
+  assert.equal(result.branches.flatMap((branch) => branch.actions).some((action) => action.player_id === playerId), false);
+  assert.equal(result.status, 'blocked');
+});
+
 test('impossible target returns supported maximum without false recommendation', async () => {
   const result = await fixtureRequest({ target_relief_dollars: 500_000_000 });
   const maximum = result.branches.find((branch) => branch.id === 'maximize_relief');
@@ -68,4 +114,3 @@ test('manual assumptions stay labeled and stale fallback blocks recommendation',
   assert.equal(result.status, 'blocked');
   assert.equal(result.recommended_branch_id, null);
 });
-

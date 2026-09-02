@@ -39,7 +39,9 @@ export async function explainCapRosterDecision(
   options: ExplainCapRosterOptions = {},
 ): Promise<NflCapRosterExplanationResponse> {
   const decision = await buildCapRosterDecision(input, options);
-  const branch = selectedBranch(decision.branches, decision.recommended_branch_id);
+  const branch = decision.status === 'ready'
+    ? selectedBranch(decision.branches, decision.recommended_branch_id)
+    : null;
   const canCallModel = input.use_live_model === true
     && (options.apiKeyAvailable ?? Boolean(process.env.ANTHROPIC_API_KEY?.trim()))
     && decision.status === 'ready'
@@ -110,7 +112,6 @@ function selectedBranch(
   recommendedBranchId: NflCapRosterBranch['id'] | null,
 ): NflCapRosterBranch | null {
   return branches.find((branch) => branch.id === recommendedBranchId)
-    ?? branches.find((branch) => branch.id === 'maximize_relief')
     ?? null;
 }
 
@@ -145,6 +146,7 @@ function playerRows(actions: NflCapRosterAction[], selectedIds?: string[]) {
       relief_dollars: action.relief_dollars,
       dead_money_dollars: action.dead_money_dollars,
       depth_effect: action.depth_effect,
+      depth_evidence: action.depth_evidence,
       confidence: action.confidence,
       source_url: action.source_url,
       rule_references: action.rule_references,
