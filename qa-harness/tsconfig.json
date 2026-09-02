@@ -16,7 +16,6 @@
     "verbatimModuleSyntax": false,
     "types": ["node"],
     "outDir": "dist",
-    "rootDir": "src",
     "noEmit": true
   },
   "include": ["src/**/*"]

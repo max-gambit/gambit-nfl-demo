@@ -16,7 +16,9 @@ const DEFAULT_TARGET = 15_000_000;
 const DEFAULT_GROUPS = ['QB'];
 
 export function NygApp() {
-  const presenter = new URLSearchParams(window.location.search).get('present') === 'nyg-cap-roster';
+  const query = new URLSearchParams(window.location.search);
+  const presenter = query.get('present') === 'nyg-cap-roster';
+  const qaBlocked = query.get('qa') === 'blocked';
   const [view, setView] = useState<View>(presenter ? 'decision' : 'briefing');
   const [health, setHealth] = useState<NflDataHealthResponse | null>(null);
   const [decision, setDecision] = useState<NflCapRosterDecisionResponse | null>(null);
@@ -39,7 +41,7 @@ export function NygApp() {
         getNflDataHealth('NYG'), getCurrentNflCapSheet('NYG', { force: true }), listNflRules(),
         modelNflCapRoster({ team_id: 'NYG', target_relief_dollars: nextTarget, protected_player_ids: nextPlayers, protected_position_groups: nextGroups, allowed_levers: ['hold', 'pre_june_cut', 'post_june_cut', 'trade', 'restructure', 'extension'] }),
       ]);
-      setHealth(nextHealth); setRoster(nextRoster); setRules(toc.sections); setDecision(nextDecision);
+      setHealth(qaBlocked ? simulateBlockedHealth(nextHealth) : nextHealth); setRoster(nextRoster); setRules(toc.sections); setDecision(nextDecision);
       setSelectedBranch(nextDecision.recommended_branch_id ?? 'maximize_relief');
     } catch (caught) { setError(caught instanceof Error ? caught.message : String(caught)); }
     finally { setLoading(false); }
@@ -70,7 +72,7 @@ export function NygApp() {
   const sourceDate = health?.datasets.find((dataset) => dataset.id === 'roster')?.as_of_date;
   const branch = decision?.branches.find((candidate) => candidate.id === selectedBranch) ?? decision?.branches[0] ?? null;
 
-  return <div className="nyg-app" data-presenter={presenter ? 'true' : 'false'}>
+  return <div className="nyg-app" data-presenter={presenter ? 'true' : 'false'} data-qa-simulation={qaBlocked ? 'blocked' : undefined}>
     <header className="nyg-header">
       <button className="nyg-wordmark" onClick={() => setView('briefing')} aria-label="Open Briefing"><span className="nyg-monogram">NY</span><span><strong>GIANTS</strong><small>FOOTBALL OPERATIONS</small></span></button>
       <nav aria-label="Primary navigation">{NAV.map((item) => <button key={item.id} className={view === item.id ? 'active' : ''} onClick={() => setView(item.id)}>{item.label}</button>)}</nav>
@@ -159,3 +161,18 @@ function formatDate(value: string) { const parsed = new Date(value.length === 10
 function formatTime(value: string) { const parsed = new Date(value); return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); }
 function labelLever(value: string) { return value.replace('pre_june', 'Pre-June 1').replace('post_june', 'Post-June 1').replace(/_/g, ' ').replace(/^./, (letter) => letter.toUpperCase()); }
 function stageLabel(value: string) { return ({ research: 'Question', validate: 'Evidence', feedback: 'Scenarios', gm: 'Decision', proposal: 'Action Plan', question: 'Question', evidence: 'Evidence', scenarios: 'Scenarios', decision: 'Decision', action_plan: 'Action Plan' } as Record<string, string>)[value] ?? 'Question'; }
+function simulateBlockedHealth(health: NflDataHealthResponse): NflDataHealthResponse {
+  const message = 'QA simulation: roster and cap data are stale or using snapshot fallback.';
+  return {
+    ...health,
+    status: 'blocked',
+    meeting_ready: false,
+    source_mode: 'checked_in_snapshot_fallback',
+    fallback_reason: message,
+    datasets: health.datasets.map((dataset) => dataset.id === 'roster' || dataset.id === 'cap_contracts'
+      ? { ...dataset, status: 'blocked', source_mode: 'checked_in_snapshot_fallback', gaps: [...dataset.gaps, { code: 'qa_simulated_block', message }], blocker: message }
+      : dataset),
+    blockers: [message],
+    remediation: ['Refresh and seed the reviewed roster and cap snapshot in the current database views.'],
+  };
+}

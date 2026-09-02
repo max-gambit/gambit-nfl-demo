@@ -18,7 +18,9 @@
     "db:diff": "supabase db diff",
     "db:seed": "npm --prefix server run seed",
     "db:seed:demo": "npm --prefix server run seed:demo",
-    "qa": "npm --prefix qa-harness start"
+    "qa": "npm --prefix qa-harness start",
+    "qa:canonical": "npm --prefix qa-harness run canonical",
+    "qa:adversarial": "npm --prefix qa-harness run adversarial"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
