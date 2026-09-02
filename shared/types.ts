@@ -193,6 +193,8 @@ export interface DataAnalysisBriefBody {
   calculations: DataAnalysisCalculation[];
   caveats: string[];
   followups: string[];
+  /** Server-attached deterministic artifact. The model never authors this payload. */
+  market_analysis?: NflTransactionMarketAnalysis;
 }
 
 export type BriefBody = RecommendationBriefBody | DataAnalysisBriefBody;
@@ -2059,7 +2061,7 @@ export interface GetCurrentNflCoverageTeamResponse extends NflCoverageMatrixResp
 
 // ── NFL demo readiness and deterministic cap/roster modeling ───────────────
 export type NflDataHealthStatus = 'ready' | 'degraded' | 'blocked';
-export type NflDataHealthDatasetId = 'roster' | 'cap_contracts' | 'player_metrics' | 'rules';
+export type NflDataHealthDatasetId = 'roster' | 'cap_contracts' | 'player_metrics' | 'rules' | 'transaction_market';
 
 export interface NflDataHealthGap {
   code: string;
@@ -2071,7 +2073,7 @@ export interface NflDataHealthDataset {
   id: NflDataHealthDatasetId;
   label: string;
   status: NflDataHealthStatus;
-  source_mode: NflCoverageSourceMode | 'authoritative_corpus';
+  source_mode: NflCoverageSourceMode | 'authoritative_corpus' | 'public_release_snapshot';
   source_name: string;
   source_url: string | null;
   as_of_date: string | null;
@@ -2109,6 +2111,156 @@ export interface NflDataHealthResponse {
   rule_authority: NflRuleAuthorityHealth;
   blockers: string[];
   remediation: string[];
+}
+
+// ── NFL historical transaction-market analysis ────────────────────────────
+export type NflTransactionMarketStatus = 'supported' | 'directional' | 'insufficient_evidence';
+export type NflTransactionAnalysisMode = 'ten_year_trend' | 'period_comparison' | 'comparables' | 'recent_influence';
+export type NflTransactionDatePrecision = 'day' | 'year';
+export type NflTransactionType =
+  | 'trade'
+  | 'free_agent_signing'
+  | 're_signing'
+  | 'extension'
+  | 'tag'
+  | 'waiver_claim'
+  | 'release'
+  | 'other';
+export type NflPositionMarketGroup = 'QB' | 'RB' | 'WR' | 'TE' | 'OT' | 'IOL' | 'EDGE' | 'IDL' | 'LB' | 'CB' | 'S' | 'ST';
+export type NflTradeCompensationBand = 'round_1' | 'rounds_2_3' | 'rounds_4_7' | 'player_only' | 'unknown';
+export type NflMarketDirection = 'growing' | 'shrinking' | 'flat' | 'mixed' | 'insufficient_evidence';
+
+export interface NflTransactionMarketRequest {
+  analysis_mode: NflTransactionAnalysisMode;
+  start_year?: number;
+  end_year?: number;
+  comparison_year?: number;
+  team_ids?: string[];
+  position_groups?: NflPositionMarketGroup[];
+  transaction_types?: NflTransactionType[];
+  include_ytd?: boolean;
+  max_comparables?: number;
+}
+
+export interface NflTransactionMarketResolvedQuery {
+  analysis_mode: NflTransactionAnalysisMode;
+  start_year: number;
+  end_year: number;
+  baseline_years: [number, number];
+  recent_years: [number, number];
+  comparison_year: number | null;
+  team_ids: string[];
+  position_groups: NflPositionMarketGroup[];
+  transaction_types: NflTransactionType[];
+  include_ytd: boolean;
+  max_comparables: number;
+}
+
+export interface NflTransactionMarketCoverage {
+  event_count: number;
+  trade_count: number;
+  contract_count: number;
+  roster_player_seasons: number;
+  matched_position_count: number;
+  position_match_basis_points: number;
+  allocable_trade_count: number;
+  priced_contract_count: number;
+  latest_event_date: string | null;
+  type_coverage: Partial<Record<NflTransactionType, number>>;
+}
+
+export interface NflTransactionMarketYearPoint {
+  year: number;
+  position_group: NflPositionMarketGroup;
+  event_count: number;
+  roster_player_seasons: number;
+  mobility_per_100_basis_points: number | null;
+  transaction_share_basis_points: number | null;
+  trade_count: number;
+  median_contract_apy_cap_basis_points: number | null;
+}
+
+export interface NflTransactionMarketSignal {
+  status: NflTransactionMarketStatus;
+  direction: NflMarketDirection;
+  baseline_value: number | null;
+  recent_value: number | null;
+  relative_change_basis_points: number | null;
+  sample_size: number;
+  unit: 'events_per_100_player_seasons' | 'transaction_share_basis_points' | 'apy_cap_basis_points' | 'compensation_band_mix';
+  explanation: string;
+}
+
+export interface NflPositionMarketTrend {
+  position_group: NflPositionMarketGroup;
+  status: NflTransactionMarketStatus;
+  direction: NflMarketDirection;
+  event_count: number;
+  mobility: NflTransactionMarketSignal;
+  transaction_share: NflTransactionMarketSignal;
+  contract_price: NflTransactionMarketSignal;
+  trade_compensation: NflTransactionMarketSignal;
+}
+
+export interface NflTransactionComparable {
+  event_id: string;
+  event_year: number;
+  event_date: string | null;
+  date_precision: NflTransactionDatePrecision;
+  transaction_type: NflTransactionType;
+  player_id: string | null;
+  player_name: string;
+  position_group: NflPositionMarketGroup | null;
+  from_team_id: string | null;
+  to_team_id: string | null;
+  contract_value_dollars: number | null;
+  contract_apy_dollars: number | null;
+  guaranteed_dollars: number | null;
+  apy_cap_basis_points: number | null;
+  compensation_band: NflTradeCompensationBand | null;
+  compensation_summary: string | null;
+  identity_confidence: 'matched' | 'directional' | 'unmatched';
+  influence_basis_points: number | null;
+  influence_explanation: string | null;
+  source_ref_ids: string[];
+}
+
+export interface NflTransactionMarketSourceRef {
+  id: string;
+  name: string;
+  url: string;
+  upstream_attribution: string;
+  retrieved_at: string;
+  as_of_date: string;
+  checksum_sha256: string;
+  coverage_note: string;
+}
+
+export interface NflTransactionMarketMethodology {
+  cohort: string;
+  mobility: string;
+  trade_price: string;
+  contract_price: string;
+  classification: string;
+  influence: string;
+  minimum_samples: string;
+}
+
+export interface NflTransactionMarketAnalysis {
+  schema_version: 'nfl_transaction_market.v1';
+  analysis_id: string;
+  generated_at: string;
+  snapshot_id: string;
+  status: NflTransactionMarketStatus;
+  query: NflTransactionMarketResolvedQuery;
+  coverage: NflTransactionMarketCoverage;
+  methodology: NflTransactionMarketMethodology;
+  yearly_series: NflTransactionMarketYearPoint[];
+  position_trends: NflPositionMarketTrend[];
+  comparables: NflTransactionComparable[];
+  influential_transactions: NflTransactionComparable[];
+  source_refs: NflTransactionMarketSourceRef[];
+  limitations: string[];
 }
 
 export type NflCapRosterLever =
