@@ -3,7 +3,7 @@ import { Icon } from '../ds/Icon';
 import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
 import { on as onEvt } from '../lib/events';
 import { useBriefs, useUi } from '../store';
-import { SourceDetail } from './SourceDetail';
+import { NflSourceDetail } from './NflSourceDetail';
 import {
   buildEvidencePackModel,
   type EvidenceCheckRow,
@@ -122,7 +122,7 @@ export function LeftRail({ extra = null, contentOverride = null, collapsed = fal
         display: 'flex', flexDirection: 'column', flexShrink: 0,
         position: 'relative', minHeight: 0,
       }}>
-        <SourceDetail source={selectedSource} onBack={() => setSelectedSourceRef(null)} />
+        <NflSourceDetail source={selectedSource} onBack={() => setSelectedSourceRef(null)} />
       </nav>
     );
   }

@@ -1,4 +1,4 @@
-// V6D3CF Warriors palette — the canonical production palette.
+// Giants demo palette — the canonical production palette.
 // Ported from v6d3c-fenway.jsx:30-58.
 
 export const F = {
@@ -13,12 +13,12 @@ export const F = {
   fgFaint: '#B8B4A8',
   border: '#D8E2EF',
   borderStrong: '#B6C7DC',
-  // Accent (= Warriors royal blue) - nav, structure, links, focus, active states only
+  // Accent — nav, structure, links, focus, active states only
   accent: '#1D428A',
   accentSoft: '#E8F0FB',
   fenway: '#1D428A',
   fenwaySoft: '#E8F0FB',
-  // Positive (= Warriors gold) — good cap delta in DATA only
+  // Positive — good cap delta in DATA only
   positive: '#B88200',
   positiveSoft: '#FFF3CC',
   red: '#B8392E',

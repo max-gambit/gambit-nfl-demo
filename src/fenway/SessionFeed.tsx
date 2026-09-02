@@ -31,7 +31,7 @@ const CONTENT_MAX_WIDTH = 760;
  *     session. Submitting auto-focuses the new brief AND opens its thread
  *     in the right panel so follow-ups land where the user expects.
  */
-export function SessionFeed() {
+export function SessionFeed({ presenter = false }: { presenter?: boolean }) {
   const { sessions, activeSessionId, patchSessionLabel, insertSession, setActiveSession } = useSessions();
   const {
     briefs,
@@ -379,6 +379,7 @@ export function SessionFeed() {
               isFocused={b.id === effectiveFocusedId}
               focusedRef={b.id === effectiveFocusedId ? focusedRef : null}
               onCompactClick={onCompactClick}
+              presenter={presenter}
             />
           ))}
         </div>
@@ -422,7 +423,7 @@ export function SessionFeed() {
   );
 }
 
-function FeedRow({ brief, isFocused, focusedRef, onCompactClick }: {
+function FeedRow({ brief, isFocused, focusedRef, onCompactClick, presenter }: {
   brief: Brief;
   isFocused: boolean;
   focusedRef: React.RefObject<HTMLDivElement> | null;
@@ -430,6 +431,7 @@ function FeedRow({ brief, isFocused, focusedRef, onCompactClick }: {
    *  the parent can capture the row's pre-click bounding rect and anchor the
    *  brief at the same viewport position after the layout commits. */
   onCompactClick: (briefId: string, originEl: HTMLElement) => void;
+  presenter: boolean;
 }) {
   const {
     setExpandedBrief, setRightPanelMode, setRightPanelOpen,
@@ -487,7 +489,7 @@ function FeedRow({ brief, isFocused, focusedRef, onCompactClick }: {
       onClick={onCardClick}
     >
       <UserQuestionBubble brief={brief} />
-      <BriefRecommendationCard brief={brief} embedTable onReply={toggleThread} isInThread={isShowingThisThread} />
+      <BriefRecommendationCard brief={brief} embedTable onReply={toggleThread} isInThread={isShowingThisThread} presenter={presenter} />
     </div>
   );
 }

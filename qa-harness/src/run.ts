@@ -98,6 +98,19 @@ async function canonicalRehearsal(page: Page, rehearsal: number, viewport: { wid
     await expectText(page, 'Create room. Preserve the football plan.');
     await expectText(page, 'Public demo data');
     assert(await page.locator('.branch-card').count() === 4, 'Expected four pre-seeded branches without a model call.');
+    assert(await page.getByRole('tab', { name: 'Question workspace' }).count() === 0, 'Presenter mode exposed operator Analysis channels.');
+    assert(await page.getByText('Channels', { exact: false }).count() === 0, 'Presenter mode loaded the operator channel rail.');
+  });
+  await check(page, `${prefix} · Primary Analysis workspace`, 'BLOCKER', async () => {
+    await page.goto(`${appUrl}/`, { waitUntil: 'domcontentloaded' });
+    await page.getByText('Preflight passed', { exact: true }).waitFor({ timeout: 20_000 });
+    await expectText(page, 'Analysis');
+    await expectText(page, 'What do you want to analyze?');
+    const composer = page.getByRole('textbox').first();
+    await composer.fill('Which Giants roster decision has the largest evidence gap?');
+    assert((await composer.inputValue()).startsWith('Which Giants roster decision'), 'Analysis composer did not accept a football question.');
+    await page.getByRole('tab', { name: 'Reviewed cap analysis' }).click();
+    await page.getByRole('heading', { name: 'Create room. Preserve the football plan.' }).waitFor({ timeout: 20_000 });
   });
   await check(page, `${prefix} · Data-health preflight`, 'BLOCKER', async () => {
     const health = await api<NflDataHealthResponse>('/nfl/data-health?team_id=NYG');
@@ -245,7 +258,7 @@ async function adversarialRun(page: Page): Promise<void> {
   });
   await check(page, 'Stale or fallback blocking state', 'BLOCKER', async () => {
     await page.goto(`${appUrl}/?present=nyg-cap-roster&qa=blocked`, { waitUntil: 'domcontentloaded' });
-    await expectText(page, 'The decision room is blocked');
+    await expectText(page, 'The reviewed analysis is blocked');
     await expectText(page, 'Fallback active');
     assert(await page.locator('.branch-card').count() === 0, 'Blocked preflight still exposed recommendation branches.');
   });
@@ -266,12 +279,18 @@ async function adversarialRun(page: Page): Promise<void> {
     const sourceAsset = await fetch(`${appUrl}/public/assets/warriors-logo.png`);
     assert(sourceAsset.status === 404, `legacy NBA source asset remains served with HTTP ${sourceAsset.status}`);
   });
+  await check(page, 'Primary Analysis reachability', 'BLOCKER', async () => {
+    await page.goto(`${appUrl}/`, { waitUntil: 'domcontentloaded' });
+    await page.getByText('Preflight passed', { exact: true }).waitFor({ timeout: 20_000 });
+    await expectText(page, 'What do you want to analyze?');
+    assert(await page.getByRole('tab', { name: 'Question workspace' }).getAttribute('aria-selected') === 'true', 'Question workspace is not the default Analysis mode.');
+  });
 }
 
 async function assertNoContamination(page: Page): Promise<void> {
   await openPresenter(page);
   const banned = /\b(NBA|76ers|Sixers|Philadelphia 76ers|Warriors|basketball|trade machine|RealGM|Porzingis|Kuminga)\b/i;
-  for (const label of ['Briefing', 'Decision Room', 'Workspaces', 'Roster & Cap', 'Rulebook', 'Settings']) {
+  for (const label of ['Analysis', 'Briefing', 'Workspaces', 'Roster & Cap', 'Rulebook', 'Settings']) {
     await page.getByRole('button', { name: label, exact: true }).click();
     await page.waitForTimeout(100);
     const text = await page.locator('body').innerText();

@@ -35,6 +35,7 @@ export const createSessionsSlice: StateCreator<SessionsSlice, [], [], SessionsSl
     const { data, error } = await supabase
       .from('sessions')
       .select('*, briefs(count)')
+      .eq('workspace_key', 'nyg-demo')
       .is('archived_at', null)
       .order('created_at', { ascending: true });
 

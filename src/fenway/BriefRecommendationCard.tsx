@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
-import { OptionsTable } from './OptionsTable';
+import { NflOptionsTable } from './NflOptionsTable';
 import { BriefActions } from './BriefActions';
 import { RecommendationCardBody } from './RecommendationCardBody';
 import { TemplateBriefBody } from './TemplateBriefBody';
@@ -29,6 +29,9 @@ interface Props {
    *  panel is in thread mode for this brief. Reinforces the "this is the brief
    *  you're chatting about" coupling. */
   isInThread?: boolean;
+  /** Presenter mode keeps the analysis and reply path, but hides generation,
+   * sharing, monitor, and mutation controls. */
+  presenter?: boolean;
 }
 
 /**
@@ -37,7 +40,7 @@ interface Props {
  * store, dispatches agents against `brief.id`. The parent doesn't need to
  * know about the brief's data — just hands over the row.
  */
-export function BriefRecommendationCard({ brief, embedTable = true, compact = false, onReply, isInThread = false }: Props) {
+export function BriefRecommendationCard({ brief, embedTable = true, compact = false, onReply, isInThread = false, presenter = false }: Props) {
   const { sourcesByBrief, artifactsByBrief, patchBrief } = useBriefs();
   const { pushToast } = useToasts();
   const [changingTemplate, setChangingTemplate] = useState(false);
@@ -337,7 +340,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
               marginTop: SPACE.xl,
               marginLeft: -SPACE['2xl'], marginRight: -SPACE['2xl'],
             }}>
-              <OptionsTable embedded />
+              <NflOptionsTable />
             </div>
           )}
         </div>
@@ -372,11 +375,11 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
           </div>
         )}
 
-        {artifacts.length > 0 && <ArtifactStrip artifacts={artifacts} />}
+        {!presenter && artifacts.length > 0 && <ArtifactStrip artifacts={artifacts} />}
 
-        {agentActionsBlock}
+        {!presenter && agentActionsBlock}
 
-        {!compact && <BriefActions />}
+        {!presenter && !compact && <BriefActions />}
 
         {onReply && (
           <div style={{

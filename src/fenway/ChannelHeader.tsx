@@ -13,7 +13,7 @@ import { renameSession } from '../api/sessions';
  *   - "+ New brief" shortcut (focuses the channel composer)
  *   - "⇉ Toggle right panel" affordance
  */
-export function ChannelHeader() {
+export function ChannelHeader({ readOnly = false }: { readOnly?: boolean }) {
   const { briefs } = useBriefs();
   const { sessions, activeSessionId, patchSessionLabel } = useSessions();
   const { monitors } = useMonitors();
@@ -81,7 +81,7 @@ export function ChannelHeader() {
 
       <div style={{ flex: 1 }} />
 
-      <button onClick={() => fire('v6d3cf:focus-composer')}
+      {!readOnly && <button onClick={() => fire('v6d3cf:focus-composer')}
         title="Ask a new question in this channel (focuses composer)"
         style={{
           padding: `0 ${SPACE.md}px`, height: 28,
@@ -93,7 +93,7 @@ export function ChannelHeader() {
         }}>
         <span style={{ fontSize: TYPE.body.md, lineHeight: 1 }}>+</span>
         New brief
-      </button>
+      </button>}
 
       <button onClick={() => setRightPanelOpen(!rightPanelOpen)}
         title={rightPanelOpen ? 'Hide right panel' : 'Show right panel'}

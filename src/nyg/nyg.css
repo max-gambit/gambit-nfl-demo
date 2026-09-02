@@ -21,3 +21,33 @@
 .answer-evidence article{display:grid;gap:5px;background:#fff;border:1px solid #d8d3c9;padding:10px}.answer-evidence a{font-size:11px;color:#243f6b}
 .depth-proof{background:#1b2941;border:1px solid #39475e;padding:12px;margin:14px 0}.depth-proof p{color:#d0d6df;font-size:12px;line-height:1.45}
 @media(max-width:760px){.model-controls{grid-template-columns:1fr}.assumption-control{grid-column:auto}.roster-row{min-width:880px}}
+
+/* Analysis is the product; the cap model is one reviewed analysis mode. */
+.nyg-main-analysis{height:calc(100vh - 108px);min-height:620px;overflow:hidden}
+.analysis-modebar{height:58px;background:#fff;border-bottom:1px solid #d8d3c9;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:0 24px}
+.analysis-modebar>div:first-child{display:grid;grid-template-columns:auto auto 1fr;align-items:baseline;gap:8px 12px;min-width:0}
+.analysis-modebar>div:first-child strong{font:600 19px 'Chakra Petch'}
+.analysis-modebar>div:first-child small{color:#6b7079;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.analysis-modebar>div:last-child{display:flex;border:1px solid #c9c4ba;border-radius:5px;padding:3px;background:#f3f0e9;flex:none}
+.analysis-modebar button{border:0;background:transparent;color:#5e636c;padding:8px 12px;border-radius:3px;font-size:12px;font-weight:700;cursor:pointer}
+.analysis-modebar button.active{background:#14233e;color:#fff}
+.analysis-workspace{height:calc(100% - 58px);background:#f7f9fc}
+.analysis-workspace-canvas{height:100%;display:flex;min-height:0}
+.analysis-workspace-main{flex:1;display:flex;flex-direction:column;min-width:0;position:relative;background:#f7f9fc}
+.analysis-loading{height:calc(100% - 58px);display:grid;place-content:center;text-align:center;gap:7px;background:#f7f9fc}
+.analysis-loading strong{font:600 20px 'Chakra Petch'}
+.analysis-loading span{color:#6b7079;font-size:13px}
+
+@media(max-width:1100px){
+  .analysis-workspace-canvas>nav{display:none!important}
+}
+
+@media(max-width:760px){
+  .nyg-main-analysis{height:calc(100vh - 144px);min-height:540px}
+  .analysis-modebar{height:auto;min-height:82px;align-items:flex-start;flex-direction:column;padding:12px 14px;gap:10px}
+  .analysis-modebar>div:first-child{grid-template-columns:auto auto}
+  .analysis-modebar>div:first-child small{grid-column:1/3;white-space:normal}
+  .analysis-modebar>div:last-child{width:100%}
+  .analysis-modebar button{flex:1}
+  .analysis-workspace{height:calc(100% - 108px)}
+}

@@ -109,7 +109,7 @@ export const createProjectsSlice: StateCreator<ProjectsSlice, [], [], ProjectsSl
 
   loadProjects: async () => {
     try {
-      const projects = await listProjectsApi();
+      const projects = await listProjectsApi('nyg-demo');
       const activeProjectId = get().activeProjectId && projects.some((project) => project.id === get().activeProjectId)
         ? get().activeProjectId
         : projects[0]?.id ?? null;

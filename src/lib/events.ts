@@ -23,6 +23,8 @@ export type GambitEventMap = {
   'v6d3cf:cite-hover': { ref: number | null };
   /** Slash-command shortcut: regenerate the active brief. BriefActions listens. */
   'v6d3cf:slash-regenerate': void;
+  /** Open the NYG workspace view and refresh its server-backed list. */
+  'nyg:open-workspaces': { refresh: boolean };
 };
 
 export function fire<K extends keyof GambitEventMap>(

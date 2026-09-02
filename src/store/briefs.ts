@@ -102,7 +102,8 @@ export const createBriefsSlice: StateCreator<BriefsSlice, [], [], BriefsSlice> =
   loadAllBriefs: async () => {
     const { data, error } = await supabase
       .from('briefs')
-      .select('*, sessions!inner(archived_at)')
+      .select('*, sessions!inner(archived_at, workspace_key)')
+      .eq('sessions.workspace_key', 'nyg-demo')
       .is('sessions.archived_at', null)
       .order('created_at', { ascending: true });
 

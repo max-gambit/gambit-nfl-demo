@@ -657,7 +657,7 @@ function auditProofForClaim(text: string): string {
     return 'Checks which future assets are movable.';
   }
   if (/\broster|player|usage|efficiency|stat|rotation\b/.test(body)) {
-    return 'Grounds the basketball baseline.';
+    return 'Grounds the football baseline.';
   }
   if (/\bcontext|priority|posture|contend|window\b/.test(body)) {
     return 'Adds team posture around the recommendation.';

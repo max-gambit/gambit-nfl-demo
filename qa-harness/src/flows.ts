@@ -2,6 +2,7 @@ export type QaMode = 'canonical' | 'adversarial';
 
 export const CANONICAL_FLOW_NAMES = [
   'Presenter cold start',
+  'Primary Analysis workspace',
   'Data-health preflight',
   'Hero branch comparison',
   'Changing target relief',
@@ -27,4 +28,5 @@ export const ADVERSARIAL_FLOW_NAMES = [
   'Private-input refusal',
   'Active-output contamination scan',
   'Inactive legacy routes and assets',
+  'Primary Analysis reachability',
 ] as const;
