@@ -1,0 +1,44 @@
+{
+  "schema": "codex_task_orchestrator_intent.v1",
+  "task_id": "nyg-demo-transaction-market-20260902-run8-product-integration",
+  "objective_summary": "Integrate deterministic NFL transaction-market analysis into the existing Analysis composer/tool loop and harden model-output governance without adding a separate demo route.",
+  "durable_recovery": true,
+  "requires_live_dirty_state": false,
+  "nodes": [
+    {
+      "id": "analysis_tool_api",
+      "goal": "parent_id=root. Implement both Analysis tools analyze_nfl_transaction_market and query_nfl_transaction_comparables in server/src/claude/data_analyst.ts using the committed deterministic analyzer and DB snapshot loader. Expose precise tool schemas, trace the exact input and returned market_analysis artifact, teach the composer to use the market tool for novel NFL historical market questions, and add focused tests. Do not create a separate route/page, persist conclusions, or let model prose perform calculations. Preserve existing tools and compatibility. Return codex_task_worker_result.v1.",
+      "dependencies": [],
+      "worker_class": "sandboxed_write",
+      "reservation": {
+        "mode": "write",
+        "paths": [
+          "server/src/claude/data_analyst.ts",
+          "server/tests/data_analyst/test_nfl_transaction_market_tools.test.ts"
+        ]
+      },
+      "expected_output": "Authenticated patch adding the two deterministic market tools, artifact-bearing traces, composer instructions, and focused tests.",
+      "verification": "Run server typecheck and focused tests for Ty's question intent, trades-only, EDGE/IOL, after-2020, recent influence, and the two unplanned variations.",
+      "stop_condition": "Stop rather than hardcode an answer, use a checked-in conclusion fixture, silently fall back from DB to the compressed snapshot, or allow the model to originate numbers/citations.",
+      "public_web_search": false
+    },
+    {
+      "id": "critic_evidence",
+      "goal": "parent_id=root. Extend the existing private critic and server-side evidence-source helpers for NflTransactionMarketAnalysis artifacts. Reject numbers absent from the artifact, period/filter mismatches, unsupported position mappings, causal wording for leave-one-out influence, sparse-sample price claims, missing methodology/coverage caveats, and comparables/citations absent from the artifact. Add deterministic fallback helpers that preserve the validated artifact and focused adversarial tests. Do not edit data_analyst.ts, shared types, routes, DB code, or UI. Return codex_task_worker_result.v1.",
+      "dependencies": [],
+      "worker_class": "sandboxed_write",
+      "reservation": {
+        "mode": "write",
+        "paths": [
+          "server/src/claude/private_critic.ts",
+          "server/src/claude/nfl_transaction_market_guardrails.ts",
+          "server/tests/data_analyst/test_nfl_transaction_market_guardrails.test.ts"
+        ]
+      },
+      "expected_output": "Authenticated patch with artifact-grounded critic checks, evidence/fallback helpers, and adversarial tests.",
+      "verification": "Run focused tests proving unsupported figures, periods, filters, causal language, sparse prices, omitted caveats, and absent comparables fail closed while artifact-grounded prose passes.",
+      "stop_condition": "Stop rather than weaken existing critics, make a model call, duplicate deterministic calculations, or fabricate evidence/source rows.",
+      "public_web_search": false
+    }
+  ]
+}
