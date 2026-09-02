@@ -2220,7 +2220,9 @@ export interface NflTransactionComparable {
   transaction_type: NflTransactionType;
   player_id: string | null;
   player_name: string;
+  raw_position: string | null;
   position_group: NflPositionMarketGroup | null;
+  normalization_basis: string | null;
   from_team_id: string | null;
   to_team_id: string | null;
   contract_value_dollars: number | null;

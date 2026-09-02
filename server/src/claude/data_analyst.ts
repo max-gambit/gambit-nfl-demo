@@ -8,6 +8,8 @@ import type {
   CbaArticle,
   DataAnalystTrace,
   DataAnalystTraceDataset,
+  NflTransactionMarketAnalysis,
+  NflTransactionMarketRequest,
   SubmitBriefInput,
   SubmitDataAnalysisInput,
   ToolCall,
@@ -20,6 +22,8 @@ import { buildNflTradeGoalScreen } from './nfl_evidence.js';
 import { loadCurrentNflData, nflTeamDetail, type NflDemoSeed } from '../nfl_data/seed.js';
 import { loadNflRulesCorpus } from '../nfl_rules/seed.js';
 import { buildNflCoverageMatrix } from '../nfl_coverage/index.js';
+import { analyzeNflTransactionMarket, type LoadNflTransactionMarketSnapshot } from '../nfl_transactions/analyze.js';
+import { loadCurrentNflTransactionMarketSnapshot } from '../nfl_transactions/seed.js';
 
 const MAX_TOOL_ROUNDS = 6;
 const DEFAULT_LIMIT = 40;
@@ -40,6 +44,7 @@ Output requirements:
 - Cite source refs in findings, tables, and calculations.
 - State missing/stale data plainly. Current app datasets are snapshots, not live feeds.
 - For NFL roster, cap, contract, position-group, audit, restructure, cut, tag, extension, or trade questions, query query_nfl_data with at least rosters, cap_sheets, and coverage before final analysis. Treat nfl_rosters_current and nfl_cap_sheets_current as authoritative over NFL Intel/context graph roster snippets for roster counts, cap completeness, player-team membership, and position-group cap claims.
+- For historical NFL transaction-market questions, call analyze_nfl_transaction_market or query_nfl_transaction_comparables. Those tools execute deterministic calculations against the current local database snapshot. Copy periods, series, signals, comparables, methodology, sources, and limitations exactly from the returned market_analysis artifact. Never calculate, repair, extrapolate, or invent a market number or citation in prose.
 - Treat nfl_coverage_current as the readiness boundary for answer strength. Strong supports a firm claim; directional requires a caveat; weak/blocked requires limiting or refusing the unsupported part instead of filling gaps with prose.
 - NFL cap_sheets rows expose contract fields including contract_years_remaining, contract_end_year, void_year_count/status, dead/cut, post-June-1 cut/trade, trade, restructure, extension, and confidence. Do not caveat that contract years, guarantees, dead money, or post-June fields are "not exposed" when those fields are present; cite row confidence in tables or source notes instead.
 - Do not say the Giants have only 4 rostered players or that a Giants cap audit is blocked on ingestion when the current roster and cap files cover the same team population. Rows needing source review are caveats, not a full-audit blocker.
@@ -51,11 +56,17 @@ Output requirements:
 
 export const DATA_ANALYST_CHAT_SYSTEM = `You are the Gambit Data Analyst answering follow-up questions inside an existing analyst thread.
 
-Use read-only app data tools whenever the user asks for fresh numbers, rankings, comparisons, tables, or source-backed checks. This local setup is the New York Giants NFL demo POV for NFL questions; omitted NFL team scope defaults to NYG. Do not write SQL. Do not invent data. Lead with the answer, then show the relevant evidence and caveats in concise prose. Translate internal data-quality labels into normal front-office language; reserve schema/product labels for tables or source metadata.`;
+Use read-only app data tools whenever the user asks for fresh numbers, rankings, comparisons, tables, or source-backed checks. This local setup is the New York Giants NFL demo POV for NFL questions; omitted NFL team scope defaults to NYG. Historical transaction-market answers must come from a newly executed analyze_nfl_transaction_market or query_nfl_transaction_comparables artifact. Copy its numbers, filters, comparables, methodology, sources, and limitations exactly; do not perform or repair calculations in prose. Do not write SQL. Do not invent data. Lead with the answer, then show the relevant evidence and caveats in concise prose. Translate internal data-quality labels into normal front-office language; reserve schema/product labels for tables or source metadata.`;
 
 type NbaDatasetKey = 'rosters' | 'cap_sheets' | 'player_stats' | 'context_graph' | 'cba_articles';
 type NflDatasetKey = 'rosters' | 'cap_sheets' | 'player_metrics' | 'coverage' | 'context_graph' | 'rules' | 'trade_screen';
-type DataAnalystToolName = 'list_available_datasets' | 'query_nba_data' | 'query_nfl_data' | 'query_brief_workspace';
+export type DataAnalystToolName =
+  | 'list_available_datasets'
+  | 'query_nba_data'
+  | 'query_nfl_data'
+  | 'query_brief_workspace'
+  | 'analyze_nfl_transaction_market'
+  | 'query_nfl_transaction_comparables';
 
 interface DataAnalystToolResult {
   ok: boolean;
@@ -63,6 +74,8 @@ interface DataAnalystToolResult {
   datasets: DataAnalystTraceDataset[];
   data: Record<string, unknown>;
   errors: { scope: string; error: string }[];
+  input?: Record<string, unknown>;
+  market_analysis?: NflTransactionMarketAnalysis;
 }
 
 export const listAvailableDatasetsTool: Anthropic.Tool = {
@@ -171,9 +184,47 @@ export const queryBriefWorkspaceTool: Anthropic.Tool = {
   },
 };
 
+const transactionMarketInputSchema: Anthropic.Tool['input_schema'] = {
+  type: 'object',
+  properties: {
+    analysis_mode: { type: 'string', enum: ['ten_year_trend', 'period_comparison', 'comparables', 'recent_influence'] },
+    start_year: { type: 'integer', minimum: 1994, maximum: 2026 },
+    end_year: { type: 'integer', minimum: 1995, maximum: 2026 },
+    comparison_year: { type: 'integer', minimum: 1994, maximum: 2025 },
+    team_ids: { type: 'array', items: { type: 'string' }, maxItems: 32 },
+    position_groups: {
+      type: 'array',
+      items: { type: 'string', enum: ['QB', 'RB', 'WR', 'TE', 'OT', 'IOL', 'EDGE', 'IDL', 'LB', 'CB', 'S', 'ST'] },
+      maxItems: 12,
+    },
+    transaction_types: {
+      type: 'array',
+      items: { type: 'string', enum: ['trade', 'free_agent_signing', 're_signing', 'extension', 'tag', 'waiver_claim', 'release', 'other'] },
+      maxItems: 8,
+    },
+    include_ytd: { type: 'boolean' },
+    max_comparables: { type: 'integer', minimum: 1, maximum: 50 },
+  },
+  required: ['analysis_mode'],
+};
+
+export const analyzeNflTransactionMarketTool: Anthropic.Tool = {
+  name: 'analyze_nfl_transaction_market',
+  description: 'Run deterministic historical NFL transaction-market calculations from the current governed local database snapshot. Use for trends, growth/shrinkage, period comparisons, mobility, trade-price, and contract-price questions.',
+  input_schema: transactionMarketInputSchema,
+};
+
+export const queryNflTransactionComparablesTool: Anthropic.Tool = {
+  name: 'query_nfl_transaction_comparables',
+  description: 'Run the same deterministic database analysis with a comparables-first result. Use for trades-only, supporting transactions, recent influence, and specific position-market comparisons.',
+  input_schema: transactionMarketInputSchema,
+};
+
 export const dataAnalystTools: Anthropic.Tool[] = [
   listAvailableDatasetsTool,
   queryNflDataTool,
+  analyzeNflTransactionMarketTool,
+  queryNflTransactionComparablesTool,
   queryNbaDataTool,
   queryBriefWorkspaceTool,
 ];
@@ -380,6 +431,9 @@ export async function handleDataAnalystToolUse(
       return queryNflDataResult(input);
     case 'query_brief_workspace':
       return queryBriefWorkspaceResult(input);
+    case 'analyze_nfl_transaction_market':
+    case 'query_nfl_transaction_comparables':
+      return queryNflTransactionMarketResult(toolName, input);
     default:
       return {
         ok: false,
@@ -395,7 +449,7 @@ export function dataAnalystTracesToToolCalls(traces: DataAnalystTrace[]): ToolCa
   return traces.map((trace) => ({
     id: trace.tool_use_id,
     name: trace.tool_name,
-    input: {
+    input: trace.input ?? {
       datasets: trace.datasets.map((dataset) => dataset.dataset_id),
       team_ids: [...new Set(trace.datasets.flatMap((dataset) => dataset.team_ids))],
     },
@@ -432,9 +486,11 @@ export function dataAnalystTracesToBriefSources(
     },
   }));
 
-  if (errors.length === 0) return sources;
+  const marketSources = transactionMarketBriefSources(traces, startRefIndex + sources.length);
+  if (errors.length === 0) return [...sources, ...marketSources];
   return [
     ...sources,
+    ...marketSources,
     {
       ref_index: startRefIndex + sources.length,
       kind: 'ANALYST_DATA',
@@ -446,6 +502,64 @@ export function dataAnalystTracesToBriefSources(
       },
     },
   ];
+}
+
+function transactionMarketBriefSources(
+  traces: DataAnalystTrace[],
+  startRefIndex: number,
+): Omit<BriefSource, 'id' | 'brief_id'>[] {
+  const analyses = traces.flatMap((trace) => trace.market_analysis ? [trace.market_analysis] : []);
+  const latest = analyses.at(-1);
+  if (!latest) return [];
+  const result: Omit<BriefSource, 'id' | 'brief_id'>[] = [];
+  for (const source of latest.source_refs) {
+    result.push({
+      ref_index: startRefIndex + result.length,
+      kind: 'ANALYST_DATA',
+      source: source.name,
+      title: `Source snapshot · ${source.name}`,
+      updated_at: source.as_of_date,
+      data: {
+        rows: [
+          { k: 'Upstream source', v: source.url },
+          { k: 'Attribution', v: source.upstream_attribution },
+          { k: 'Retrieved', v: source.retrieved_at },
+          { k: 'As of', v: source.as_of_date },
+          { k: 'Checksum', v: source.checksum_sha256 },
+          { k: 'Coverage', v: source.coverage_note },
+          { k: 'Used by', v: `Market analysis ${latest.analysis_id}` },
+        ],
+        source_ref: source,
+        snapshot_id: latest.snapshot_id,
+      },
+    });
+  }
+  for (const comparable of latest.comparables.slice(0, 12)) {
+    result.push({
+      ref_index: startRefIndex + result.length,
+      kind: 'ANALYST_DATA',
+      source: 'NFL_TRANSACTION_MARKET',
+      title: `Transaction · ${comparable.player_name}`,
+      updated_at: comparable.event_date ?? String(comparable.event_year),
+      data: {
+        rows: [
+          { k: 'Date', v: comparable.event_date ?? `${comparable.event_year} (${comparable.date_precision} precision)` },
+          { k: 'Move', v: comparable.transaction_type.replaceAll('_', ' ') },
+          { k: 'Position', v: comparable.position_group ?? 'unresolved' },
+          { k: 'Teams', v: `${comparable.from_team_id ?? '—'} → ${comparable.to_team_id ?? '—'}` },
+          { k: 'Identity match', v: comparable.identity_confidence },
+          { k: 'Compensation', v: comparable.compensation_summary ?? comparable.compensation_band ?? 'not available' },
+          { k: 'Contract terms', v: comparable.contract_apy_dollars == null ? 'not available' : `$${comparable.contract_apy_dollars.toLocaleString()} APY` },
+          { k: 'Calculation usage', v: latest.influential_transactions.some((row) => row.event_id === comparable.event_id) ? 'Comparable and leave-one-out influence row' : 'Supporting comparable' },
+          { k: 'Raw position', v: comparable.raw_position ?? 'not available' },
+          { k: 'Normalization', v: comparable.normalization_basis ?? (comparable.position_group ? 'Provider role normalized to the displayed position family' : 'Raw role could not be mapped precisely') },
+        ],
+        transaction: comparable,
+        snapshot_id: latest.snapshot_id,
+      },
+    });
+  }
+  return result;
 }
 
 export function dataAnalysisCbaCitationSources(
@@ -555,8 +669,10 @@ function dataAnalystTraceFromResult(toolUseId: string, result: DataAnalystToolRe
   return {
     tool_use_id: toolUseId,
     tool_name: result.tool_name,
+    input: result.input,
     datasets: result.datasets,
     errors: result.errors,
+    market_analysis: result.market_analysis,
   };
 }
 
@@ -589,7 +705,9 @@ export function isDataAnalystToolUse(block: Anthropic.ContentBlock): block is An
     block.name === 'list_available_datasets' ||
     block.name === 'query_nfl_data' ||
     block.name === 'query_nba_data' ||
-    block.name === 'query_brief_workspace'
+    block.name === 'query_brief_workspace' ||
+    block.name === 'analyze_nfl_transaction_market' ||
+    block.name === 'query_nfl_transaction_comparables'
   );
 }
 
@@ -601,8 +719,10 @@ async function listAvailableDatasetsResult(): Promise<DataAnalystToolResult> {
     contextGraphCatalogEntry(),
     nflRulesCatalogEntry(),
   ]);
-  for (const item of [nflDemo, ...nflStaticDatasets, contextGraph, nflRules]) {
+  const transactionMarket = await transactionMarketCatalogEntry();
+  for (const item of [nflDemo, ...nflStaticDatasets, transactionMarket, contextGraph, nflRules]) {
     if ('error' in item) {
+      if (item.scope === 'nfl_transaction_market_catalog') continue;
       addError(result, item.scope, item.error);
     } else {
       result.datasets.push(item);
@@ -610,6 +730,74 @@ async function listAvailableDatasetsResult(): Promise<DataAnalystToolResult> {
   }
   result.data.datasets = result.datasets;
   return result;
+}
+
+export async function queryNflTransactionMarketResult(
+  toolName: 'analyze_nfl_transaction_market' | 'query_nfl_transaction_comparables',
+  input: unknown,
+  loadSnapshot: LoadNflTransactionMarketSnapshot = loadCurrentNflTransactionMarketSnapshot,
+): Promise<DataAnalystToolResult> {
+  const result = emptyResult(toolName);
+  const body = objectInput(input);
+  const request = normalizeTransactionMarketRequest(body, toolName);
+  result.input = { ...request };
+  try {
+    const analysis = await analyzeNflTransactionMarket(request, {
+      loadSnapshot,
+    });
+    result.market_analysis = analysis;
+    result.data.market_analysis = analysis;
+    result.datasets.push({
+      dataset_id: 'nfl_transaction_market_current',
+      label: 'NFL historical transaction market',
+      source_name: 'nflverse public data snapshot',
+      as_of_date: analysis.source_refs.reduce((latest, source) => (
+        !latest || source.as_of_date > latest ? source.as_of_date : latest
+      ), null as string | null),
+      team_ids: analysis.query.team_ids,
+      row_count: analysis.coverage.event_count,
+    });
+  } catch (error) {
+    addError(result, 'nfl_transaction_market', error instanceof Error ? error.message : String(error));
+  }
+  return result;
+}
+
+function normalizeTransactionMarketRequest(
+  body: Record<string, unknown>,
+  toolName: 'analyze_nfl_transaction_market' | 'query_nfl_transaction_comparables',
+): NflTransactionMarketRequest {
+  const fallbackMode = toolName === 'query_nfl_transaction_comparables' ? 'comparables' : 'ten_year_trend';
+  const mode = typeof body.analysis_mode === 'string' ? body.analysis_mode : fallbackMode;
+  return {
+    analysis_mode: mode as NflTransactionMarketRequest['analysis_mode'],
+    ...(numberInput(body.start_year) != null ? { start_year: Math.trunc(numberInput(body.start_year)!) } : {}),
+    ...(numberInput(body.end_year) != null ? { end_year: Math.trunc(numberInput(body.end_year)!) } : {}),
+    ...(numberInput(body.comparison_year) != null ? { comparison_year: Math.trunc(numberInput(body.comparison_year)!) } : {}),
+    ...(stringArrayInput(body.team_ids).length ? { team_ids: stringArrayInput(body.team_ids).map((item) => item.toUpperCase()) } : {}),
+    ...(stringArrayInput(body.position_groups).length ? { position_groups: stringArrayInput(body.position_groups).map((item) => item.toUpperCase()) as NflTransactionMarketRequest['position_groups'] } : {}),
+    ...(stringArrayInput(body.transaction_types).length ? { transaction_types: stringArrayInput(body.transaction_types) as NflTransactionMarketRequest['transaction_types'] } : {}),
+    include_ytd: body.include_ytd === true,
+    ...(numberInput(body.max_comparables) != null ? { max_comparables: Math.trunc(numberInput(body.max_comparables)!) } : {}),
+  };
+}
+
+async function transactionMarketCatalogEntry(): Promise<DataAnalystTraceDataset | { scope: string; error: string }> {
+  try {
+    const snapshot = await loadCurrentNflTransactionMarketSnapshot();
+    return {
+      dataset_id: 'nfl_transaction_market_current',
+      label: 'NFL historical transaction market',
+      source_name: 'nflverse public data snapshot',
+      as_of_date: snapshot.source_refs.reduce((latest, source) => (
+        !latest || source.as_of_date > latest ? source.as_of_date : latest
+      ), null as string | null),
+      team_ids: [],
+      row_count: snapshot.events.length,
+    };
+  } catch (error) {
+    return { scope: 'nfl_transaction_market_catalog', error: error instanceof Error ? error.message : String(error) };
+  }
 }
 
 async function nflStaticCatalogEntries(): Promise<Array<DataAnalystTraceDataset | { scope: string; error: string }>> {

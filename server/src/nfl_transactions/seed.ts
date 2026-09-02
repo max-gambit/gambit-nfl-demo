@@ -123,10 +123,10 @@ export async function loadCurrentNflTransactionMarketSnapshot(
   throwIfError(snapshotResult, 'current transaction snapshot');
   const snapshotRow = snapshotResult.data as Record<string, unknown>;
   const [events, populations, caps, sources] = await Promise.all([
-    selectAll(database, 'nfl_current_transaction_events'),
-    selectAll(database, 'nfl_current_position_year_populations'),
-    selectAll(database, 'nfl_current_transaction_league_caps'),
-    selectAll(database, 'nfl_current_transaction_source_manifests'),
+    selectAll(database, 'nfl_current_transaction_events', ['event_id']),
+    selectAll(database, 'nfl_current_position_year_populations', ['year', 'team_id', 'position_group']),
+    selectAll(database, 'nfl_current_transaction_league_caps', ['year']),
+    selectAll(database, 'nfl_current_transaction_source_manifests', ['source_ref_id']),
   ]);
   if (!events.length) throw new Error('current transaction snapshot has no events');
   return {
@@ -189,7 +189,7 @@ export async function loadNflTransactionMarketDataHealth(
   const result = await database.from('nfl_current_transaction_dataset_snapshot').select('*').single();
   throwIfError(result, 'current transaction snapshot health');
   const row = result.data as Record<string, unknown>;
-  const sources = await selectAll(database, 'nfl_current_transaction_source_manifests');
+  const sources = await selectAll(database, 'nfl_current_transaction_source_manifests', ['source_ref_id']);
   return {
     source_mode: 'supabase_current_views',
     snapshot_id: String(row.snapshot_id),
@@ -218,10 +218,16 @@ async function upsertChunks(client: SupabaseClient, table: string, rows: Record<
   }
 }
 
-async function selectAll(client: SupabaseClient, table: string): Promise<Record<string, unknown>[]> {
+async function selectAll(
+  client: SupabaseClient,
+  table: string,
+  orderColumns: string[],
+): Promise<Record<string, unknown>[]> {
   const result: Record<string, unknown>[] = [];
   for (let start = 0; ; start += 1_000) {
-    const response = await client.from(table).select('*').range(start, start + 999);
+    let query = client.from(table).select('*');
+    for (const column of orderColumns) query = query.order(column, { ascending: true });
+    const response = await query.range(start, start + 999);
     throwIfError(response, `${table} load`);
     const rows = (response.data ?? []) as Record<string, unknown>[];
     result.push(...rows);

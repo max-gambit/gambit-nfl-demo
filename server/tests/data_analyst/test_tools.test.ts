@@ -46,6 +46,8 @@ test('data analyst tool catalog exposes read-only app data tools and structured 
   assert.deepEqual(dataAnalystTools.map((tool) => tool.name), [
     'list_available_datasets',
     'query_nfl_data',
+    'analyze_nfl_transaction_market',
+    'query_nfl_transaction_comparables',
     'query_nba_data',
     'query_brief_workspace',
   ]);

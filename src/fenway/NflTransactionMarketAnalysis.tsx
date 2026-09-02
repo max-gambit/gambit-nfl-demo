@@ -73,6 +73,8 @@ export function NflTransactionMarketAnalysisView({ analysis }: { analysis: NflTr
         </div>
       </section>
 
+      <StrategyImplications trends={trendRows} />
+
       <section>
         <SectionLabel>Method and cohort</SectionLabel>
         <div style={{
@@ -127,6 +129,44 @@ export function NflTransactionMarketAnalysisView({ analysis }: { analysis: NflTr
       </section>
     </div>
   );
+}
+
+function StrategyImplications({ trends }: { trends: NflPositionMarketTrend[] }) {
+  const rows = trends
+    .filter((trend) => trend.status !== 'insufficient_evidence')
+    .sort((a, b) => statusRank(b) - statusRank(a) || b.event_count - a.event_count)
+    .slice(0, 6);
+  if (rows.length === 0) return null;
+  return <section>
+    <SectionLabel>Trade-strategy implications</SectionLabel>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: SPACE.sm }}>
+      {rows.map((trend) => <div key={trend.position_group} style={{ padding: SPACE.md, border: `1px solid ${F.border}`, borderRadius: RADIUS.md, background: F.surface }}>
+        <strong style={{ display: 'block', color: F.ink, fontSize: TYPE.body.sm, marginBottom: 4 }}>
+          {trend.position_group} · {trend.direction.replaceAll('_', ' ')}
+        </strong>
+        <span style={{ color: F.fgMuted, fontSize: TYPE.body.sm, lineHeight: 1.5 }}>
+          {strategyText(trend)}
+        </span>
+      </div>)}
+    </div>
+  </section>;
+}
+
+function strategyText(trend: NflPositionMarketTrend): string {
+  if (trend.direction === 'growing' && trend.status === 'supported') {
+    return 'Expect a more active market: start counterparty work earlier, establish a price ceiling from the returned comparables, and avoid waiting for a single deadline-day option.';
+  }
+  if (trend.direction === 'shrinking' && trend.status === 'supported') {
+    return 'Treat a thinner market as a sourcing constraint, not automatic leverage: widen the comparable window and validate availability before setting an aggressive ask.';
+  }
+  if (trend.direction === 'flat' && trend.status === 'supported') {
+    return 'Activity and price are broadly stable under the governed thresholds; use role fit and specific compensation bands to separate otherwise similar calls.';
+  }
+  return 'Signals are mixed or directional. Negotiate to the supported activity or price signal only, and keep the broader market claim out of the decision memo.';
+}
+
+function statusRank(trend: NflPositionMarketTrend): number {
+  return trend.status === 'supported' ? 2 : trend.status === 'directional' ? 1 : 0;
 }
 
 function SnapshotHeader({ analysis }: { analysis: NflTransactionMarketAnalysis }) {
@@ -214,6 +254,8 @@ function ComparableSection({ title, rows, showInfluence = false }: { title: stri
             </div>
             <div style={{ color: F.fgMuted, fontSize: TYPE.meta.md }}>
               Identity: {row.identity_confidence}
+              {row.raw_position ? ` · Raw role: ${row.raw_position}` : ''}
+              {row.normalization_basis ? ` · Normalized via ${row.normalization_basis}` : ''}
               {showInfluence && row.influence_explanation ? ` · ${row.influence_explanation}` : ''}
             </div>
           </article>

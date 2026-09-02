@@ -41,6 +41,11 @@ test('snapshot preserves raw boundaries while analytical values stay safe', asyn
     || event.contract_value_dollars == null
     || event.guaranteed_dollars <= event.contract_value_dollars));
   assert.ok(snapshot.player_matches.some((match) => /ambiguous DE\/OLB\/DL/.test(match.normalization_basis)));
+  const coachRights = snapshot.events.find((event) => event.player_name === 'Sean Payton' && event.event_year === 2023);
+  assert.equal(coachRights?.position_group, null);
+  assert.equal(coachRights?.identity_confidence, 'unmatched');
+  assert.match(coachRights?.normalization_basis ?? '', /possible non-player rights transaction/i);
+  assert.ok(coachRights?.raw_source_record);
 });
 
 test('checked-in data files contain no generated market conclusion', async () => {

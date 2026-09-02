@@ -17,7 +17,7 @@ import type {
   NflTransactionRosterPlayerSeason,
 } from './analyze.js';
 
-const TRANSFORMATION_VERSION = 'nfl-transaction-normalization.v5';
+const TRANSFORMATION_VERSION = 'nfl-transaction-normalization.v6';
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const DEFAULT_OUTPUT_DIR = path.join(REPO_ROOT, 'data/nfl-transactions');
 const COMPLETED_YEARS = Array.from({ length: 10 }, (_, index) => 2016 + index);
@@ -50,6 +50,7 @@ interface PlayerLookupRow extends CsvRow {
   position_group: string;
   position: string;
   pff_position: string;
+  last_season: string;
 }
 
 interface ContractHistoryRow {
@@ -357,7 +358,12 @@ function normalizeTradeEvents(
   for (const [tradeId, tradeAssets] of byTrade) {
     const playerAssets = tradeAssets.filter((asset) => asset.asset_type === 'player');
     for (const playerAsset of playerAssets) {
-      const player = playerAsset.pfr_id ? players.byPfr.get(playerAsset.pfr_id) : undefined;
+      const identityCandidate = playerAsset.pfr_id ? players.byPfr.get(playerAsset.pfr_id) : undefined;
+      const candidateLastSeason = identityCandidate?.last_season ? Number(identityCandidate.last_season) : null;
+      const stalePlayerIdentity = candidateLastSeason != null
+        && Number.isInteger(candidateLastSeason)
+        && playerAsset.event_year > candidateLastSeason + 1;
+      const player = stalePlayerIdentity ? undefined : identityCandidate;
       const position = normalizePosition(player?.pff_position, player?.position, player?.position_group);
       const confidence = player && position.group ? 'matched' : player ? 'directional' : 'unmatched';
       const oppositeAssets = tradeAssets.filter((asset) => (
@@ -379,7 +385,9 @@ function normalizeTradeEvents(
         player_name: playerAsset.pfr_name ?? player?.display_name ?? 'Unknown player',
         raw_position: player?.position || null,
         position_group: position.group,
-        normalization_basis: position.basis,
+        normalization_basis: stalePlayerIdentity
+          ? `PFR identity maps to a player whose last recorded season was ${candidateLastSeason}; excluded as a possible non-player rights transaction or name collision`
+          : position.basis,
         from_team_id: playerAsset.gave_team_id,
         to_team_id: playerAsset.received_team_id,
         contract_value_dollars: null,
@@ -404,7 +412,9 @@ function normalizeTradeEvents(
         raw_position: player?.position || null,
         normalized_position_group: position.group,
         match_confidence: confidence,
-        normalization_basis: position.basis,
+        normalization_basis: stalePlayerIdentity
+          ? `PFR identity maps to a player whose last recorded season was ${candidateLastSeason}; excluded as a possible non-player rights transaction or name collision`
+          : position.basis,
       });
     }
   }

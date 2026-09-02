@@ -1,7 +1,8 @@
 import type Anthropic from '@anthropic-ai/sdk';
-import type { NflCapRosterDecisionResponse, SubmitBriefInput, SubmitDataAnalysisInput } from '@shared/types';
+import type { NflCapRosterDecisionResponse, NflTransactionMarketAnalysis, SubmitBriefInput, SubmitDataAnalysisInput } from '@shared/types';
 import { BRIEF_MODEL, createClaudeMessage } from './client.js';
 import type { ComposedNflContext } from './nfl_context_composer.js';
+import { evaluateNflTransactionMarketDraft } from './nfl_transaction_market_guardrails.js';
 
 export type NflPrivateCriticVerdict = 'accept' | 'revise';
 export type NflPrivateCriticIssueCategory =
@@ -19,7 +20,8 @@ export type NflPrivateCriticIssueCategory =
   | 'unsupported_role_fit'
   | 'unsupported_benchmark_claim'
   | 'confidence_mismatch'
-  | 'missing_rule_citation';
+  | 'missing_rule_citation'
+  | 'transaction_artifact_mismatch';
 
 export interface NflPrivateCriticIssue {
   category: NflPrivateCriticIssueCategory;
@@ -41,6 +43,7 @@ export interface RunNflPrivateCriticArgs {
   composedContext: ComposedNflContext | null;
   draftKind: 'brief' | 'data_analysis';
   draft: SubmitBriefInput | SubmitDataAnalysisInput;
+  transactionMarketAnalysis?: NflTransactionMarketAnalysis | null;
   createMessage?: typeof createClaudeMessage;
 }
 
@@ -84,6 +87,7 @@ const privateCriticTool: Anthropic.Tool = {
                 'unsupported_benchmark_claim',
                 'confidence_mismatch',
                 'missing_rule_citation',
+                'transaction_artifact_mismatch',
               ],
             },
             severity: { type: 'string', enum: ['high', 'medium', 'low'] },
@@ -110,7 +114,7 @@ const privateCriticTool: Anthropic.Tool = {
 };
 
 export async function runNflPrivateCritic(args: RunNflPrivateCriticArgs): Promise<NflPrivateCriticResult> {
-  if (!args.composedContext) return acceptCritique();
+  if (!args.composedContext && !args.transactionMarketAnalysis) return acceptCritique();
   const deterministic = evaluateNflDraftForPrivateCritic(args);
   const callModel = args.createMessage ?? createClaudeMessage;
 
@@ -127,7 +131,7 @@ export async function runNflPrivateCritic(args: RunNflPrivateCriticArgs): Promis
             'Accept compact, natural, judgment-led prose when it is supported. Revise only when the issue would make a Giants/front-office demo answer less credible.',
             'Never add public sources. Never expose this critique to the user. Return exactly one submit_private_critique tool call.',
             '',
-            args.composedContext.system_block,
+            args.composedContext?.system_block ?? 'No roster/cap composer context applies to this transaction-market artifact.',
           ].join('\n'),
         },
       ],
@@ -155,10 +159,10 @@ export async function runNflPrivateCritic(args: RunNflPrivateCriticArgs): Promis
 }
 
 export function evaluateNflDraftForPrivateCritic(args: RunNflPrivateCriticArgs): NflPrivateCriticResult {
-  if (!args.composedContext) return acceptCritique();
+  if (!args.composedContext && !args.transactionMarketAnalysis) return acceptCritique();
   const draftText = draftToText(args.draft);
   const question = args.question;
-  const contextText = [
+  const contextText = args.composedContext ? [
     args.composedContext.must_use_facts.join('\n'),
     args.composedContext.decision_primitives.map((primitive) => [
       primitive.key,
@@ -168,8 +172,23 @@ export function evaluateNflDraftForPrivateCritic(args: RunNflPrivateCriticArgs):
     ].join('\n')).join('\n'),
     args.composedContext.coverage_boundaries.join('\n'),
     args.composedContext.do_not_claim.join('\n'),
-  ].join('\n');
+  ].join('\n') : '';
   const issues: NflPrivateCriticIssue[] = [];
+
+  if (args.transactionMarketAnalysis && 'answer' in args.draft) {
+    const marketGuardrail = evaluateNflTransactionMarketDraft(args.draft, args.transactionMarketAnalysis);
+    for (const issue of marketGuardrail.issues) {
+      issues.push({
+        category: 'transaction_artifact_mismatch',
+        severity: 'high',
+        claim: issue,
+        evidence_boundary: 'Historical market prose must be a faithful explanation of the attached deterministic artifact.',
+        fix: 'Remove or correct the unsupported claim using only the artifact periods, filters, numbers, comparables, source references, methodology, and limitations.',
+      });
+    }
+  }
+
+  if (!args.composedContext) return critiqueFromIssues(issues);
 
   if (/Vita Vea/i.test(draftText)
     && /(highest[-\s]?confidence|lead lane|lead path|cleanest route|best lane)/i.test(draftText)

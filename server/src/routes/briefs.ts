@@ -14,6 +14,13 @@ import {
   submitDataAnalysisTool,
 } from '../claude/data_analyst.js';
 import {
+  buildDeterministicNflTransactionMarketFallback,
+  buildNflTransactionMarketSystemBlock,
+  deterministicMarketSourceRows,
+  evaluateNflTransactionMarketDraft,
+  latestNflTransactionMarketAnalysis,
+} from '../claude/nfl_transaction_market_guardrails.js';
+import {
   buildFallbackBriefPresentation,
   buildBriefTemplateSystemBlock,
   buildDataAnalysisTemplateSystemBlock,
@@ -63,12 +70,16 @@ import {
   templateSelectionFromBrief,
 } from '@shared/briefTemplates';
 import { db } from '../db/client.js';
+import {
+  isNflTransactionMarketQuestion,
+  transactionMarketRequestFromQuestion,
+} from '../nfl_transactions/question.js';
 import type {
   AddBriefShareRecipientRequest, Brief, BriefMode, BriefProgress, BriefProgressEventKind, BriefProgressPhase, BriefProgressStreamEvent, BriefShare, BriefShareLink, BriefShareLinkResponse,
   BriefShareRecipientResponse, BriefShareSnapshot, CreateBriefRequest, CreateBriefResponse,
   CreateSavedBriefTemplateResponse, ListBriefTemplatesResponse, RegenerateBriefRequest,
   ResolveBriefShareLinkResponse, SavedBriefTemplate, SubmitBriefInput, TeamMember, CbaArticle, DataAnalystTrace,
-  SubmitDataAnalysisInput,
+  NflTransactionMarketAnalysis, SubmitDataAnalysisInput,
 } from '@shared/types';
 
 export const briefRoutes = new Hono();
@@ -1144,14 +1155,16 @@ async function maybeRunNflDataAnalysisPrivateCritic(args: {
   composedNflContext: ComposedNflContext | null;
   system: Anthropic.TextBlockParam[];
   messages: Anthropic.MessageParam[];
+  transactionMarketAnalysis: NflTransactionMarketAnalysis | null;
 }): Promise<{ input: SubmitDataAnalysisInput } | null> {
-  if (!args.composedNflContext) return null;
+  if (!args.composedNflContext && !args.transactionMarketAnalysis) return null;
   try {
     const critique = await runNflPrivateCritic({
       question: args.brief.question,
       composedContext: args.composedNflContext,
       draftKind: 'data_analysis',
       draft: args.input,
+      transactionMarketAnalysis: args.transactionMarketAnalysis,
     });
     if (critique.verdict !== 'revise') return null;
 
@@ -1181,8 +1194,21 @@ async function maybeRunNflDataAnalysisPrivateCritic(args: {
     const toolUse = response.content.find((block) => block.type === 'tool_use' && block.name === 'submit_data_analysis');
     if (!toolUse || toolUse.type !== 'tool_use') return null;
     const input = normalizeSubmitDataAnalysisInput(toolUse.input);
-    return input ? { input } : null;
+    if (!input) {
+      return args.transactionMarketAnalysis
+        ? { input: buildDeterministicNflTransactionMarketFallback(args.transactionMarketAnalysis) }
+        : null;
+    }
+    if (args.transactionMarketAnalysis) {
+      const validation = evaluateNflTransactionMarketDraft(input, args.transactionMarketAnalysis);
+      if (!validation.ok) return { input: buildDeterministicNflTransactionMarketFallback(args.transactionMarketAnalysis) };
+    }
+    return { input };
   } catch (error) {
+    if (args.transactionMarketAnalysis) {
+      console.warn('[briefs] transaction-market critic failed closed with deterministic fallback', args.brief.id, error);
+      return { input: buildDeterministicNflTransactionMarketFallback(args.transactionMarketAnalysis) };
+    }
     if (process.env.NFL_PRIVATE_CRITIC_STRICT === '1') throw error;
     console.warn('[briefs] NFL private critic failed open for data analysis', args.brief.id, error);
     return null;
@@ -1215,11 +1241,15 @@ export async function generateDataAnalysisBrief(brief: Brief) {
         { role: 'user', content: brief.question },
       ],
     });
+    dataLookup = await ensureNflTransactionMarketLookup(brief.question, dataLookup);
     dataLookup = await ensureNflRosterCapDataLookup(brief.question, dataLookup);
+    const transactionMarketAnalysis = latestNflTransactionMarketAnalysis(dataLookup.traces);
     const composedNflContext = buildNflContextComposerForDataAnalyst(brief.question, dataLookup.traces, dataLookup.messages);
-    const finalSystem = composedNflContext
-      ? [...system, { type: 'text' as const, text: composedNflContext.system_block }]
-      : system;
+    const finalSystem = [
+      ...system,
+      ...(composedNflContext ? [{ type: 'text' as const, text: composedNflContext.system_block }] : []),
+      ...(transactionMarketAnalysis ? [{ type: 'text' as const, text: buildNflTransactionMarketSystemBlock(transactionMarketAnalysis) }] : []),
+    ];
     if (dataLookup.traces.length === 0) {
       throw new Error('Data analyst generation did not call an app-data tool.');
     }
@@ -1264,9 +1294,15 @@ export async function generateDataAnalysisBrief(brief: Brief) {
       composedNflContext,
       system: finalSystem,
       messages: dataLookup.messages,
+      transactionMarketAnalysis,
     });
     if (criticResult?.input) {
       input = criticResult.input;
+    }
+    if (transactionMarketAnalysis) {
+      const validation = evaluateNflTransactionMarketDraft(input, transactionMarketAnalysis);
+      if (!validation.ok) input = buildDeterministicNflTransactionMarketFallback(transactionMarketAnalysis);
+      input = bindMarketSourceReferences(input, deterministicMarketSourceRows(transactionMarketAnalysis, 1));
     }
     await progress.mark(
       'matching_sources',
@@ -1276,7 +1312,9 @@ export async function generateDataAnalysisBrief(brief: Brief) {
       'tool',
     );
     const maxSourceRefIndex = input.sources.reduce((max, source) => Math.max(max, source.ref_index), 0);
-    const traceSources = dataAnalystTracesToBriefSources(dataLookup.traces, maxSourceRefIndex + 1);
+    const traceSources = dataAnalystTracesToBriefSources(dataLookup.traces, maxSourceRefIndex + 1)
+      .filter((source) => !transactionMarketAnalysis
+        || (!source.title.startsWith('Source snapshot ·') && source.title !== 'App data · NFL historical transaction market'));
     const existingSources = [...input.sources, ...traceSources];
     const maxExistingSourceRefIndex = existingSources.reduce((max, source) => Math.max(max, source.ref_index), 0);
     const cbaSources = dataAnalysisCbaCitationSources(
@@ -1315,6 +1353,7 @@ export async function generateDataAnalysisBrief(brief: Brief) {
           calculations: input.calculations,
           caveats: input.caveats,
           followups: input.followups,
+          ...(transactionMarketAnalysis ? { market_analysis: transactionMarketAnalysis } : {}),
         },
         status: 'ready',
         progress: readyProgress,
@@ -1338,6 +1377,63 @@ export async function generateDataAnalysisBrief(brief: Brief) {
   } finally {
     heartbeat.stop();
   }
+}
+
+export async function ensureNflTransactionMarketLookup(
+  question: string,
+  lookup: { messages: Anthropic.MessageParam[]; traces: DataAnalystTrace[] },
+  inherited: NflTransactionMarketAnalysis['query'] | null = null,
+): Promise<{ messages: Anthropic.MessageParam[]; traces: DataAnalystTrace[] }> {
+  if (!isNflTransactionMarketQuestion(question) && !inherited) return lookup;
+  const request = transactionMarketRequestFromQuestion(question, inherited);
+  const toolName = request.analysis_mode === 'comparables' || request.analysis_mode === 'recent_influence'
+    ? 'query_nfl_transaction_comparables'
+    : 'analyze_nfl_transaction_market';
+  const toolUseId = `server_required_nfl_transaction_market_${randomBytes(6).toString('hex')}`;
+  const result = await handleDataAnalystToolUse(toolName, request);
+  if (!result.ok || !result.market_analysis) {
+    throw new Error(result.errors.map((error) => `${error.scope}: ${error.error}`).join('; ') || 'NFL transaction-market analysis unavailable.');
+  }
+  const trace: DataAnalystTrace = {
+    tool_use_id: toolUseId,
+    tool_name: toolName,
+    input: request as unknown as Record<string, unknown>,
+    datasets: result.datasets,
+    errors: result.errors,
+    market_analysis: result.market_analysis,
+  };
+  return {
+    messages: [
+      ...lookup.messages,
+      {
+        role: 'assistant',
+        content: [{ type: 'tool_use', id: toolUseId, name: toolName, input: request }] as Anthropic.ContentBlockParam[],
+      },
+      {
+        role: 'user',
+        content: [{ type: 'tool_result', tool_use_id: toolUseId, content: JSON.stringify(result) }],
+      },
+    ],
+    traces: [...lookup.traces, trace],
+  };
+}
+
+function bindMarketSourceReferences(
+  input: SubmitDataAnalysisInput,
+  sources: SubmitDataAnalysisInput['sources'],
+): SubmitDataAnalysisInput {
+  const refs = sources.map((source) => source.ref_index);
+  const fallbackRef = refs[0] ?? 1;
+  const bind = (values: number[]) => values.filter((value) => refs.includes(value)).length
+    ? values.filter((value) => refs.includes(value))
+    : [fallbackRef];
+  return {
+    ...input,
+    sources,
+    key_findings: input.key_findings.map((item) => ({ ...item, source_refs: bind(item.source_refs) })),
+    tables: input.tables.map((item) => ({ ...item, source_refs: bind(item.source_refs) })),
+    calculations: input.calculations.map((item) => ({ ...item, source_refs: bind(item.source_refs) })),
+  };
 }
 
 async function ensureNflRosterCapDataLookup(
