@@ -1309,9 +1309,18 @@ export interface DataAnalystTraceDataset {
 
 export interface DataAnalystTrace {
   tool_use_id: string;
-  tool_name: 'list_available_datasets' | 'query_nba_data' | 'query_nfl_data' | 'query_brief_workspace';
+  tool_name:
+    | 'list_available_datasets'
+    | 'query_nba_data'
+    | 'query_nfl_data'
+    | 'query_brief_workspace'
+    | 'analyze_nfl_transaction_market'
+    | 'query_nfl_transaction_comparables';
+  input?: Record<string, unknown>;
   datasets: DataAnalystTraceDataset[];
   errors: { scope: string; error: string }[];
+  /** Deterministic server result used by Analysis. Never authored by the model. */
+  market_analysis?: NflTransactionMarketAnalysis;
 }
 
 export type ContextGraphWarRoomTier = 'hot' | 'warm' | 'watch';

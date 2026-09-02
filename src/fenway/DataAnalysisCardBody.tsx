@@ -1,6 +1,7 @@
 import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
 import { Cite } from '../ds/Cite';
 import type { DataAnalysisBriefBody } from '@shared/types';
+import { NflTransactionMarketAnalysisView } from './NflTransactionMarketAnalysis';
 
 interface Props {
   body: DataAnalysisBriefBody;
@@ -9,6 +10,10 @@ interface Props {
 export function DataAnalysisCardBody({ body }: Props) {
   return (
     <div style={{ display: 'grid', gap: SPACE.lg }}>
+      {body.market_analysis && (
+        <NflTransactionMarketAnalysisView analysis={body.market_analysis} />
+      )}
+
       {body.key_findings.length > 0 && (
         <section>
           <SectionLabel>Key findings</SectionLabel>
