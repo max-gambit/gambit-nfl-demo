@@ -19,7 +19,7 @@
     "build:nfl-data": "tsx src/nfl_data/build_reviewed_snapshot.ts",
     "seed:nfl-data": "tsx src/db/seed-nfl-data.ts",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/context_graph/*.test.ts tests/nfl_data/*.test.ts tests/nfl_rules/*.test.ts tests/nba_rosters/*.test.ts tests/nba_cap_sheets/*.test.ts tests/nba_player_stats/*.test.ts tests/data_analyst/*.test.ts",
+    "test": "tsx --test tests/context_graph/*.test.ts tests/nfl_data/*.test.ts tests/nfl_decision/*.test.ts tests/nfl_rules/*.test.ts tests/nba_rosters/*.test.ts tests/nba_cap_sheets/*.test.ts tests/nba_player_stats/*.test.ts tests/data_analyst/*.test.ts",
     "test:cba": "tsx --test tests/data_analyst/test_cba_workbench.test.ts tests/data_analyst/test_cba_retrieval_eval.test.ts",
     "acceptance:nfl-analyze": "tsx src/claude/nfl_analyze_preview.ts",
     "context-graph:validate": "tsx src/context_graph/cli.ts validate",

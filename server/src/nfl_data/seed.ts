@@ -636,7 +636,7 @@ async function loadCurrentNflDataFromDb(): Promise<NflDemoSeed> {
   if (rosterRows.length === 0) throw new Error('no current NFL roster rows found in Supabase current views');
   const first = rosterRows[0];
   const sourceMeta = objectRecord(first.snapshot_source_meta);
-  return {
+  const seed: NflDemoSeed = {
     schema_version: 1,
     season: first.season,
     as_of_date: first.as_of_date,
@@ -650,6 +650,9 @@ async function loadCurrentNflDataFromDb(): Promise<NflDemoSeed> {
     player_metrics: (metricRowsRaw as CurrentNflMetricRow[]).map(dbMetricRowToSeed),
     source_refs: Array.isArray(sourceMeta.source_refs) ? sourceMeta.source_refs as NflSourceRef[] : [],
   };
+  validateDbSnapshotCoherence(rosterRows, capRowsRaw as CurrentNflCapRow[], metricRowsRaw as CurrentNflMetricRow[]);
+  validateNflDemoSeed(seed);
+  return seed;
 }
 
 async function fetchAllRows(
@@ -754,6 +757,7 @@ const NFL_CURRENT_CAP_PLAYER_SELECT = [
   'contract_lever',
   'source_url',
   'source_status',
+  'source_data',
 ].join(',');
 
 const NFL_CURRENT_PLAYER_METRIC_SELECT = [
@@ -804,7 +808,25 @@ const NFL_CURRENT_PLAYER_METRIC_SELECT = [
   'position_metric_summary',
   'position_metrics',
   'quality_flags',
+  'source_data',
 ].join(',');
+
+function validateDbSnapshotCoherence(
+  rosterRows: CurrentNflRosterEntryRow[],
+  capRows: CurrentNflCapRow[],
+  metricRows: CurrentNflMetricRow[],
+): void {
+  const first = rosterRows[0];
+  if (!first) throw new Error('no current NFL roster rows found in Supabase current views');
+  for (const [label, rows] of [['roster', rosterRows], ['cap', capRows], ['metrics', metricRows]] as const) {
+    if (rows.length === 0) throw new Error(`no current NFL ${label} rows found in Supabase current views`);
+    for (const row of rows) {
+      if (row.season !== first.season || row.as_of_date !== first.as_of_date || row.retrieved_at !== first.retrieved_at) {
+        throw new Error(`current NFL ${label} view is not coherent with the roster snapshot`);
+      }
+    }
+  }
+}
 
 function dbRosterRowToSeed(row: CurrentNflRosterEntryRow): NflRosterEntry {
   return {
@@ -920,9 +942,15 @@ interface CurrentNflRosterEntryRow extends NflRosterEntry {
 
 interface CurrentNflCapRow extends NflCapRow {
   source_order: number;
+  season: string;
+  as_of_date: string;
+  retrieved_at: string;
 }
 
 interface CurrentNflMetricRow extends Omit<NflPlayerMetricRow, 'source_data' | 'metric_families' | 'position_metrics' | 'quality_flags'> {
+  season: string;
+  as_of_date: string;
+  retrieved_at: string;
   source_status: 'captured' | 'roster-derived' | 'source-needed';
   metric_families: unknown;
   position_metrics: unknown;

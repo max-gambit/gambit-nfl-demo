@@ -6,6 +6,8 @@ export interface Session {
   id: string;
   user_id: string | null;
   label: string;
+  workspace_key?: string;
+  seed_key?: string | null;
   created_at: string;
   updated_at: string;
   archived_at: string | null;
@@ -455,6 +457,8 @@ export interface Project {
   id: string;
   user_id: string | null;
   title: string;
+  workspace_key?: string;
+  seed_key?: string | null;
   question: string;
   objective: string;
   workflow_type: ProjectWorkflowType;
@@ -2051,6 +2055,159 @@ export interface NflCoverageMatrixResponse {
 
 export interface GetCurrentNflCoverageTeamResponse extends NflCoverageMatrixResponse {
   team: NflCoverageTeamRow | null;
+}
+
+// ── NFL demo readiness and deterministic cap/roster modeling ───────────────
+export type NflDataHealthStatus = 'ready' | 'degraded' | 'blocked';
+export type NflDataHealthDatasetId = 'roster' | 'cap_contracts' | 'player_metrics' | 'rules';
+
+export interface NflDataHealthGap {
+  code: string;
+  message: string;
+  affected_count?: number;
+}
+
+export interface NflDataHealthDataset {
+  id: NflDataHealthDatasetId;
+  label: string;
+  status: NflDataHealthStatus;
+  source_mode: NflCoverageSourceMode | 'authoritative_corpus';
+  source_name: string;
+  source_url: string | null;
+  as_of_date: string | null;
+  retrieved_at: string | null;
+  expected_cadence: string;
+  max_age_hours: number | null;
+  age_hours: number | null;
+  row_count: number;
+  captured_count: number;
+  derived_count: number;
+  source_needed_count: number;
+  gaps: NflDataHealthGap[];
+  blocker: string | null;
+}
+
+export interface NflRuleAuthorityHealth {
+  status: NflDataHealthStatus;
+  authoritative_url: string | null;
+  effective_date: string | null;
+  retrieved_at: string | null;
+  rules_with_locators: number;
+  total_rules: number;
+  gaps: NflDataHealthGap[];
+}
+
+export interface NflDataHealthResponse {
+  schema_version: 'nfl_data_health.v1';
+  generated_at: string;
+  team_id: string;
+  status: NflDataHealthStatus;
+  meeting_ready: boolean;
+  source_mode: NflCoverageSourceMode;
+  fallback_reason: string | null;
+  datasets: NflDataHealthDataset[];
+  rule_authority: NflRuleAuthorityHealth;
+  blockers: string[];
+  remediation: string[];
+}
+
+export type NflCapRosterLever =
+  | 'hold'
+  | 'restructure'
+  | 'extension'
+  | 'pre_june_cut'
+  | 'post_june_cut'
+  | 'trade';
+
+export interface NflUserEnteredAssumption {
+  key: string;
+  value: string | number | boolean;
+  label: string;
+  source: 'user_entered';
+}
+
+export interface NflCapRosterDecisionRequest {
+  team_id: string;
+  target_relief_dollars: number;
+  protected_player_ids: string[];
+  protected_position_groups: string[];
+  allowed_levers: NflCapRosterLever[];
+  assumptions?: NflUserEnteredAssumption[];
+}
+
+export interface NflDecisionRuleReference {
+  rule_id: string;
+  title: string;
+  locator: string;
+  authoritative_url: string;
+}
+
+export interface NflCapRosterAction {
+  player_id: string;
+  player_name: string;
+  position: string | null;
+  lever: Exclude<NflCapRosterLever, 'hold'>;
+  relief_dollars: number;
+  dead_money_dollars: number;
+  cap_number_dollars: number;
+  depth_effect: 'none' | 'low' | 'medium' | 'high' | 'unknown';
+  confidence: 'captured' | 'derived' | 'estimated' | 'source-needed';
+  source_status: string;
+  source_url: string | null;
+  blockers: string[];
+  rule_references: NflDecisionRuleReference[];
+  next_actions: string[];
+}
+
+export type NflCapRosterBranchId = 'hold' | 'preserve_depth' | 'balanced' | 'maximize_relief';
+
+export interface NflCapRosterBranch {
+  id: NflCapRosterBranchId;
+  label: string;
+  thesis: string;
+  status: 'supported' | 'directional' | 'insufficient_evidence';
+  target_relief_dollars: number;
+  total_relief_dollars: number;
+  total_dead_money_dollars: number;
+  target_met: boolean;
+  actions: NflCapRosterAction[];
+  blockers: string[];
+  tradeoffs: string[];
+}
+
+export interface NflCapRosterDecisionResponse {
+  schema_version: 'nfl_cap_roster_decision.v1';
+  generated_at: string;
+  status: 'ready' | 'insufficient_evidence' | 'blocked';
+  team_id: string;
+  public_demo_data: true;
+  data_health: NflDataHealthResponse;
+  evidence: {
+    source_refs: NflSourceRef[];
+    captured_contract_rows: number;
+    directional_contract_rows: number;
+    source_needed_contract_rows: number;
+    rule_reference_count: number;
+  };
+  baseline: {
+    season: string;
+    as_of_date: string;
+    retrieved_at: string;
+    roster_count: number;
+    total_cap_commitments_dollars: number;
+    complete_cap_rows: number;
+    incomplete_cap_rows: number;
+  };
+  branches: NflCapRosterBranch[];
+  recommended_branch_id: NflCapRosterBranchId | null;
+  what_changes_the_call: Array<{
+    id: string;
+    trigger: string;
+    effect: string;
+    owner: string;
+  }>;
+  assumptions: NflUserEnteredAssumption[];
+  deterministic_summary: string;
 }
 
 // ── CBA reference corpus ────────────────────────────────────────────────────

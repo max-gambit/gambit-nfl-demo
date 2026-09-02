@@ -11,6 +11,7 @@ import type {
   CbaSearchResponse,
   CbaSection,
   CbaTocResponse,
+  NflCapRosterDecisionRequest,
 } from '@shared/types';
 import {
   groupNflTeams,
@@ -18,6 +19,8 @@ import {
   nflTeamDetail,
 } from '../nfl_data/seed.js';
 import { buildNflCoverageMatrix, buildNflCoverageTeam } from '../nfl_coverage/index.js';
+import { buildNflDataHealth } from '../nfl_coverage/data_health.js';
+import { buildCapRosterDecision } from '../nfl_decision/cap_roster.js';
 import { loadNflRulesCorpus, type NflRuleRow } from '../nfl_rules/seed.js';
 
 export const nflRoutes = new Hono();
@@ -82,6 +85,35 @@ nflRoutes.get('/coverage/current/:teamId', async (c) => {
   const detail = await buildNflCoverageTeam(c.req.param('teamId').toUpperCase());
   if (!detail.team) return c.json({ error: 'nfl_team_not_found' }, 404);
   return c.json(detail);
+});
+
+nflRoutes.get('/data-health', async (c) => {
+  const teamId = (c.req.query('team_id') ?? 'NYG').toUpperCase();
+  try {
+    const health = await buildNflDataHealth(teamId);
+    if (health.datasets.find((dataset) => dataset.id === 'roster')?.row_count === 0) {
+      return c.json({ error: 'nfl_team_not_found' }, 404);
+    }
+    return c.json(health);
+  } catch (error) {
+    return c.json({ error: 'nfl_data_health_failed', detail: error instanceof Error ? error.message : String(error) }, 500);
+  }
+});
+
+nflRoutes.post('/decision-models/cap-roster', async (c) => {
+  let body: NflCapRosterDecisionRequest;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: 'invalid_json' }, 400);
+  }
+  try {
+    return c.json(await buildCapRosterDecision(body));
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    const status = /Unknown NFL team/.test(detail) ? 404 : 400;
+    return c.json({ error: status === 404 ? 'nfl_team_not_found' : 'invalid_cap_roster_request', detail }, status);
+  }
 });
 
 nflRoutes.get('/rules', async (c) => {
@@ -191,9 +223,9 @@ function nflRuleToSection(corpus: NflRulesCorpus, rule: NflRuleRow, index: numbe
     label: rule.title,
     body: nflRuleBody(rule),
     document_id: corpus.document_id,
-    article: 'NFL Rules',
-    section: rule.rule_family,
-    section_number: null,
+    article: rule.source_document,
+    section: rule.source_locator,
+    section_number: rule.source_locator,
     page_start: null,
     page_end: null,
     sort_key: index,
@@ -222,6 +254,10 @@ function nflRuleBody(rule: NflRuleRow): string {
     rule.summary,
     '',
     `Analysis use: ${rule.analysis_use}`,
+    `Authority: ${rule.source_document}`,
+    `Locator: ${rule.source_locator}`,
+    `Effective: ${rule.effective_date}`,
+    `Evidence boundary: ${rule.analysis_boundary}`,
     `Source note: ${rule.source_note}`,
   ].join('\n');
 }

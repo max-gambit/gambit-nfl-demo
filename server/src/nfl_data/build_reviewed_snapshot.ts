@@ -12,8 +12,8 @@ import {
   validateNflDemoSeed,
 } from './seed.js';
 
-const AS_OF_DATE = '2026-06-25';
-const RETRIEVED_AT = '2026-06-25T11:45:00.000Z';
+const RETRIEVED_AT = process.env.NFL_DATA_RETRIEVED_AT ?? new Date().toISOString();
+const AS_OF_DATE = process.env.NFL_DATA_AS_OF_DATE ?? RETRIEVED_AT.slice(0, 10);
 const DEFAULT_NFL_PLAYER_METRICS_FIXTURE_PATH = fileURLToPath(
   new URL('../../../data/nfl-player-metrics/reviewed-2025.json', import.meta.url),
 );
@@ -30,7 +30,7 @@ const NFLVERSE_NGS_PASSING_2025_URL = 'https://github.com/nflverse/nflverse-data
 const NFLVERSE_NGS_RECEIVING_2025_URL = 'https://github.com/nflverse/nflverse-data/releases/download/nextgen_stats/ngs_receiving.csv.gz';
 const NFLVERSE_NGS_RUSHING_2025_URL = 'https://github.com/nflverse/nflverse-data/releases/download/nextgen_stats/ngs_rushing.csv.gz';
 const NFLVERSE_INJURIES_2025_URL = 'https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_2025.csv';
-const NFLVERSE_DEPTH_CHARTS_2026_URL = 'https://github.com/nflverse/nflverse-data/releases/download/depth_charts/depth_charts_2025.csv';
+const NFLVERSE_DEPTH_CHARTS_2026_URL = 'https://github.com/nflverse/nflverse-data/releases/download/depth_charts/depth_charts_2026.csv';
 
 interface TeamConfig extends NflDemoTeam {
   nfl_slug: string;
@@ -133,6 +133,7 @@ interface ContractLedgerSummary {
   void_year_count: number | null;
   void_years_source_status: NflCapRow['void_years_source_status'];
   total_value_remaining: number | null;
+  guaranteed_remaining: number | null;
   contract_ledger_status: NflCapRow['contract_ledger_status'];
   contract_ledger_confidence: NflCapRow['contract_ledger_confidence'];
   contract_years: Record<string, unknown>[];
@@ -229,13 +230,13 @@ async function main() {
   const rosterEntries: NflRosterEntry[] = [];
   const capRows: NflCapRow[] = [];
   const metricRows: NflPlayerMetricRow[] = [];
-  const teamSnapshots = await Promise.all(TEAMS.map(async (team) => {
+  const teamSnapshots = await mapConcurrent(TEAMS, 4, async (team) => {
     const [rosterRows, otcSnapshot] = await Promise.all([
       fetchOfficialRoster(team),
       fetchOtcContractSnapshot(team),
     ]);
     return { team, rosterRows, otcLedgers: otcSnapshot.ledgers, nonActiveCharges: otcSnapshot.nonActiveCharges };
-  }));
+  });
   const globalOtcByName = new Map<string, ParsedOtcLedger[]>();
   for (const snapshot of teamSnapshots) {
     for (const ledger of snapshot.otcLedgers) {
@@ -313,7 +314,7 @@ async function main() {
         contract_years_remaining: ledger.contract_years_remaining,
         void_year_count: ledger.void_year_count,
         void_years_source_status: ledger.void_years_source_status,
-        guaranteed_remaining: nonActiveLedger ? null : otc?.guaranteed_salary ?? estimatedLedger?.guaranteed_remaining ?? oldCap?.guaranteed_remaining ?? null,
+        guaranteed_remaining: nonActiveLedger ? null : ledger.guaranteed_remaining ?? estimatedLedger?.guaranteed_remaining ?? null,
         dead_money_if_cut_2026: otc?.dead_money_cut ?? nonActiveLedger?.dead_money_if_cut_2026 ?? estimatedLedger?.dead_money_if_cut_2026 ?? null,
         cut_savings_2026: otc?.cut_savings ?? nonActiveLedger?.cut_savings_2026 ?? estimatedLedger?.cut_savings_2026 ?? null,
         post_june_1_dead_money_2026: otc?.post_june_1_dead_money_cut ?? nonActiveLedger?.post_june_1_dead_money_2026 ?? estimatedLedger?.post_june_1_dead_money_2026 ?? null,
@@ -1293,6 +1294,7 @@ function deriveNonActiveContractLedger(charge: ParsedNonActiveCapCharge): Derive
     void_year_count: 0,
     void_years_source_status: 'not-available',
     total_value_remaining: null,
+    guaranteed_remaining: null,
     contract_ledger_status: 'captured',
     contract_ledger_confidence: 'derived',
     contract_years: [contractYear],
@@ -1513,6 +1515,7 @@ export function summarizeContractLedger(rows: ParsedOtcYearRow[]): ContractLedge
       void_year_count: null,
       void_years_source_status: 'source-needed',
       total_value_remaining: null,
+      guaranteed_remaining: null,
       contract_ledger_status: 'source-needed',
       contract_ledger_confidence: 'source-needed',
       contract_years: [],
@@ -1528,6 +1531,7 @@ export function summarizeContractLedger(rows: ParsedOtcYearRow[]): ContractLedge
     ? Math.max(...countableRows.map((row) => Number(row.season)))
     : 2026;
   const totalValueRemaining = sumNumbers(countableRows.map(cashDueForYear));
+  const guaranteedRemaining = sumNumbers(countableRows.map((row) => row.guaranteed_salary));
   const confidence = ledgerConfidence(current, countableRows.length, sorted.length);
 
   return {
@@ -1536,6 +1540,7 @@ export function summarizeContractLedger(rows: ParsedOtcYearRow[]): ContractLedge
     void_year_count: voidRows.length,
     void_years_source_status: 'captured',
     total_value_remaining: totalValueRemaining,
+    guaranteed_remaining: guaranteedRemaining,
     contract_ledger_status: 'captured',
     contract_ledger_confidence: confidence,
     contract_years: sorted.map(compactContractYear),
@@ -1543,12 +1548,39 @@ export function summarizeContractLedger(rows: ParsedOtcYearRow[]): ContractLedge
 }
 
 async function fetchText(url: string): Promise<string> {
-  const res = await fetch(url, { headers: { 'user-agent': 'gambit-nfl-demo-reviewed-snapshot/1.0' } });
-  if (!res.ok) throw new Error(`GET ${url} failed: ${res.status}`);
-  if (url.endsWith('.gz')) {
-    return gunzipSync(Buffer.from(await res.arrayBuffer())).toString('utf8');
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      const res = await fetch(url, {
+        headers: { 'user-agent': 'gambit-nfl-demo-reviewed-snapshot/1.0' },
+        signal: AbortSignal.timeout(30_000),
+      });
+      if (!res.ok) throw new Error(`GET ${url} failed: ${res.status}`);
+      if (url.endsWith('.gz')) {
+        return gunzipSync(Buffer.from(await res.arrayBuffer())).toString('utf8');
+      }
+      return res.text();
+    } catch (error) {
+      lastError = error;
+      if (attempt < 3) await new Promise((resolve) => setTimeout(resolve, attempt * 750));
+    }
   }
-  return res.text();
+  throw lastError instanceof Error ? lastError : new Error(`GET ${url} failed`);
+}
+
+async function mapConcurrent<T, U>(items: T[], limit: number, fn: (item: T) => Promise<U>): Promise<U[]> {
+  const output = new Array<U>(items.length);
+  let next = 0;
+  async function worker() {
+    for (;;) {
+      const index = next;
+      next += 1;
+      if (index >= items.length) return;
+      output[index] = await fn(items[index]!);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, () => worker()));
+  return output;
 }
 
 async function readExistingSeed(): Promise<NflDemoSeed | null> {
