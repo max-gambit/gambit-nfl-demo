@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { CbaSection, GetCurrentNflTeamResponse, NflCapRosterAction, NflCapRosterBranch, NflCapRosterDecisionResponse, NflDataHealthResponse } from '@shared/types';
+import type { CbaSection, GetCurrentNflTeamResponse, NflCapRosterAction, NflCapRosterBranch, NflCapRosterDecisionResponse, NflDataHealthResponse, NflWorkspaceSummary } from '@shared/types';
 import { getCurrentNflCapSheet } from '../api/nfl';
 import { getNflDataHealth, modelNflCapRoster } from '../api/nflDecision';
 import { getNflRuleArticle, listNflRules } from '../api/nflRules';
+import { createNflWorkspace, listNflWorkspaces } from '../api/nflWorkspace';
 import './nyg.css';
 
 type View = 'briefing' | 'decision' | 'workspaces' | 'roster' | 'rulebook' | 'settings';
@@ -21,6 +22,7 @@ export function NygApp() {
   const [decision, setDecision] = useState<NflCapRosterDecisionResponse | null>(null);
   const [roster, setRoster] = useState<GetCurrentNflTeamResponse | null>(null);
   const [rules, setRules] = useState<CbaSection[]>([]);
+  const [workspaces, setWorkspaces] = useState<NflWorkspaceSummary[]>([]);
   const [target, setTarget] = useState(DEFAULT_TARGET);
   const [protectedPlayers, setProtectedPlayers] = useState<string[]>([]);
   const [protectedGroups, setProtectedGroups] = useState<string[]>(DEFAULT_GROUPS);
@@ -43,6 +45,18 @@ export function NygApp() {
     finally { setLoading(false); }
   }
   useEffect(() => { void load(DEFAULT_TARGET, [], DEFAULT_GROUPS); }, []);
+  useEffect(() => {
+    void listNflWorkspaces()
+      .then(setWorkspaces)
+      .catch((caught) => setError(caught instanceof Error ? caught.message : String(caught)));
+  }, []);
+
+  async function createWorkspace(question: string): Promise<void> {
+    const trimmed = question.trim();
+    if (!trimmed) return;
+    const created = await createNflWorkspace({ question: trimmed });
+    setWorkspaces((current) => [created.workspace, ...current.filter((item) => item.id !== created.workspace.id)]);
+  }
 
   async function openRule(ruleId: string) {
     try { const detail = await getNflRuleArticle(ruleId); setFocusedRule(detail.section); setView('rulebook'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -67,7 +81,7 @@ export function NygApp() {
     <main className="nyg-main">
       {view === 'briefing' && <Briefing health={health} decision={decision} onOpenDecision={() => setView('decision')} onOpenRoster={() => setView('roster')} />}
       {view === 'decision' && <DecisionRoom loading={loading} health={health} decision={decision} branch={branch} selectedBranch={selectedBranch} setSelectedBranch={setSelectedBranch} target={target} setTarget={setTarget} protectedGroups={protectedGroups} setProtectedGroups={setProtectedGroups} onRecompute={() => void load()} focusedAction={focusedAction} onFocusAction={setFocusedAction} onProtectPlayer={(id) => { const next = [...new Set([...protectedPlayers, id])]; setProtectedPlayers(next); void load(target, next, protectedGroups); }} onOpenRule={(id) => void openRule(id)} />}
-      {view === 'workspaces' && <Workspaces onOpenDecision={() => setView('decision')} decision={decision} />}
+      {view === 'workspaces' && <Workspaces onOpenDecision={() => setView('decision')} decision={decision} workspaces={workspaces} onCreate={createWorkspace} />}
       {view === 'roster' && <RosterCap roster={roster} onFocus={(action) => { setFocusedAction(action); setView('decision'); }} decision={decision} />}
       {view === 'rulebook' && <Rulebook rules={rules} focused={focusedRule} onOpen={(id) => void openRule(id)} onAnalyze={() => setView('decision')} />}
       {view === 'settings' && <Settings health={health} />}
@@ -95,9 +109,27 @@ function DecisionRoom(props: DecisionProps) {
   </div><aside className="evidence-panel"><span className="kicker">Evidence inspector</span>{props.focusedAction ? <><h2>{props.focusedAction.player_name}</h2><p>{labelLever(props.focusedAction.lever)} · {props.focusedAction.position}</p><dl><div><dt>Cap number</dt><dd>{money(props.focusedAction.cap_number_dollars)}</dd></div><div><dt>Verified relief</dt><dd className="positive">{money(props.focusedAction.relief_dollars)}</dd></div><div><dt>Dead money</dt><dd>{money(props.focusedAction.dead_money_dollars)}</dd></div><div><dt>Contract evidence</dt><dd>{props.focusedAction.confidence}</dd></div></dl><a className="source-link" href={props.focusedAction.source_url ?? '#'} target="_blank" rel="noreferrer">Open player contract source ↗</a>{props.focusedAction.rule_references.map((rule) => <button className="rule-link" key={rule.rule_id} onClick={() => props.onOpenRule(rule.rule_id)}><span>{rule.title}</span><small>{rule.locator}</small></button>)}<button className="quiet-button full" onClick={() => props.onProtectPlayer(props.focusedAction!.player_id)}>Protect player and recompute</button></> : <><h2>Every number opens its proof.</h2><p>Select a player action to inspect the contract row, exact CBA locator, depth effect, and next confirmation.</p><div className="evidence-empty"><span>01</span> Player contract row<br /><span>02</span> Rule authority<br /><span>03</span> Football consequence</div></>}</aside></section>;
 }
 
-function Workspaces({ onOpenDecision, decision }: { onOpenDecision: () => void; decision: NflCapRosterDecisionResponse | null }) {
+function Workspaces({ onOpenDecision, decision, workspaces, onCreate }: { onOpenDecision: () => void; decision: NflCapRosterDecisionResponse | null; workspaces: NflWorkspaceSummary[]; onCreate: (question: string) => Promise<void> }) {
   const stages = ['Question', 'Evidence', 'Scenarios', 'Decision', 'Action Plan'];
-  return <section className="page-shell"><PageTitle eyebrow="Workspace · NYG demo" title="2026 cap flexibility without structural damage" subtitle="A persistent decision initiative, organized around the work—not a generic project tracker." /><div className="workspace-overview"><div><span className="kicker">Decision owner</span><strong>Football Operations</strong></div><div><span className="kicker">Current stage</span><strong>Scenarios</strong></div><div><span className="kicker">Evidence state</span><strong>{decision?.data_health.meeting_ready ? 'Hero path verified' : 'Preflight blocked'}</strong></div><button className="primary-button" onClick={onOpenDecision}>Open live model</button></div><div className="stage-track">{stages.map((stage, index) => <div key={stage} className={index < 3 ? 'complete' : index === 3 ? 'current' : ''}><span>{index < 3 ? '✓' : index + 1}</span><strong>{stage}</strong><small>{['Define relief target and protected depth.', 'Attach contract rows and rule authority.', 'Compare deterministic branch ladder.', 'Select a branch with named owners.', 'Prepare transaction and replacement checks.'][index]}</small></div>)}</div><div className="workspace-notes"><article><span className="kicker">Decision statement</span><h3>Which verified path creates at least {money(decision?.branches[0]?.target_relief_dollars ?? DEFAULT_TARGET)} while preserving the positions we refuse to weaken?</h3></article><article><span className="kicker">Next action</span><h3>Cap administration confirms selected contract rows; personnel signs off on replacement depth.</h3></article></div></section>;
+  const [draftOpen, setDraftOpen] = useState(false);
+  const [draftQuestion, setDraftQuestion] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = workspaces.find((workspace) => workspace.id === selectedId) ?? workspaces[0] ?? null;
+  async function submitDraft() {
+    if (!draftQuestion.trim() || creating) return;
+    setCreating(true); setCreateError(null);
+    try {
+      await onCreate(draftQuestion);
+      setDraftQuestion(''); setDraftOpen(false);
+    } catch (caught) { setCreateError(caught instanceof Error ? caught.message : String(caught)); }
+    finally { setCreating(false); }
+  }
+  return <section className="page-shell"><div className="workspace-title-row"><PageTitle eyebrow="Workspaces · NYG demo" title={selected?.title ?? 'Decision workspaces'} subtitle="Persistent football-operations initiatives, organized around the work—not a generic project tracker." /><button className="primary-button" onClick={() => setDraftOpen(true)}>+ New workspace</button></div>
+    {draftOpen && <article className="workspace-draft"><div><span className="kicker">Client-side draft</span><h2>Start with the decision question</h2><p>Nothing is persisted until you submit the first question.</p></div><textarea aria-label="New workspace question" placeholder="What football decision needs a verified evidence and scenario path?" value={draftQuestion} onChange={(event) => setDraftQuestion(event.target.value)} /><div className="draft-actions"><button className="quiet-button" onClick={() => { setDraftOpen(false); setDraftQuestion(''); setCreateError(null); }}>Cancel</button><button className="primary-button" onClick={() => void submitDraft()} disabled={!draftQuestion.trim() || creating}>{creating ? 'Creating…' : 'Create from first question'}</button></div>{createError && <p className="settings-blocker">{createError}</p>}</article>}
+    {workspaces.length > 0 && <div className="workspace-list" aria-label="NYG decision workspaces">{workspaces.map((workspace) => <button key={workspace.id} className={selected?.id === workspace.id ? 'selected' : ''} onClick={() => setSelectedId(workspace.id)}><span>{workspace.seeded ? 'Reviewed fixture' : 'Persisted'}</span><strong>{workspace.title}</strong><small>{workspace.question}</small></button>)}</div>}
+    <div className="workspace-overview"><div><span className="kicker">Decision owner</span><strong>Football Operations</strong></div><div><span className="kicker">Current stage</span><strong>{selected ? stageLabel(selected.stage) : 'Question'}</strong></div><div><span className="kicker">Evidence state</span><strong>{decision?.data_health.meeting_ready ? 'Hero path verified' : 'Preflight blocked'}</strong></div><button className="primary-button" onClick={onOpenDecision}>Open live model</button></div><div className="stage-track">{stages.map((stage, index) => <div key={stage} className={index < 3 ? 'complete' : index === 3 ? 'current' : ''}><span>{index < 3 ? '✓' : index + 1}</span><strong>{stage}</strong><small>{['Define relief target and protected depth.', 'Attach contract rows and rule authority.', 'Compare deterministic branch ladder.', 'Select a branch with named owners.', 'Prepare transaction and replacement checks.'][index]}</small></div>)}</div><div className="workspace-notes"><article><span className="kicker">Decision statement</span><h3>{selected?.question ?? `Which verified path creates at least ${money(decision?.branches[0]?.target_relief_dollars ?? DEFAULT_TARGET)} while preserving the positions we refuse to weaken?`}</h3></article><article><span className="kicker">Next action</span><h3>Cap administration confirms selected contract rows; personnel signs off on replacement depth.</h3></article></div></section>;
 }
 
 function RosterCap({ roster, decision, onFocus }: { roster: GetCurrentNflTeamResponse | null; decision: NflCapRosterDecisionResponse | null; onFocus: (action: NflCapRosterAction) => void }) {
@@ -126,3 +158,4 @@ function money(value: number) { return new Intl.NumberFormat('en-US', { style: '
 function formatDate(value: string) { const parsed = new Date(value.length === 10 ? `${value}T12:00:00Z` : value); return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }); }
 function formatTime(value: string) { const parsed = new Date(value); return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); }
 function labelLever(value: string) { return value.replace('pre_june', 'Pre-June 1').replace('post_june', 'Post-June 1').replace(/_/g, ' ').replace(/^./, (letter) => letter.toUpperCase()); }
+function stageLabel(value: string) { return ({ research: 'Question', validate: 'Evidence', feedback: 'Scenarios', gm: 'Decision', proposal: 'Action Plan', question: 'Question', evidence: 'Evidence', scenarios: 'Scenarios', decision: 'Decision', action_plan: 'Action Plan' } as Record<string, string>)[value] ?? 'Question'; }

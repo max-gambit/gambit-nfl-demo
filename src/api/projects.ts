@@ -42,8 +42,9 @@ import type {
 } from '@shared/types';
 import { postJson, SERVER_URL } from './client';
 
-export async function listProjects(): Promise<ProjectSummary[]> {
-  const res = await fetch(`${SERVER_URL}/projects`);
+export async function listProjects(workspaceKey?: 'legacy' | 'nyg-demo'): Promise<ProjectSummary[]> {
+  const suffix = workspaceKey ? `?workspace_key=${encodeURIComponent(workspaceKey)}` : '';
+  const res = await fetch(`${SERVER_URL}/projects${suffix}`);
   if (!res.ok) await throwHttp('GET /projects', res);
   const body = await res.json() as ListProjectsResponse;
   return body.projects;

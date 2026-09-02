@@ -2210,6 +2210,32 @@ export interface NflCapRosterDecisionResponse {
   deterministic_summary: string;
 }
 
+export type NflWorkspaceStage = 'question' | 'evidence' | 'scenarios' | 'decision' | 'action_plan';
+
+export interface NflWorkspaceSummary {
+  id: string;
+  title: string;
+  question: string;
+  objective: string;
+  stage: NflWorkspaceStage;
+  team_id: string;
+  seeded: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ListNflWorkspacesResponse {
+  workspaces: NflWorkspaceSummary[];
+}
+
+export interface CreateNflWorkspaceRequest {
+  question: string;
+}
+
+export interface CreateNflWorkspaceResponse {
+  workspace: NflWorkspaceSummary;
+}
+
 // ── CBA reference corpus ────────────────────────────────────────────────────
 export interface CbaDocument {
   id: string;
@@ -2418,6 +2444,8 @@ export interface CreateProjectRequest {
   title: string;
   question: string;
   objective: string;
+  workspace_key?: 'legacy' | 'nyg-demo';
+  seed_key?: string | null;
   workflow_type?: ProjectWorkflowType;
   subject_team_id?: string;
   counterparty_team_id?: string | null;
