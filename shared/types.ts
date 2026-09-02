@@ -2096,6 +2096,7 @@ export interface NflDataHealthDataset {
   source_needed_count: number;
   gaps: NflDataHealthGap[];
   blocker: string | null;
+  coverage?: Record<string, string | number | boolean | null>;
 }
 
 export interface NflRuleAuthorityHealth {

@@ -15,6 +15,7 @@ import type {
   NflCapRosterExplanationRequest,
   CreateNflWorkspaceRequest,
   NflPresenterPreflightCheck,
+  NflTransactionMarketRequest,
 } from '@shared/types';
 import {
   groupNflTeams,
@@ -29,6 +30,8 @@ import { explainCapRosterDecision } from '../nfl_decision/explain.js';
 import { loadNflRulesCorpus, type NflRuleRow } from '../nfl_rules/seed.js';
 import { createNygWorkspace, listNygWorkspaces } from '../nfl_workspace/service.js';
 import { NYG_HERO_SEED_KEY } from '../nfl_workspace/seed.js';
+import { analyzeNflTransactionMarket } from '../nfl_transactions/analyze.js';
+import { loadCurrentNflTransactionMarketSnapshot } from '../nfl_transactions/seed.js';
 
 export const nflRoutes = new Hono();
 
@@ -105,6 +108,27 @@ nflRoutes.get('/data-health', async (c) => {
     return c.json(health);
   } catch (error) {
     return c.json({ error: 'nfl_data_health_failed', detail: error instanceof Error ? error.message : String(error) }, 500);
+  }
+});
+
+nflRoutes.post('/transaction-market/analyze', async (c) => {
+  let body: NflTransactionMarketRequest;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: 'invalid_json' }, 400);
+  }
+  try {
+    return c.json(await analyzeNflTransactionMarket(body, {
+      loadSnapshot: loadCurrentNflTransactionMarketSnapshot,
+    }));
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    const unavailable = /snapshot|database|fetch failed|relation .* does not exist/i.test(detail);
+    return c.json({
+      error: unavailable ? 'nfl_transaction_market_unavailable' : 'invalid_transaction_market_request',
+      detail,
+    }, unavailable ? 503 : 400);
   }
 });
 

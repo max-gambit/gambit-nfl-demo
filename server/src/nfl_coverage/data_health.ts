@@ -10,12 +10,18 @@ import {
   type NflCurrentDataLoadResult,
 } from '../nfl_data/seed.js';
 import { loadNflRulesCorpus, type NflRulesCorpus } from '../nfl_rules/seed.js';
+import {
+  loadNflTransactionMarketDataHealth,
+  type NflTransactionMarketDataHealth,
+} from '../nfl_transactions/seed.js';
 
 const ROSTER_MAX_AGE_HOURS = 48;
+const TRANSACTION_SNAPSHOT_MAX_AGE_HOURS = 168;
 
 export interface BuildNflDataHealthOptions {
   data?: NflCurrentDataLoadResult;
   rules?: NflRulesCorpus;
+  transactionMarket?: NflTransactionMarketDataHealth | null;
   generatedAt?: Date;
 }
 
@@ -24,9 +30,12 @@ export async function buildNflDataHealth(
   options: BuildNflDataHealthOptions = {},
 ): Promise<NflDataHealthResponse> {
   const normalizedTeamId = teamId.toUpperCase();
-  const [{ seed, source_mode, fallback_reason }, rules] = await Promise.all([
+  const [{ seed, source_mode, fallback_reason }, rules, transactionMarketResult] = await Promise.all([
     options.data ? Promise.resolve(options.data) : loadCurrentNflTeamDataWithMode(normalizedTeamId),
     options.rules ? Promise.resolve(options.rules) : loadNflRulesCorpus(),
+    options.transactionMarket !== undefined
+      ? Promise.resolve(options.transactionMarket)
+      : loadNflTransactionMarketDataHealth().catch((error) => ({ error: error instanceof Error ? error.message : String(error) })),
   ]);
   const generatedAt = options.generatedAt ?? new Date();
   const roster = seed.roster_entries.filter((row) => row.team_id === normalizedTeamId);
@@ -53,12 +62,55 @@ export async function buildNflDataHealth(
   const ruleGaps = rulesMissing.length
     ? [{ code: 'rule_locator_missing', message: 'One or more rule rows lacks an authoritative URL, effective date, or exact locator.', affected_count: rulesMissing.length }]
     : [];
+  const transactionMarket = transactionMarketResult && !('error' in transactionMarketResult) ? transactionMarketResult : null;
+  const transactionAgeHours = transactionMarket ? dateAgeHours(transactionMarket.retrieved_at, generatedAt) : null;
+  const transactionGaps: NflDataHealthDataset['gaps'] = [];
+  if (!transactionMarket) transactionGaps.push({ code: 'transaction_snapshot_missing', message: `Historical transaction snapshot is unavailable${transactionMarketResult && 'error' in transactionMarketResult ? `: ${transactionMarketResult.error}` : '.'}` });
+  if (transactionMarket?.source_mode !== 'supabase_current_views') transactionGaps.push({ code: 'transaction_not_db_backed', message: 'Historical transaction analysis is not loaded from the current database view.' });
+  if (transactionMarket && (transactionAgeHours == null || transactionAgeHours > TRANSACTION_SNAPSHOT_MAX_AGE_HOURS)) transactionGaps.push({ code: 'transaction_snapshot_stale', message: 'Historical transaction snapshot retrieval is older than seven days.' });
+  if (transactionMarket && (transactionMarket.coverage.start_year > 2016 || transactionMarket.coverage.end_year < 2025)) transactionGaps.push({ code: 'transaction_year_coverage', message: 'Historical transaction snapshot does not cover every completed season from 2016 through 2025.' });
+  if (transactionMarket && transactionMarket.coverage.position_match_basis_points < 8_500) transactionGaps.push({ code: 'transaction_identity_blocked', message: 'Transaction position identity coverage is below 85%; position-market conclusions are blocked.' });
+  else if (transactionMarket && transactionMarket.coverage.position_match_basis_points < 9_500) transactionGaps.push({ code: 'transaction_identity_directional', message: 'Transaction position identity coverage is below 95%; position-market conclusions are directional.' });
+  if (transactionMarket && transactionMarket.coverage.compensation_coverage_basis_points < 5_000) transactionGaps.push({ code: 'transaction_compensation_sparse', message: 'Fewer than half of player trades have allocable compensation; trade-price conclusions are blocked.' });
+  else if (transactionMarket && transactionMarket.coverage.compensation_coverage_basis_points < 9_500) transactionGaps.push({ code: 'transaction_compensation_directional', message: 'Some trades have multi-player or unavailable compensation and remain unpriced.' });
+  if (transactionMarket && transactionMarket.coverage.contract_term_coverage_basis_points < 9_500) transactionGaps.push({ code: 'transaction_contract_terms_sparse', message: 'Historical contract price coverage is below 95%.' });
+  const transactionBlocked = transactionGaps.some((gap) => ['transaction_snapshot_missing', 'transaction_not_db_backed', 'transaction_snapshot_stale', 'transaction_year_coverage', 'transaction_identity_blocked', 'transaction_compensation_sparse'].includes(gap.code));
 
   const datasets: NflDataHealthDataset[] = [
     dataset('roster', 'Roster', blockingStatus(rosterGaps), source_mode, seed.source_name, seed.source_url, seed.as_of_date, seed.retrieved_at, 'Within 48 hours', ROSTER_MAX_AGE_HOURS, ageHours, roster.length, roster.length, 0, 0, rosterGaps),
     dataset('cap_contracts', 'Cap & contracts', blockingStatus(capGaps), source_mode, seed.source_name, seed.source_url, seed.as_of_date, seed.retrieved_at, 'Within 48 hours', ROSTER_MAX_AGE_HOURS, ageHours, cap.length, cap.filter((row) => exactContractRow(row) && row.contract_ledger_confidence === 'captured').length, cap.filter((row) => exactContractRow(row) && row.contract_ledger_confidence === 'derived').length, cap.filter((row) => !exactContractRow(row)).length, capGaps),
     dataset('player_metrics', 'Historical performance', metricGaps.length ? 'degraded' : 'ready', source_mode, seed.source_name, seed.source_url, seed.as_of_date, seed.retrieved_at, 'After each completed season and public-feed revision', null, null, metrics.length, metrics.filter((row) => row.source_status === 'captured').length, metrics.filter((row) => row.source_status === 'roster-derived').length, metricSourceNeeded, metricGaps),
     dataset('rules', 'Rule authority', ruleGaps.length ? 'blocked' : 'ready', 'authoritative_corpus', rules.source_name, rules.source_url, rules.as_of_date, rules.retrieved_at, 'On CBA, resolution, or league-calendar change', null, null, rules.rules.length, rules.rules.length - rulesMissing.length, 0, rulesMissing.length, ruleGaps),
+    {
+      ...dataset(
+        'transaction_market',
+        'Historical transaction market',
+        transactionBlocked ? 'blocked' : transactionGaps.length ? 'degraded' : 'ready',
+        transactionMarket?.source_mode ?? 'public_release_snapshot',
+        'nflverse trades, players, rosters, and OverTheCap-derived contracts',
+        'https://nflverse.nflverse.com/index.html',
+        transactionMarket?.as_of_date ?? null,
+        transactionMarket?.retrieved_at ?? null,
+        'Refresh against nflverse public releases before a material analysis session',
+        TRANSACTION_SNAPSHOT_MAX_AGE_HOURS,
+        transactionAgeHours,
+        transactionMarket?.row_count ?? 0,
+        transactionMarket?.coverage.matched_position_count ?? 0,
+        transactionMarket?.coverage.directional_position_count ?? 0,
+        transactionMarket?.coverage.unmatched_position_count ?? 0,
+        transactionGaps,
+      ),
+      coverage: transactionMarket ? {
+        snapshot_id: transactionMarket.snapshot_id,
+        start_year: transactionMarket.coverage.start_year,
+        end_year: transactionMarket.coverage.end_year,
+        trade_event_count: transactionMarket.coverage.trade_event_count,
+        contract_event_count: transactionMarket.coverage.contract_event_count,
+        position_match_basis_points: transactionMarket.coverage.position_match_basis_points,
+        compensation_coverage_basis_points: transactionMarket.coverage.compensation_coverage_basis_points,
+        contract_term_coverage_basis_points: transactionMarket.coverage.contract_term_coverage_basis_points,
+      } : undefined,
+    },
   ];
   const blockers = datasets.flatMap((item) => item.status === 'blocked' ? item.gaps.map((gap) => gap.message) : []);
   const status: NflDataHealthStatus = blockers.length ? 'blocked' : datasets.some((item) => item.status === 'degraded') ? 'degraded' : 'ready';
