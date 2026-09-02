@@ -17,6 +17,11 @@ export interface NflCurrentDataLoadResult {
   fallback_reason: string | null;
 }
 
+let currentDataCache: { expires_at: number; value: NflCurrentDataLoadResult } | null = null;
+let currentDataInFlight: Promise<NflCurrentDataLoadResult> | null = null;
+const currentTeamDataCache = new Map<string, { expires_at: number; value: NflCurrentDataLoadResult }>();
+const currentTeamDataInFlight = new Map<string, Promise<NflCurrentDataLoadResult>>();
+
 export interface NflDemoTeam {
   team_id: string;
   abbreviation: string;
@@ -163,6 +168,19 @@ export async function loadCurrentNflData(): Promise<NflDemoSeed> {
 }
 
 export async function loadCurrentNflDataWithMode(): Promise<NflCurrentDataLoadResult> {
+  if (currentDataCache && currentDataCache.expires_at > Date.now()) return currentDataCache.value;
+  if (currentDataInFlight) return currentDataInFlight;
+  currentDataInFlight = loadCurrentNflDataUncached();
+  try {
+    const value = await currentDataInFlight;
+    currentDataCache = { expires_at: Date.now() + 30_000, value };
+    return value;
+  } finally {
+    currentDataInFlight = null;
+  }
+}
+
+async function loadCurrentNflDataUncached(): Promise<NflCurrentDataLoadResult> {
   if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return {
       seed: await loadNflDemoSeed(),
@@ -183,6 +201,38 @@ export async function loadCurrentNflDataWithMode(): Promise<NflCurrentDataLoadRe
       fallback_reason: error instanceof Error ? error.message : String(error),
     };
   }
+}
+
+export async function loadCurrentNflTeamDataWithMode(teamId: string): Promise<NflCurrentDataLoadResult> {
+  const normalized = teamId.toUpperCase();
+  const cached = currentTeamDataCache.get(normalized);
+  if (cached && cached.expires_at > Date.now()) return cached.value;
+  const inFlight = currentTeamDataInFlight.get(normalized);
+  if (inFlight) return inFlight;
+  const promise = loadCurrentNflTeamDataUncached(normalized);
+  currentTeamDataInFlight.set(normalized, promise);
+  try {
+    const value = await promise;
+    currentTeamDataCache.set(normalized, { expires_at: Date.now() + 30_000, value });
+    return value;
+  } finally {
+    currentTeamDataInFlight.delete(normalized);
+  }
+}
+
+async function loadCurrentNflTeamDataUncached(teamId: string): Promise<NflCurrentDataLoadResult> {
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return { seed: filterSeedToTeam(await loadNflDemoSeed(), teamId), source_mode: 'checked_in_snapshot', fallback_reason: null };
+  }
+  try {
+    return { seed: await loadCurrentNflTeamDataFromDb(teamId), source_mode: 'supabase_current_views', fallback_reason: null };
+  } catch (error) {
+    return { seed: filterSeedToTeam(await loadNflDemoSeed(), teamId), source_mode: 'checked_in_snapshot_fallback', fallback_reason: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+function filterSeedToTeam(seed: NflDemoSeed, teamId: string): NflDemoSeed {
+  return { ...seed, teams: seed.teams.filter((row) => row.team_id === teamId), roster_entries: seed.roster_entries.filter((row) => row.team_id === teamId), cap_rows: seed.cap_rows.filter((row) => row.team_id === teamId), player_metrics: seed.player_metrics.filter((row) => row.team_id === teamId) };
 }
 
 export function validateNflDemoSeed(seed: NflDemoSeed): NflDemoSummary {
@@ -655,10 +705,44 @@ async function loadCurrentNflDataFromDb(): Promise<NflDemoSeed> {
   return seed;
 }
 
+async function loadCurrentNflTeamDataFromDb(teamId: string): Promise<NflDemoSeed> {
+  const filter = [{ column: 'team_id', value: teamId }];
+  const [teamRows, rosterRowsRaw, capRowsRaw, metricRowsRaw] = await Promise.all([
+    fetchAllRows('nfl_teams', [{ column: 'team_id' }], { filters: filter }),
+    fetchAllRows('nfl_current_roster_entries', [{ column: 'source_order' }], { selectColumns: NFL_CURRENT_ROSTER_ENTRY_SELECT, filters: filter }),
+    fetchAllRows('nfl_current_cap_sheet_player_rows', [{ column: 'source_order' }], { selectColumns: NFL_CURRENT_CAP_PLAYER_SELECT, filters: filter }),
+    fetchAllRows('nfl_current_player_metric_rows', [{ column: 'player_name' }], { selectColumns: NFL_CURRENT_PLAYER_METRIC_SELECT, filters: filter }),
+  ]);
+  const rosterRows = rosterRowsRaw as CurrentNflRosterEntryRow[];
+  const capRows = capRowsRaw as CurrentNflCapRow[];
+  const metricRows = metricRowsRaw as CurrentNflMetricRow[];
+  const first = rosterRows[0];
+  if (!first || teamRows.length !== 1) throw new Error(`no current NFL rows found for ${teamId}`);
+  validateDbSnapshotCoherence(rosterRows, capRows, metricRows);
+  if (rosterRows.length !== capRows.length || rosterRows.length !== metricRows.length) {
+    throw new Error(`current NFL ${teamId} views fail roster/cap/metric parity`);
+  }
+  const sourceMeta = objectRecord(first.snapshot_source_meta);
+  return {
+    schema_version: 1,
+    season: first.season,
+    as_of_date: first.as_of_date,
+    source_name: first.source_name,
+    source_url: first.source_url,
+    retrieved_at: first.retrieved_at,
+    notes: splitNotes(first.snapshot_notes),
+    teams: teamRows as NflDemoTeam[],
+    roster_entries: rosterRows.map(dbRosterRowToSeed),
+    cap_rows: capRows.map(dbCapRowToSeed),
+    player_metrics: metricRows.map(dbMetricRowToSeed),
+    source_refs: Array.isArray(sourceMeta.source_refs) ? sourceMeta.source_refs as NflSourceRef[] : [],
+  };
+}
+
 async function fetchAllRows(
   table: string,
   orderBy: Array<{ column: string; ascending?: boolean }>,
-  options: { pageSize?: number; selectColumns?: string } = {},
+  options: { pageSize?: number; selectColumns?: string; filters?: Array<{ column: string; value: string }> } = {},
 ): Promise<unknown[]> {
   const { db } = await import('../db/client.js');
   const rows: unknown[] = [];
@@ -666,6 +750,7 @@ async function fetchAllRows(
   const selectColumns = options.selectColumns ?? '*';
   for (let offset = 0; ; offset += pageSize) {
     let query = db.from(table).select(selectColumns) as any;
+    for (const filter of options.filters ?? []) query = query.eq(filter.column, filter.value);
     for (const order of orderBy) {
       query = query.order(order.column, { ascending: order.ascending ?? true });
     }
@@ -808,7 +893,6 @@ const NFL_CURRENT_PLAYER_METRIC_SELECT = [
   'position_metric_summary',
   'position_metrics',
   'quality_flags',
-  'source_data',
 ].join(',');
 
 function validateDbSnapshotCoherence(

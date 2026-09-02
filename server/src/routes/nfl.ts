@@ -16,6 +16,7 @@ import type {
 import {
   groupNflTeams,
   loadCurrentNflDataWithMode,
+  loadCurrentNflTeamDataWithMode,
   nflTeamDetail,
 } from '../nfl_data/seed.js';
 import { buildNflCoverageMatrix, buildNflCoverageTeam } from '../nfl_coverage/index.js';
@@ -46,8 +47,9 @@ nflRoutes.get('/cap-sheets/current', async (c) => {
 });
 
 nflRoutes.get('/cap-sheets/current/:teamId', async (c) => {
-  const { seed, source_mode, fallback_reason } = await loadCurrentNflDataWithMode();
-  const detail = nflTeamDetail(seed, c.req.param('teamId').toUpperCase());
+  const teamId = c.req.param('teamId').toUpperCase();
+  const { seed, source_mode, fallback_reason } = await loadCurrentNflTeamDataWithMode(teamId);
+  const detail = nflTeamDetail(seed, teamId);
   if (!detail) return c.json({ error: 'nfl_team_not_found' }, 404);
   return c.json({ ...detail, source_mode, fallback_reason });
 });

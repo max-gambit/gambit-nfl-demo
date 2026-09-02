@@ -61,7 +61,7 @@ Every durable run contains dependency-free nodes with exact reservations. At mos
 - Upstream drift: the current main commit titled `Add NFL context composer critic` also contains an inherited RealGM/NBA corpus. This task will not rewrite history; inherited NBA implementation must remain dormant and unreachable from the NYG active path.
 - Browser at 1440×900: New York Giants header, but active navigation is `League / Analyze / Projects / Database / NFL Rules`; the channel rail exposes Philadelphia/76ers prompts and an empty Untitled channel.
 - Client title: `Gambit · Analyze` at `http://localhost:5173/`.
-- Server baseline: neither `http://localhost:8787/health` nor `http://localhost:8788/health` was reachable. The client was rendering from an already-running Vite process without a live Hono API.
+- Server baseline: the live Hono API was running at `http://localhost:8790`; the earlier 8787/8788 probes targeted stale ports and were not evidence that the client lacked a server.
 - Existing checked-in NFL/rule metadata is dated 2026-06-25, so it is not meeting-ready under the 48-hour critical-data policy.
 
 ## Stop conditions

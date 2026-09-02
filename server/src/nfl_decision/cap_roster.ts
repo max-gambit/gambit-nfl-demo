@@ -7,7 +7,7 @@ import type {
   NflDecisionRuleReference,
 } from '@shared/types';
 import { buildNflDataHealth, type BuildNflDataHealthOptions } from '../nfl_coverage/data_health.js';
-import { loadCurrentNflDataWithMode, type NflCapRow, type NflDemoSeed } from '../nfl_data/seed.js';
+import { loadCurrentNflTeamDataWithMode, type NflCapRow, type NflDemoSeed } from '../nfl_data/seed.js';
 import { loadNflRulesCorpus, type NflRuleRow } from '../nfl_rules/seed.js';
 
 export interface BuildCapRosterDecisionOptions extends BuildNflDataHealthOptions {}
@@ -18,7 +18,7 @@ export async function buildCapRosterDecision(
 ): Promise<NflCapRosterDecisionResponse> {
   validateRequest(input);
   const teamId = input.team_id.toUpperCase();
-  const data = options.data ?? await loadCurrentNflDataWithMode();
+  const data = options.data ?? await loadCurrentNflTeamDataWithMode(teamId);
   const rules = options.rules ?? await loadNflRulesCorpus();
   const generatedAt = options.generatedAt ?? new Date();
   const health = await buildNflDataHealth(teamId, { data, rules, generatedAt });
@@ -255,4 +255,3 @@ function deterministicSummary(teamId: string, target: number, maximum: number, r
 function formatDollars(value: number): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
 }
-

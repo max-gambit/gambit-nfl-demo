@@ -5,6 +5,7 @@ import type {
 } from '@shared/types';
 import {
   loadCurrentNflDataWithMode,
+  loadCurrentNflTeamDataWithMode,
   type NflCapRow,
   type NflCurrentDataLoadResult,
 } from '../nfl_data/seed.js';
@@ -24,7 +25,7 @@ export async function buildNflDataHealth(
 ): Promise<NflDataHealthResponse> {
   const normalizedTeamId = teamId.toUpperCase();
   const [{ seed, source_mode, fallback_reason }, rules] = await Promise.all([
-    options.data ? Promise.resolve(options.data) : loadCurrentNflDataWithMode(),
+    options.data ? Promise.resolve(options.data) : loadCurrentNflTeamDataWithMode(normalizedTeamId),
     options.rules ? Promise.resolve(options.rules) : loadNflRulesCorpus(),
   ]);
   const generatedAt = options.generatedAt ?? new Date();
