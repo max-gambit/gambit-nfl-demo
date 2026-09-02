@@ -3,7 +3,7 @@
   "task_id": "nyg-demo-transaction-market-20260902-run7-foundation",
   "objective_summary": "Build independent source-ingestion/database and deterministic-methodology foundations for live NFL transaction-market analysis inside Gambit Analysis.",
   "durable_recovery": true,
-  "requires_live_dirty_state": true,
+  "requires_live_dirty_state": false,
   "nodes": [
     {
       "id": "transaction_ingestion",
