@@ -2210,6 +2210,24 @@ export interface NflCapRosterDecisionResponse {
   deterministic_summary: string;
 }
 
+export interface NflCapRosterExplanationRequest extends NflCapRosterDecisionRequest {
+  question: string;
+  use_live_model?: boolean;
+}
+
+export interface NflCapRosterExplanationResponse {
+  schema_version: 'nfl_cap_roster_explanation.v1';
+  generated_at: string;
+  status: 'model_validated' | 'deterministic_fallback';
+  branch_id: NflCapRosterBranchId | null;
+  summary: string;
+  rationale: string;
+  risks: string[];
+  next_actions: string[];
+  player_rows: Array<Pick<NflCapRosterAction, 'player_id' | 'player_name' | 'lever' | 'relief_dollars' | 'dead_money_dollars' | 'depth_effect' | 'confidence' | 'source_url' | 'rule_references'>>;
+  validation_issues: string[];
+}
+
 export type NflWorkspaceStage = 'question' | 'evidence' | 'scenarios' | 'decision' | 'action_plan';
 
 export interface NflWorkspaceSummary {

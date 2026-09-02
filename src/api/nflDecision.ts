@@ -1,6 +1,8 @@
 import type {
   NflCapRosterDecisionRequest,
   NflCapRosterDecisionResponse,
+  NflCapRosterExplanationRequest,
+  NflCapRosterExplanationResponse,
   NflDataHealthResponse,
   NflPresenterPreflightResponse,
 } from '@shared/types';
@@ -20,4 +22,8 @@ export async function getNflPresenterPreflight(teamId = 'NYG'): Promise<NflPrese
 
 export async function modelNflCapRoster(request: NflCapRosterDecisionRequest): Promise<NflCapRosterDecisionResponse> {
   return postJson('/nfl/decision-models/cap-roster', request);
+}
+
+export async function explainNflCapRoster(request: NflCapRosterExplanationRequest): Promise<NflCapRosterExplanationResponse> {
+  return postJson('/nfl/decision-models/cap-roster/explain', request);
 }

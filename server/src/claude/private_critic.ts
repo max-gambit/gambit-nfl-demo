@@ -1,5 +1,5 @@
 import type Anthropic from '@anthropic-ai/sdk';
-import type { SubmitBriefInput, SubmitDataAnalysisInput } from '@shared/types';
+import type { NflCapRosterDecisionResponse, SubmitBriefInput, SubmitDataAnalysisInput } from '@shared/types';
 import { BRIEF_MODEL, createClaudeMessage } from './client.js';
 import type { ComposedNflContext } from './nfl_context_composer.js';
 
@@ -18,7 +18,8 @@ export type NflPrivateCriticIssueCategory =
   | 'missing_trade_price'
   | 'unsupported_role_fit'
   | 'unsupported_benchmark_claim'
-  | 'confidence_mismatch';
+  | 'confidence_mismatch'
+  | 'missing_rule_citation';
 
 export interface NflPrivateCriticIssue {
   category: NflPrivateCriticIssueCategory;
@@ -41,6 +42,15 @@ export interface RunNflPrivateCriticArgs {
   draftKind: 'brief' | 'data_analysis';
   draft: SubmitBriefInput | SubmitDataAnalysisInput;
   createMessage?: typeof createClaudeMessage;
+}
+
+export interface NflCapRosterNarrativeDraft {
+  summary: string;
+  rationale: string;
+  risks: string[];
+  next_actions: string[];
+  player_ids: string[];
+  rule_ids: string[];
 }
 
 const privateCriticTool: Anthropic.Tool = {
@@ -73,6 +83,7 @@ const privateCriticTool: Anthropic.Tool = {
                 'unsupported_role_fit',
                 'unsupported_benchmark_claim',
                 'confidence_mismatch',
+                'missing_rule_citation',
               ],
             },
             severity: { type: 'string', enum: ['high', 'medium', 'low'] },
@@ -316,6 +327,110 @@ export function evaluateNflDraftForPrivateCritic(args: RunNflPrivateCriticArgs):
   return critiqueFromIssues(issues);
 }
 
+export function evaluateNflCapRosterNarrative(
+  decision: NflCapRosterDecisionResponse,
+  draft: NflCapRosterNarrativeDraft,
+): NflPrivateCriticResult {
+  const branch = decision.branches.find((candidate) => candidate.id === decision.recommended_branch_id)
+    ?? decision.branches.find((candidate) => candidate.id === 'maximize_relief')
+    ?? null;
+  const text = [draft.summary, draft.rationale, ...draft.risks, ...draft.next_actions].join('\n');
+  const issues: NflPrivateCriticIssue[] = [];
+  const branchPlayerIds = new Set(branch?.actions.map((action) => action.player_id) ?? []);
+  const branchRuleIds = new Set(branch?.actions.flatMap((action) => action.rule_references.map((rule) => rule.rule_id)) ?? []);
+  const unsupportedPlayerIds = draft.player_ids.filter((playerId) => !branchPlayerIds.has(playerId));
+
+  if (unsupportedPlayerIds.length) {
+    issues.push({
+      category: 'unsupported_player_quality',
+      severity: 'high',
+      claim: `The explanation references players outside the validated branch: ${unsupportedPlayerIds.join(', ')}.`,
+      evidence_boundary: 'Player references must be copied from the selected deterministic branch.',
+      fix: 'Remove player references that are not present in the validated branch payload.',
+    });
+  }
+
+  const allowedDollars = new Set<number>([
+    decision.baseline.total_cap_commitments_dollars,
+    ...(branch ? [branch.target_relief_dollars, branch.total_relief_dollars, branch.total_dead_money_dollars] : []),
+    ...(branch?.actions.flatMap((action) => [action.relief_dollars, action.dead_money_dollars, action.cap_number_dollars]) ?? []),
+  ]);
+  const unsupportedDollars = extractDollarAmounts(text).filter((value) => !allowedDollars.has(value));
+  if (unsupportedDollars.length) {
+    issues.push({
+      category: 'cap_math_mismatch',
+      severity: 'high',
+      claim: `The explanation introduces unsupported dollar figures: ${[...new Set(unsupportedDollars)].join(', ')}.`,
+      evidence_boundary: 'All dollar values must already exist in the validated deterministic branch payload.',
+      fix: 'Use only the exact target, branch totals, or per-player figures from the deterministic payload.',
+    });
+  }
+
+  const unsupportedRules = draft.rule_ids.filter((ruleId) => !branchRuleIds.has(ruleId));
+  if ((branch?.actions.length ?? 0) > 0 && draft.rule_ids.length === 0) {
+    issues.push({
+      category: 'missing_rule_citation',
+      severity: 'high',
+      claim: 'The explanation omits rule citations for transaction actions.',
+      evidence_boundary: 'Every modeled transaction action carries an authoritative rule reference.',
+      fix: 'Include the rule IDs already attached to the validated branch actions.',
+    });
+  } else if (unsupportedRules.length) {
+    issues.push({
+      category: 'missing_rule_citation',
+      severity: 'high',
+      claim: `The explanation cites rules outside the validated branch: ${unsupportedRules.join(', ')}.`,
+      evidence_boundary: 'Rule citations must be copied from the deterministic branch payload.',
+      fix: 'Remove invented rule IDs and use only branch-attached rule references.',
+    });
+  }
+
+  if (/\b(private|confidential|internal (?:medical|scouting|board)|medical grade|coach(?:ing)? trust|owner pressure)\b/i.test(text)) {
+    issues.push({
+      category: 'private_data_bluff',
+      severity: 'high',
+      claim: 'The explanation relies on private or team-only context.',
+      evidence_boundary: 'The presenter uses public demo data and has no private Giants inputs.',
+      fix: 'Remove the private claim and turn it into an explicit validation question.',
+    });
+  }
+
+  if (/\b(elite|poor player|replacement[- ]level|locker room|scheme fit|medical risk|declining|ascending)\b/i.test(text)) {
+    issues.push({
+      category: 'unsupported_player_quality',
+      severity: 'high',
+      claim: 'The explanation introduces a player-quality, fit, or medical judgment absent from the branch.',
+      evidence_boundary: 'The deterministic branch supports contract mechanics and a bounded depth-effect label only.',
+      fix: 'Limit the explanation to sourced economics, modeled depth effect, blockers, and confirmation actions.',
+    });
+  }
+
+  if (branch?.actions.some((action) => action.depth_effect !== 'none')
+    && /\b(no|zero|without any)\s+(?:modeled\s+)?depth (?:effect|impact|cost)\b/i.test(text)) {
+    issues.push({
+      category: 'row_count_depth_overclaim',
+      severity: 'high',
+      claim: 'The explanation erases a modeled depth effect present in the validated branch.',
+      evidence_boundary: 'Depth effects must be copied from the deterministic player actions.',
+      fix: 'State the branch depth tradeoff and preserve its validation boundary.',
+    });
+  }
+
+  return critiqueFromIssues(issues);
+}
+
+function extractDollarAmounts(text: string): number[] {
+  const values: number[] = [];
+  const pattern = /\$\s*([0-9]+(?:,[0-9]{3})*(?:\.[0-9]+)?)\s*([mk])?/gi;
+  for (const match of text.matchAll(pattern)) {
+    const base = Number(match[1].replace(/,/g, ''));
+    const multiplier = match[2]?.toLowerCase() === 'm' ? 1_000_000 : match[2]?.toLowerCase() === 'k' ? 1_000 : 1;
+    const value = base * multiplier;
+    if (Number.isSafeInteger(value)) values.push(value);
+  }
+  return values;
+}
+
 export function buildNflPrivateCriticRevisionBlock(critique: NflPrivateCriticResult): string {
   return [
     '=== PRIVATE CRITIC REVISION INSTRUCTIONS ===',
@@ -519,6 +634,7 @@ function criticCategory(value: unknown): NflPrivateCriticIssueCategory {
     case 'unsupported_role_fit':
     case 'unsupported_benchmark_claim':
     case 'confidence_mismatch':
+    case 'missing_rule_citation':
       return value;
     default:
       return 'missed_user_decision';

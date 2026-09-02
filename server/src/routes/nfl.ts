@@ -12,6 +12,7 @@ import type {
   CbaSection,
   CbaTocResponse,
   NflCapRosterDecisionRequest,
+  NflCapRosterExplanationRequest,
   CreateNflWorkspaceRequest,
   NflPresenterPreflightCheck,
 } from '@shared/types';
@@ -24,6 +25,7 @@ import {
 import { buildNflCoverageMatrix, buildNflCoverageTeam } from '../nfl_coverage/index.js';
 import { buildNflDataHealth } from '../nfl_coverage/data_health.js';
 import { buildCapRosterDecision } from '../nfl_decision/cap_roster.js';
+import { explainCapRosterDecision } from '../nfl_decision/explain.js';
 import { loadNflRulesCorpus, type NflRuleRow } from '../nfl_rules/seed.js';
 import { createNygWorkspace, listNygWorkspaces } from '../nfl_workspace/service.js';
 import { NYG_HERO_SEED_KEY } from '../nfl_workspace/seed.js';
@@ -119,6 +121,23 @@ nflRoutes.post('/decision-models/cap-roster', async (c) => {
     const detail = error instanceof Error ? error.message : String(error);
     const status = /Unknown NFL team/.test(detail) ? 404 : 400;
     return c.json({ error: status === 404 ? 'nfl_team_not_found' : 'invalid_cap_roster_request', detail }, status);
+  }
+});
+
+nflRoutes.post('/decision-models/cap-roster/explain', async (c) => {
+  let body: NflCapRosterExplanationRequest;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: 'invalid_json' }, 400);
+  }
+  if (!body.question?.trim()) return c.json({ error: 'question required' }, 400);
+  try {
+    return c.json(await explainCapRosterDecision(body));
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    const status = /Unknown NFL team/.test(detail) ? 404 : 400;
+    return c.json({ error: status === 404 ? 'nfl_team_not_found' : 'invalid_cap_roster_explanation_request', detail }, status);
   }
 });
 
