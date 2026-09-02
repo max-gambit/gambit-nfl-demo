@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { CbaSection, GetCurrentNflTeamResponse, NflCapRosterAction, NflCapRosterBranch, NflCapRosterDecisionResponse, NflDataHealthResponse, NflWorkspaceSummary } from '@shared/types';
 import { getCurrentNflCapSheet } from '../api/nfl';
-import { getNflDataHealth, modelNflCapRoster } from '../api/nflDecision';
+import { getNflPresenterPreflight, modelNflCapRoster } from '../api/nflDecision';
 import { getNflRuleArticle, listNflRules } from '../api/nflRules';
 import { createNflWorkspace, listNflWorkspaces } from '../api/nflWorkspace';
 import './nyg.css';
@@ -37,10 +37,11 @@ export function NygApp() {
   async function load(nextTarget = target, nextPlayers = protectedPlayers, nextGroups = protectedGroups) {
     setLoading(true); setError(null);
     try {
-      const [nextHealth, nextRoster, toc, nextDecision] = await Promise.all([
-        getNflDataHealth('NYG'), getCurrentNflCapSheet('NYG', { force: true }), listNflRules(),
+      const [preflight, nextRoster, toc, nextDecision] = await Promise.all([
+        getNflPresenterPreflight('NYG'), getCurrentNflCapSheet('NYG', { force: true }), listNflRules(),
         modelNflCapRoster({ team_id: 'NYG', target_relief_dollars: nextTarget, protected_player_ids: nextPlayers, protected_position_groups: nextGroups, allowed_levers: ['hold', 'pre_june_cut', 'post_june_cut', 'trade', 'restructure', 'extension'] }),
       ]);
+      const nextHealth = preflight.meeting_ready ? preflight.health : applyPresenterBlockers(preflight.health, preflight.blockers);
       setHealth(qaBlocked ? simulateBlockedHealth(nextHealth) : nextHealth); setRoster(nextRoster); setRules(toc.sections); setDecision(nextDecision);
       setSelectedBranch(nextDecision.recommended_branch_id ?? 'maximize_relief');
     } catch (caught) { setError(caught instanceof Error ? caught.message : String(caught)); }
@@ -175,4 +176,7 @@ function simulateBlockedHealth(health: NflDataHealthResponse): NflDataHealthResp
     blockers: [message],
     remediation: ['Refresh and seed the reviewed roster and cap snapshot in the current database views.'],
   };
+}
+function applyPresenterBlockers(health: NflDataHealthResponse, blockers: string[]): NflDataHealthResponse {
+  return blockers.length === 0 ? health : { ...health, status: 'blocked', meeting_ready: false, blockers: [...new Set([...health.blockers, ...blockers])] };
 }

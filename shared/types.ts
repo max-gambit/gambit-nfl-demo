@@ -2236,6 +2236,24 @@ export interface CreateNflWorkspaceResponse {
   workspace: NflWorkspaceSummary;
 }
 
+export interface NflPresenterPreflightCheck {
+  id: 'data_health' | 'workspace_fixture' | 'deterministic_decision' | 'public_demo_boundary';
+  status: 'ready' | 'blocked';
+  detail: string;
+}
+
+export interface NflPresenterPreflightResponse {
+  schema_version: 'nfl_presenter_preflight.v1';
+  generated_at: string;
+  presentation_id: 'nyg-cap-roster';
+  team_id: 'NYG';
+  meeting_ready: boolean;
+  health: NflDataHealthResponse;
+  fixture: NflWorkspaceSummary | null;
+  checks: NflPresenterPreflightCheck[];
+  blockers: string[];
+}
+
 // ── CBA reference corpus ────────────────────────────────────────────────────
 export interface CbaDocument {
   id: string;

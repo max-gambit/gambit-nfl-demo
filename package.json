@@ -20,7 +20,8 @@
     "db:seed:demo": "npm --prefix server run seed:demo",
     "qa": "npm --prefix qa-harness start",
     "qa:canonical": "npm --prefix qa-harness run canonical",
-    "qa:adversarial": "npm --prefix qa-harness run adversarial"
+    "qa:adversarial": "npm --prefix qa-harness run adversarial",
+    "demo:verify:nfl": "npm --prefix server run verify:nfl"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",

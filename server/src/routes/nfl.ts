@@ -13,6 +13,7 @@ import type {
   CbaTocResponse,
   NflCapRosterDecisionRequest,
   CreateNflWorkspaceRequest,
+  NflPresenterPreflightCheck,
 } from '@shared/types';
 import {
   groupNflTeams,
@@ -25,6 +26,7 @@ import { buildNflDataHealth } from '../nfl_coverage/data_health.js';
 import { buildCapRosterDecision } from '../nfl_decision/cap_roster.js';
 import { loadNflRulesCorpus, type NflRuleRow } from '../nfl_rules/seed.js';
 import { createNygWorkspace, listNygWorkspaces } from '../nfl_workspace/service.js';
+import { NYG_HERO_SEED_KEY } from '../nfl_workspace/seed.js';
 
 export const nflRoutes = new Hono();
 
@@ -117,6 +119,45 @@ nflRoutes.post('/decision-models/cap-roster', async (c) => {
     const detail = error instanceof Error ? error.message : String(error);
     const status = /Unknown NFL team/.test(detail) ? 404 : 400;
     return c.json({ error: status === 404 ? 'nfl_team_not_found' : 'invalid_cap_roster_request', detail }, status);
+  }
+});
+
+nflRoutes.get('/presenter-preflight', async (c) => {
+  const teamId = (c.req.query('team_id') ?? 'NYG').toUpperCase();
+  if (teamId !== 'NYG') return c.json({ error: 'nfl_presenter_team_not_supported' }, 404);
+  try {
+    const [health, workspaces, decision] = await Promise.all([
+      buildNflDataHealth('NYG'),
+      listNygWorkspaces(),
+      buildCapRosterDecision({
+        team_id: 'NYG',
+        target_relief_dollars: 15_000_000,
+        protected_player_ids: [],
+        protected_position_groups: ['QB'],
+        allowed_levers: ['hold', 'restructure', 'extension', 'pre_june_cut', 'post_june_cut', 'trade'],
+      }),
+    ]);
+    const fixture = workspaces.find((workspace) => workspace.seeded) ?? null;
+    const checks: NflPresenterPreflightCheck[] = [
+      { id: 'data_health', status: health.meeting_ready ? 'ready' : 'blocked', detail: health.meeting_ready ? 'Current database-backed roster/cap and authoritative rule checks passed.' : health.blockers.join('; ') },
+      { id: 'workspace_fixture', status: fixture ? 'ready' : 'blocked', detail: fixture ? `Reviewed workspace ${NYG_HERO_SEED_KEY} is available.` : `Reviewed workspace ${NYG_HERO_SEED_KEY} is missing.` },
+      { id: 'deterministic_decision', status: decision.status === 'ready' && decision.recommended_branch_id ? 'ready' : 'blocked', detail: decision.deterministic_summary },
+      { id: 'public_demo_boundary', status: decision.public_demo_data ? 'ready' : 'blocked', detail: decision.public_demo_data ? 'Presenter is explicitly limited to public demo data.' : 'Public demo boundary is missing.' },
+    ];
+    const blockers = checks.filter((check) => check.status === 'blocked').map((check) => check.detail);
+    return c.json({
+      schema_version: 'nfl_presenter_preflight.v1',
+      generated_at: new Date().toISOString(),
+      presentation_id: 'nyg-cap-roster',
+      team_id: 'NYG',
+      meeting_ready: blockers.length === 0,
+      health,
+      fixture,
+      checks,
+      blockers,
+    });
+  } catch (error) {
+    return c.json({ error: 'nfl_presenter_preflight_failed', detail: error instanceof Error ? error.message : String(error) }, 500);
   }
 });
 
