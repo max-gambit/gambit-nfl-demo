@@ -139,7 +139,9 @@ export async function loadCurrentNflTransactionMarketSnapshot(
       transaction_type: row.transaction_type as NflTransactionMarketSnapshot['events'][number]['transaction_type'],
       player_id: nullableString(row.player_id),
       player_name: String(row.player_name),
+      raw_position: nullableString(row.raw_position),
       position_group: row.position_group as NflTransactionMarketSnapshot['events'][number]['position_group'],
+      normalization_basis: nullableString(row.normalization_basis),
       from_team_id: nullableString(row.from_team_id),
       to_team_id: nullableString(row.to_team_id),
       contract_value_dollars: nullableNumber(row.contract_value_dollars),
@@ -153,6 +155,7 @@ export async function loadCurrentNflTransactionMarketSnapshot(
       compensation_summary: nullableString(row.compensation_summary),
       identity_confidence: row.identity_confidence as NflTransactionMarketSnapshot['events'][number]['identity_confidence'],
       source_ref_ids: stringArray(row.source_ref_ids),
+      raw_source_record: isRecord(row.raw_source_record) ? row.raw_source_record : null,
     })),
     roster_player_seasons: populations.map((row) => ({
       year: Number(row.year),
@@ -243,4 +246,8 @@ function nullableNumber(value: unknown): number | null {
 
 function stringArray(value: unknown): string[] {
   return Array.isArray(value) ? value.map(String) : [];
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }

@@ -18,6 +18,10 @@ import { briefModeForTemplate, inferBriefTemplateFromQuestion } from '@shared/br
 import type { AgentKind, Brief, BriefTemplateId, BriefTemplateSelection } from '@shared/types';
 
 const CONTENT_MAX_WIDTH = 760;
+const NFL_MARKET_STARTERS = [
+  'Which position markets have grown or shrunk over the last 10 years, and what does that imply for trade strategy?',
+  'Among trades since 2018, which positions most often returned day-one or day-two picks?',
+];
 
 /**
  * Phase 9 — channel feed with focused-card expand/collapse pattern.
@@ -349,10 +353,31 @@ export function SessionFeed({ presenter = false }: { presenter?: boolean }) {
             onValueChange={setDraftQuestion}
             onSlashCommand={dispatchFromChannel}
             disabled={submitting}
-            placeholder="Ask about Giants cap, contracts, tags, trades, or NFL rules..."
+            placeholder="Ask about a position market, trade comparables, Giants cap, or NFL rules..."
             focusBinding="main"
             autoFocus
           />
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: SPACE.xs, marginTop: SPACE.md, justifyContent: 'center' }}>
+            {NFL_MARKET_STARTERS.map((question, index) => (
+              <button
+                key={question}
+                type="button"
+                onClick={() => void submitNewBrief(question)}
+                disabled={submitting}
+                style={{
+                  border: `1px solid ${F.border}`,
+                  borderRadius: RADIUS.pill,
+                  background: F.surface,
+                  color: F.inkSoft,
+                  padding: `${SPACE.xs}px ${SPACE.sm}px`,
+                  fontSize: TYPE.body.sm,
+                  cursor: submitting ? 'default' : 'pointer',
+                }}
+              >
+                {index === 0 ? 'Analyze 10-year position markets' : 'Compare recent trade returns'}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     );

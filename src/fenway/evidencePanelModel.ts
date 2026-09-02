@@ -185,6 +185,9 @@ export function classifyEvidenceSource(source: BriefSource): EvidenceSourceClass
   if (source.kind === 'CBA' || /\bcba\b|cba_articles|article [ivx]+|section/.test(text)) {
     return classification(source, 'cba', 'cba', 'CBA constraint check', 'Flags transaction-rule constraints that affect execution.', 'shield', teamLabel);
   }
+  if (/nfl[_\s-]transaction[_\s-]market|historical transaction|nflverse|trade comparables?/.test(text)) {
+    return classification(source, 'market', 'market', 'Historical transaction market', 'Shows the governed source snapshot, executed filters, comparable rows, and calculation boundary.', 'search', teamLabel);
+  }
   if (source.kind === 'ANALYST_DATA' && currentNbaEvidence(source)) {
     return classification(source, 'current_team_data', 'current_team_data', 'Current team data', 'Confirms roster, cap posture, and player-stat baseline.', 'clipboard', teamLabel);
   }

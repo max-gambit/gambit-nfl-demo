@@ -59,7 +59,9 @@ export interface NflTransactionMarketEvent {
   transaction_type: NflTransactionType;
   player_id: string | null;
   player_name: string;
+  raw_position?: string | null;
   position_group: NflPositionMarketGroup | null;
+  normalization_basis?: string | null;
   from_team_id: string | null;
   to_team_id: string | null;
   contract_value_dollars: number | null;
@@ -77,6 +79,7 @@ export interface NflTransactionMarketEvent {
   compensation_summary: string | null;
   identity_confidence: IdentityConfidence;
   source_ref_ids: string[];
+  raw_source_record?: Record<string, unknown> | null;
 }
 
 export interface NflTransactionRosterPlayerSeason {

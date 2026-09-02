@@ -5,6 +5,9 @@ import { db } from '../db/client.js';
 import { buildNflDataHealth } from '../nfl_coverage/data_health.js';
 import { buildCapRosterDecision } from '../nfl_decision/cap_roster.js';
 import { NYG_DEMO_WORKSPACE_KEY, NYG_HERO_PROJECT, NYG_HERO_SEED_KEY } from '../nfl_workspace/seed.js';
+import { analyzeNflTransactionMarketSnapshot } from '../nfl_transactions/analyze.js';
+import { loadCurrentNflTransactionMarketSnapshot } from '../nfl_transactions/seed.js';
+import { transactionMarketRequestFromQuestion } from '../nfl_transactions/question.js';
 
 interface Check { id: string; status: 'pass' | 'fail'; detail: string }
 
@@ -18,6 +21,38 @@ async function main(): Promise<void> {
   record('freshness', Boolean(roster && roster.age_hours != null && roster.age_hours <= 48 && roster.row_count === 102), `roster rows=${roster?.row_count ?? 0}; age_hours=${roster?.age_hours ?? 'unknown'}`);
   const capHealth = health.datasets.find((dataset) => dataset.id === 'cap_contracts');
   record('health_counts', Boolean(capHealth && capHealth.captured_count + capHealth.derived_count + capHealth.source_needed_count === capHealth.row_count), `cap categories=${(capHealth?.captured_count ?? 0) + (capHealth?.derived_count ?? 0) + (capHealth?.source_needed_count ?? 0)}; cap rows=${capHealth?.row_count ?? 0}`);
+  const transactionHealth = health.datasets.find((dataset) => dataset.id === 'transaction_market');
+  record('transaction_health', Boolean(
+    transactionHealth
+    && transactionHealth.source_mode === 'supabase_current_views'
+    && transactionHealth.row_count >= 10_000
+    && Number(transactionHealth.coverage?.position_match_basis_points ?? 0) >= 9_500,
+  ), `status=${transactionHealth?.status ?? 'missing'}; rows=${transactionHealth?.row_count ?? 0}; identity_bps=${transactionHealth?.coverage?.position_match_basis_points ?? 'unknown'}`);
+
+  const transactionSnapshot = await loadCurrentNflTransactionMarketSnapshot();
+  const transactionPrompts = [
+    'Which position markets have grown or shrunk over the last 10 years, and what does that imply for trade strategy?',
+    'Among trades since 2018, which positions most often returned day-one or day-two picks?',
+    'Compare safety and running-back material-move rates before and after 2020.',
+  ];
+  const transactionAnalyses = transactionPrompts.map((question) => analyzeNflTransactionMarketSnapshot(
+    transactionMarketRequestFromQuestion(question),
+    transactionSnapshot,
+  ));
+  record('transaction_live_variations', transactionAnalyses.every((analysis) => (
+    analysis.snapshot_id === transactionSnapshot.snapshot_id
+    && analysis.yearly_series.length > 0
+    && analysis.position_trends.length > 0
+    && analysis.methodology.cohort.length > 0
+    && analysis.source_refs.length > 0
+  )), transactionAnalyses.map((analysis) => `${analysis.query.analysis_mode}:${analysis.query.position_groups.join('/')}:${analysis.coverage.event_count}`).join('; '));
+  record('transaction_filter_variations',
+    transactionAnalyses[1].query.start_year === 2018
+      && transactionAnalyses[1].query.transaction_types.join(',') === 'trade'
+      && transactionAnalyses[2].query.comparison_year === 2020
+      && transactionAnalyses[2].query.position_groups.join(',') === 'RB,S',
+    `trade=${JSON.stringify(transactionAnalyses[1].query)}; comparison=${JSON.stringify(transactionAnalyses[2].query)}`,
+  );
 
   const decision = await buildCapRosterDecision({
     team_id: 'NYG',

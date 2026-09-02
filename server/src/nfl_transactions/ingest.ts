@@ -17,7 +17,7 @@ import type {
   NflTransactionRosterPlayerSeason,
 } from './analyze.js';
 
-const TRANSFORMATION_VERSION = 'nfl-transaction-normalization.v4';
+const TRANSFORMATION_VERSION = 'nfl-transaction-normalization.v5';
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const DEFAULT_OUTPUT_DIR = path.join(REPO_ROOT, 'data/nfl-transactions');
 const COMPLETED_YEARS = Array.from({ length: 10 }, (_, index) => 2016 + index);
@@ -377,7 +377,9 @@ function normalizeTradeEvents(
         transaction_type: 'trade',
         player_id: player?.gsis_id || player?.pfr_id || playerAsset.pfr_id,
         player_name: playerAsset.pfr_name ?? player?.display_name ?? 'Unknown player',
+        raw_position: player?.position || null,
         position_group: position.group,
+        normalization_basis: position.basis,
         from_team_id: playerAsset.gave_team_id,
         to_team_id: playerAsset.received_team_id,
         contract_value_dollars: null,
@@ -390,6 +392,7 @@ function normalizeTradeEvents(
         compensation_summary: compensationSummary(oppositeAssets, playerAssets.length),
         identity_confidence: confidence,
         source_ref_ids: sourceRefIds,
+        raw_source_record: playerAsset.raw_source_record,
       });
       matches.push({
         event_id: eventId,
@@ -451,7 +454,9 @@ function normalizeContractEvents(
       transaction_type: transactionType,
       player_id: playerId,
       player_name: row.player ?? player?.display_name ?? 'Unknown player',
+      raw_position: rawPosition,
       position_group: position.group,
+      normalization_basis: position.basis,
       from_team_id: null,
       to_team_id: teamId,
       contract_value_dollars: valueDollars,
@@ -463,6 +468,17 @@ function normalizeContractEvents(
       compensation_summary: null,
       identity_confidence: confidence,
       source_ref_ids: sourceRefIds,
+      raw_source_record: {
+        player: row.player,
+        position: row.position,
+        team: row.team,
+        year_signed: row.year_signed,
+        years: row.years,
+        value_millions: row.value,
+        apy_millions: row.apy,
+        guaranteed_millions: row.guaranteed,
+        apy_cap_pct: row.apy_cap_pct,
+      },
     });
     terms.push({
       event_id: eventId,

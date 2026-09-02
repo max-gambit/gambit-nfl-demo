@@ -90,6 +90,13 @@ const DATA_PATTERNS = [
   /\bspend share\b/i,
   /\bover[-\s]?invested\b/i,
   /\bunder[-\s]?invested\b/i,
+  /\bposition[-\s]?markets?\b/i,
+  /\btransaction[-\s]?markets?\b/i,
+  /\bmaterial[-\s]?moves?\b/i,
+  /\btrades?\s+since\s+20\d{2}\b/i,
+  /\bday[-\s]?(?:one|two|1|2)\s+picks?\b/i,
+  /\bbefore\s+and\s+after\s+20\d{2}\b/i,
+  /\bwhat changed after\s+20\d{2}\b/i,
 ];
 const STAFF_PATTERNS = [
   /\bstaff\b/i,
