@@ -58,7 +58,9 @@ export async function runModelMoveSmoke(viewport = { width: 1440, height: 900 })
     const burnsSecond = await playerFacts(result);
     assert.match(await result.innerText(), /Most relevant trades/i);
 
-    await submit(page, 'Make it a first.');
+    const roundFollowup = result.getByRole('button', { name: 'Make it a first.', exact: true });
+    await roundFollowup.waitFor({ timeout: 10_000 });
+    await roundFollowup.click();
     await result.getByText(/2027 round 1 pick \(Day 1\) for Brian Burns/i).waitFor({ timeout: 20_000 });
     const burnsFirst = await playerFacts(result);
     assert.deepEqual(burnsFirst, burnsSecond, 'Pick-only edit changed player-dependent cap or depth facts.');
