@@ -182,11 +182,21 @@ export function classifyEvidenceSource(source: BriefSource): EvidenceSourceClass
   const text = `${source.kind} ${source.source ?? ''} ${source.title} ${rows.map((row) => `${row.k} ${row.v}`).join(' ')}`.toLowerCase();
   const teamLabel = teamLabelForSource(source, rows);
 
+  if (source.data?.seller_move_contract === true) {
+    return classification(source, 'contract', 'contract', 'Contract and cap calculation', 'Shows the loaded contract figures used for cap space and dead money.', 'doc', teamLabel);
+  }
+  if (source.data?.seller_move_role === true) {
+    return classification(source, 'roster', 'roster', 'Current role and depth', 'Shows the public role information used for the depth consequence.', 'clipboard', teamLabel);
+  }
+  if (source.data?.seller_move_comparable === true) {
+    return classification(source, 'market', 'market', 'Comparable trade', 'Shows the historical trade used to compare the proposed return.', 'search', teamLabel);
+  }
+
   if (source.kind === 'CBA' || /\bcba\b|cba_articles|article [ivx]+|section/.test(text)) {
     return classification(source, 'cba', 'cba', 'CBA constraint check', 'Flags transaction-rule constraints that affect execution.', 'shield', teamLabel);
   }
   if (/nfl[_\s-]transaction[_\s-]market|historical transaction|nflverse|trade comparables?/.test(text)) {
-    return classification(source, 'market', 'market', 'Historical transaction market', 'Shows the governed source snapshot, executed filters, comparable rows, and calculation boundary.', 'search', teamLabel);
+    return classification(source, 'market', 'market', 'Historical transaction market', 'Shows the public data release, selected filters, comparable trades, and calculation.', 'search', teamLabel);
   }
   if (source.kind === 'ANALYST_DATA' && currentNbaEvidence(source)) {
     return classification(source, 'current_team_data', 'current_team_data', 'Current team data', 'Confirms roster, cap posture, and player-stat baseline.', 'clipboard', teamLabel);
@@ -246,6 +256,35 @@ function focusedClaimSpecs(
 function briefClaimSpecs(body: BriefBody | null): AuditClaimSpec[] {
   if (!body) return [];
   if (body.kind === 'data_analysis') {
+    if (body.seller_move_analysis?.result) {
+      const comparableRefs = body.seller_move_analysis.result.comparables.map((_, index) => index + 3);
+      return [
+        {
+          key: 'seller:contract',
+          type: 'claim' as const,
+          title: 'Contract and cap calculation',
+          proof: 'Checks the current-year cap space and dead-money figures against the loaded player contract.',
+          refs: [1],
+          icon: 'doc',
+        },
+        {
+          key: 'seller:role',
+          type: 'claim' as const,
+          title: 'Current role and depth',
+          proof: 'Checks the stated role consequence against the public roster and role record.',
+          refs: [2],
+          icon: 'clipboard',
+        },
+        ...(comparableRefs.length ? [{
+          key: 'seller:comparables',
+          type: 'claim' as const,
+          title: 'Historical trade range',
+          proof: 'Checks the proposed pick against the closest same-position seller returns.',
+          refs: comparableRefs,
+          icon: 'search',
+        }] : []),
+      ];
+    }
     return [
       ...body.key_findings.map((finding, index) => ({
         key: `finding:${index}`,
@@ -797,6 +836,10 @@ function freshestLabel(labels: (string | null)[]): string | null {
 
 function compactAuditTitle(spec: AuditClaimSpec, rows: EvidenceCheckRow[]): string {
   if (spec.type === 'option') return compactOptionTitle(spec.title, rows);
+
+  if (rows.some((row) => row.source.data?.seller_move_contract === true)) return 'Contract and cap calculation';
+  if (rows.some((row) => row.source.data?.seller_move_role === true)) return 'Current role and depth';
+  if (rows.some((row) => row.source.data?.seller_move_comparable === true)) return 'Historical trade range';
 
   const body = `${cleanBodyText(spec.title)} ${cleanBodyText(spec.proof)}`.toLowerCase();
   const team = compactTeamPrefix(rows);

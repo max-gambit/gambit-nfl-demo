@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 import {
   latestSellerMoveScenarioForSession,
   latestTransactionMarketBrief,
@@ -43,7 +46,16 @@ test('primary Analysis continuation selects the latest executed market scope', (
   );
 });
 
-test('deterministic market artifact is streamable while interpretation is still generating', () => {
+test('primary composer sends only the current question and leaves context routing to the server', async () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
+  const source = await readFile(path.join(repoRoot, 'src', 'fenway', 'SessionFeed.tsx'), 'utf8');
+
+  assert.doesNotMatch(source, /latestTransactionMarketBriefForActiveAnalysis/);
+  assert.doesNotMatch(source, /inherited_market_brief_id/);
+  assert.match(source, /question:\s*q/);
+});
+
+test('deterministic market artifact is a complete answer without waiting for interpretation', () => {
   const analysis = marketAnalysis('analysis-live', ['EDGE']);
   const body = transactionMarketArtifactBody(analysis);
   const progress = {
@@ -55,7 +67,7 @@ test('deterministic market artifact is streamable while interpretation is still 
     events: [],
   };
 
-  assert.equal(body.answer, '');
+  assert.match(body.answer, /For New York:/);
   assert.deepEqual(body.key_findings, []);
   assert.strictEqual(body.market_analysis, analysis);
   assert.deepEqual(briefProgressStreamPayload({
@@ -111,11 +123,11 @@ test('seller proposal state remains inside its channel and is absent in a fresh 
   assert.equal(latestSellerMoveScenarioForSession([], 'fresh-channel'), null);
 });
 
-test('initial market response progress is already renderable before interpretation', () => {
+test('initial market response progress is complete immediately', () => {
   const progress = marketArtifactBriefProgress();
-  assert.equal(progress.phase, 'drafting');
-  assert.equal(progress.pct, 36);
-  assert.equal(progress.label, 'Market calculation ready');
+  assert.equal(progress.phase, 'ready');
+  assert.equal(progress.pct, 100);
+  assert.equal(progress.label, 'Market answer ready');
 });
 
 test('EDGE and IOL comparison leads with a football conclusion while preserving signal boundaries', () => {
@@ -149,6 +161,29 @@ test('football read does not turn insufficient price evidence into a supported p
   assert.match(read.conclusion, /price evidence is not strong enough to call/i);
   assert.match(read.implication, /keep price posture provisional/i);
   assert.doesNotMatch(`${read.conclusion} ${read.implication}`, /supported .*price/i);
+});
+
+test('period follow-up leads with the before-and-after delta instead of repeating a market ranking', () => {
+  const edge = marketTrend('EDGE', 1417, 'growing', 'flat', 'flat');
+  edge.mobility.baseline_value = 82;
+  edge.mobility.recent_value = 137;
+  const analysis = {
+    ...marketAnalysis('analysis-after-2020', ['EDGE']),
+    status: 'directional',
+    query: {
+      ...marketAnalysis('analysis-after-2020-query', ['EDGE']).query,
+      analysis_mode: 'period_comparison',
+      baseline_years: [2016, 2020],
+      recent_years: [2021, 2025],
+      comparison_year: 2020,
+    },
+    position_trends: [edge],
+  } as unknown as NflTransactionMarketAnalysis;
+
+  const read = nflTransactionMarketFootballRead(analysis);
+  assert.match(read.conclusion, /^After 2020,/);
+  assert.match(read.conclusion, /0\.82 to 1\.37 moves per 100 roster player-seasons/);
+  assert.doesNotMatch(read.conclusion, /posted the highest observed shares/i);
 });
 
 test('trades-only football read labels only completed years when YTD is included', () => {

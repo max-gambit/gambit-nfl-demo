@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  BRIEF_GENERATION_DEADLINE_MS,
+  beginBriefGeneration,
   briefGenerationErrorMessage,
   briefProgressStreamPayload,
   buildBriefUserPrompt,
@@ -616,11 +618,11 @@ test('missing decision-brief options are repairable before failing the brief', (
   );
   assert.equal(
     shouldRepairMissingSubmitBriefFields(['options'], { template_id: 'comparison_matrix' }),
-    false,
+    true,
   );
   assert.equal(
     shouldRepairMissingSubmitBriefFields(['options', 'sources'], { template_id: 'decision_brief' }),
-    false,
+    true,
   );
 });
 
@@ -647,7 +649,7 @@ test('brief generation errors hide raw provider JSON for known operational block
     briefGenerationErrorMessage(new Error(
       '400 {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_123"}',
     )),
-    'Anthropic API credit balance is too low. Add credits or switch ANTHROPIC_API_KEY, then regenerate this brief.',
+    'Live interpretation is unavailable right now. Your question is saved; try again in a moment.',
   );
 
   assert.equal(
@@ -658,6 +660,25 @@ test('brief generation errors hide raw provider JSON for known operational block
         },
       },
     }),
-    'Configured Anthropic model does not support forced tool submissions. Switch to a tool-capable brief model or fallback model, then regenerate this brief.',
+    'The answer could not be completed from the available sources. Your question is saved; try again.',
   );
+});
+
+test('open-ended generation has a sub-15-second terminal-state deadline', () => {
+  assert.ok(BRIEF_GENERATION_DEADLINE_MS > 0);
+  assert.ok(BRIEF_GENERATION_DEADLINE_MS < 15_000);
+  assert.equal(
+    briefGenerationErrorMessage(new Error('brief_generation_deadline_exceeded')),
+    'This answer took too long to finish. Your question is saved; try again or ask it more narrowly.',
+  );
+});
+
+test('a retry invalidates the older in-process generation lease', () => {
+  const first = beginBriefGeneration('brief-retry-test');
+  const retry = beginBriefGeneration('brief-retry-test');
+
+  assert.equal(first.isActive(), false);
+  assert.equal(retry.isActive(), true);
+  retry.stop();
+  assert.equal(retry.isActive(), false);
 });

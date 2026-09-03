@@ -98,6 +98,30 @@ export function nflTransactionMarketFootballRead(
     };
   }
 
+  if (analysis.query.analysis_mode === 'period_comparison') {
+    const movementChanges = ranked
+      .filter((trend) => signalIsUsable(trend.mobility)
+        && trend.mobility.baseline_value != null
+        && trend.mobility.recent_value != null)
+      .sort((left, right) => (
+        Math.abs((right.mobility.recent_value ?? 0) - (right.mobility.baseline_value ?? 0))
+        - Math.abs((left.mobility.recent_value ?? 0) - (left.mobility.baseline_value ?? 0))
+      ));
+    if (movementChanges.length > 0) {
+      const lead = movementChanges.slice(0, 3).map((trend) => (
+        `${trend.position_group} player movement ${periodDirectionVerb(trend.mobility.direction)} from ${formatMovementRate(trend.mobility.baseline_value!)} to ${formatMovementRate(trend.mobility.recent_value!)} moves per 100 roster player-seasons`
+      ));
+      const split = analysis.query.comparison_year;
+      const periodLabel = split == null
+        ? `${analysis.query.baseline_years.join('–')} versus ${analysis.query.recent_years.join('–')}`
+        : `after ${split}`;
+      return {
+        conclusion: `${capitalizeFirst(periodLabel)}, ${joinClauses(lead)}.`,
+        implication: 'For New York: treat the largest changes as an availability signal, then use the position-level price rows and closest transactions before changing an offer.',
+      };
+    }
+  }
+
   if (tradeOnly) {
     const premiumPickLeaders = [...ranked]
       .filter((trend) => trend.trade_compensation.status !== 'insufficient_evidence'
@@ -207,6 +231,27 @@ function signalIsUsable(
 
 function formatPercent(basisPoints: number): string {
   return `${(basisPoints / 100).toFixed(1)}%`;
+}
+
+function formatMovementRate(basisPoints: number): string {
+  return (basisPoints / 100).toFixed(2);
+}
+
+function periodDirectionVerb(direction: string): string {
+  if (direction === 'growing') return 'rose';
+  if (direction === 'shrinking') return 'fell';
+  if (direction === 'flat') return 'held roughly steady';
+  return 'was mixed';
+}
+
+function capitalizeFirst(value: string): string {
+  return value.replace(/^./, (letter) => letter.toUpperCase());
+}
+
+function joinClauses(values: string[]): string {
+  if (values.length <= 1) return values[0] ?? 'no supported position change was available';
+  if (values.length === 2) return `${values[0]}, and ${values[1]}`;
+  return `${values.slice(0, -1).join('; ')}, and ${values.at(-1)}`;
 }
 
 function joinNames(names: string[]): string {

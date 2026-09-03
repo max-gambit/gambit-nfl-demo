@@ -191,9 +191,10 @@ export function calculateNflSellerMove(
       sample_size: sortedReturns.length,
       cohort_label: `${input.market_scope.start_year}–${input.market_scope.end_year}${input.market_scope.include_ytd ? ' including YTD' : ''} single-player ${input.position_group} trades with seller-side draft picks`,
       middle_range: strongerBoundary && weakerBoundary ? {
-        stronger_pick: pickLabel(strongerBoundary.pick_year, strongerBoundary.pick_round),
-        weaker_pick: pickLabel(weakerBoundary.pick_year, weakerBoundary.pick_round),
+        stronger_pick: relativePickLabel(strongerBoundary.pick_round, strongerBoundary.pick_delay_years),
+        weaker_pick: relativePickLabel(weakerBoundary.pick_round, weakerBoundary.pick_delay_years),
       } : null,
+      timing_note: proposalTimingNote(input.pick_year, input.pick_round, currentYear, range),
       method: 'The middle historical range is the 25th through 75th percentile of seller returns. Each trade is ranked by the strongest seller-received pick in the package: round first, then how many draft years away the pick was. The full received pick package remains visible on each comparable.',
     },
     cap: {
@@ -443,8 +444,27 @@ function pickDay(round: number): 1 | 2 | 3 {
   return round === 1 ? 1 : round <= 3 ? 2 : 3;
 }
 
-function pickLabel(year: number, round: number): string {
-  return `${year} round ${round} (Day ${pickDay(round)})`;
+function relativePickLabel(round: number, delayYears: number): string {
+  const timing = delayYears === 0
+    ? 'same-year draft'
+    : delayYears === 1
+      ? 'next draft'
+      : `${delayYears} drafts later`;
+  return `Round ${round} (Day ${pickDay(round)}), ${timing}`;
+}
+
+function proposalTimingNote(
+  pickYear: number,
+  pickRound: number,
+  currentYear: number,
+  range: NflSellerMoveResponse['market']['range'],
+): string {
+  const delay = pickYear - currentYear;
+  const timing = delay === 1 ? 'the next draft' : `${delay} drafts away`;
+  const classification = range == null
+    ? 'The available trades do not support a firm range.'
+    : `It remains ${range} the middle historical range.`;
+  return `The proposed ${pickYear} round ${pickRound} pick is ${timing}. Within the same round, a later pick is treated as weaker. ${classification}`;
 }
 
 function depthConsequence(value: ReturnType<typeof nflDepthEffect>): NflSellerMoveResponse['depth']['consequence'] {

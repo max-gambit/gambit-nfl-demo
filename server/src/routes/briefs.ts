@@ -62,9 +62,10 @@ import {
 } from '../claude/move_candidates.js';
 import { buildSubmitBriefTool } from '../claude/tools.js';
 import { buildMessagesWithContextGraphLookups } from '../claude/tool_loop.js';
-import { stripBriefModePrefix } from '@shared/briefMode';
+import { inferBriefModeFromQuestion, stripBriefModePrefix } from '@shared/briefMode';
 import {
   latestSellerMoveScenarioForSession,
+  nflTransactionMarketFootballRead,
   sellerMoveScenarioFromBrief,
   transactionMarketAnalysisFromBrief,
 } from '@shared/nflTransactionMarket';
@@ -81,6 +82,8 @@ import {
   transactionMarketRequestFromQuestion,
 } from '../nfl_transactions/question.js';
 import { runNflSellerMoveConversationTurn } from '../nfl_transactions/seller_move_conversation.js';
+import { classifyNflAnalysisTurn } from '../nfl_transactions/intent.js';
+import { buildNflRuleAnswer } from '../nfl_rules/analysis.js';
 import type {
   AddBriefShareRecipientRequest, Brief, BriefMode, BriefProgress, BriefProgressEventKind, BriefProgressPhase, BriefProgressStreamEvent, BriefShare, BriefShareLink, BriefShareLinkResponse, BriefSource,
   BriefShareRecipientResponse, BriefShareSnapshot, CreateBriefRequest, CreateBriefResponse,
@@ -92,8 +95,27 @@ import type {
 export const briefRoutes = new Hono();
 const DEFAULT_SHARE_TEAM_ID = 'GSW';
 const BRIEF_GENERATION_HEARTBEAT_MS = 60_000;
+export const BRIEF_GENERATION_DEADLINE_MS = 14_000;
 const MAX_BRIEF_PROGRESS_EVENTS = 12;
 type DataAnalysisLookup = { messages: Anthropic.MessageParam[]; traces: DataAnalystTrace[] };
+export type BriefGenerationGuard = { isActive: () => boolean };
+const ALWAYS_ACTIVE_GENERATION: BriefGenerationGuard = { isActive: () => true };
+const activeBriefGenerations = new Map<string, symbol>();
+
+export function beginBriefGeneration(briefId: string): BriefGenerationGuard & { stop: () => void } {
+  const token = Symbol(briefId);
+  activeBriefGenerations.set(briefId, token);
+  return {
+    isActive: () => activeBriefGenerations.get(briefId) === token,
+    stop: () => {
+      if (activeBriefGenerations.get(briefId) === token) activeBriefGenerations.delete(briefId);
+    },
+  };
+}
+
+function invalidateActiveBriefGeneration(briefId: string): void {
+  activeBriefGenerations.delete(briefId);
+}
 
 /**
  * POST /briefs
@@ -141,89 +163,86 @@ briefRoutes.post('/', async (c) => {
   if (!sessionRes.data) {
     return c.json({ error: 'session_not_found' }, 404);
   }
-  let inheritedMarketAnalysis: NflTransactionMarketAnalysis | null = null;
-  let inheritedSellerMove = null as ReturnType<typeof sellerMoveScenarioFromBrief>;
-  if (body.inherited_market_brief_id !== undefined) {
-    if (typeof body.inherited_market_brief_id !== 'string' || !isUuid(body.inherited_market_brief_id)) {
-      return c.json({ error: 'invalid_inherited_market_brief_id' }, 400);
-    }
-    const inheritedRes = await db
-      .from('briefs')
-      .select('id, session_id, body')
-      .eq('id', body.inherited_market_brief_id)
-      .eq('session_id', session_id)
-      .maybeSingle();
-    if (inheritedRes.error) {
-      return c.json({ error: 'load_inherited_market_scope_failed', detail: inheritedRes.error.message }, 500);
-    }
-    if (!inheritedRes.data) {
-      return c.json({ error: 'inherited_market_brief_not_found' }, 409);
-    }
-    inheritedMarketAnalysis = transactionMarketAnalysisFromBrief(inheritedRes.data as Pick<Brief, 'body'>);
-    if (!inheritedMarketAnalysis) {
-      return c.json({ error: 'inherited_market_scope_unavailable' }, 409);
-    }
-    inheritedSellerMove = sellerMoveScenarioFromBrief(inheritedRes.data as Pick<Brief, 'body'>);
-    if (!inheritedSellerMove) {
-      const priorScenarioRes = await db
-        .from('briefs')
-        .select('body, session_id')
-        .eq('session_id', session_id)
-        .order('created_at', { ascending: false })
-        .limit(50);
-      if (priorScenarioRes.error) {
-        return c.json({ error: 'load_seller_move_context_failed', detail: priorScenarioRes.error.message }, 500);
-      }
-      // The database predicate is the primary boundary; the helper repeats it
-      // so scenario state cannot cross channels if this query is broadened later.
-      inheritedSellerMove = latestSellerMoveScenarioForSession(
-        (priorScenarioRes.data ?? []) as Array<Pick<Brief, 'body' | 'session_id'>>,
-        session_id,
-      );
-    }
+  const contextRes = await db
+    .from('briefs')
+    .select('body, session_id')
+    .eq('session_id', session_id)
+    .order('created_at', { ascending: false })
+    .limit(50);
+  if (contextRes.error) {
+    return c.json({ error: 'load_analysis_context_failed', detail: 'The prior conversation could not be loaded.' }, 500);
   }
-
-  const preparedSellerMove = inheritedMarketAnalysis
-    ? await runNflSellerMoveConversationTurn(question, inheritedMarketAnalysis, inheritedSellerMove)
+  const contextBriefs = (contextRes.data ?? []) as Array<Pick<Brief, 'body' | 'session_id'>>;
+  const latestMarketAnalysis = contextBriefs
+    .map((prior) => transactionMarketAnalysisFromBrief(prior))
+    .find((analysis): analysis is NflTransactionMarketAnalysis => Boolean(analysis)) ?? null;
+  const latestSellerMove = latestSellerMoveScenarioForSession(contextBriefs, session_id);
+  const intent = classifyNflAnalysisTurn(question, {
+    market_query: latestMarketAnalysis?.query ?? null,
+    seller_scenario: latestSellerMove,
+  });
+  const preparedSellerTurn = intent.kind === 'seller_move'
+    ? await runNflSellerMoveConversationTurn(question, latestMarketAnalysis, latestSellerMove).catch(() => null)
+    : null;
+  const preparedSellerMove = preparedSellerTurn?.artifact ?? null;
+  const preparedRuleAnswer = intent.kind === 'rules'
+    ? await buildNflRuleAnswer(question).catch(() => ({
+      body: unavailableRuleAnswerBody(),
+      sources: [],
+    }))
     : null;
   const explicitMode = normalizeBriefMode(body.mode);
-  const transactionMarketQuestion = !preparedSellerMove
-    && (isNflTransactionMarketQuestion(question) || Boolean(inheritedMarketAnalysis));
-  const marketContextActive = Boolean(preparedSellerMove) || transactionMarketQuestion;
-  const requestedMode = marketContextActive ? 'data_analyst' : explicitMode ?? parsedQuestion.mode;
+  const transactionMarketQuestion = intent.kind === 'transaction_market';
+  const immediateClarification = intent.kind === 'seller_modifier_without_context';
+  const marketContextActive = intent.kind === 'seller_move'
+    || transactionMarketQuestion
+    || Boolean(preparedRuleAnswer)
+    || immediateClarification;
+  const requestedMode = marketContextActive
+    ? 'data_analyst'
+    : parsedQuestion.mode ?? explicitMode ?? inferBriefModeFromQuestion(question);
   const templateParse = parseBriefTemplateSelection(body.template, body.question);
   if (templateParse.errors.length > 0) {
     return c.json({ error: 'invalid_template', detail: templateParse.errors }, 400);
   }
-  const templateSelection = marketContextActive || (body.template == null && requestedMode === 'data_analyst')
+  const templateSelection = marketContextActive || requestedMode === 'data_analyst'
     ? { template_id: 'data_table' as const }
     : templateParse.selection;
   const mode = briefModeForTemplate(templateSelection)
     ?? requestedMode
     ?? 'brief';
 
-  // A transaction-market answer has two clocks: the deterministic database
-  // calculation (fast) and the model interpretation (slow). Complete the
-  // governed calculation before inserting the brief so the POST response
-  // itself contains the renderable artifact and never depends on Realtime or
-  // polling to make the calculation visible.
-  let preparedMarketLookup: DataAnalysisLookup | null = null;
+  // Deterministic market, seller, and rule answers are complete before insert,
+  // so the POST response itself is renderable and never waits on model prose.
   let preparedMarketBody: DataAnalysisBriefBody | null = null;
   let preparedProgress: BriefProgress | null = null;
-  if (preparedSellerMove && inheritedMarketAnalysis) {
-    preparedMarketBody = sellerMoveArtifactBody(inheritedMarketAnalysis, preparedSellerMove);
+  let preparedSources: Array<Omit<BriefSource, 'id' | 'brief_id'>> = [];
+  if (intent.kind === 'seller_move' && !preparedSellerTurn) {
+    preparedMarketBody = unavailableSellerAnswerBody();
+    preparedProgress = readyBriefProgress('Trade check unavailable', 'The public contract or transaction source could not be loaded.');
+  } else if (preparedSellerMove && preparedSellerTurn) {
+    preparedMarketBody = sellerMoveArtifactBody(preparedSellerTurn.market, preparedSellerMove);
     preparedProgress = sellerMoveBriefProgress(preparedSellerMove);
+    preparedSources = deterministicSellerMoveEvidenceRows(preparedSellerMove);
+  } else if (immediateClarification) {
+    preparedMarketBody = sellerModifierClarificationBody();
+    preparedProgress = readyBriefProgress('Clarification ready', 'The proposed trade needs a player, draft year, and round.');
+  } else if (preparedRuleAnswer) {
+    preparedMarketBody = preparedRuleAnswer.body;
+    preparedProgress = readyBriefProgress('Rule answer ready', 'The controlling public rule and exact source location are ready.');
+    preparedSources = preparedRuleAnswer.sources;
   } else if (transactionMarketQuestion) {
     try {
-      preparedMarketLookup = await ensureNflTransactionMarketLookup(
+      const preparedMarketLookup = await ensureNflTransactionMarketLookup(
         question,
         { messages: [{ role: 'user', content: question }], traces: [] },
-        inheritedMarketAnalysis?.query ?? null,
+        intent.inherited_query,
       );
       const analysis = latestNflTransactionMarketAnalysis(preparedMarketLookup.traces);
       if (!analysis) throw new Error('Required NFL transaction-market analysis was not returned.');
       preparedMarketBody = transactionMarketArtifactBody(analysis);
-      preparedProgress = marketArtifactBriefProgress();
+      preparedProgress = readyBriefProgress('Market answer ready', 'The live calculation, comparison, transactions, and sources are ready.');
+      preparedSources = deterministicMarketEvidenceRows(analysis, 1);
     } catch (error) {
       return c.json({
         error: 'transaction_market_analysis_failed',
@@ -243,10 +262,10 @@ briefRoutes.post('/', async (c) => {
       template_base_id: templateSelection.base_template_id ?? null,
       custom_template_id: templateSelection.custom_template_id ?? null,
       template_instructions: templateSelection.instructions ?? null,
-      thesis: preparedSellerMove ? preparedMarketBody?.answer ?? preparedSellerMove.message : null,
+      thesis: preparedMarketBody?.answer ?? null,
       body: preparedMarketBody,
       progress: preparedProgress ?? initialBriefProgress(),
-      status: preparedSellerMove ? 'ready' : 'generating',
+      status: preparedMarketBody ? 'ready' : 'generating',
     })
     .select()
     .single();
@@ -257,19 +276,15 @@ briefRoutes.post('/', async (c) => {
 
   const brief = insert.data as Brief;
 
-  // The calculation and its transaction evidence share the same fast clock.
-  // Persist both before returning so every visible comparable is drillable
-  // while the optional model interpretation continues in the background.
-  if (preparedMarketBody?.market_analysis) {
-    const immediateSources = (preparedSellerMove
-      ? deterministicSellerMoveEvidenceRows(preparedSellerMove)
-      : deterministicMarketEvidenceRows(preparedMarketBody.market_analysis, 1))
-      .map((source) => ({ ...source, brief_id: brief.id }));
+  // Persist direct-answer sources before returning so every visible source or
+  // comparable is drillable on the same clock as the answer.
+  if (preparedSources.length > 0) {
+    const immediateSources = preparedSources.map((source) => ({ ...source, brief_id: brief.id }));
     try {
       await insertMissingBriefSources(brief.id, immediateSources);
     } catch (error) {
       const progress = failedBriefProgress(error);
-      const detail = error instanceof Error ? error.message : String(error);
+      const detail = briefGenerationErrorMessage(error);
       await db
         .from('briefs')
         .update({ status: 'failed', error: detail, progress, updated_at: progress.updated_at })
@@ -278,23 +293,24 @@ briefRoutes.post('/', async (c) => {
     }
   }
 
-  // Seller-move continuations are complete deterministic answers. They do not
-  // wait for or invite a model to reinterpret the user's terms or the math.
-  if (preparedSellerMove) {
+  // Deterministic answers are complete before this response. They do not wait
+  // for or invite a model to reinterpret sourced rules, terms, or calculations.
+  if (preparedMarketBody) {
     const response: CreateBriefResponse = { brief };
     return c.json(response, 201);
   }
 
   // Kick off generation in the background — the route returns immediately.
   // Errors are caught and persisted as `status='failed'` rather than crashing.
-  void generateBriefForMode(brief, inheritedMarketAnalysis?.query ?? null, preparedMarketLookup).catch(async (err) => {
+  void generateBriefWithDeadline(brief).catch(async (err) => {
     console.error('[briefs] generate failed', brief.id, err);
     const errorMessage = briefGenerationErrorMessage(err);
     const progress = failedBriefProgress(err);
     await db
       .from('briefs')
       .update({ status: 'failed', error: errorMessage, progress, updated_at: progress.updated_at })
-      .eq('id', brief.id);
+      .eq('id', brief.id)
+      .eq('status', 'generating');
     publishBriefProgress(briefProgressStreamPayload({
       id: brief.id,
       status: 'failed',
@@ -723,6 +739,10 @@ export async function regenerateBriefById(
     ? existingBrief.mode
     : (briefModeForTemplate(templateParse.selection) ?? 'brief');
 
+  // A retry owns the brief from this point forward. Any older provider task
+  // may finish, but its generation guard will prevent or roll back child rows.
+  invalidateActiveBriefGeneration(id);
+
   // Wipe prior options/sources so the regenerated brief doesn't accumulate
   // duplicate ref_indexes; the foreign-key cascade isn't enough on its own.
   await db.from('brief_options').delete().eq('brief_id', id);
@@ -750,14 +770,15 @@ export async function regenerateBriefById(
   if (reset.error || !reset.data) return null;
   const fresh = reset.data as Brief;
 
-  void generateBriefForMode(fresh, inheritedMarketQuery).catch(async (err) => {
+  void generateBriefWithDeadline(fresh, inheritedMarketQuery).catch(async (err) => {
     console.error('[briefs] regenerate failed', fresh.id, err);
     const errorMessage = briefGenerationErrorMessage(err);
     const progress = failedBriefProgress(err);
     await db
       .from('briefs')
       .update({ status: 'failed', error: errorMessage, progress, updated_at: progress.updated_at })
-      .eq('id', fresh.id);
+      .eq('id', fresh.id)
+      .eq('status', 'generating');
     publishBriefProgress(briefProgressStreamPayload({
       id: fresh.id,
       status: 'failed',
@@ -774,12 +795,42 @@ export async function generateBriefForMode(
   brief: Brief,
   inheritedMarketQuery: NflTransactionMarketAnalysis['query'] | null = null,
   preparedMarketLookup: DataAnalysisLookup | null = null,
+  generation: BriefGenerationGuard = ALWAYS_ACTIVE_GENERATION,
 ) {
-  if (brief.mode === 'data_analyst') return generateDataAnalysisBrief(brief, inheritedMarketQuery, preparedMarketLookup);
-  return generateBrief(brief);
+  if (brief.mode === 'data_analyst') return generateDataAnalysisBrief(brief, inheritedMarketQuery, preparedMarketLookup, generation);
+  return generateBrief(brief, generation);
 }
 
-export async function generateBrief(brief: Brief) {
+async function generateBriefWithDeadline(
+  brief: Brief,
+  inheritedMarketQuery: NflTransactionMarketAnalysis['query'] | null = null,
+  preparedMarketLookup: DataAnalysisLookup | null = null,
+): Promise<void> {
+  let timer: NodeJS.Timeout | null = null;
+  const generation = beginBriefGeneration(brief.id);
+  try {
+    await Promise.race([
+      generateBriefForMode(brief, inheritedMarketQuery, preparedMarketLookup, generation),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(
+          () => {
+            generation.stop();
+            reject(new Error('brief_generation_deadline_exceeded'));
+          },
+          BRIEF_GENERATION_DEADLINE_MS,
+        );
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+    generation.stop();
+  }
+}
+
+export async function generateBrief(
+  brief: Brief,
+  generation: BriefGenerationGuard = ALWAYS_ACTIVE_GENERATION,
+) {
   const startedAt = Date.now();
   const heartbeat = startBriefGenerationHeartbeat(brief);
   const progress = createBriefProgressTracker(brief, heartbeat);
@@ -931,7 +982,9 @@ export async function generateBrief(brief: Brief) {
     // Decision briefs still require strategic option rows, but model drift
     // should get one structural repair pass before the user sees a failure.
     let missing = missingSubmitBriefFields(input, templateSelection);
+    let structuralRepairAttempted = false;
     if (shouldRepairMissingSubmitBriefFields(missing, templateSelection)) {
+      structuralRepairAttempted = true;
       const repaired = await repairSubmitBriefTemplate({
         originalInput: input,
         templateSelection,
@@ -965,7 +1018,15 @@ export async function generateBrief(brief: Brief) {
 
     const onlyMissingTemplatePresentation = missing.length === 1 && missing[0] === 'presentation';
     if (missing.length > 0 && !onlyMissingTemplatePresentation) {
-      throw new Error(`submit_brief input missing required fields: ${missing.join(', ')}`);
+      await persistEvidenceBoundGenerationFallback({
+        brief,
+        heartbeat,
+        generation,
+        progress,
+        sources: [...reservedSources, ...contextGraphSources],
+        startedAt,
+      });
+      return;
     }
 
     // Persist brief body + thesis + status atomically (best-effort — Supabase
@@ -984,17 +1045,18 @@ export async function generateBrief(brief: Brief) {
         'The draft had valid substance but needed renderer-compatible structure.',
         'model',
       );
-      const repaired = await repairSubmitBriefTemplate({
-        originalInput: input,
-        templateSelection,
-        system,
-        messages: contextGraphLookup.messages,
-        allowServerProvidedSources,
-        validationErrors: presentationValidation.errors.length
-          ? presentationValidation.errors
-          : ['selected template requires presentation.sections'],
-        availableSources: existingSources,
-      });
+      const repaired = structuralRepairAttempted ? null : await repairSubmitBriefTemplate({
+          originalInput: input,
+          templateSelection,
+          system,
+          messages: contextGraphLookup.messages,
+          allowServerProvidedSources,
+          validationErrors: presentationValidation.errors.length
+            ? presentationValidation.errors
+            : ['selected template requires presentation.sections'],
+          availableSources: existingSources,
+        });
+      structuralRepairAttempted = true;
 
       if (repaired) {
         input = repaired.input;
@@ -1110,22 +1172,31 @@ export async function generateBrief(brief: Brief) {
       'write',
     );
 
-    if (optionRows.length > 0) {
-      const optionsInsert = await db.from('brief_options').insert(optionRows);
-      if (optionsInsert.error) throw new Error(`brief_options insert failed: ${optionsInsert.error.message}`);
+    if (!(await heartbeat.isCurrent()) || !generation.isActive()) return;
+    const insertedOptionIds = optionRows.length > 0
+      ? await insertBriefOptionsForGeneration(optionRows, generation)
+      : [];
+    if (!insertedOptionIds) return;
+    const insertedSourceIds = sourceRows.length > 0
+      ? await insertMissingBriefSources(brief.id, sourceRows, generation)
+      : [];
+    if (!insertedSourceIds) {
+      await removeInsertedBriefRows('brief_options', insertedOptionIds);
+      return;
     }
-    if (sourceRows.length > 0) {
-      const sourcesInsert = await db.from('brief_sources').insert(sourceRows);
-      if (sourcesInsert.error) throw new Error(`brief_sources insert failed: ${sourcesInsert.error.message}`);
+    if (!generation.isActive()) {
+      await Promise.all([
+        removeInsertedBriefRows('brief_options', insertedOptionIds),
+        removeInsertedBriefRows('brief_sources', insertedSourceIds),
+      ]);
+      return;
     }
 
     // Conditional write: only flip to 'ready' if the brief is still in
     // 'generating' state. Guards against a slow successful generation
     // overriding a failed state already set by the stale-brief sweeper. If
     // the row's status changed under us (sweeper marked it failed, or the
-    // user regenerated), we leave it alone — the user's view wins. Persist
-    // the options/sources rows we just wrote either way; a future regen will
-    // wipe them.
+    // user regenerated), we leave it alone — the user's view wins.
     const readyProgress = progress.complete();
     const updated = await db
       .from('briefs')
@@ -1149,8 +1220,20 @@ export async function generateBrief(brief: Brief) {
       .eq('updated_at', heartbeat.currentUpdatedAt())
       .select('updated_at')
       .maybeSingle();
-    if (updated.error) throw new Error(`brief update failed: ${updated.error.message}`);
-    if (!updated.data) return;
+    if (updated.error) {
+      await Promise.all([
+        removeInsertedBriefRows('brief_options', insertedOptionIds),
+        removeInsertedBriefRows('brief_sources', insertedSourceIds),
+      ]);
+      throw new Error(`brief update failed: ${updated.error.message}`);
+    }
+    if (!updated.data) {
+      await Promise.all([
+        removeInsertedBriefRows('brief_options', insertedOptionIds),
+        removeInsertedBriefRows('brief_sources', insertedSourceIds),
+      ]);
+      return;
+    }
     publishBriefProgress(briefProgressStreamPayload({
       id: brief.id,
       status: 'ready',
@@ -1227,6 +1310,80 @@ async function repairSubmitBriefTemplate(args: {
     console.warn('[briefs] template repair failed; falling back to deterministic sections', err);
     return null;
   }
+}
+
+async function persistEvidenceBoundGenerationFallback(args: {
+  brief: Brief;
+  heartbeat: BriefGenerationHeartbeat;
+  generation: BriefGenerationGuard;
+  progress: ReturnType<typeof createBriefProgressTracker>;
+  sources: Array<Omit<BriefSource, 'id' | 'brief_id'>>;
+  startedAt: number;
+}): Promise<void> {
+  if (!(await args.heartbeat.isCurrent()) || !args.generation.isActive()) return;
+  let insertedSourceIds: string[] = [];
+  if (args.sources.length > 0) {
+    const inserted = await insertMissingBriefSources(
+      args.brief.id,
+      args.sources.map((source) => ({ ...source, brief_id: args.brief.id })),
+      args.generation,
+    );
+    if (!inserted) return;
+    insertedSourceIds = inserted;
+  }
+  const body: DataAnalysisBriefBody = {
+    kind: 'data_analysis',
+    answer: 'I could not complete a source-supported answer from the available public information.',
+    key_findings: [],
+    tables: [],
+    calculations: [],
+    caveats: [
+      args.sources.length > 0
+        ? 'The sources that were successfully checked remain attached. No unsupported conclusion has been filled in.'
+        : 'No usable public source was returned, so no football conclusion is being inferred.',
+    ],
+    followups: [],
+  };
+  const readyProgress = args.progress.complete(
+    'Source-limited answer ready',
+    'The supported source material is preserved without filling in missing claims.',
+  );
+  if (!args.generation.isActive()) {
+    await removeInsertedBriefRows('brief_sources', insertedSourceIds);
+    return;
+  }
+  const updated = await db
+    .from('briefs')
+    .update({
+      mode: 'data_analyst',
+      thesis: body.answer,
+      body,
+      status: 'ready',
+      progress: readyProgress,
+      duration_ms: Date.now() - args.startedAt,
+      updated_at: readyProgress.updated_at,
+    })
+    .eq('id', args.brief.id)
+    .eq('status', 'generating')
+    .eq('updated_at', args.heartbeat.currentUpdatedAt())
+    .select('updated_at')
+    .maybeSingle();
+  if (updated.error) {
+    await removeInsertedBriefRows('brief_sources', insertedSourceIds);
+    throw new Error(`brief fallback update failed: ${updated.error.message}`);
+  }
+  if (!updated.data) {
+    await removeInsertedBriefRows('brief_sources', insertedSourceIds);
+    return;
+  }
+  publishBriefProgress(briefProgressStreamPayload({
+    id: args.brief.id,
+    status: 'ready',
+    error: null,
+    progress: readyProgress,
+    updated_at: (updated.data as Pick<Brief, 'updated_at'>).updated_at,
+    body,
+  }));
 }
 
 async function maybeRunNflBriefPrivateCritic(args: {
@@ -1358,6 +1515,7 @@ export async function generateDataAnalysisBrief(
   brief: Brief,
   inheritedMarketQuery: NflTransactionMarketAnalysis['query'] | null = null,
   preparedMarketLookup: DataAnalysisLookup | null = null,
+  generation: BriefGenerationGuard = ALWAYS_ACTIVE_GENERATION,
 ) {
   const startedAt = Date.now();
   const heartbeat = startBriefGenerationHeartbeat(brief);
@@ -1402,11 +1560,13 @@ export async function generateDataAnalysisBrief(
         const provisionalBody = transactionMarketArtifactBody(immediateMarketAnalysis);
         const persisted = await heartbeat.update({ body: provisionalBody });
         if (!persisted) return;
-        await insertMissingBriefSources(
+        const sourcesPersisted = await insertMissingBriefSources(
           brief.id,
           deterministicMarketEvidenceRows(immediateMarketAnalysis, 1)
             .map((source) => ({ ...source, brief_id: brief.id })),
+          generation,
         );
+        if (!sourcesPersisted) return;
         publishBriefProgress(briefProgressStreamPayload({
           id: brief.id,
           status: 'generating',
@@ -1534,13 +1694,14 @@ export async function generateDataAnalysisBrief(
     // The channel can be removed while the optional interpretation is still
     // running (for example after an isolated headless rehearsal). Do not
     // write child evidence after its brief has gone away.
-    if (!(await heartbeat.isCurrent())) return;
-    if (sourceRows.length > 0) {
-      if (transactionMarketAnalysis) await insertMissingBriefSources(brief.id, sourceRows);
-      else {
-        const sourcesInsert = await db.from('brief_sources').insert(sourceRows);
-        if (sourcesInsert.error) throw new Error(`brief_sources insert failed: ${sourcesInsert.error.message}`);
-      }
+    if (!(await heartbeat.isCurrent()) || !generation.isActive()) return;
+    const insertedSourceIds = sourceRows.length > 0
+      ? await insertMissingBriefSources(brief.id, sourceRows, generation)
+      : [];
+    if (!insertedSourceIds) return;
+    if (!generation.isActive()) {
+      await removeInsertedBriefRows('brief_sources', insertedSourceIds);
+      return;
     }
 
     const readyProgress = progress.complete('Analysis ready', 'Findings, tables, calculations, and source cards are ready.');
@@ -1568,8 +1729,14 @@ export async function generateDataAnalysisBrief(
       .eq('updated_at', heartbeat.currentUpdatedAt())
       .select('updated_at')
       .maybeSingle();
-    if (updated.error) throw new Error(`brief update failed: ${updated.error.message}`);
-    if (!updated.data) return;
+    if (updated.error) {
+      await removeInsertedBriefRows('brief_sources', insertedSourceIds);
+      throw new Error(`brief update failed: ${updated.error.message}`);
+    }
+    if (!updated.data) {
+      await removeInsertedBriefRows('brief_sources', insertedSourceIds);
+      return;
+    }
     publishBriefProgress(briefProgressStreamPayload({
       id: brief.id,
       status: 'ready',
@@ -1624,15 +1791,57 @@ export async function ensureNflTransactionMarketLookup(
 export function transactionMarketArtifactBody(
   analysis: NflTransactionMarketAnalysis,
 ): DataAnalysisBriefBody {
+  const read = Array.isArray(analysis.position_trends)
+    ? nflTransactionMarketFootballRead(analysis)
+    : {
+      conclusion: 'The live market calculation is ready.',
+      implication: 'For New York: review the executed position scope and supporting transactions before setting a trade posture.',
+    };
   return {
     kind: 'data_analysis',
-    answer: '',
+    answer: `${read.conclusion} ${read.implication}`,
     key_findings: [],
     tables: [],
     calculations: [],
     caveats: [],
     followups: [],
     market_analysis: analysis,
+  };
+}
+
+function sellerModifierClarificationBody(): DataAnalysisBriefBody {
+  return {
+    kind: 'data_analysis',
+    answer: 'I do not have an active proposed trade in this conversation. Name the Giants player, draft year, and round you want to test.',
+    key_findings: [],
+    tables: [],
+    calculations: [],
+    caveats: [],
+    followups: [],
+  };
+}
+
+function unavailableRuleAnswerBody(): DataAnalysisBriefBody {
+  return {
+    kind: 'data_analysis',
+    answer: 'The public NFL rule source could not be loaded right now.',
+    key_findings: [],
+    tables: [],
+    calculations: [],
+    caveats: ['No rule or cap conclusion is being inferred. Try again after the rule source is available.'],
+    followups: [],
+  };
+}
+
+function unavailableSellerAnswerBody(): DataAnalysisBriefBody {
+  return {
+    kind: 'data_analysis',
+    answer: 'I could not calculate that proposed trade because the current public contract or transaction source is unavailable.',
+    key_findings: [],
+    tables: [],
+    calculations: [],
+    caveats: ['No cap figure, market range, or depth conclusion is being inferred. Try again after the public data is available.'],
+    followups: [],
   };
 }
 
@@ -1774,24 +1983,58 @@ export function deterministicMarketEvidenceRows(
 async function insertMissingBriefSources(
   briefId: string,
   rows: Array<Omit<BriefSource, 'id'>>,
-): Promise<void> {
-  if (rows.length === 0) return;
+  generation: BriefGenerationGuard = ALWAYS_ACTIVE_GENERATION,
+): Promise<string[] | null> {
+  if (rows.length === 0) return [];
+  if (!generation.isActive()) return null;
   const existing = await db.from('brief_sources').select('ref_index').eq('brief_id', briefId);
   if (existing.error) throw new Error(`brief_sources lookup failed: ${existing.error.message}`);
+  if (!generation.isActive()) return null;
   const existingRefs = new Set((existing.data ?? []).map((row) => Number(row.ref_index)));
   const missing = rows.filter((row) => !existingRefs.has(row.ref_index));
-  if (missing.length === 0) return;
-  const inserted = await db.from('brief_sources').insert(missing);
+  if (missing.length === 0) return [];
+  const inserted = await db.from('brief_sources').insert(missing).select('id');
   if (inserted.error) {
     // A workspace may be deleted after the last heartbeat check but before
     // this child insert. Confirm that narrow race before treating the foreign
     // key failure as a real persistence error.
     if (inserted.error.code === '23503') {
       const parent = await db.from('briefs').select('id').eq('id', briefId).maybeSingle();
-      if (!parent.error && !parent.data) return;
+      if (!parent.error && !parent.data) return [];
     }
     throw new Error(`brief_sources insert failed: ${inserted.error.message}`);
   }
+  const insertedIds = (inserted.data ?? []).map((row) => String(row.id));
+  if (!generation.isActive()) {
+    await removeInsertedBriefRows('brief_sources', insertedIds);
+    return null;
+  }
+  return insertedIds;
+}
+
+async function insertBriefOptionsForGeneration(
+  rows: Array<Record<string, unknown>>,
+  generation: BriefGenerationGuard,
+): Promise<string[] | null> {
+  if (rows.length === 0) return [];
+  if (!generation.isActive()) return null;
+  const inserted = await db.from('brief_options').insert(rows).select('id');
+  if (inserted.error) throw new Error(`brief_options insert failed: ${inserted.error.message}`);
+  const insertedIds = (inserted.data ?? []).map((row) => String(row.id));
+  if (!generation.isActive()) {
+    await removeInsertedBriefRows('brief_options', insertedIds);
+    return null;
+  }
+  return insertedIds;
+}
+
+async function removeInsertedBriefRows(
+  table: 'brief_options' | 'brief_sources',
+  ids: string[],
+): Promise<void> {
+  if (ids.length === 0) return;
+  const removed = await db.from(table).delete().in('id', ids);
+  if (removed.error) throw new Error(`${table} stale-generation cleanup failed: ${removed.error.message}`);
 }
 
 function bindMarketSourceReferences(
@@ -2187,9 +2430,8 @@ export function shouldRepairMissingSubmitBriefFields(
   missing: string[],
   templateSelection: ReturnType<typeof templateSelectionForBrief> = { template_id: 'decision_brief' },
 ): boolean {
-  const templateId = effectiveBriefTemplateId(templateSelection);
-  if (missing.length === 1 && missing[0] === 'options' && templateId === 'decision_brief') return true;
-  return false;
+  void templateSelection;
+  return missing.length > 0;
 }
 
 function withTemplateFallbackWatch(input: SubmitBriefInput): SubmitBriefInput {
@@ -2207,14 +2449,17 @@ function withTemplateFallbackWatch(input: SubmitBriefInput): SubmitBriefInput {
 
 export function briefGenerationErrorMessage(error: unknown): string {
   const providerMessage = providerErrorMessage(error);
-  if (providerMessage && /credit balance is too low/i.test(providerMessage)) {
-    return 'Anthropic API credit balance is too low. Add credits or switch ANTHROPIC_API_KEY, then regenerate this brief.';
+  const raw = `${providerMessage ?? ''} ${error instanceof Error ? error.message : String(error)}`;
+  if (/brief_generation_deadline_exceeded/i.test(raw)) {
+    return 'This answer took too long to finish. Your question is saved; try again or ask it more narrowly.';
   }
-  if (providerMessage && /tool_choice forces tool use is not compatible/i.test(providerMessage)) {
-    return 'Configured Anthropic model does not support forced tool submissions. Switch to a tool-capable brief model or fallback model, then regenerate this brief.';
+  if (/credit balance|overloaded|rate limit|service unavailable|connection|fetch failed/i.test(raw)) {
+    return 'Live interpretation is unavailable right now. Your question is saved; try again in a moment.';
   }
-  if (providerMessage) return providerMessage;
-  return error instanceof Error ? error.message : String(error);
+  if (/transaction.market|snapshot|roster|contract|source|dataset/i.test(raw)) {
+    return 'The required public data could not be loaded. Your question is saved; check the data status and try again.';
+  }
+  return 'The answer could not be completed from the available sources. Your question is saved; try again.';
 }
 
 export function createBriefShareToken(random: (size: number) => Buffer = randomBytes): string {
@@ -2367,10 +2612,20 @@ function initialBriefProgress(label = 'Brief queued'): BriefProgress {
 
 export function marketArtifactBriefProgress(): BriefProgress {
   return briefProgressSnapshot({
-    phase: 'drafting',
-    pct: 36,
-    label: 'Market calculation ready',
-    detail: 'Rendering the executed scope, series, comparables, methodology, and limitations while the interpretation is drafted.',
+    phase: 'ready',
+    pct: 100,
+    label: 'Market answer ready',
+    detail: 'The live calculation, comparison, transactions, and sources are ready.',
+    kind: 'data',
+  });
+}
+
+function readyBriefProgress(label: string, detail: string): BriefProgress {
+  return briefProgressSnapshot({
+    phase: 'ready',
+    pct: 100,
+    label,
+    detail,
     kind: 'data',
   });
 }

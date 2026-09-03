@@ -3,12 +3,24 @@ import type { BriefSource } from '@shared/types';
 import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
 
 const URL_KEYS = new Set(['source_url', 'url', 'authoritative_url']);
+const HIDDEN_KEYS = new Set([
+  'dataset_id',
+  'event_id',
+  'analysis_id',
+  'player_id',
+  'source_ref_ids',
+  'raw_source_record',
+  'snapshot_id',
+  'seller_move_contract',
+  'seller_move_role',
+  'seller_move_comparable',
+]);
 const MAX_RECORDS = 30;
 
 export function NflSourceDetail({ source, onBack }: { source: BriefSource; onBack: () => void }) {
   const data = isRecord(source.data) ? source.data : {};
   const asOf = firstStringDeep(data, ['as_of_date', 'as_of', 'season']) ?? source.updated_at;
-  const boundary = firstStringDeep(data, ['source_status', 'evidence_status', 'provenance']) ?? 'Captured public demo evidence';
+  const boundary = firstStringDeep(data, ['source_status', 'evidence_status', 'provenance']) ?? 'Captured public source';
   const sourceUrls = collectUrls(data);
 
   return (
@@ -21,13 +33,13 @@ export function NflSourceDetail({ source, onBack }: { source: BriefSource; onBac
         <span style={{
           fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs, fontWeight: 700,
           color: F.fenway, textTransform: 'uppercase', letterSpacing: TRACKING.micro,
-        }}>{source.kind.replace(/_/g, ' ')}</span>
+        }}>{sourceKindLabel(source)}</span>
         <h2 style={{ margin: `${SPACE.sm}px 0`, fontFamily: 'var(--font-display)', fontSize: TYPE.display.lg }}>{source.title}</h2>
         <p style={{ margin: 0, color: F.fgMuted, fontSize: TYPE.body.sm }}>{source.source ?? 'Public NFL source'} · ref [{source.ref_index}]</p>
       </div>
       <dl style={{ margin: `${SPACE['2xl']}px 0`, borderTop: `1px solid ${F.border}` }}>
         <Fact label="As of" value={asOf ?? 'Not supplied'} />
-        <Fact label="Evidence boundary" value={boundary} />
+        <Fact label="Source status" value={boundary} />
       </dl>
 
       {Object.keys(data).length > 0 ? <StructuredValue value={data} /> : (
@@ -73,9 +85,9 @@ function StructuredValue({ value, depth = 0 }: { value: unknown; depth?: number 
   }
 
   if (!isRecord(value)) return <span>{displayValue(value)}</span>;
-  const entries = Object.entries(value).filter(([key]) => !URL_KEYS.has(key));
+  const entries = Object.entries(value).filter(([key]) => !URL_KEYS.has(key) && !HIDDEN_KEYS.has(key));
   const primitiveEntries = entries.filter(([, item]) => isPrimitive(item));
-  const nestedEntries = entries.filter(([, item]) => !isPrimitive(item));
+  const nestedEntries = entries.filter(([, item]) => !isPrimitive(item) && hasVisibleData(item));
   return <div style={{ display: 'grid', gap: SPACE.md }}>
     {primitiveEntries.length > 0 && <dl style={{ margin: 0, borderTop: `1px solid ${F.border}` }}>{primitiveEntries.map(([key, item]) => <Fact key={key} label={key} value={displayValue(item)} />)}</dl>}
     {nestedEntries.map(([key, item]) => <section key={key} style={{ marginTop: depth ? SPACE.sm : SPACE.md }}>
@@ -86,7 +98,7 @@ function StructuredValue({ value, depth = 0 }: { value: unknown; depth?: number 
 }
 
 function RecordCard({ record, index, depth }: { record: Record<string, unknown>; index: number; depth: number }) {
-  const title = firstString(record, ['player_name', 'player', 'name', 'title', 'rule_family', 'dataset_id']) ?? `Record ${index + 1}`;
+  const title = firstString(record, ['player_name', 'player', 'name', 'title', 'rule_family']) ?? `Record ${index + 1}`;
   const urls = collectUrls(record);
   return <article style={{
     border: `1px solid ${F.border}`, borderRadius: RADIUS.md, background: F.surface,
@@ -180,6 +192,14 @@ function isPrimitive(value: unknown): value is string | number | boolean | null 
   return value == null || ['string', 'number', 'boolean'].includes(typeof value);
 }
 
+function hasVisibleData(value: unknown): boolean {
+  if (Array.isArray(value)) return value.some(hasVisibleData);
+  if (!isRecord(value)) return value != null;
+  return Object.entries(value).some(([key, item]) => (
+    !URL_KEYS.has(key) && !HIDDEN_KEYS.has(key) && (isPrimitive(item) || hasVisibleData(item))
+  ));
+}
+
 function displayValue(value: unknown): string {
   if (value == null || value === '') return '—';
   if (typeof value === 'boolean') return value ? 'Yes' : 'No';
@@ -189,4 +209,11 @@ function displayValue(value: unknown): string {
 
 function label(value: string): string {
   return value.replace(/_/g, ' ').replace(/\b\w/g, (character) => character.toUpperCase());
+}
+
+function sourceKindLabel(source: BriefSource): string {
+  if (source.kind !== 'ANALYST_DATA') return source.kind.replace(/_/g, ' ');
+  if (source.data?.seller_move_role === true) return 'Roster source';
+  if (source.data?.seller_move_comparable === true) return 'Transaction source';
+  return 'Public data';
 }

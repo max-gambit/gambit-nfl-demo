@@ -13,8 +13,6 @@ import {
 } from '../api/sessions';
 import { runAgent } from '../api/agent';
 import { stripBriefModePrefix } from '@shared/briefMode';
-import { briefModeForTemplate, inferBriefTemplateFromQuestion } from '@shared/briefTemplates';
-import { latestTransactionMarketBriefForActiveAnalysis } from '@shared/nflTransactionMarket';
 import type { AgentKind, Brief, BriefTemplateSelection } from '@shared/types';
 
 const CONTENT_MAX_WIDTH = 760;
@@ -45,7 +43,6 @@ export function SessionFeed() {
   const [submitting, setSubmitting] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const focusedRef = useRef<HTMLDivElement>(null);
-  const pendingMarketBriefIdsRef = useRef(new Set<string>());
 
   const session = sessions.find((s) => s.id === activeSessionId) ?? null;
   // Briefs in this channel, oldest-first (Slack feed order).
@@ -65,14 +62,6 @@ export function SessionFeed() {
     const last = channelBriefs[channelBriefs.length - 1];
     return last?.id ?? null;
   }, [expandedBriefId, channelBriefs]);
-  const latestMarketBrief = useMemo(
-    () => latestTransactionMarketBriefForActiveAnalysis(
-      channelBriefs,
-      effectiveFocusedId,
-      pendingMarketBriefIdsRef.current,
-    ),
-    [channelBriefs, effectiveFocusedId],
-  );
 
   // Sync activeBriefId with the focused card so OptionsTable / cap strip / etc.
   // follow the user's attention naturally.
@@ -233,15 +222,10 @@ export function SessionFeed() {
   const submitNewBrief = async (text: string) => {
     const parsed = stripBriefModePrefix(text);
     const q = parsed.question.trim();
-    const continuesMarketAnalysis = Boolean(activeSessionId && latestMarketBrief);
-    const template: BriefTemplateSelection = {
-      template_id: continuesMarketAnalysis || parsed.mode === 'data_analyst'
-        ? 'data_table'
-        : inferBriefTemplateFromQuestion(text),
-    };
-    const mode = continuesMarketAnalysis
-      ? 'data_analyst'
-      : briefModeForTemplate(template) ?? parsed.mode ?? 'brief';
+    const requestMode = parsed.mode ?? undefined;
+    const requestTemplate: BriefTemplateSelection | undefined = parsed.mode
+      ? { template_id: 'data_table' }
+      : undefined;
     if (!q || submitting) return;
     setSubmitting(true);
     try {
@@ -249,20 +233,17 @@ export function SessionFeed() {
       if (!activeSessionId) {
         // First-question case (no channel yet) — create session + brief in
         // one shot. Session is auto-labeled from the question.
-        const created = await createBriefWithSession(q, mode, template);
+        const created = await createBriefWithSession(q, requestMode, requestTemplate);
         insertSession(created.session);
         setActiveSession(created.session.id);
         brief = created.brief;
       } else {
-        const inheritedMarketBrief = latestMarketBrief;
         brief = await createBrief({
           session_id: activeSessionId,
           question: q,
-          mode,
-          template,
-          ...(inheritedMarketBrief ? { inherited_market_brief_id: inheritedMarketBrief.id } : {}),
+          mode: requestMode,
+          template: requestTemplate,
         });
-        if (inheritedMarketBrief) pendingMarketBriefIdsRef.current.add(brief.id);
 
         // Auto-rename Untitled channels from the first question — this is the
         // signal that the user has actually committed to this channel. Fire-

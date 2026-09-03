@@ -7,7 +7,13 @@ interface Props {
   progress?: BriefProgress | null;
 }
 
-export function GeneratingBriefCard({ question }: Props) {
+export function GeneratingBriefCard({ question, progress }: Props) {
+  const label = progress?.label && progress.phase !== 'queued'
+    ? progress.label
+    : 'Checking the question…';
+  const detail = progress?.detail && progress.phase !== 'queued'
+    ? progress.detail
+    : 'Gathering the relevant public information and preparing the answer.';
   return (
     <div role="status" aria-live="polite" style={{
       background: F.surface, border: `1px solid ${F.border}`,
@@ -23,10 +29,10 @@ export function GeneratingBriefCard({ question }: Props) {
         }}>G</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 600, color: F.ink }}>
-            Reviewing the question…
+            {label}
           </div>
           <div style={{ fontFamily: 'var(--font-sans)', fontSize: 12, color: F.fgMuted, marginTop: 2 }}>
-            Gathering the relevant evidence and preparing the answer.
+            {detail}
           </div>
         </div>
         <span style={{

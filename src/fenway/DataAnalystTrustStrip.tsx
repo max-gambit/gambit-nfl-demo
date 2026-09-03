@@ -34,7 +34,7 @@ export function DataAnalystTrustStrip({ toolCalls }: { toolCalls?: ToolCall[] | 
           borderRadius: RADIUS.pill,
           padding: `2px ${SPACE.xs + 2}px`,
         }}>
-          {dataset.dataset_id.replace(/^nba_/, '').replace(/_current$/, '').replaceAll('_', ' ')}
+          {dataset.label}
           {dataset.team_ids.length ? ` · ${dataset.team_ids.join('/')}` : ''}
         </span>
       ))}

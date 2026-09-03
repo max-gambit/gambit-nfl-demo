@@ -6,12 +6,22 @@ import { fileURLToPath } from 'node:url';
 import { loadNflDemoSeed } from '../../src/nfl_data/seed.js';
 import { analyzeNflTransactionMarketSnapshot } from '../../src/nfl_transactions/analyze.js';
 import {
+  defaultSellerMarketFromSnapshot,
   parseNflSellerMoveTurn,
   resolveNflSellerMoveConversationTurn,
 } from '../../src/nfl_transactions/seller_move_conversation.js';
 import { loadReviewedNflTransactionSnapshot } from '../../src/nfl_transactions/seed.js';
 
 const GENERATED_AT = '2026-09-03T16:00:00.000Z';
+
+test('fresh seller proposals use the latest ten completed seasons without a prior market answer', async () => {
+  const fixture = await liveFixture();
+  const market = defaultSellerMarketFromSnapshot(fixture.seed, fixture.snapshot);
+
+  assert.equal(market.query.start_year, 2016);
+  assert.equal(market.query.end_year, 2025);
+  assert.equal(market.query.include_ytd, false);
+});
 
 test('a market-analysis continuation resolves a full Giants seller proposal', async () => {
   const fixture = await liveFixture();
@@ -60,6 +70,9 @@ test('year-only continuation preserves the player and round', async () => {
   assert.equal(updated.result!.proposal.pick_year, 2028);
   assert.equal(updated.result!.proposal.pick_round, 2);
   assert.equal(updated.result!.player.player_id, initial.result!.player.player_id);
+  assert.match(updated.result!.market.timing_note, /later pick is treated as weaker/i);
+  assert.doesNotMatch(updated.result!.market.middle_range?.stronger_pick ?? '', /^20\d{2}/);
+  assert.doesNotMatch(updated.result!.market.middle_range?.weaker_pick ?? '', /^20\d{2}/);
 });
 
 test('incomplete and unknown-player proposals ask one concise clarification', async () => {
@@ -70,7 +83,40 @@ test('incomplete and unknown-player proposals ask one concise clarification', as
   assert.equal(missingReturn.status, 'clarification');
   assert.equal(missingReturn.message, 'What draft year and round should New York receive?');
   assert.equal(unknownPlayer.status, 'clarification');
-  assert.equal(unknownPlayer.message, 'Which current Giants player did you mean?');
+  assert.match(unknownPlayer.message ?? '', /could not match that name to the current Giants roster/i);
+});
+
+test('player resolution distinguishes roster match, incomplete contract data, ambiguity, and typo suggestions', async () => {
+  const fixture = await liveFixture();
+  const incompleteSeed = structuredClone(fixture.seed);
+  const burns = incompleteSeed.cap_rows.find((row) => row.player_name === 'Brian Burns')!;
+  burns.source_url = null;
+  const parsedBurns = parseNflSellerMoveTurn('What if we moved Brian Burns for a 2027 second?', null)!;
+  const incomplete = resolveNflSellerMoveConversationTurn(
+    parsedBurns, fixture.market, null, incompleteSeed, fixture.snapshot, GENERATED_AT,
+  );
+  assert.equal(incomplete.status, 'unavailable');
+  assert.match(incomplete.message ?? '', /on the current Giants roster.*contract row is not complete enough/i);
+
+  const ambiguousSeed = structuredClone(fixture.seed);
+  const exemplar = structuredClone(ambiguousSeed.roster_entries.find((row) => row.team_id === 'NYG')!);
+  ambiguousSeed.roster_entries.push(
+    { ...exemplar, player_id: 'test-smith-1', player_name: 'Alex Smith', roster_status: 'active' },
+    { ...exemplar, player_id: 'test-smith-2', player_name: 'Jordan Smith', roster_status: 'active' },
+  );
+  const parsedSmith = parseNflSellerMoveTurn('What if we moved Smith for a 2027 second?', null)!;
+  const ambiguous = resolveNflSellerMoveConversationTurn(
+    parsedSmith, fixture.market, null, ambiguousSeed, fixture.snapshot, GENERATED_AT,
+  );
+  assert.equal(ambiguous.status, 'clarification');
+  assert.match(ambiguous.message ?? '', /Alex Smith or Jordan Smith/i);
+
+  const parsedTypo = parseNflSellerMoveTurn('What if we moved Bryan Burns for a 2027 second?', null)!;
+  const typo = resolveNflSellerMoveConversationTurn(
+    parsedTypo, fixture.market, null, fixture.seed, fixture.snapshot, GENERATED_AT,
+  );
+  assert.equal(typo.status, 'clarification');
+  assert.match(typo.message ?? '', /Did you mean Brian Burns/i);
 });
 
 test('short clarification replies complete only the missing seller fields', async () => {

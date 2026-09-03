@@ -6,7 +6,10 @@ import type {
   NflTransactionMarketAnalysis,
 } from '@shared/types';
 import { loadCurrentNflTeamDataWithMode, type NflDemoSeed } from '../nfl_data/seed.js';
-import type { NflTransactionMarketSnapshot } from './analyze.js';
+import {
+  analyzeNflTransactionMarketSnapshot,
+  type NflTransactionMarketSnapshot,
+} from './analyze.js';
 import {
   buildNflSellerMoveOptions,
   calculateNflSellerMove,
@@ -27,6 +30,11 @@ type SellerMovePatch = {
 export interface ParsedSellerMoveTurn {
   kind: 'scenario';
   patch: SellerMovePatch;
+}
+
+export interface PreparedNflSellerMoveTurn {
+  artifact: NflSellerMoveConversationArtifact;
+  market: NflTransactionMarketAnalysis;
 }
 
 /**
@@ -90,9 +98,9 @@ export function parseNflSellerMoveTurn(
 
 export async function runNflSellerMoveConversationTurn(
   question: string,
-  market: NflTransactionMarketAnalysis,
+  market: NflTransactionMarketAnalysis | null,
   previous: NflSellerMoveScenarioState | null,
-): Promise<NflSellerMoveConversationArtifact | null> {
+): Promise<PreparedNflSellerMoveTurn | null> {
   const parsed = parseNflSellerMoveTurn(question, previous);
   if (!parsed) return null;
   let teamData;
@@ -103,12 +111,45 @@ export async function runNflSellerMoveConversationTurn(
       loadCurrentNflTransactionMarketSnapshot(),
     ]);
   } catch {
-    return unavailableArtifact(baseScenario(market, previous), 'The current public contract or transaction data is unavailable right now.');
+    if (!market) return null;
+    return {
+      artifact: unavailableArtifact(baseScenario(market, previous), 'The current public contract or transaction data is unavailable right now.'),
+      market,
+    };
   }
+  const effectiveMarket = market ?? defaultSellerMarketFromSnapshot(teamData.seed, snapshot);
   if (teamData.source_mode !== 'supabase_current_views') {
-    return unavailableArtifact(baseScenario(market, previous), 'Current Giants contract data is not available from the local database.');
+    return {
+      artifact: unavailableArtifact(baseScenario(effectiveMarket, previous), 'Current Giants contract data is not available from the local database.'),
+      market: effectiveMarket,
+    };
   }
-  return resolveNflSellerMoveConversationTurn(parsed, market, previous, teamData.seed, snapshot);
+  return {
+    artifact: resolveNflSellerMoveConversationTurn(parsed, effectiveMarket, previous, teamData.seed, snapshot),
+    market: effectiveMarket,
+  };
+}
+
+export function defaultSellerMarketFromSnapshot(seed: NflDemoSeed, snapshot: NflTransactionMarketSnapshot): NflTransactionMarketAnalysis {
+  const currentYear = Number.parseInt(seed.season, 10);
+  if (!Number.isInteger(currentYear)) throw new Error('The current league year is unavailable.');
+  const endYear = currentYear - 1;
+  return analyzeNflTransactionMarketSnapshot({
+    analysis_mode: 'ten_year_trend',
+    start_year: endYear - 9,
+    end_year: endYear,
+    transaction_types: [
+      'trade',
+      'free_agent_signing',
+      're_signing',
+      'extension',
+      'tag',
+      'waiver_claim',
+      'release',
+    ],
+    include_ytd: false,
+    max_comparables: 12,
+  }, snapshot);
 }
 
 /** Pure conversation resolver used by focused tests and the live brief route. */
@@ -133,13 +174,16 @@ export function resolveNflSellerMoveConversationTurn(
   if (scenario.player_query) {
     const resolution = resolvePlayer(scenario.player_query, seed, snapshot);
     if (resolution.kind === 'ambiguous') {
-      return clarificationArtifact(scenario, `Which Giants player did you mean: ${joinNames(resolution.players.map((player) => player.player_name))}?`);
+      return clarificationArtifact(scenario, `Which Giants player did you mean: ${joinNames(resolution.names)}?`);
     }
     if (resolution.kind === 'unsupported') {
-      return unavailableArtifact(scenario, `${resolution.playerName} does not have a complete current public contract row for this calculation.`);
+      return unavailableArtifact(scenario, `${resolution.playerName} is on the current Giants roster, but the loaded public contract row is not complete enough to calculate this trade.`);
     }
     if (resolution.kind === 'missing') {
-      return clarificationArtifact(scenario, 'Which current Giants player did you mean?');
+      const suggestions = resolution.suggestions.length
+        ? ` Did you mean ${joinNames(resolution.suggestions)}?`
+        : '';
+      return clarificationArtifact(scenario, `I could not match that name to the current Giants roster.${suggestions}`);
     }
     scenario.player_id = resolution.player.player_id;
     scenario.player_name = resolution.player.player_name;
@@ -202,20 +246,51 @@ function baseScenario(
 
 type PlayerResolution =
   | { kind: 'resolved'; player: NflSellerMovePlayerOption }
-  | { kind: 'ambiguous'; players: NflSellerMovePlayerOption[] }
+  | { kind: 'ambiguous'; names: string[] }
   | { kind: 'unsupported'; playerName: string }
-  | { kind: 'missing' };
+  | { kind: 'missing'; suggestions: string[] };
 
 function resolvePlayer(query: string, seed: NflDemoSeed, snapshot: NflTransactionMarketSnapshot): PlayerResolution {
   const options = buildNflSellerMoveOptions(seed, 'NYG', POSITION_GROUPS, snapshot).positions.flatMap((position) => position.players);
   const eligible = matchingPlayers(query, options);
   if (eligible.length === 1) return { kind: 'resolved', player: eligible[0] };
-  if (eligible.length > 1) return { kind: 'ambiguous', players: eligible };
+  if (eligible.length > 1) return { kind: 'ambiguous', names: eligible.map((player) => player.player_name) };
 
   const activeRoster = seed.roster_entries.filter((row) => row.team_id === 'NYG' && row.roster_status === 'active');
   const rosterMatches = matchingNames(query, activeRoster.map((row) => row.player_name));
   if (rosterMatches.length === 1) return { kind: 'unsupported', playerName: rosterMatches[0] };
-  return { kind: 'missing' };
+  if (rosterMatches.length > 1) return { kind: 'ambiguous', names: rosterMatches };
+  return {
+    kind: 'missing',
+    suggestions: suggestedNames(query, activeRoster.map((row) => row.player_name)),
+  };
+}
+
+function suggestedNames(query: string, names: string[]): string[] {
+  const needle = normalizeName(query);
+  if (!needle) return [];
+  return [...names]
+    .map((name) => ({ name, distance: editDistance(needle, normalizeName(name)) }))
+    .filter((item) => item.distance <= Math.max(3, Math.floor(needle.length * 0.45)))
+    .sort((left, right) => left.distance - right.distance || left.name.localeCompare(right.name))
+    .slice(0, 3)
+    .map((item) => item.name);
+}
+
+function editDistance(left: string, right: string): number {
+  const prior = Array.from({ length: right.length + 1 }, (_, index) => index);
+  for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
+    const current = [leftIndex];
+    for (let rightIndex = 1; rightIndex <= right.length; rightIndex += 1) {
+      current[rightIndex] = Math.min(
+        current[rightIndex - 1] + 1,
+        prior[rightIndex] + 1,
+        prior[rightIndex - 1] + (left[leftIndex - 1] === right[rightIndex - 1] ? 0 : 1),
+      );
+    }
+    prior.splice(0, prior.length, ...current);
+  }
+  return prior[right.length];
 }
 
 function matchingPlayers(query: string, players: NflSellerMovePlayerOption[]): NflSellerMovePlayerOption[] {

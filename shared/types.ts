@@ -2369,6 +2369,7 @@ export interface NflSellerMoveResponse {
       stronger_pick: string;
       weaker_pick: string;
     } | null;
+    timing_note: string;
     method: string;
   };
   cap: {

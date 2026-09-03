@@ -64,6 +64,7 @@ export function NflSellerMoveAnalysis({
         {result.market.range_label}
       </p>
       <small style={{ color: F.fgMuted }}>{result.market.sample_size} usable historical trades · {result.market.cohort_label}</small>
+      <small style={{ display: 'block', marginTop: 4, color: F.fgMuted }}>{result.market.timing_note}</small>
     </section>
 
     <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: SPACE.sm }}>

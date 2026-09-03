@@ -37,6 +37,8 @@ export function NflTransactionMarketAnalysisView({ analysis, interpretation = ''
     fire('v6d3cf:open-evidence', { ref });
   };
   const visibleTrends = primaryTrendRows(analysis);
+  const showContractPrice = visibleTrends.some((trend) => trend.contract_price.status !== 'insufficient_evidence');
+  const showTradePrice = visibleTrends.some((trend) => trend.trade_compensation.status !== 'insufficient_evidence');
   const keyTransactions = (
     analysis.influential_transactions.length > 0
       ? analysis.influential_transactions
@@ -77,11 +79,20 @@ export function NflTransactionMarketAnalysisView({ analysis, interpretation = ''
             {analysis.query.baseline_years.join('–')} vs {analysis.query.recent_years.join('–')}
           </span>
         </div>
+        <p style={{ margin: `0 0 ${SPACE.sm}px`, color: F.fgMuted, fontSize: TYPE.meta.md }}>
+          Player movement means qualifying transactions for every 100 roster spots over one season.
+        </p>
         <div style={{ overflowX: 'auto', border: `1px solid ${F.border}`, borderRadius: RADIUS.md, background: F.surface }}>
-          <table style={{ width: '100%', minWidth: 690, borderCollapse: 'collapse', fontSize: TYPE.body.sm }}>
+          <table style={{ width: '100%', minWidth: showContractPrice && showTradePrice ? 690 : 520, borderCollapse: 'collapse', fontSize: TYPE.body.sm }}>
             <thead>
               <tr>
-                {['Position', 'Overall read', 'Player movement', 'Contract cost vs. cap', 'Premium-pick trades'].map((label) => (
+                {[
+                  'Position',
+                  'Overall read',
+                  'Player movement',
+                  ...(showContractPrice ? ['Contract cost vs. cap'] : []),
+                  ...(showTradePrice ? ['Premium-pick trades'] : []),
+                ].map((label) => (
                   <th key={label} style={tableHeaderStyle}>{label}</th>
                 ))}
               </tr>
@@ -92,8 +103,8 @@ export function NflTransactionMarketAnalysisView({ analysis, interpretation = ''
                   <td style={tableCellStyle(index, visibleTrends.length)}><strong style={{ color: F.ink }}>{trend.position_group}</strong></td>
                   <td style={tableCellStyle(index, visibleTrends.length)}><OverallRead trend={trend} /></td>
                   <td style={tableCellStyle(index, visibleTrends.length)}><SignalRead signal={trend.mobility} /></td>
-                  <td style={tableCellStyle(index, visibleTrends.length)}><SignalRead signal={trend.contract_price} /></td>
-                  <td style={tableCellStyle(index, visibleTrends.length)}><SignalRead signal={trend.trade_compensation} /></td>
+                  {showContractPrice && <td style={tableCellStyle(index, visibleTrends.length)}><SignalRead signal={trend.contract_price} /></td>}
+                  {showTradePrice && <td style={tableCellStyle(index, visibleTrends.length)}><SignalRead signal={trend.trade_compensation} /></td>}
                 </tr>
               ))}
             </tbody>
@@ -243,7 +254,7 @@ function ScopeSummary({ analysis }: { analysis: NflTransactionMarketAnalysis }) 
       {analysis.query.team_ids.length ? ` · ${analysis.query.team_ids.join(', ')}` : ' · leaguewide'}
     </span>
     <span style={{ color: F.fgMuted, fontSize: TYPE.meta.md }}>
-      Calculated {formatDate(analysis.generated_at)} · snapshot {analysis.snapshot_id.slice(0, 12)}
+      Calculated {formatDate(analysis.generated_at)} from the loaded public data release
     </span>
   </section>;
 }
@@ -263,7 +274,7 @@ function AnnualSeriesChart({ analysis }: { analysis: NflTransactionMarketAnalysi
     <SectionLabel>Year-by-year player movement</SectionLabel>
     <div style={{ border: `1px solid ${F.border}`, borderRadius: RADIUS.md, background: F.surface, overflow: 'hidden' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: SPACE.sm, padding: `${SPACE.sm}px ${SPACE.md}px`, borderBottom: `1px solid ${F.border}`, color: F.fgMuted, fontSize: TYPE.meta.md }}>
-        <span>Player moves per 100 roster player-seasons</span>
+        <span>Qualifying transactions per 100 roster spots in one season</span>
         <span>{years[0]}–{years.at(-1)}</span>
       </div>
       {chartRows.map(([position, points]) => {
@@ -296,6 +307,9 @@ function AnnualSeriesChart({ analysis }: { analysis: NflTransactionMarketAnalysi
 }
 
 function FullSignalComparison({ trends }: { trends: NflPositionMarketTrend[] }) {
+  const showTransactionShare = trends.some((trend) => trend.transaction_share.status !== 'insufficient_evidence');
+  const showContractPrice = trends.some((trend) => trend.contract_price.status !== 'insufficient_evidence');
+  const showTradePrice = trends.some((trend) => trend.trade_compensation.status !== 'insufficient_evidence');
   return <section>
     <SectionLabel>Full signal comparison</SectionLabel>
     <div style={{ display: 'grid', gap: SPACE.sm }}>
@@ -307,9 +321,9 @@ function FullSignalComparison({ trends }: { trends: NflPositionMarketTrend[] }) 
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: SPACE.sm, marginTop: SPACE.sm }}>
             <SignalMetric label="How often players moved" signal={trend.mobility} />
-            <SignalMetric label="Share of league movement" signal={trend.transaction_share} />
-            <SignalMetric label="Contract cost versus cap" signal={trend.contract_price} />
-            <SignalMetric label="Trades returning premium picks" signal={trend.trade_compensation} />
+            {showTransactionShare && <SignalMetric label="Share of league movement" signal={trend.transaction_share} />}
+            {showContractPrice && <SignalMetric label="Contract cost versus cap" signal={trend.contract_price} />}
+            {showTradePrice && <SignalMetric label="Trades returning premium picks" signal={trend.trade_compensation} />}
           </div>
         </article>
       ))}

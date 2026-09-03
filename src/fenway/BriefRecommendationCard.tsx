@@ -305,7 +305,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
         letterSpacing: TRACKING.micro, textTransform: 'uppercase',
         marginBottom: SPACE.sm,
       }}>
-        {isDataAnalyst ? 'Market answer' : presentationFirst ? 'Current lean' : 'Working thesis'}
+        {isDataAnalyst ? 'Answer' : presentationFirst ? 'Current lean' : 'Working thesis'}
       </div>
       <p style={{
         margin: 0,
