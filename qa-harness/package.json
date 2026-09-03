@@ -8,6 +8,7 @@
     "start": "tsx src/run.ts --mode canonical",
     "canonical": "tsx src/run.ts --mode canonical",
     "adversarial": "tsx src/run.ts --mode adversarial",
+    "smoke:model-move": "tsx src/model-move-smoke.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

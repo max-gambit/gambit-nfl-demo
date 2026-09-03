@@ -15,6 +15,8 @@ import type {
   NflCapRosterExplanationRequest,
   CreateNflWorkspaceRequest,
   NflReadinessPreflightCheck,
+  NflPositionMarketGroup,
+  NflSellerMoveRequest,
   NflTransactionMarketRequest,
 } from '@shared/types';
 import {
@@ -32,6 +34,7 @@ import { createNygWorkspace, listNygWorkspaces } from '../nfl_workspace/service.
 import { NYG_HERO_SEED_KEY } from '../nfl_workspace/seed.js';
 import { analyzeNflTransactionMarket } from '../nfl_transactions/analyze.js';
 import { loadCurrentNflTransactionMarketSnapshot } from '../nfl_transactions/seed.js';
+import { getNflSellerMoveOptions, modelNflSellerMove } from '../nfl_transactions/model_move.js';
 
 export const nflRoutes = new Hono();
 
@@ -127,6 +130,43 @@ nflRoutes.post('/transaction-market/analyze', async (c) => {
     const unavailable = /snapshot|database|fetch failed|relation .* does not exist/i.test(detail);
     return c.json({
       error: unavailable ? 'nfl_transaction_market_unavailable' : 'invalid_transaction_market_request',
+      detail,
+    }, unavailable ? 503 : 400);
+  }
+});
+
+nflRoutes.get('/transaction-market/move-options', async (c) => {
+  const teamId = (c.req.query('team_id') ?? 'NYG').toUpperCase();
+  const positionGroups = (c.req.query('position_groups') ?? '')
+    .split(',')
+    .map((value) => value.trim().toUpperCase())
+    .filter(Boolean) as NflPositionMarketGroup[];
+  try {
+    return c.json(await getNflSellerMoveOptions(teamId, positionGroups));
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    const unavailable = /database|not available/i.test(detail);
+    return c.json({
+      error: unavailable ? 'nfl_seller_move_unavailable' : 'invalid_nfl_seller_move_options_request',
+      detail,
+    }, unavailable ? 503 : 400);
+  }
+});
+
+nflRoutes.post('/transaction-market/model-move', async (c) => {
+  let body: NflSellerMoveRequest;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: 'invalid_json' }, 400);
+  }
+  try {
+    return c.json(await modelNflSellerMove(body));
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    const unavailable = /database|not available|snapshot.*current/i.test(detail);
+    return c.json({
+      error: unavailable ? 'nfl_seller_move_unavailable' : 'invalid_nfl_seller_move_request',
       detail,
     }, unavailable ? 503 : 400);
   }

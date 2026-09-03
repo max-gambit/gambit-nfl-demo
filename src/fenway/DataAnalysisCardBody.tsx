@@ -2,6 +2,7 @@ import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
 import { Cite } from '../ds/Cite';
 import type { DataAnalysisBriefBody } from '@shared/types';
 import { NflTransactionMarketAnalysisView } from './NflTransactionMarketAnalysis';
+import { fire } from '../lib/events';
 
 interface Props {
   body: DataAnalysisBriefBody;
@@ -147,7 +148,7 @@ export function DataAnalysisCardBody({ body }: Props) {
           <SectionLabel>Next questions</SectionLabel>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: SPACE.xs }}>
             {body.followups.map((followup, index) => (
-              <span key={index} style={{
+              <button type="button" key={index} onClick={() => fire('v6d3cf:submit-brief', { text: followup })} style={{
                 fontFamily: 'var(--font-sans)',
                 fontSize: TYPE.body.sm,
                 color: F.fenway,
@@ -155,7 +156,8 @@ export function DataAnalysisCardBody({ body }: Props) {
                 border: `1px solid ${F.fenway}`,
                 borderRadius: RADIUS.pill,
                 padding: `${SPACE.xs - 1}px ${SPACE.sm}px`,
-              }}>{followup}</span>
+                cursor: 'pointer',
+              }}>{followup}</button>
             ))}
           </div>
         </section>

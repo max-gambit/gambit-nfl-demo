@@ -34,7 +34,7 @@ export async function buildCapRosterDecision(
   const metricByPlayer = new Map(detail.metrics.map((row) => [row.player_id, row]));
   const ruleByFamily = new Map(rules.rules.map((rule) => [rule.rule_family, rule]));
   const allowed = new Set(input.allowed_levers);
-  const exactRows = detail.cap.filter(isExact);
+  const exactRows = detail.cap.filter(isExactNflCapRow);
   const excludedDirectional = detail.cap.length - exactRows.length;
   const candidates = bestActionPerPlayer(detail.cap.flatMap((row) => {
     if (!row.player_id || protectedPlayers.has(row.player_id) || protectedGroups.has(normalizePosition(row.position))) return [];
@@ -85,8 +85,8 @@ export async function buildCapRosterDecision(
       exact_contract_rows: exactRows.length,
       captured_contract_rows: exactRows.filter((row) => row.contract_ledger_confidence === 'captured').length,
       derived_contract_rows: exactRows.filter((row) => row.contract_ledger_confidence === 'derived').length,
-      directional_contract_rows: detail.cap.filter((row) => !isExact(row) && row.source_status === 'estimated').length,
-      source_needed_contract_rows: detail.cap.filter((row) => !isExact(row) && row.source_status !== 'estimated').length,
+      directional_contract_rows: detail.cap.filter((row) => !isExactNflCapRow(row) && row.source_status === 'estimated').length,
+      source_needed_contract_rows: detail.cap.filter((row) => !isExactNflCapRow(row) && row.source_status !== 'estimated').length,
       rule_reference_count: new Set(branches.flatMap((branch) => branch.actions.flatMap((action) => action.rule_references.map((rule) => rule.rule_id)))).size,
     },
     baseline: {
@@ -95,8 +95,8 @@ export async function buildCapRosterDecision(
       retrieved_at: data.seed.retrieved_at,
       roster_count: detail.rosterCount,
       total_cap_commitments_dollars: detail.cap.reduce((total, row) => total + (row.cap_number_2026 ?? 0), 0),
-      complete_cap_rows: detail.cap.filter(isExact).length,
-      incomplete_cap_rows: detail.cap.filter((row) => !isExact(row)).length,
+      complete_cap_rows: detail.cap.filter(isExactNflCapRow).length,
+      incomplete_cap_rows: detail.cap.filter((row) => !isExactNflCapRow(row)).length,
     },
     branches,
     recommended_branch_id: recommendedBranchId,
@@ -136,7 +136,7 @@ function actionCandidates(
   metric: NflDemoSeed['player_metrics'][number] | undefined,
   rules: Map<string, NflRuleRow>,
 ): NflCapRosterAction[] {
-  if (!row.player_id || !isExact(row)) return [];
+  if (!row.player_id || !isExactNflCapRow(row)) return [];
   const choices: Array<[NflCapRosterLever, number | null, number | null, string]> = [
     ['pre_june_cut', row.cut_savings_2026, row.dead_money_if_cut_2026, 'post_june_1_accounting'],
     ['post_june_cut', row.post_june_1_cut_savings_2026, row.post_june_1_dead_money_2026, 'post_june_1_accounting'],
@@ -154,8 +154,8 @@ function actionCandidates(
       relief_dollars: relief,
       dead_money_dollars: dead,
       cap_number_dollars: row.cap_number_2026!,
-      depth_effect: depthEffect(metric),
-      depth_evidence: depthEvidence(metric),
+      depth_effect: nflDepthEffect(metric),
+      depth_evidence: nflDepthEvidence(metric),
       confidence: row.contract_ledger_confidence,
       source_status: row.source_status,
       source_url: row.source_url,
@@ -166,7 +166,7 @@ function actionCandidates(
   });
 }
 
-function isExact(row: NflCapRow): boolean {
+export function isExactNflCapRow(row: NflCapRow): boolean {
   return row.source_status === 'captured'
     && (row.contract_ledger_confidence === 'captured' || row.contract_ledger_confidence === 'derived')
     && row.cap_number_2026 != null
@@ -179,7 +179,7 @@ function isExact(row: NflCapRow): boolean {
     && row.post_june_1_cut_savings_2026 != null
     && row.trade_dead_money_2026 != null
     && row.trade_savings_2026 != null
-    && rowArithmeticReconciles(row);
+    && nflCapRowArithmeticReconciles(row);
 }
 
 function bestActionPerPlayer(actions: NflCapRosterAction[]): NflCapRosterAction[] {
@@ -217,14 +217,14 @@ function actionSortBalanced(a: NflCapRosterAction, b: NflCapRosterAction): numbe
   return impact[a.depth_effect] - impact[b.depth_effect] || b.relief_dollars - a.relief_dollars || a.player_name.localeCompare(b.player_name);
 }
 
-function depthEffect(metric: NflDemoSeed['player_metrics'][number] | undefined): NflCapRosterAction['depth_effect'] {
+export function nflDepthEffect(metric: NflDemoSeed['player_metrics'][number] | undefined): NflCapRosterAction['depth_effect'] {
   if (!hasCapturedDepthEvidence(metric) || metric.snap_share_2025 == null) return 'unknown';
   if (metric.snap_share_2025 >= 0.65) return 'high';
   if (metric.snap_share_2025 >= 0.3) return 'medium';
   return 'low';
 }
 
-function depthEvidence(metric: NflDemoSeed['player_metrics'][number] | undefined): NflCapRosterAction['depth_evidence'] {
+export function nflDepthEvidence(metric: NflDemoSeed['player_metrics'][number] | undefined): NflCapRosterAction['depth_evidence'] {
   if (!hasCapturedDepthEvidence(metric) || metric.snap_share_2025 == null) {
     return {
       source_status: 'source-needed',
@@ -263,7 +263,7 @@ function normalizePosition(position: string | null): string {
   return value;
 }
 
-function rowArithmeticReconciles(row: NflCapRow): boolean {
+export function nflCapRowArithmeticReconciles(row: NflCapRow): boolean {
   if (row.cap_number_2026 == null) return false;
   return [
     [row.dead_money_if_cut_2026, row.cut_savings_2026],

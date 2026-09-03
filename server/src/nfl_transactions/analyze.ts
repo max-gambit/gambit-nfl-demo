@@ -96,9 +96,29 @@ export interface NflTransactionLeagueCap {
   source_ref_ids?: string[];
 }
 
+export interface NflTransactionTradeAsset {
+  asset_id: string;
+  trade_id: string;
+  event_year: number;
+  trade_date: string | null;
+  gave_team_id: string;
+  received_team_id: string;
+  asset_type: 'player' | 'draft_pick';
+  pfr_id: string | null;
+  pfr_name: string | null;
+  pick_season: number | null;
+  pick_round: number | null;
+  pick_number: number | null;
+  conditional: boolean | null;
+  source_ref_id: string;
+  raw_source_record?: Record<string, unknown> | null;
+}
+
 export interface NflTransactionMarketSnapshot {
   snapshot_id: string;
   events: NflTransactionMarketEvent[];
+  /** Optional because calculation-only fixtures predating seller-move analysis omit assets. */
+  trade_assets?: NflTransactionTradeAsset[];
   roster_player_seasons: NflTransactionRosterPlayerSeason[];
   league_caps: NflTransactionLeagueCap[];
   source_refs: NflTransactionMarketSourceRef[];

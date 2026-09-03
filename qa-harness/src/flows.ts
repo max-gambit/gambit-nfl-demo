@@ -1,32 +1,12 @@
 export type QaMode = 'canonical' | 'adversarial';
 
 export const CANONICAL_FLOW_NAMES = [
-  'Live Analysis entry',
-  'Primary Analysis workspace',
-  'Data-health preflight',
-  'Hero branch comparison',
-  'Changing target relief',
-  'Protecting a position group',
-  'Evidence and rule drilldown',
-  'What changes the call',
-  'Workspace handoff and client draft',
-  'Roster and cap supporting view',
-  'Offline follow-up',
-  'Private-data refusal',
-  'Reload returns to live Analysis',
-  'Responsive layout',
-  'Zero active NBA terminology',
+  'Live seller-move flow at meeting viewport',
+  'Live seller-move flow at narrow viewport',
 ] as const;
 
 export const ADVERSARIAL_FLOW_NAMES = [
-  'Impossible relief target',
-  'Invalid dollar input',
-  'Protected-group invariant',
-  'Branch arithmetic reconciliation',
-  'Unsupported rule abstention',
-  'Stale or fallback blocking state',
-  'Private-input refusal',
-  'Active-output contamination scan',
-  'Inactive legacy routes and assets',
-  'Primary Analysis reachability',
+  'Fresh market result is required',
+  'Invalid proposed pick is rejected',
+  'Retired cap room is unreachable',
 ] as const;

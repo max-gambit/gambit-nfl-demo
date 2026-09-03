@@ -15,6 +15,8 @@ export type GambitEventMap = {
   'v6d3cf:submit-chat': { text: string };
   /** Submit `text` as a new data analyst brief in the active channel. */
   'v6d3cf:submit-data-brief': { text: string };
+  /** Submit `text` through the primary Analysis composer in the active channel. */
+  'v6d3cf:submit-brief': { text: string };
   /** Prefill the main Analyze composer without submitting. */
   'v6d3cf:prefill-composer': { text: string };
   /** Prefill the right-panel brief reply composer without submitting. */

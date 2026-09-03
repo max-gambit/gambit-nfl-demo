@@ -152,8 +152,9 @@ export async function loadCurrentNflTransactionMarketSnapshot(
   throwIfError(snapshotResult, 'current transaction snapshot');
   const snapshotRow = snapshotResult.data as Record<string, unknown>;
   const snapshotId = String(snapshotRow.snapshot_id);
-  const [events, populations, caps, sources] = await Promise.all([
+  const [events, tradeAssets, populations, caps, sources] = await Promise.all([
     selectAll(database, 'nfl_transaction_events', ['event_id'], snapshotId),
+    selectAll(database, 'nfl_trade_assets', ['asset_id'], snapshotId),
     selectAll(database, 'nfl_position_year_populations', ['year', 'team_id', 'position_group'], snapshotId),
     selectAll(database, 'nfl_transaction_league_caps', ['year'], snapshotId),
     selectAll(database, 'nfl_transaction_source_manifests', ['source_ref_id'], snapshotId),
@@ -185,6 +186,23 @@ export async function loadCurrentNflTransactionMarketSnapshot(
       compensation_summary: nullableString(row.compensation_summary),
       identity_confidence: row.identity_confidence as NflTransactionMarketSnapshot['events'][number]['identity_confidence'],
       source_ref_ids: stringArray(row.source_ref_ids),
+      raw_source_record: isRecord(row.raw_source_record) ? row.raw_source_record : null,
+    })),
+    trade_assets: tradeAssets.map((row) => ({
+      asset_id: String(row.asset_id),
+      trade_id: String(row.trade_id),
+      event_year: Number(row.event_year),
+      trade_date: nullableString(row.trade_date),
+      gave_team_id: String(row.gave_team_id),
+      received_team_id: String(row.received_team_id),
+      asset_type: row.asset_type as 'player' | 'draft_pick',
+      pfr_id: nullableString(row.pfr_id),
+      pfr_name: nullableString(row.pfr_name),
+      pick_season: nullableNumber(row.pick_season),
+      pick_round: nullableNumber(row.pick_round),
+      pick_number: nullableNumber(row.pick_number),
+      conditional: row.conditional == null ? null : Boolean(row.conditional),
+      source_ref_id: String(row.source_ref_id),
       raw_source_record: isRecord(row.raw_source_record) ? row.raw_source_record : null,
     })),
     roster_player_seasons: populations.map((row) => ({

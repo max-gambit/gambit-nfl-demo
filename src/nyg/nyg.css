@@ -31,6 +31,7 @@
 .analysis-modebar>div:last-child{display:flex;border:1px solid #c9c4ba;border-radius:5px;padding:3px;background:#f3f0e9;flex:none}
 .analysis-modebar button{border:0;background:transparent;color:#5e636c;padding:8px 12px;border-radius:3px;font-size:12px;font-weight:700;cursor:pointer}
 .analysis-modebar button.active{background:#14233e;color:#fff}
+.analysis-modebar.analysis-modebar-single>div:last-child{display:grid;border:0;border-radius:0;padding:0;background:transparent}
 .analysis-workspace{height:calc(100% - 58px);background:#f7f9fc}
 .analysis-workspace-canvas{height:100%;display:flex;min-height:0}
 .analysis-workspace-main{flex:1;display:flex;flex-direction:column;min-width:0;position:relative;background:#f7f9fc}

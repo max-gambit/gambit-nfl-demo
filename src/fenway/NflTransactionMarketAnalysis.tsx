@@ -9,6 +9,7 @@ import { nflTransactionMarketFootballRead } from '@shared/nflTransactionMarket';
 import { fire } from '../lib/events';
 import { useBriefs, useUi } from '../store';
 import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
+import { NflModelMove } from './NflModelMove';
 
 interface Props {
   analysis: NflTransactionMarketAnalysis;
@@ -122,6 +123,8 @@ export function NflTransactionMarketAnalysisView({ analysis, interpretation = ''
         </section>
       )}
 
+      <NflModelMove analysis={analysis} />
+
       {supplemental && (
         <section style={{ padding: SPACE.md, borderLeft: `3px solid ${F.borderStrong}`, background: F.cream50 }}>
           <SectionLabel>Analyst interpretation</SectionLabel>
@@ -134,10 +137,11 @@ export function NflTransactionMarketAnalysisView({ analysis, interpretation = ''
           <SectionLabel>Next questions</SectionLabel>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: SPACE.xs }}>
             {followups.slice(0, 4).map((followup) => (
-              <span key={followup} style={{
+              <button type="button" key={followup} onClick={() => fire('v6d3cf:submit-brief', { text: followup })} style={{
                 color: F.fenway, background: F.fenwaySoft, border: `1px solid ${F.fenway}`,
                 borderRadius: RADIUS.pill, padding: `${SPACE.xs - 1}px ${SPACE.sm}px`, fontSize: TYPE.body.sm,
-              }}>{followup}</span>
+                cursor: 'pointer', fontFamily: 'var(--font-sans)',
+              }}>{followup}</button>
             ))}
           </div>
         </section>

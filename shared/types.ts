@@ -2282,6 +2282,118 @@ export interface NflTransactionMarketAnalysis {
   limitations: string[];
 }
 
+export interface NflSellerMovePlayerOption {
+  team_id: string;
+  player_id: string;
+  player_name: string;
+  listed_position: string | null;
+  position_group: NflPositionMarketGroup;
+  cap_year: number;
+  contract_as_of_date: string;
+  contract_source_url: string;
+}
+
+export interface NflSellerMovePositionOption {
+  position_group: NflPositionMarketGroup;
+  players: NflSellerMovePlayerOption[];
+}
+
+export interface NflSellerMoveOptionsResponse {
+  schema_version: 'nfl_seller_move_options.v1';
+  team_id: string;
+  current_year: number;
+  contract_as_of_date: string;
+  positions: NflSellerMovePositionOption[];
+}
+
+export interface NflSellerMoveRequest {
+  team_id: string;
+  player_id: string;
+  position_group: NflPositionMarketGroup;
+  pick_year: number;
+  pick_round: number;
+  market_scope: {
+    snapshot_id: string;
+    start_year: number;
+    end_year: number;
+    include_ytd: boolean;
+    team_ids: string[];
+  };
+}
+
+export interface NflSellerMoveComparable {
+  event_id: string;
+  event_date: string | null;
+  event_year: number;
+  player_name: string;
+  position_group: NflPositionMarketGroup;
+  from_team_id: string;
+  to_team_id: string;
+  pick_year: number;
+  pick_round: number;
+  pick_day: 1 | 2 | 3;
+  pick_delay_years: number;
+  compensation_summary: string;
+  source_name: string;
+  source_url: string;
+}
+
+export interface NflSellerMoveResponse {
+  schema_version: 'nfl_seller_move.v1';
+  generated_at: string;
+  status: 'supported' | 'insufficient_evidence';
+  proposal: {
+    source: 'user_entered';
+    pick_year: number;
+    pick_round: number;
+    pick_day: 1 | 2 | 3;
+    label: string;
+  };
+  player: {
+    team_id: string;
+    player_id: string;
+    player_name: string;
+    listed_position: string | null;
+    position_group: NflPositionMarketGroup;
+    contract_as_of_date: string;
+  };
+  market: {
+    range: 'above' | 'within' | 'below' | null;
+    range_label: string;
+    sample_size: number;
+    cohort_label: string;
+    middle_range: {
+      stronger_pick: string;
+      weaker_pick: string;
+    } | null;
+    method: string;
+  };
+  cap: {
+    accounting_timing: string;
+    current_year: number;
+    current_cap_number_dollars: number;
+    current_year_cap_space_created_dollars: number;
+    current_year_dead_money_dollars: number;
+    next_year: {
+      year: number;
+      scheduled_cap_dollars: number;
+      accelerated_dead_money_dollars: number;
+      cap_effect_dollars: number;
+    } | null;
+    contract_source_url: string;
+    calculation: string;
+  };
+  depth: {
+    consequence: 'major_role' | 'meaningful_role' | 'limited_role' | 'needs_review';
+    label: string;
+    basis: string;
+    source_url: string | null;
+  };
+  comparables: NflSellerMoveComparable[];
+  sources: NflTransactionMarketSourceRef[];
+  limitations: string[];
+}
+
 export type NflCapRosterLever =
   | 'hold'
   | 'restructure'

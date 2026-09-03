@@ -3,6 +3,7 @@ import type {
   GetCurrentNflPlayerMetricsTeamResponse,
   GetCurrentNflTeamResponse,
   NflCoverageMatrixResponse,
+  NflDataHealthResponse,
   ListCurrentNflDemoResponse,
 } from '@shared/types';
 import { SERVER_URL } from './client';
@@ -43,6 +44,10 @@ export async function getCurrentNflCapSheet(
     teamDetailPromises.set(key, promise);
   }
   return teamDetailPromises.get(key)!;
+}
+
+export async function getNflDataHealth(teamId = 'NYG'): Promise<NflDataHealthResponse> {
+  return getJson(`/nfl/data-health?team_id=${encodeURIComponent(teamId.toUpperCase())}`);
 }
 
 export async function getCurrentNflPlayerMetrics(opts: { force?: boolean } = {}): Promise<ListCurrentNflDemoResponse> {

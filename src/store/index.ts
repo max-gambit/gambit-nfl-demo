@@ -26,10 +26,8 @@ import { createToastsSlice } from './toasts';
 
 export type RootStore = SessionsSlice & BriefsSlice & TraySlice & UiSlice & CbaSlice & BookmarksSlice & ProjectsSlice & MonitorsSlice & ToastsSlice;
 
-// Persist only the active selection — narrow surface so a stale storage
-// value can't poison the rest of the store. The actual session + brief data
-// always re-fetches from Supabase on mount; storage just hints which to
-// activate after the load finishes.
+// Persist only durable UI preferences. Question and brief selection is
+// deliberately visit-local so every fresh Analysis launch starts clean.
 export const useStore = create<RootStore>()(
   persist(
     (...a) => ({
@@ -48,7 +46,7 @@ export const useStore = create<RootStore>()(
       // Bumped for the NFL demo identity/default POV. Mismatched versions
       // migrate through this narrow persisted surface instead of dropping the
       // app into Zustand's no-migrate warning path.
-      version: 15,
+      version: 16,
       migrate: (persisted) => {
         const s = persisted as Partial<RootStore>;
         const storedNav = s.activeNav as string | undefined;
@@ -71,8 +69,6 @@ export const useStore = create<RootStore>()(
         };
       },
       partialize: (s) => ({
-        activeSessionId: s.activeSessionId,
-        activeBriefId: s.activeBriefId,
         activeNav: s.activeNav,
         databaseTeamId: s.databaseTeamId,
         databasePlayerId: s.databasePlayerId,

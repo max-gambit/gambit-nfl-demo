@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
 import { BriefRecommendationCard } from './BriefRecommendationCard';
-import { BriefTemplatePicker } from './BriefTemplatePicker';
 import { CompactBriefRow } from './CompactBriefRow';
 import { Composer } from './Composer';
 import { on as onEvt } from '../lib/events';
@@ -16,13 +15,9 @@ import { runAgent } from '../api/agent';
 import { stripBriefModePrefix } from '@shared/briefMode';
 import { briefModeForTemplate, inferBriefTemplateFromQuestion } from '@shared/briefTemplates';
 import { latestTransactionMarketBriefForActiveAnalysis } from '@shared/nflTransactionMarket';
-import type { AgentKind, Brief, BriefTemplateId, BriefTemplateSelection } from '@shared/types';
+import type { AgentKind, Brief, BriefTemplateSelection } from '@shared/types';
 
 const CONTENT_MAX_WIDTH = 760;
-const NFL_MARKET_STARTERS = [
-  'Which position markets have grown or shrunk over the last 10 years, and what does that imply for trade strategy?',
-  'Among trades since 2018, which positions most often returned day-one or day-two picks?',
-];
 
 /**
  * Phase 9 — channel feed with focused-card expand/collapse pattern.
@@ -48,27 +43,11 @@ export function SessionFeed() {
   } = useUi();
   const { pushToast } = useToasts();
   const [submitting, setSubmitting] = useState(false);
-  const [draftQuestion, setDraftQuestion] = useState('');
-  const [templateSelection, setTemplateSelection] = useState<BriefTemplateSelection>({ template_id: 'decision_brief' });
-  const [templateManuallySelected, setTemplateManuallySelected] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const focusedRef = useRef<HTMLDivElement>(null);
   const pendingMarketBriefIdsRef = useRef(new Set<string>());
 
   const session = sessions.find((s) => s.id === activeSessionId) ?? null;
-  const suggestedTemplateId = useMemo<BriefTemplateId>(
-    () => inferBriefTemplateFromQuestion(draftQuestion),
-    [draftQuestion],
-  );
-  const displayedTemplateSelection = templateManuallySelected
-    ? templateSelection
-    : { template_id: suggestedTemplateId };
-
-  const chooseTemplate = (selection: BriefTemplateSelection) => {
-    setTemplateSelection(selection);
-    setTemplateManuallySelected(true);
-  };
-
   // Briefs in this channel, oldest-first (Slack feed order).
   const channelBriefs = useMemo(
     () => briefs
@@ -255,9 +234,11 @@ export function SessionFeed() {
     const parsed = stripBriefModePrefix(text);
     const q = parsed.question.trim();
     const continuesMarketAnalysis = Boolean(activeSessionId && latestMarketBrief);
-    const template = continuesMarketAnalysis || parsed.mode === 'data_analyst'
-      ? { template_id: 'data_table' as const }
-      : (templateManuallySelected ? templateSelection : { template_id: inferBriefTemplateFromQuestion(text) });
+    const template: BriefTemplateSelection = {
+      template_id: continuesMarketAnalysis || parsed.mode === 'data_analyst'
+        ? 'data_table'
+        : inferBriefTemplateFromQuestion(text),
+    };
     const mode = continuesMarketAnalysis
       ? 'data_analyst'
       : briefModeForTemplate(template) ?? parsed.mode ?? 'brief';
@@ -301,7 +282,6 @@ export function SessionFeed() {
       setExpandedBrief(brief.id);
       setRightPanelMode('list');
       setRightPanelOpen(false);
-      setDraftQuestion('');
     } catch (err) {
       pushToast({
         tone: 'error',
@@ -315,6 +295,9 @@ export function SessionFeed() {
 
   useEffect(() => onEvt('v6d3cf:submit-data-brief', ({ text }) => {
     void submitNewBrief(`/data ${text}`);
+  }), [submitNewBrief]);
+  useEffect(() => onEvt('v6d3cf:submit-brief', ({ text }) => {
+    void submitNewBrief(text);
   }), [submitNewBrief]);
 
   // Slash-command from the channel composer dispatches an agent against the
@@ -361,43 +344,14 @@ export function SessionFeed() {
           }}>
             What do you want to analyze?
           </div>
-          <TemplateToolbar
-            selected={displayedTemplateSelection}
-            suggestedTemplateId={suggestedTemplateId}
-            draftQuestion={draftQuestion}
-            onChange={chooseTemplate}
-            disabled={submitting}
-          />
           <Composer
             onSubmit={submitNewBrief}
-            onValueChange={setDraftQuestion}
             onSlashCommand={dispatchFromChannel}
             disabled={submitting}
-            placeholder="Ask about a position market, trade comparables, Giants cap, or NFL rules..."
+            placeholder="Ask about a position market, trade comparables, the Giants roster, or NFL rules..."
             focusBinding="main"
             autoFocus
           />
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: SPACE.xs, marginTop: SPACE.md, justifyContent: 'center' }}>
-            {NFL_MARKET_STARTERS.map((question, index) => (
-              <button
-                key={question}
-                type="button"
-                onClick={() => void submitNewBrief(question)}
-                disabled={submitting}
-                style={{
-                  border: `1px solid ${F.border}`,
-                  borderRadius: RADIUS.pill,
-                  background: F.surface,
-                  color: F.inkSoft,
-                  padding: `${SPACE.xs}px ${SPACE.sm}px`,
-                  fontSize: TYPE.body.sm,
-                  cursor: submitting ? 'default' : 'pointer',
-                }}
-              >
-                {index === 0 ? 'Analyze 10-year position markets' : 'Compare recent trade returns'}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
     );
@@ -443,17 +397,9 @@ export function SessionFeed() {
           pointerEvents: 'auto',
         }}>
           <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto' }}>
-            {!latestMarketBrief && <TemplateToolbar
-              selected={displayedTemplateSelection}
-              suggestedTemplateId={suggestedTemplateId}
-              draftQuestion={draftQuestion}
-              onChange={chooseTemplate}
-              disabled={submitting}
-            />}
             <Composer
               key={activeSessionId ?? 'no-session'}
               onSubmit={submitNewBrief}
-              onValueChange={setDraftQuestion}
               onSlashCommand={dispatchFromChannel}
               disabled={submitting}
               placeholder="Ask a Giants/NFL question…"
@@ -533,50 +479,6 @@ function FeedRow({ brief, isFocused, focusedRef, onCompactClick }: {
     >
       <UserQuestionBubble brief={brief} />
       <BriefRecommendationCard brief={brief} embedTable onReply={toggleThread} isInThread={isShowingThisThread} />
-    </div>
-  );
-}
-
-function TemplateToolbar({
-  selected,
-  suggestedTemplateId,
-  draftQuestion,
-  onChange,
-  disabled,
-}: {
-  selected: BriefTemplateSelection;
-  suggestedTemplateId: BriefTemplateId;
-  draftQuestion: string;
-  onChange: (selection: BriefTemplateSelection) => void;
-  disabled: boolean;
-}) {
-  return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: SPACE.sm,
-      marginBottom: SPACE.sm,
-      minWidth: 0,
-    }}>
-      <BriefTemplatePicker
-        selected={selected}
-        suggestedTemplateId={suggestedTemplateId}
-        draftQuestion={draftQuestion}
-        onChange={onChange}
-        disabled={disabled}
-      />
-      <span style={{
-        fontFamily: 'var(--font-mono)',
-        fontSize: TYPE.meta.xs,
-        color: F.fgFaint,
-        letterSpacing: TRACKING.micro,
-        textTransform: 'uppercase',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-      }}>
-        answer format
-      </span>
     </div>
   );
 }
