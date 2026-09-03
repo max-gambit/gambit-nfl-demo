@@ -29,9 +29,6 @@ interface Props {
    *  panel is in thread mode for this brief. Reinforces the "this is the brief
    *  you're chatting about" coupling. */
   isInThread?: boolean;
-  /** Presenter mode keeps the analysis and reply path, but hides generation,
-   * sharing, monitor, and mutation controls. */
-  presenter?: boolean;
 }
 
 /**
@@ -40,7 +37,7 @@ interface Props {
  * store, dispatches agents against `brief.id`. The parent doesn't need to
  * know about the brief's data — just hands over the row.
  */
-export function BriefRecommendationCard({ brief, embedTable = true, compact = false, onReply, isInThread = false, presenter = false }: Props) {
+export function BriefRecommendationCard({ brief, embedTable = true, compact = false, onReply, isInThread = false }: Props) {
   const { sourcesByBrief, artifactsByBrief, patchBrief } = useBriefs();
   const { pushToast } = useToasts();
   const [changingTemplate, setChangingTemplate] = useState(false);
@@ -351,7 +348,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
             </div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.md, color: F.fgMuted, marginTop: 1 }}>{sourcesNote}</div>
           </div>
-          {!presenter && !dataAnalysisBody?.market_analysis && <BriefTemplatePicker
+          {!dataAnalysisBody?.market_analysis && <BriefTemplatePicker
             selected={templateSelection}
             onChange={(selection) => void changeTemplate(selection)}
             draftQuestion={brief.question}
@@ -421,13 +418,13 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
           </div>
         )}
 
-        {!presenter && artifacts.length > 0 && <ArtifactStrip artifacts={artifacts} />}
+        {artifacts.length > 0 && <ArtifactStrip artifacts={artifacts} />}
 
-        {!presenter && agentActionsBlock}
+        {agentActionsBlock}
 
-        {!presenter && !compact && <BriefActions />}
+        {!compact && <BriefActions />}
 
-        {!presenter && onReply && (
+        {onReply && (
           <div style={{
             marginTop: SPACE.md, paddingTop: SPACE.md,
             borderTop: `1px dashed ${F.border}`,

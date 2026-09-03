@@ -1,7 +1,7 @@
 export type QaMode = 'canonical' | 'adversarial';
 
 export const CANONICAL_FLOW_NAMES = [
-  'Presenter cold start',
+  'Live Analysis entry',
   'Primary Analysis workspace',
   'Data-health preflight',
   'Hero branch comparison',
@@ -13,7 +13,7 @@ export const CANONICAL_FLOW_NAMES = [
   'Roster and cap supporting view',
   'Offline follow-up',
   'Private-data refusal',
-  'Reload and presentation reset',
+  'Reload returns to live Analysis',
   'Responsive layout',
   'Zero active NBA terminology',
 ] as const;

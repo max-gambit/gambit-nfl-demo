@@ -38,7 +38,7 @@ test('deterministic fallback carries method, source provenance, filters, and lim
   assert.match(text, /Supporting transactions:/);
 });
 
-test('presenter evidence rows include the exact returned transactions', () => {
+test('transaction evidence rows include the exact returned transactions', () => {
   const analysis = analysisFixture();
   const rows = deterministicMarketEventSourceRows(analysis, analysis.source_refs.length + 1);
 

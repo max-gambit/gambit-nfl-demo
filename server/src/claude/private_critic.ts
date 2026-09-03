@@ -444,7 +444,7 @@ export function evaluateNflCapRosterNarrative(
       category: 'private_data_bluff',
       severity: 'high',
       claim: 'The explanation relies on private or team-only context.',
-      evidence_boundary: 'The presenter uses public demo data and has no private Giants inputs.',
+      evidence_boundary: 'The analysis uses public demo data and has no private Giants inputs.',
       fix: 'Remove the private claim and turn it into an explicit validation question.',
     });
   }

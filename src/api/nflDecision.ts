@@ -4,7 +4,7 @@ import type {
   NflCapRosterExplanationRequest,
   NflCapRosterExplanationResponse,
   NflDataHealthResponse,
-  NflPresenterPreflightResponse,
+  NflReadinessPreflightResponse,
 } from '@shared/types';
 import { postJson, SERVER_URL } from './client';
 
@@ -14,10 +14,10 @@ export async function getNflDataHealth(teamId = 'NYG'): Promise<NflDataHealthRes
   return res.json() as Promise<NflDataHealthResponse>;
 }
 
-export async function getNflPresenterPreflight(teamId = 'NYG'): Promise<NflPresenterPreflightResponse> {
-  const res = await fetch(`${SERVER_URL}/nfl/presenter-preflight?team_id=${encodeURIComponent(teamId)}`);
-  if (!res.ok) throw new Error(`GET /nfl/presenter-preflight failed: ${res.status} ${await res.text().catch(() => '')}`);
-  return res.json() as Promise<NflPresenterPreflightResponse>;
+export async function getNflReadinessPreflight(teamId = 'NYG'): Promise<NflReadinessPreflightResponse> {
+  const res = await fetch(`${SERVER_URL}/nfl/readiness-preflight?team_id=${encodeURIComponent(teamId)}`);
+  if (!res.ok) throw new Error(`GET /nfl/readiness-preflight failed: ${res.status} ${await res.text().catch(() => '')}`);
+  return res.json() as Promise<NflReadinessPreflightResponse>;
 }
 
 export async function modelNflCapRoster(request: NflCapRosterDecisionRequest): Promise<NflCapRosterDecisionResponse> {

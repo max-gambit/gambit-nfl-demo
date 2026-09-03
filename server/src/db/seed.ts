@@ -5,7 +5,7 @@ import { seedNygDemoWorkspace } from './seed-nfl-demo-workspace.js';
 
 // Baseline seed — runs on every fresh DB.
 //
-// Upserts the owned public NFL datasets and Giants presenter fixture.
+// Upserts the owned public NFL datasets and Giants supporting workspace.
 // User-created and legacy sessions/projects are never deleted by this seed.
 
 async function main() {
@@ -28,7 +28,7 @@ async function main() {
     `${transactionSummary.seed_status}`,
   );
   await seedNygDemoWorkspace();
-  console.log('  · Giants presenter workspace upserted in nyg-demo scope');
+  console.log('  · Giants supporting workspace upserted in nyg-demo scope');
 
   console.log('✓ safe NFL baseline seed complete. Existing sessions and projects were preserved.');
 }

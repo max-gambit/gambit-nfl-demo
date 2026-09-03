@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { RailChannels } from '../briefs/RailChannels';
 import { BriefRightPanel } from '../fenway/BriefRightPanel';
 import { ChannelHeader } from '../fenway/ChannelHeader';
@@ -16,22 +16,12 @@ import {
   useUi,
 } from '../store';
 
-const TY_TRANSACTION_MARKET_QUESTION = 'Which position markets have grown or shrunk over the last 10 years, and what does that imply for trade strategy?';
-
-interface AnalysisWorkspaceProps {
-  presenter?: boolean;
-}
-
 /** The primary question -> analysis -> evidence -> follow-up workspace. */
-export function AnalysisWorkspace({ presenter = false }: AnalysisWorkspaceProps) {
+export function AnalysisWorkspace() {
   const [evidenceDrawerOpen, setEvidenceDrawerOpen] = useState(false);
-  const presentationInitialized = useRef(false);
-  const { sessions, activeSessionId, sessionsLoaded, loadSessions, setActiveSession } = useSessions();
+  const { sessionsLoaded, loadSessions } = useSessions();
   const {
-    briefs,
-    briefsLoaded,
     activeBriefId,
-    setActiveBrief,
     loadAllBriefs,
     loadBriefData,
     loadTurns,
@@ -44,58 +34,12 @@ export function AnalysisWorkspace({ presenter = false }: AnalysisWorkspaceProps)
   const { loadMonitors, subscribeMonitors, acknowledgeBriefAlerts } = useMonitors();
   const {
     railCollapsed,
-    setRailCollapsed,
-    setExpandedBrief,
-    setRightPanelMode,
-    setRightPanelOpen,
     setSelectedOptionRef,
     setSourceFilterRefs,
     setSelectedSourceRef,
     toggleRailCollapsed,
   } = useUi();
   const startNewChannel = useNewChannel();
-
-  useEffect(() => {
-    if (presentationInitialized.current || !sessionsLoaded || !briefsLoaded) return;
-    const tyBrief = [...briefs]
-      .filter((brief) => brief.question.trim() === TY_TRANSACTION_MARKET_QUESTION)
-      .sort((left, right) => new Date(right.created_at).getTime() - new Date(left.created_at).getTime())[0];
-    const presentationSession = presenter
-      ? sessions.find((session) => session.id === tyBrief?.session_id) ?? null
-      : sessions.length === 1 && tyBrief?.session_id === sessions[0].id ? sessions[0] : null;
-    if (!presentationSession) return;
-
-    const targetBrief = tyBrief;
-    if (!targetBrief) return;
-
-    presentationInitialized.current = true;
-    if (activeSessionId !== presentationSession.id) setActiveSession(presentationSession.id);
-    setActiveBrief(targetBrief.id);
-    setExpandedBrief(targetBrief.id);
-    setRightPanelMode('list');
-    setRightPanelOpen(false);
-    setRailCollapsed(true);
-    setEvidenceDrawerOpen(false);
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        const card = document.querySelector<HTMLElement>(`[data-brief-id="${targetBrief.id}"] [data-recommendation-card="true"]`);
-        card?.scrollIntoView({ block: 'start' });
-      });
-    });
-  }, [
-    activeSessionId,
-    briefs,
-    briefsLoaded,
-    presenter,
-    sessions,
-    sessionsLoaded,
-    setActiveBrief,
-    setActiveSession,
-    setExpandedBrief,
-    setRailCollapsed,
-    setRightPanelMode,
-    setRightPanelOpen,
-  ]);
 
   useEffect(() => {
     void loadSessions();
@@ -174,7 +118,7 @@ export function AnalysisWorkspace({ presenter = false }: AnalysisWorkspaceProps)
   }
 
   return (
-    <div className="analysis-workspace" data-presenter={presenter ? 'true' : 'false'}>
+    <div className="analysis-workspace">
       <div className="analysis-workspace-canvas">
         {evidenceDrawerOpen && (
           <button
@@ -186,7 +130,7 @@ export function AnalysisWorkspace({ presenter = false }: AnalysisWorkspaceProps)
         )}
         <div className={`analysis-evidence-rail${evidenceDrawerOpen ? ' open' : ''}`}>
           <LeftRail
-            extra={<RailChannels readOnly={presenter} />}
+            extra={<RailChannels />}
             collapsed={railCollapsed}
             onToggle={toggleRailCollapsed}
           />
@@ -197,8 +141,8 @@ export function AnalysisWorkspace({ presenter = false }: AnalysisWorkspaceProps)
             className="analysis-evidence-trigger"
             onClick={() => setEvidenceDrawerOpen(true)}
           >Why this answer</button>
-          <ChannelHeader readOnly={presenter} />
-          <SessionFeed presenter={presenter} />
+          <ChannelHeader />
+          <SessionFeed />
         </main>
         <BriefRightPanel />
       </div>

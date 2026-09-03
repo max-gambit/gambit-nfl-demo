@@ -8,9 +8,7 @@ import {
   NYG_DEMO_WORKSPACE_KEY,
   NYG_HERO_PROJECT,
   NYG_HERO_SEED_KEY,
-  NYG_TRANSACTION_PRESENTER_BRIEF_IDS,
-  NYG_TRANSACTION_PRESENTER_SEED_KEY,
-  NYG_TRANSACTION_PRESENTER_SESSION_ID,
+  RETIRED_NYG_ANALYSIS_FIXTURE_SEED_KEY,
 } from '../nfl_workspace/seed.js';
 import { analyzeNflTransactionMarketSnapshot } from '../nfl_transactions/analyze.js';
 import { loadCurrentNflTransactionMarketSnapshot } from '../nfl_transactions/seed.js';
@@ -84,27 +82,21 @@ async function main(): Promise<void> {
   record('decision_evidence_counts', evidenceCount === decision.baseline.roster_count, `evidence categories=${evidenceCount}; roster rows=${decision.baseline.roster_count}`);
   const depthBounded = decision.branches.every((branch) => branch.actions.every((action) => action.depth_evidence.source_status === 'captured' || action.depth_effect === 'unknown'));
   record('depth_evidence', depthBounded, `uncaptured role inputs remain unknown=${depthBounded}`);
-  record('presenter_decision', decision.status === 'ready' && decision.recommended_branch_id === 'balanced', decision.deterministic_summary);
+  record('cap_decision', decision.status === 'ready' && decision.recommended_branch_id === 'balanced', decision.deterministic_summary);
 
-  const [sessions, projects, transactionPresenter, transactionPresenterBriefs, visibleChannels] = await Promise.all([
+  const [sessions, projects, visibleRetiredAnalysisFixture] = await Promise.all([
     db.from('sessions').select('id', { count: 'exact', head: true }).eq('workspace_key', NYG_DEMO_WORKSPACE_KEY).eq('seed_key', NYG_HERO_SEED_KEY),
     db.from('projects').select('id', { count: 'exact', head: true }).eq('workspace_key', NYG_DEMO_WORKSPACE_KEY).eq('seed_key', NYG_HERO_SEED_KEY),
-    db.from('sessions').select('id', { count: 'exact', head: true }).eq('workspace_key', NYG_DEMO_WORKSPACE_KEY).eq('seed_key', NYG_TRANSACTION_PRESENTER_SEED_KEY).is('archived_at', null),
-    db.from('briefs').select('id', { count: 'exact', head: true }).eq('session_id', NYG_TRANSACTION_PRESENTER_SESSION_ID).in('id', [...NYG_TRANSACTION_PRESENTER_BRIEF_IDS]),
-    db.from('sessions').select('id', { count: 'exact', head: true }).eq('workspace_key', NYG_DEMO_WORKSPACE_KEY).is('archived_at', null),
+    db.from('sessions').select('id', { count: 'exact', head: true }).eq('workspace_key', NYG_DEMO_WORKSPACE_KEY).eq('seed_key', RETIRED_NYG_ANALYSIS_FIXTURE_SEED_KEY).is('archived_at', null),
   ]);
-  if (sessions.error) throw new Error(`presenter session check failed: ${sessions.error.message}`);
-  if (projects.error) throw new Error(`presenter project check failed: ${projects.error.message}`);
-  if (transactionPresenter.error) throw new Error(`transaction presenter session check failed: ${transactionPresenter.error.message}`);
-  if (transactionPresenterBriefs.error) throw new Error(`transaction presenter brief check failed: ${transactionPresenterBriefs.error.message}`);
-  if (visibleChannels.error) throw new Error(`visible channel check failed: ${visibleChannels.error.message}`);
+  if (sessions.error) throw new Error(`support session check failed: ${sessions.error.message}`);
+  if (projects.error) throw new Error(`support project check failed: ${projects.error.message}`);
+  if (visibleRetiredAnalysisFixture.error) throw new Error(`retired Analysis fixture check failed: ${visibleRetiredAnalysisFixture.error.message}`);
   record('seed_ownership', sessions.count === 1 && projects.count === 1, `owned sessions=${sessions.count ?? 0}; owned projects=${projects.count ?? 0}`);
   record(
-    'analysis_presenter_state',
-    transactionPresenter.count === 1
-      && transactionPresenterBriefs.count === NYG_TRANSACTION_PRESENTER_BRIEF_IDS.length
-      && visibleChannels.count === 1,
-    `presenter sessions=${transactionPresenter.count ?? 0}; briefs=${transactionPresenterBriefs.count ?? 0}; visible channels=${visibleChannels.count ?? 0}`,
+    'analysis_live_start',
+    visibleRetiredAnalysisFixture.count === 0,
+    `visible precomputed sessions=${visibleRetiredAnalysisFixture.count ?? 0}`,
   );
 
   const modules = await collectActiveModules(path.join(repoRoot, 'src/main.tsx'));

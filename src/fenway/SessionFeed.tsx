@@ -36,7 +36,7 @@ const NFL_MARKET_STARTERS = [
  *     session. Submitting auto-focuses the new brief AND opens its thread
  *     in the right panel so follow-ups land where the user expects.
  */
-export function SessionFeed({ presenter = false }: { presenter?: boolean }) {
+export function SessionFeed() {
   const { sessions, activeSessionId, patchSessionLabel, insertSession, setActiveSession } = useSessions();
   const {
     briefs,
@@ -424,7 +424,6 @@ export function SessionFeed({ presenter = false }: { presenter?: boolean }) {
               isFocused={b.id === effectiveFocusedId}
               focusedRef={b.id === effectiveFocusedId ? focusedRef : null}
               onCompactClick={onCompactClick}
-              presenter={presenter}
             />
           ))}
         </div>
@@ -457,7 +456,7 @@ export function SessionFeed({ presenter = false }: { presenter?: boolean }) {
               onValueChange={setDraftQuestion}
               onSlashCommand={dispatchFromChannel}
               disabled={submitting}
-              placeholder={`Ask a Giants/NFL question in #${session.label}...`}
+              placeholder="Ask a Giants/NFL question…"
               focusBinding="main"
               autoFocus={channelBriefs.length === 0}
             />
@@ -468,7 +467,7 @@ export function SessionFeed({ presenter = false }: { presenter?: boolean }) {
   );
 }
 
-function FeedRow({ brief, isFocused, focusedRef, onCompactClick, presenter }: {
+function FeedRow({ brief, isFocused, focusedRef, onCompactClick }: {
   brief: Brief;
   isFocused: boolean;
   focusedRef: React.RefObject<HTMLDivElement> | null;
@@ -476,7 +475,6 @@ function FeedRow({ brief, isFocused, focusedRef, onCompactClick, presenter }: {
    *  the parent can capture the row's pre-click bounding rect and anchor the
    *  brief at the same viewport position after the layout commits. */
   onCompactClick: (briefId: string, originEl: HTMLElement) => void;
-  presenter: boolean;
 }) {
   const {
     setExpandedBrief, setRightPanelMode, setRightPanelOpen,
@@ -534,7 +532,7 @@ function FeedRow({ brief, isFocused, focusedRef, onCompactClick, presenter }: {
       onClick={onCardClick}
     >
       <UserQuestionBubble brief={brief} />
-      <BriefRecommendationCard brief={brief} embedTable onReply={toggleThread} isInThread={isShowingThisThread} presenter={presenter} />
+      <BriefRecommendationCard brief={brief} embedTable onReply={toggleThread} isInThread={isShowingThisThread} />
     </div>
   );
 }

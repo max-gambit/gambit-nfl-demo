@@ -164,7 +164,7 @@ test('missing citations and invented private inputs fail closed', async () => {
   assert.ok(result.validation_issues.some((issue) => issue.includes('private_data_bluff')));
 });
 
-test('default presenter follow-up never requires a model provider', async () => {
+test('default cap-analysis follow-up never requires a model provider', async () => {
   const { request, options } = await fixture();
   let calls = 0;
   const result = await explainCapRosterDecision({ ...request, use_live_model: false }, {

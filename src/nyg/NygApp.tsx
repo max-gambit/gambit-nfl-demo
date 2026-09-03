@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CbaSection, GetCurrentNflTeamResponse, NflCapRosterAction, NflCapRosterBranch, NflCapRosterDecisionResponse, NflCapRosterExplanationResponse, NflDataHealthResponse, NflWorkspaceSummary } from '@shared/types';
 import { getCurrentNflCapSheet } from '../api/nfl';
 import { resolveBriefShareToken } from '../api/briefs';
-import { explainNflCapRoster, getNflPresenterPreflight, modelNflCapRoster } from '../api/nflDecision';
+import { explainNflCapRoster, getNflReadinessPreflight, modelNflCapRoster } from '../api/nflDecision';
 import { getNflRuleArticle, listNflRules } from '../api/nflRules';
 import { createNflWorkspace, listNflWorkspaces } from '../api/nflWorkspace';
 import { AnalysisWorkspace } from '../analysis/AnalysisWorkspace';
@@ -19,11 +19,8 @@ const NAV: Array<{ id: View; label: string }> = [
 ];
 const DEFAULT_TARGET = 15_000_000;
 const DEFAULT_GROUPS = ['QB'];
-const TY_TRANSACTION_MARKET_QUESTION = 'Which position markets have grown or shrunk over the last 10 years, and what does that imply for trade strategy?';
-
 export function NygApp() {
   const query = new URLSearchParams(window.location.search);
-  const presenter = query.get('present') === 'nyg-cap-roster';
   const qaBlocked = query.get('qa') === 'blocked';
   const [view, setView] = useState<View>('analysis');
   const [analysisMode, setAnalysisMode] = useState<AnalysisMode>('workspace');
@@ -41,7 +38,6 @@ export function NygApp() {
   const [focusedRule, setFocusedRule] = useState<CbaSection | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [resetEpoch, setResetEpoch] = useState(0);
   const [deepLinkHandled, setDeepLinkHandled] = useState(false);
   const requestSequence = useRef(0);
   const { sessionsLoaded, setActiveSession } = useSessions();
@@ -51,7 +47,6 @@ export function NygApp() {
     setExpandedBrief,
     setRightPanelMode,
     setRightPanelOpen,
-    setRailCollapsed,
   } = useUi();
 
   async function load(nextTarget = target, nextPlayers = protectedPlayers, nextGroups = protectedGroups, nextAssumption = assumption) {
@@ -59,11 +54,11 @@ export function NygApp() {
     setLoading(true); setError(null); setDecision(null); setFocusedAction(null);
     try {
       const [preflight, nextRoster, toc, nextDecision] = await Promise.all([
-        getNflPresenterPreflight('NYG'), getCurrentNflCapSheet('NYG', { force: true }), listNflRules(),
-        modelNflCapRoster({ team_id: 'NYG', target_relief_dollars: nextTarget, protected_player_ids: nextPlayers, protected_position_groups: nextGroups, allowed_levers: ['hold', 'pre_june_cut', 'post_june_cut', 'trade', 'restructure', 'extension'], assumptions: nextAssumption.trim() ? [{ key: 'presenter_scenario', label: 'Temporary presenter scenario', value: nextAssumption.trim(), source: 'user_entered' }] : [] }),
+        getNflReadinessPreflight('NYG'), getCurrentNflCapSheet('NYG', { force: true }), listNflRules(),
+        modelNflCapRoster({ team_id: 'NYG', target_relief_dollars: nextTarget, protected_player_ids: nextPlayers, protected_position_groups: nextGroups, allowed_levers: ['hold', 'pre_june_cut', 'post_june_cut', 'trade', 'restructure', 'extension'], assumptions: nextAssumption.trim() ? [{ key: 'user_scenario', label: 'Temporary scenario', value: nextAssumption.trim(), source: 'user_entered' }] : [] }),
       ]);
       if (requestId !== requestSequence.current) return;
-      const nextHealth = preflight.meeting_ready ? preflight.health : applyPresenterBlockers(preflight.health, preflight.blockers);
+      const nextHealth = preflight.meeting_ready ? preflight.health : applyReadinessBlockers(preflight.health, preflight.blockers);
       setHealth(qaBlocked ? simulateBlockedHealth(nextHealth) : nextHealth); setRoster(nextRoster); setRules(toc.sections); setDecision(nextDecision);
       setSelectedBranch(nextDecision.recommended_branch_id ?? 'maximize_relief');
     } catch (caught) {
@@ -71,6 +66,13 @@ export function NygApp() {
       setHealth(null); setDecision(null); setError(caught instanceof Error ? caught.message : String(caught));
     } finally { if (requestId === requestSequence.current) setLoading(false); }
   }
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has('present')) return;
+    params.delete('present');
+    const next = params.toString();
+    window.history.replaceState({}, '', `${window.location.pathname}${next ? `?${next}` : ''}${window.location.hash}`);
+  }, []);
   useEffect(() => { void load(DEFAULT_TARGET, [], DEFAULT_GROUPS, ''); }, []);
   useEffect(() => {
     void listNflWorkspaces()
@@ -87,7 +89,7 @@ export function NygApp() {
   }), []);
 
   useEffect(() => {
-    if (presenter || deepLinkHandled || !sessionsLoaded || !briefsLoaded) return;
+    if (deepLinkHandled || !sessionsLoaded || !briefsLoaded) return;
     const params = new URLSearchParams(window.location.search);
     const linkedBriefId = params.get('brief');
     const shareToken = params.get('share');
@@ -141,7 +143,6 @@ export function NygApp() {
     briefs,
     briefsLoaded,
     deepLinkHandled,
-    presenter,
     pushToast,
     sessionsLoaded,
     setActiveBrief,
@@ -163,18 +164,6 @@ export function NygApp() {
     catch (caught) { setError(caught instanceof Error ? caught.message : String(caught)); }
   }
   function invalidateDecision() { setDecision(null); setFocusedAction(null); }
-  function resetPresentation() {
-    setView('analysis'); setAnalysisMode('workspace'); setTarget(DEFAULT_TARGET); setProtectedPlayers([]); setProtectedGroups(DEFAULT_GROUPS); setAssumption('');
-    setSelectedBranch('balanced'); setFocusedAction(null); setFocusedRule(null); window.scrollTo({ top: 0 });
-    const tyBrief = briefs.find((brief) => brief.question.trim() === TY_TRANSACTION_MARKET_QUESTION);
-    if (tyBrief) {
-      setActiveSession(tyBrief.session_id);
-      setActiveBrief(tyBrief.id);
-      setExpandedBrief(tyBrief.id);
-    }
-    setRightPanelMode('list'); setRightPanelOpen(false); setRailCollapsed(true);
-    setResetEpoch((value) => value + 1); void load(DEFAULT_TARGET, [], DEFAULT_GROUPS, '');
-  }
   useEffect(() => {
     if (!focusedAction || view !== 'analysis' || analysisMode !== 'cap_model' || !window.matchMedia('(max-width: 1100px)').matches) return;
     window.requestAnimationFrame(() => {
@@ -186,16 +175,16 @@ export function NygApp() {
   const branch = decision?.branches.find((candidate) => candidate.id === selectedBranch) ?? decision?.branches[0] ?? null;
   const activeAnalysisMode: AnalysisMode = analysisMode;
 
-  return <div className="nyg-app" data-presenter={presenter ? 'true' : 'false'} data-qa-simulation={qaBlocked ? 'blocked' : undefined}>
+  return <div className="nyg-app" data-qa-simulation={qaBlocked ? 'blocked' : undefined}>
     <header className="nyg-header">
       <button className="nyg-wordmark" onClick={() => { setView('analysis'); setAnalysisMode('workspace'); }} aria-label="Open Analysis"><span className="nyg-monogram">NY</span><span><strong>GIANTS</strong><small>FOOTBALL OPERATIONS</small></span></button>
       <nav aria-label="Primary navigation">{NAV.map((item) => <button key={item.id} className={view === item.id ? 'active' : ''} onClick={() => { setView(item.id); if (item.id === 'analysis') setAnalysisMode('workspace'); }}>{item.label}</button>)}</nav>
-      <div className="nyg-header-actions"><span className="public-badge">Public demo data</span>{presenter && <button className="quiet-button" onClick={resetPresentation}>Reset presentation</button>}</div>
+      <div className="nyg-header-actions"><span className="public-badge">Public demo data</span></div>
     </header>
     <div className="nyg-statusbar"><StatusDot status={health?.meeting_ready ? 'ready' : health ? 'blocked' : 'loading'} /><span>{health?.meeting_ready ? `Roster & cap current through ${sourceDate ? formatDate(sourceDate) : 'the latest public update'}` : health ? 'Public data needs attention' : 'Checking public data'}</span></div>
     {error && <div className="nyg-alert" role="alert"><strong>Couldn’t load current data.</strong> {error}</div>}
     <main className={`nyg-main ${view === 'analysis' ? 'nyg-main-analysis' : ''}`}>
-      {view === 'analysis' && <><AnalysisModeBar mode={activeAnalysisMode} onChange={setAnalysisMode} />{activeAnalysisMode === 'workspace' ? <AnalysisWorkspace presenter={presenter} /> : health && !health.meeting_ready ? <BlockedPreflight health={health} /> : <DecisionRoom loading={loading} health={health} decision={decision} branch={branch} selectedBranch={selectedBranch} setSelectedBranch={(id) => { setSelectedBranch(id); setFocusedAction(null); }} target={target} setTarget={(value) => { setTarget(value); invalidateDecision(); }} protectedPlayers={protectedPlayers} protectedGroups={protectedGroups} setProtectedGroups={(value) => { setProtectedGroups(value); invalidateDecision(); }} assumption={assumption} setAssumption={(value) => { setAssumption(value); invalidateDecision(); }} resetKey={resetEpoch} onRecompute={() => void load()} focusedAction={focusedAction} onFocusAction={setFocusedAction} onProtectPlayer={(id) => { const next = [...new Set([...protectedPlayers, id])]; setProtectedPlayers(next); void load(target, next, protectedGroups, assumption); }} onOpenRule={(id) => void openRule(id)} />}</>}
+      {view === 'analysis' && <><AnalysisModeBar mode={activeAnalysisMode} onChange={setAnalysisMode} />{activeAnalysisMode === 'workspace' ? <AnalysisWorkspace /> : health && !health.meeting_ready ? <BlockedPreflight health={health} /> : <DecisionRoom loading={loading} health={health} decision={decision} branch={branch} selectedBranch={selectedBranch} setSelectedBranch={(id) => { setSelectedBranch(id); setFocusedAction(null); }} target={target} setTarget={(value) => { setTarget(value); invalidateDecision(); }} protectedPlayers={protectedPlayers} protectedGroups={protectedGroups} setProtectedGroups={(value) => { setProtectedGroups(value); invalidateDecision(); }} assumption={assumption} setAssumption={(value) => { setAssumption(value); invalidateDecision(); }} onRecompute={() => void load()} focusedAction={focusedAction} onFocusAction={setFocusedAction} onProtectPlayer={(id) => { const next = [...new Set([...protectedPlayers, id])]; setProtectedPlayers(next); void load(target, next, protectedGroups, assumption); }} onOpenRule={(id) => void openRule(id)} />}</>}
       {view === 'briefing' && <Briefing health={health} decision={decision} onOpenDecision={() => { setView('analysis'); setAnalysisMode('cap_model'); }} onOpenRoster={() => setView('roster')} />}
       {view === 'workspaces' && <Workspaces onOpenDecision={() => { setView('analysis'); setAnalysisMode('cap_model'); }} decision={decision} workspaces={workspaces} onCreate={createWorkspace} />}
       {view === 'roster' && <RosterCap roster={roster} onFocus={(action) => { setSelectedBranch('maximize_relief'); setFocusedAction(action); setView('analysis'); setAnalysisMode('cap_model'); }} decision={decision} />}
@@ -217,7 +206,7 @@ function Briefing({ health, decision, onOpenDecision, onOpenRoster }: { health: 
   </section>;
 }
 
-type DecisionProps = { loading: boolean; health: NflDataHealthResponse | null; decision: NflCapRosterDecisionResponse | null; branch: NflCapRosterBranch | null; selectedBranch: NflCapRosterBranch['id']; setSelectedBranch: (id: NflCapRosterBranch['id']) => void; target: number; setTarget: (value: number) => void; protectedPlayers: string[]; protectedGroups: string[]; setProtectedGroups: (value: string[]) => void; assumption: string; setAssumption: (value: string) => void; resetKey: number; onRecompute: () => void; focusedAction: NflCapRosterAction | null; onFocusAction: (action: NflCapRosterAction | null) => void; onProtectPlayer: (id: string) => void; onOpenRule: (id: string) => void };
+type DecisionProps = { loading: boolean; health: NflDataHealthResponse | null; decision: NflCapRosterDecisionResponse | null; branch: NflCapRosterBranch | null; selectedBranch: NflCapRosterBranch['id']; setSelectedBranch: (id: NflCapRosterBranch['id']) => void; target: number; setTarget: (value: number) => void; protectedPlayers: string[]; protectedGroups: string[]; setProtectedGroups: (value: string[]) => void; assumption: string; setAssumption: (value: string) => void; onRecompute: () => void; focusedAction: NflCapRosterAction | null; onFocusAction: (action: NflCapRosterAction | null) => void; onProtectPlayer: (id: string) => void; onOpenRule: (id: string) => void };
 function DecisionRoom(props: DecisionProps) {
   const { loading, health, decision, branch } = props;
   const protectableActions = decision?.branches.find((candidate) => candidate.id === 'maximize_relief')?.actions ?? [];
@@ -228,7 +217,7 @@ function DecisionRoom(props: DecisionProps) {
     <div className="model-controls"><label><span>Required 2026 relief</span><input aria-label="Target relief dollars" type="number" step="1000000" min="0" value={props.target} disabled={loading} onChange={(e) => props.setTarget(Math.max(0, Math.round(Number(e.target.value))))} /></label><div className="control-group"><span>Protected groups</span><div className="chip-row">{['QB', 'RB', 'TE', 'OL', 'WR', 'DL', 'EDGE/LB', 'CB', 'S'].map((group) => <button key={group} disabled={loading} className={props.protectedGroups.includes(group) ? 'chip active' : 'chip'} onClick={() => props.setProtectedGroups(props.protectedGroups.includes(group) ? props.protectedGroups.filter((item) => item !== group) : [...props.protectedGroups, group])}>{group}</button>)}</div><select aria-label="Protect player" value="" disabled={loading || protectableActions.length === 0} onChange={(event) => { if (event.target.value) props.onProtectPlayer(event.target.value); }}><option value="">Protect a player · {props.protectedPlayers.length} selected</option>{protectableActions.map((action) => <option key={action.player_id} value={action.player_id}>{action.player_name} · {action.position}</option>)}</select></div><label className="assumption-control"><span>Temporary scenario assumption</span><input aria-label="Temporary scenario assumption" value={props.assumption} disabled={loading} placeholder="Optional; not persisted" onChange={(event) => props.setAssumption(event.target.value)} /><small>User-entered · not sourced · not persisted</small></label><button className="primary-button" onClick={props.onRecompute} disabled={loading}>{loading ? 'Recomputing…' : 'Recompute branches'}</button></div>
     <div className="branch-grid" aria-label="Cap relief branches">{decision?.branches.map((candidate) => <button key={candidate.id} className={`branch-card ${props.selectedBranch === candidate.id ? 'selected' : ''}`} onClick={() => props.setSelectedBranch(candidate.id)}><span className="branch-state">{candidate.status.replace('_', ' ')}</span><strong>{candidate.label}</strong><span className="branch-number">{money(candidate.total_relief_dollars)}</span><small>{candidate.target_met ? 'Target met' : candidate.id === 'hold' ? 'Baseline' : `${money(Math.max(0, candidate.target_relief_dollars - candidate.total_relief_dollars))} short`}</small></button>)}</div>
     {branch && <article className="branch-detail"><div className="branch-detail-head"><div><span className="kicker">Selected branch</span><h2>{branch.label}</h2><p>{branch.thesis}</p></div><div className="totals"><Metric label="Verified relief" value={money(branch.total_relief_dollars)} /><Metric label="Dead money" value={money(branch.total_dead_money_dollars)} /></div></div><div className="action-table" role="table"><div className="action-row action-head" role="row"><span>Player / action</span><span>Depth effect</span><span>Relief</span><span>Dead money</span></div>{branch.actions.length === 0 && <div className="empty-row">No transaction actions in this branch.</div>}{branch.actions.map((action) => <button className="action-row" role="row" key={action.player_id} onClick={() => props.onFocusAction(action)}><span><strong>{action.player_name}</strong><small>{action.position} · {labelLever(action.lever)}</small></span><span><Impact value={action.depth_effect} /></span><span className="positive">{money(action.relief_dollars)}</span><span>{money(action.dead_money_dollars)}</span></button>)}</div>{branch.blockers.length > 0 && <div className="boundary-note"><strong>Evidence boundary</strong>{branch.blockers.map((item) => <p key={item}>{item}</p>)}</div>}</article>}
-    <section className="changes-call"><span className="kicker">What changes the call</span><div className="trigger-grid">{decision?.what_changes_the_call.map((item) => <article key={item.id}><strong>{item.trigger}</strong><p>{item.effect}</p><small>{item.owner}</small></article>)}</div></section><FollowUp key={props.resetKey} target={props.target} protectedPlayers={props.protectedPlayers} protectedGroups={props.protectedGroups} assumption={props.assumption} />
+    <section className="changes-call"><span className="kicker">What changes the call</span><div className="trigger-grid">{decision?.what_changes_the_call.map((item) => <article key={item.id}><strong>{item.trigger}</strong><p>{item.effect}</p><small>{item.owner}</small></article>)}</div></section><FollowUp target={props.target} protectedPlayers={props.protectedPlayers} protectedGroups={props.protectedGroups} assumption={props.assumption} />
   </div><aside className="evidence-panel" tabIndex={-1}><span className="kicker">Why this answer</span>{props.focusedAction ? <><h2>{props.focusedAction.player_name}</h2><p>{labelLever(props.focusedAction.lever)} · {props.focusedAction.position}</p><dl><div><dt>Cap number</dt><dd>{money(props.focusedAction.cap_number_dollars)}</dd></div><div><dt>Verified relief</dt><dd className="positive">{money(props.focusedAction.relief_dollars)}</dd></div><div><dt>Dead money</dt><dd>{money(props.focusedAction.dead_money_dollars)}</dd></div><div><dt>Contract evidence</dt><dd>{props.focusedAction.confidence}</dd></div><div><dt>Data as of</dt><dd>{decision?.baseline.as_of_date ? formatDate(decision.baseline.as_of_date) : 'Unavailable'}</dd></div><div><dt>Football consequence</dt><dd><Impact value={props.focusedAction.depth_effect} /></dd></div></dl><div className="depth-proof"><span>2025 public role evidence</span><p>{props.focusedAction.depth_evidence.basis}</p>{props.focusedAction.depth_evidence.source_url && <a className="source-link" href={props.focusedAction.depth_evidence.source_url} target="_blank" rel="noreferrer">Open role source ↗</a>}</div><div className="claim-usage"><span>Used by</span><strong>{branch?.label ?? 'Selected branch'} · verified relief and transaction line</strong><small>{props.focusedAction.confidence === 'captured' ? 'Captured contract values' : 'Defensibly derived contract values'}; reconciled calculation.</small></div>{props.focusedAction.source_url && <a className="source-link" href={props.focusedAction.source_url} target="_blank" rel="noreferrer">Open player contract source ↗</a>}{props.focusedAction.rule_references.map((rule) => <button className="rule-link" key={rule.rule_id} onClick={() => props.onOpenRule(rule.rule_id)}><span>{rule.title}</span><small>{rule.locator}</small></button>)}<div className="confirmation-list"><span>Before execution</span>{props.focusedAction.next_actions.map((action) => <p key={action}>✓ {action}</p>)}</div><button className="quiet-button full" onClick={() => props.onProtectPlayer(props.focusedAction!.player_id)}>Protect player and recompute</button></> : <><h2>Every number opens its proof.</h2><p>Select an action in the current branch to inspect its contract row, exact rule locator, and bounded football consequence.</p><div className="evidence-empty"><span>01</span> Player contract row<br /><span>02</span> Rule authority<br /><span>03</span> Public role evidence</div></>}</aside></section>;
 }
 
@@ -258,7 +247,7 @@ function Workspaces({ onOpenDecision, decision, workspaces, onCreate }: { onOpen
   }
   return <section className="page-shell"><div className="workspace-title-row"><PageTitle eyebrow="Workspaces · NYG" title={selected?.title ?? 'Decision workspaces'} subtitle="Keep the question, evidence, scenarios, decision, and action plan together." /><button className="primary-button" onClick={() => setDraftOpen(true)}>+ New workspace</button></div>
     {draftOpen && <article className="workspace-draft"><div><span className="kicker">New workspace</span><h2>Start with the decision question</h2><p>The workspace begins when you submit the first question.</p></div><textarea aria-label="New workspace question" placeholder="What football decision needs an evidence and scenario path?" value={draftQuestion} onChange={(event) => setDraftQuestion(event.target.value)} /><div className="draft-actions"><button className="quiet-button" onClick={() => { setDraftOpen(false); setDraftQuestion(''); setCreateError(null); }}>Cancel</button><button className="primary-button" onClick={() => void submitDraft()} disabled={!draftQuestion.trim() || creating}>{creating ? 'Creating…' : 'Create from first question'}</button></div>{createError && <p className="settings-blocker">{createError}</p>}</article>}
-    {workspaces.length > 0 && <div className="workspace-list" aria-label="NYG decision workspaces">{workspaces.map((workspace) => <button key={workspace.id} className={selected?.id === workspace.id ? 'selected' : ''} onClick={() => setSelectedId(workspace.id)}><span>{workspace.seeded ? 'Reviewed' : 'In progress'}</span><strong>{workspace.title}</strong><small>{workspace.question}</small></button>)}</div>}
+    {workspaces.length > 0 && <div className="workspace-list" aria-label="NYG decision workspaces">{workspaces.map((workspace) => <button key={workspace.id} className={selected?.id === workspace.id ? 'selected' : ''} onClick={() => setSelectedId(workspace.id)}><span>{workspace.seeded ? 'Public data' : 'In progress'}</span><strong>{workspace.title}</strong><small>{workspace.question}</small></button>)}</div>}
     <div className="workspace-overview"><div><span className="kicker">Decision owner</span><strong>Football Operations</strong></div><div><span className="kicker">Current stage</span><strong>{selected ? stageLabel(selected.stage) : 'Question'}</strong></div><div><span className="kicker">Evidence state</span><strong>{decision?.data_health.meeting_ready ? 'Current' : 'Needs attention'}</strong></div><button className="primary-button" onClick={onOpenDecision}>Open in Analysis</button></div><div className="stage-track">{stages.map((stage, index) => <div key={stage.id} className={index < currentStage ? 'complete' : index === currentStage ? 'current' : ''}><span>{index < currentStage ? '✓' : index + 1}</span><strong>{stage.label}</strong><small>{stage.note}</small></div>)}</div><div className="workspace-notes"><article><span className="kicker">Decision statement</span><h3>{selected?.question ?? `Which verified path creates at least ${money(decision?.branches[0]?.target_relief_dollars ?? DEFAULT_TARGET)} while preserving the positions we refuse to weaken?`}</h3></article><article><span className="kicker">Next action</span><h3>Cap administration confirms selected contract rows; personnel signs off on replacement depth.</h3></article></div></section>;
 }
 
@@ -295,7 +284,7 @@ function FollowUp({ target, protectedPlayers, protectedGroups, assumption }: { t
     }
     setPending(true); setError(null);
     try {
-      setAnswer(await explainNflCapRoster({ team_id: 'NYG', question, use_live_model: useLiveModel, target_relief_dollars: target, protected_player_ids: protectedPlayers, protected_position_groups: protectedGroups, allowed_levers: ['hold', 'pre_june_cut', 'post_june_cut', 'trade', 'restructure', 'extension'], assumptions: assumption.trim() ? [{ key: 'presenter_scenario', label: 'Temporary presenter scenario', value: assumption.trim(), source: 'user_entered' }] : [] }));
+      setAnswer(await explainNflCapRoster({ team_id: 'NYG', question, use_live_model: useLiveModel, target_relief_dollars: target, protected_player_ids: protectedPlayers, protected_position_groups: protectedGroups, allowed_levers: ['hold', 'pre_june_cut', 'post_june_cut', 'trade', 'restructure', 'extension'], assumptions: assumption.trim() ? [{ key: 'user_scenario', label: 'Temporary scenario', value: assumption.trim(), source: 'user_entered' }] : [] }));
     } catch (caught) { setAnswer(null); setError(caught instanceof Error ? caught.message : String(caught)); }
     finally { setPending(false); }
   }
@@ -329,6 +318,6 @@ function simulateBlockedHealth(health: NflDataHealthResponse): NflDataHealthResp
     remediation: ['Refresh and seed the reviewed roster and cap snapshot in the current database views.'],
   };
 }
-function applyPresenterBlockers(health: NflDataHealthResponse, blockers: string[]): NflDataHealthResponse {
+function applyReadinessBlockers(health: NflDataHealthResponse, blockers: string[]): NflDataHealthResponse {
   return blockers.length === 0 ? health : { ...health, status: 'blocked', meeting_ready: false, blockers: [...new Set([...health.blockers, ...blockers])] };
 }

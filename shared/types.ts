@@ -2433,21 +2433,20 @@ export interface CreateNflWorkspaceResponse {
   workspace: NflWorkspaceSummary;
 }
 
-export interface NflPresenterPreflightCheck {
-  id: 'data_health' | 'workspace_fixture' | 'deterministic_decision' | 'public_demo_boundary';
+export interface NflReadinessPreflightCheck {
+  id: 'data_health' | 'supporting_workspace' | 'deterministic_decision' | 'public_demo_boundary';
   status: 'ready' | 'blocked';
   detail: string;
 }
 
-export interface NflPresenterPreflightResponse {
-  schema_version: 'nfl_presenter_preflight.v1';
+export interface NflReadinessPreflightResponse {
+  schema_version: 'nfl_readiness_preflight.v1';
   generated_at: string;
-  presentation_id: 'nyg-cap-roster';
   team_id: 'NYG';
   meeting_ready: boolean;
   health: NflDataHealthResponse;
-  fixture: NflWorkspaceSummary | null;
-  checks: NflPresenterPreflightCheck[];
+  workspace: NflWorkspaceSummary | null;
+  checks: NflReadinessPreflightCheck[];
   blockers: string[];
 }
 

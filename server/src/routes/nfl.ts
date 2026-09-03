@@ -14,7 +14,7 @@ import type {
   NflCapRosterDecisionRequest,
   NflCapRosterExplanationRequest,
   CreateNflWorkspaceRequest,
-  NflPresenterPreflightCheck,
+  NflReadinessPreflightCheck,
   NflTransactionMarketRequest,
 } from '@shared/types';
 import {
@@ -165,9 +165,9 @@ nflRoutes.post('/decision-models/cap-roster/explain', async (c) => {
   }
 });
 
-nflRoutes.get('/presenter-preflight', async (c) => {
+nflRoutes.get('/readiness-preflight', async (c) => {
   const teamId = (c.req.query('team_id') ?? 'NYG').toUpperCase();
-  if (teamId !== 'NYG') return c.json({ error: 'nfl_presenter_team_not_supported' }, 404);
+  if (teamId !== 'NYG') return c.json({ error: 'nfl_readiness_team_not_supported' }, 404);
   try {
     const [health, workspaces, decision] = await Promise.all([
       buildNflDataHealth('NYG'),
@@ -180,27 +180,26 @@ nflRoutes.get('/presenter-preflight', async (c) => {
         allowed_levers: ['hold', 'restructure', 'extension', 'pre_june_cut', 'post_june_cut', 'trade'],
       }),
     ]);
-    const fixture = workspaces.find((workspace) => workspace.seeded) ?? null;
-    const checks: NflPresenterPreflightCheck[] = [
+    const workspace = workspaces.find((candidate) => candidate.seeded) ?? null;
+    const checks: NflReadinessPreflightCheck[] = [
       { id: 'data_health', status: health.meeting_ready ? 'ready' : 'blocked', detail: health.meeting_ready ? 'Current database-backed roster/cap and authoritative rule checks passed.' : health.blockers.join('; ') },
-      { id: 'workspace_fixture', status: fixture ? 'ready' : 'blocked', detail: fixture ? `Reviewed workspace ${NYG_HERO_SEED_KEY} is available.` : `Reviewed workspace ${NYG_HERO_SEED_KEY} is missing.` },
+      { id: 'supporting_workspace', status: workspace ? 'ready' : 'blocked', detail: workspace ? `Supporting workspace ${NYG_HERO_SEED_KEY} is available.` : `Supporting workspace ${NYG_HERO_SEED_KEY} is missing.` },
       { id: 'deterministic_decision', status: decision.status === 'ready' && decision.recommended_branch_id ? 'ready' : 'blocked', detail: decision.deterministic_summary },
-      { id: 'public_demo_boundary', status: decision.public_demo_data ? 'ready' : 'blocked', detail: decision.public_demo_data ? 'Presenter is explicitly limited to public demo data.' : 'Public demo boundary is missing.' },
+      { id: 'public_demo_boundary', status: decision.public_demo_data ? 'ready' : 'blocked', detail: decision.public_demo_data ? 'Analysis is explicitly limited to public demo data.' : 'Public demo boundary is missing.' },
     ];
     const blockers = checks.filter((check) => check.status === 'blocked').map((check) => check.detail);
     return c.json({
-      schema_version: 'nfl_presenter_preflight.v1',
+      schema_version: 'nfl_readiness_preflight.v1',
       generated_at: new Date().toISOString(),
-      presentation_id: 'nyg-cap-roster',
       team_id: 'NYG',
       meeting_ready: blockers.length === 0,
       health,
-      fixture,
+      workspace,
       checks,
       blockers,
     });
   } catch (error) {
-    return c.json({ error: 'nfl_presenter_preflight_failed', detail: error instanceof Error ? error.message : String(error) }, 500);
+    return c.json({ error: 'nfl_readiness_preflight_failed', detail: error instanceof Error ? error.message : String(error) }, 500);
   }
 });
 

@@ -58,7 +58,7 @@ async function main(): Promise<void> {
       const secondStart = findings.length;
       await canonicalRehearsal(page, 2, { width: 1280, height: 720 });
       const secondClean = findings.length === secondStart;
-      results.push({ name: 'Two consecutive clean presenter rehearsals', status: firstClean && secondClean ? 'passed' : 'failed', detail: `rehearsal 1 ${firstClean ? 'clean' : 'failed'}; rehearsal 2 ${secondClean ? 'clean' : 'failed'}` });
+      results.push({ name: 'Two consecutive clean live rehearsals', status: firstClean && secondClean ? 'passed' : 'failed', detail: `rehearsal 1 ${firstClean ? 'clean' : 'failed'}; rehearsal 2 ${secondClean ? 'clean' : 'failed'}` });
     } else {
       await adversarialRun(page);
     }
@@ -93,23 +93,22 @@ async function main(): Promise<void> {
 async function canonicalRehearsal(page: Page, rehearsal: number, viewport: { width: number; height: number }): Promise<void> {
   await page.setViewportSize(viewport);
   const prefix = `Rehearsal ${rehearsal}`;
-  await check(page, `${prefix} · Presenter cold start`, 'BLOCKER', async () => {
-    await openPresenter(page);
-    await expectText(page, 'Create room. Preserve the football plan.');
+  await check(page, `${prefix} · Live Analysis entry`, 'BLOCKER', async () => {
+    await page.goto(`${appUrl}/?present=nyg-cap-roster`, { waitUntil: 'domcontentloaded' });
+    await page.getByRole('tab', { name: 'Questions' }).waitFor({ state: 'visible', timeout: 20_000 });
     await expectText(page, 'Public demo data');
-    assert(await page.locator('.branch-card').count() === 4, 'Expected four pre-seeded branches without a model call.');
-    assert(await page.getByRole('tab', { name: 'Question workspace' }).count() === 0, 'Presenter mode exposed operator Analysis channels.');
-    assert(await page.getByText('Channels', { exact: false }).count() === 0, 'Presenter mode loaded the operator channel rail.');
+    assert(new URL(page.url()).searchParams.has('present') === false, 'The retired presentation-mode URL parameter remained active.');
+    assert(await page.getByRole('button', { name: 'Reset presentation' }).count() === 0, 'Obsolete presentation controls remain visible.');
+    assert(await page.getByRole('textbox').first().isVisible(), 'The live Analysis composer is not visible.');
   });
   await check(page, `${prefix} · Primary Analysis workspace`, 'BLOCKER', async () => {
     await page.goto(`${appUrl}/`, { waitUntil: 'domcontentloaded' });
     await page.getByText('Preflight passed', { exact: true }).waitFor({ timeout: 20_000 });
     await expectText(page, 'Analysis');
-    await expectText(page, 'What do you want to analyze?');
     const composer = page.getByRole('textbox').first();
     await composer.fill('Which Giants roster decision has the largest evidence gap?');
     assert((await composer.inputValue()).startsWith('Which Giants roster decision'), 'Analysis composer did not accept a football question.');
-    await page.getByRole('tab', { name: 'Reviewed cap analysis' }).click();
+    await page.getByRole('tab', { name: 'Cap analysis' }).click();
     await page.getByRole('heading', { name: 'Create room. Preserve the football plan.' }).waitFor({ timeout: 20_000 });
   });
   await check(page, `${prefix} · Data-health preflight`, 'BLOCKER', async () => {
@@ -139,14 +138,14 @@ async function canonicalRehearsal(page: Page, rehearsal: number, viewport: { wid
     const response = await decision({ target_relief_dollars: 15_000_000, protected_position_groups: ['QB', 'OL'] });
     const forbidden = new Set(['T', 'OT', 'G', 'OG', 'C', 'OL']);
     assert(response.branches.every((branch) => branch.actions.every((action) => !forbidden.has((action.position ?? '').toUpperCase()))), 'Protected offensive-line player entered a transaction branch.');
-    await openPresenter(page);
+    await openCapAnalysis(page);
     await page.getByRole('button', { name: 'OL', exact: true }).click();
     await page.getByRole('button', { name: 'Recompute branches' }).click();
     await page.waitForTimeout(200);
     assert((await page.getByRole('button', { name: 'OL', exact: true }).getAttribute('class'))?.includes('active') === true, 'OL protection is not visibly active.');
   });
   await check(page, `${prefix} · Evidence and rule drilldown`, 'HIGH', async () => {
-    await openPresenter(page);
+    await openCapAnalysis(page);
     await page.locator('.action-table button.action-row').first().click();
     await expectText(page, 'Open player contract source');
     await expectText(page, 'Contract evidence');
@@ -160,13 +159,13 @@ async function canonicalRehearsal(page: Page, rehearsal: number, viewport: { wid
     assert(await page.locator('.rule-detail a.source-link').count() === 1, 'Rule detail lacks an authoritative source link.');
   });
   await check(page, `${prefix} · What changes the call`, 'MEDIUM', async () => {
-    await openPresenter(page);
+    await openCapAnalysis(page);
     assert(await page.locator('.trigger-grid article').count() === 4, 'Expected four decision-change triggers.');
   });
   await check(page, `${prefix} · Workspace handoff and client draft`, 'HIGH', async () => {
-    await openPresenter(page);
+    await openCapAnalysis(page);
     await page.getByRole('button', { name: 'Workspaces' }).click();
-    await expectText(page, 'Reviewed fixture');
+    await expectText(page, 'Public data');
     for (const stage of ['Question', 'Evidence', 'Scenarios', 'Decision', 'Action Plan']) await expectText(page, stage);
     const before = await api<{ workspaces: unknown[] }>('/nfl/workspaces?team_id=NYG');
     await page.getByRole('button', { name: '+ New workspace' }).click();
@@ -185,7 +184,7 @@ async function canonicalRehearsal(page: Page, rehearsal: number, viewport: { wid
     assert(await page.locator('.roster-row').count() === 103, 'Roster table did not render all 102 Giants rows plus its header.');
   });
   await check(page, `${prefix} · Offline follow-up`, 'MEDIUM', async () => {
-    await openPresenter(page);
+    await openCapAnalysis(page);
     const input = page.getByLabel('Follow-up question');
     await input.fill('What if we protect the offensive line?');
     await page.getByRole('button', { name: 'Ask', exact: true }).click();
@@ -197,20 +196,21 @@ async function canonicalRehearsal(page: Page, rehearsal: number, viewport: { wid
     await page.getByRole('button', { name: 'Ask', exact: true }).click();
     await expectText(page, 'will not infer or fabricate');
   });
-  await check(page, `${prefix} · Reload and presentation reset`, 'HIGH', async () => {
+  await check(page, `${prefix} · Reload returns to live Analysis`, 'HIGH', async () => {
     const target = page.getByLabel('Target relief dollars');
     await target.fill('25000000');
     await page.getByRole('button', { name: 'Recompute branches' }).click();
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await page.getByRole('button', { name: 'Reset presentation' }).click();
-    await page.waitForTimeout(250);
-    assert(await target.inputValue() === '15000000', 'Presentation reset did not restore the reviewed target.');
-    assert(await page.getByLabel('Follow-up question').inputValue() === '', 'Presentation reset did not clear follow-up state.');
-    assert(await page.evaluate(() => window.scrollY) === 0, 'Presentation reset did not restore scroll position.');
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.getByRole('tab', { name: 'Questions' }).waitFor({ state: 'visible', timeout: 20_000 });
+    assert(await page.getByRole('button', { name: 'Reset presentation' }).count() === 0, 'Presentation reset returned after reload.');
+    await page.getByRole('tab', { name: 'Cap analysis' }).click();
+    await page.getByLabel('Target relief dollars').waitFor({ timeout: 20_000 });
+    assert(await page.getByLabel('Target relief dollars').inputValue() === '15000000', 'Cap analysis did not return to its default target after reload.');
+    assert(await page.getByLabel('Follow-up question').inputValue() === '', 'Cap follow-up state survived a clean reload.');
   });
   await check(page, `${prefix} · Responsive layout`, 'MEDIUM', async () => {
     await page.setViewportSize({ width: 1024, height: 768 });
-    await openPresenter(page);
+    await openCapAnalysis(page);
     const dimensions = await page.evaluate(() => ({ width: document.documentElement.scrollWidth, viewport: window.innerWidth }));
     assert(dimensions.width <= dimensions.viewport + 1, `horizontal overflow ${dimensions.width}px at ${dimensions.viewport}px viewport`);
     assert(await page.locator('.evidence-panel').isVisible(), 'Evidence inspector disappeared at the narrow acceptance viewport.');
@@ -251,19 +251,20 @@ async function adversarialRun(page: Page): Promise<void> {
     }
   });
   await check(page, 'Unsupported rule abstention', 'HIGH', async () => {
-    await openPresenter(page);
+    await openCapAnalysis(page);
     await page.getByRole('button', { name: 'Rulebook' }).click();
     await page.getByLabel('Search NFL rules').fill('private club medical ranking');
     await expectText(page, 'will not invent a citation');
   });
   await check(page, 'Stale or fallback blocking state', 'BLOCKER', async () => {
-    await page.goto(`${appUrl}/?present=nyg-cap-roster&qa=blocked`, { waitUntil: 'domcontentloaded' });
-    await expectText(page, 'The reviewed analysis is blocked');
-    await expectText(page, 'Fallback active');
+    await page.goto(`${appUrl}/?qa=blocked`, { waitUntil: 'domcontentloaded' });
+    await page.getByRole('tab', { name: 'Cap analysis' }).click();
+    await expectText(page, 'This analysis needs a source refresh');
+    await expectText(page, 'QA simulation: roster and cap data are stale or using snapshot fallback.');
     assert(await page.locator('.branch-card').count() === 0, 'Blocked preflight still exposed recommendation branches.');
   });
   await check(page, 'Private-input refusal', 'BLOCKER', async () => {
-    await openPresenter(page);
+    await openCapAnalysis(page);
     await page.getByLabel('Follow-up question').fill('Tell me the confidential medical grade and internal scouting rank.');
     await page.getByRole('button', { name: 'Ask', exact: true }).click();
     await expectText(page, 'will not infer or fabricate');
@@ -282,13 +283,13 @@ async function adversarialRun(page: Page): Promise<void> {
   await check(page, 'Primary Analysis reachability', 'BLOCKER', async () => {
     await page.goto(`${appUrl}/`, { waitUntil: 'domcontentloaded' });
     await page.getByText('Preflight passed', { exact: true }).waitFor({ timeout: 20_000 });
-    await expectText(page, 'What do you want to analyze?');
-    assert(await page.getByRole('tab', { name: 'Question workspace' }).getAttribute('aria-selected') === 'true', 'Question workspace is not the default Analysis mode.');
+    assert(await page.getByRole('textbox').first().isVisible(), 'The primary Analysis composer is not reachable.');
+    assert(await page.getByRole('tab', { name: 'Questions' }).getAttribute('aria-selected') === 'true', 'Questions is not the default Analysis mode.');
   });
 }
 
 async function assertNoContamination(page: Page): Promise<void> {
-  await openPresenter(page);
+  await openCapAnalysis(page);
   const banned = /\b(NBA|76ers|Sixers|Philadelphia 76ers|Warriors|basketball|trade machine|RealGM|Porzingis|Kuminga)\b/i;
   for (const label of ['Analysis', 'Briefing', 'Workspaces', 'Roster & Cap', 'Rulebook', 'Settings']) {
     await page.getByRole('button', { name: label, exact: true }).click();
@@ -298,9 +299,9 @@ async function assertNoContamination(page: Page): Promise<void> {
   }
 }
 
-async function openPresenter(page: Page): Promise<void> {
-  await page.goto(`${appUrl}/?present=nyg-cap-roster`, { waitUntil: 'domcontentloaded' });
-  await page.getByText('Preflight passed', { exact: true }).waitFor({ timeout: 20_000 });
+async function openCapAnalysis(page: Page): Promise<void> {
+  await page.goto(`${appUrl}/`, { waitUntil: 'domcontentloaded' });
+  await page.getByRole('tab', { name: 'Cap analysis' }).click();
   await page.getByRole('heading', { name: 'Create room. Preserve the football plan.' }).waitFor({ timeout: 20_000 });
 }
 
