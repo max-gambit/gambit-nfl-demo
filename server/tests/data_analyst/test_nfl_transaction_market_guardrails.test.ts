@@ -43,6 +43,19 @@ test('artifact-grounded fallback itself passes deterministic checks', () => {
   assert.deepEqual(evaluateNflTransactionMarketDraft(draft, analysis), { ok: true, issues: [] });
 });
 
+test('artifact-grounded fallback admits signed shrinking deltas', () => {
+  const analysis = structuredClone(analysisFixture());
+  const signal = analysis.position_trends[0].mobility;
+  signal.baseline_value = 800;
+  signal.recent_value = 600;
+  signal.relative_change_basis_points = -2500;
+  signal.direction = 'shrinking';
+  const draft = buildDeterministicNflTransactionMarketFallback(analysis);
+
+  assert.match(draft.key_findings[0].body, /Δ -2\.00 per 100/);
+  assert.deepEqual(evaluateNflTransactionMarketDraft(draft, analysis), { ok: true, issues: [] });
+});
+
 test('trades-only fallback answers the governed premium-pick ranking directly', () => {
   const draft = buildDeterministicNflTransactionMarketFallback(analysisFixture());
 

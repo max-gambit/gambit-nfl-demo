@@ -373,7 +373,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
         }}>
           {presentationFirst && recommendationBody && <TemplateBriefBody body={recommendationBody} />}
 
-          {summaryBlock}
+          {!dataAnalysisBody?.market_analysis && summaryBlock}
 
           {dataAnalysisBody
             ? <DataAnalysisCardBody body={dataAnalysisBody} />

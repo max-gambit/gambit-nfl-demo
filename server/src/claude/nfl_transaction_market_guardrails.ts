@@ -4,6 +4,7 @@ import type {
   NflTransactionMarketAnalysis,
   SubmitDataAnalysisInput,
 } from '@shared/types';
+import { nflTransactionMarketFootballRead } from '@shared/nflTransactionMarket';
 import { teamIdsFromQuestion } from '../nfl_transactions/question.js';
 
 export interface NflTransactionMarketGuardrailResult {
@@ -108,15 +109,18 @@ export function buildDeterministicNflTransactionMarketFallback(
     ));
   const growing = usable.filter((trend) => trend.status === 'supported' && trend.direction === 'growing').map((trend) => trend.position_group);
   const shrinking = usable.filter((trend) => trend.status === 'supported' && trend.direction === 'shrinking').map((trend) => trend.position_group);
+  const footballRead = nflTransactionMarketFootballRead(analysis);
   const answer = analysis.status === 'insufficient_evidence'
     ? 'The current public-data snapshot does not support a firm market conclusion for the executed filters. The calculated series and comparables are shown below, but the sample and identity gates require an abstention.'
     : tradeOnly && premiumTradeRanking.length > 0
       ? `Across all completed years in ${analysis.query.start_year}–${analysis.query.end_year}, the highest observed day-one or day-two pick shares among allocable single-player trades were ${premiumTradeRanking.slice(0, 3).map((trend) => `${trend.position_group} ${formatBasisPoints(trend.trade_compensation.overall_value!)}`).join(', ')}. Multi-player and unknown-compensation deals remain comparables but are not assigned a fabricated per-player price.`
     : [
-      growing.length ? `${growing.join(', ')} show supported market growth across at least two non-conflicting signals.` : 'No position clears the supported multi-signal growth gate.',
-      shrinking.length ? `${shrinking.join(', ')} show supported market shrinkage.` : 'No position clears the supported multi-signal shrinkage gate.',
-      'Treat mixed or directional rows as signal-specific evidence rather than an overall market call.',
-    ].join(' ');
+      footballRead.conclusion,
+      footballRead.implication,
+      growing.length ? `${growing.join(', ')} clear the supported multi-signal growth gate.` : '',
+      shrinking.length ? `${shrinking.join(', ')} clear the supported multi-signal shrinkage gate.` : '',
+      'The classification rules and evidence gates remain visible below.',
+    ].filter(Boolean).join(' ');
   const sources = deterministicMarketSourceRows(analysis, 1);
   const ref = sources[0]?.ref_index ?? 1;
   return {
@@ -212,14 +216,21 @@ export function deterministicMarketChatAnswer(analysis: NflTransactionMarketAnal
 function signalSummary(signal: NflPositionMarketTrend['mobility']): string {
   if (signal.status === 'insufficient_evidence' || signal.baseline_value == null || signal.recent_value == null) return 'insufficient evidence';
   const format = signal.unit === 'events_per_100_player_seasons'
-    ? (value: number) => (value / 100).toFixed(1)
-    : (value: number) => formatBasisPoints(value);
+    ? (value: number) => (value / 100).toFixed(2)
+    : (value: number) => formatBasisPoints(value, 2);
+  const delta = signal.unit === 'events_per_100_player_seasons'
+    ? `${signed((signal.recent_value - signal.baseline_value) / 100, 2)} per 100`
+    : `${signed(signal.recent_value - signal.baseline_value, 0)} bp`;
   const overall = signal.overall_value == null ? '' : `; all completed years ${format(signal.overall_value)}`;
-  return `${format(signal.baseline_value)} → ${format(signal.recent_value)} (${signal.direction}; ${signal.status}${overall})`;
+  return `${format(signal.baseline_value)} → ${format(signal.recent_value)}; Δ ${delta} (${signal.direction}; ${signal.status}${overall})`;
 }
 
-function formatBasisPoints(value: number): string {
-  return `${(value / 100).toFixed(1)}%`;
+function formatBasisPoints(value: number, precision = 1): string {
+  return `${(value / 100).toFixed(precision)}%`;
+}
+
+function signed(value: number, precision: number): string {
+  return `${value > 0 ? '+' : ''}${value.toFixed(precision)}`;
 }
 
 function dataAnalysisText(draft: SubmitDataAnalysisInput): string {
@@ -236,10 +247,13 @@ function allowedNumericTokens(analysis: NflTransactionMarketAnalysis): Set<strin
   const values = new Set<string>(['0', '1', '2', '3', '5', '10', '20', '85', '95', '100']);
   const visit = (value: unknown) => {
     if (typeof value === 'number' && Number.isFinite(value)) {
-      values.add(String(value));
-      values.add((value / 100).toFixed(1));
-      values.add(Math.round(value / 1_000).toString());
-      values.add((value / 1_000_000).toFixed(1).replace(/\.0$/, ''));
+      for (const candidate of new Set([value, Math.abs(value)])) {
+        values.add(String(candidate));
+        values.add((candidate / 100).toFixed(1));
+        values.add((candidate / 100).toFixed(2));
+        values.add(Math.round(candidate / 1_000).toString());
+        values.add((candidate / 1_000_000).toFixed(1).replace(/\.0$/, ''));
+      }
     } else if (Array.isArray(value)) {
       value.forEach(visit);
     } else if (value && typeof value === 'object') {
@@ -247,6 +261,13 @@ function allowedNumericTokens(analysis: NflTransactionMarketAnalysis): Set<strin
     }
   };
   visit(analysis);
+  for (const trend of analysis.position_trends) {
+    for (const signal of [trend.mobility, trend.transaction_share, trend.contract_price, trend.trade_compensation]) {
+      if (signal.baseline_value != null && signal.recent_value != null) {
+        visit(signal.recent_value - signal.baseline_value);
+      }
+    }
+  }
   values.add(String(analysis.query.end_year - analysis.query.start_year + 1));
   return values;
 }
@@ -381,6 +402,9 @@ function signalNumericVariants(
   ]) {
     for (const token of artifactNumericVariants(candidate)) values.add(token);
   }
+  if (signal.baseline_value != null && signal.recent_value != null) {
+    for (const token of artifactNumericVariants(signal.recent_value - signal.baseline_value)) values.add(token);
+  }
   if (/\b(?:sample(?: size)?|observations?|contracts? observed|trades? observed)\b/i.test(clause)) {
     values.add(normalizeNumber(String(signal.sample_size)));
   }
@@ -391,10 +415,13 @@ function artifactNumericVariants(value: unknown): Set<string> {
   const values = new Set<string>();
   const visit = (candidate: unknown) => {
     if (typeof candidate === 'number' && Number.isFinite(candidate)) {
-      values.add(normalizeNumber(String(candidate)));
-      values.add(normalizeNumber((candidate / 100).toFixed(1)));
-      values.add(normalizeNumber(Math.round(candidate / 1_000).toString()));
-      values.add(normalizeNumber((candidate / 1_000_000).toFixed(1)));
+      for (const numeric of new Set([candidate, Math.abs(candidate)])) {
+        values.add(normalizeNumber(String(numeric)));
+        values.add(normalizeNumber((numeric / 100).toFixed(1)));
+        values.add(normalizeNumber((numeric / 100).toFixed(2)));
+        values.add(normalizeNumber(Math.round(numeric / 1_000).toString()));
+        values.add(normalizeNumber((numeric / 1_000_000).toFixed(1)));
+      }
     } else if (Array.isArray(candidate)) {
       candidate.forEach(visit);
     } else if (candidate && typeof candidate === 'object') {

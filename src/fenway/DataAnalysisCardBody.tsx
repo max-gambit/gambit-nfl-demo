@@ -14,6 +14,23 @@ export function DataAnalysisCardBody({ body }: Props) {
         <NflTransactionMarketAnalysisView analysis={body.market_analysis} />
       )}
 
+      {body.market_analysis && body.answer.trim() && (
+        <section>
+          <SectionLabel>Analyst interpretation</SectionLabel>
+          <p style={{
+            margin: 0,
+            padding: SPACE.md,
+            border: `1px solid ${F.border}`,
+            borderRadius: RADIUS.md,
+            background: F.surface,
+            color: F.inkSoft,
+            fontFamily: 'var(--font-sans)',
+            fontSize: TYPE.body.md,
+            lineHeight: 1.6,
+          }}>{body.answer}</p>
+        </section>
+      )}
+
       {body.key_findings.length > 0 && (
         <section>
           <SectionLabel>Key findings</SectionLabel>

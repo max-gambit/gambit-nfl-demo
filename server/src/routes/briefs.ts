@@ -87,6 +87,7 @@ export const briefRoutes = new Hono();
 const DEFAULT_SHARE_TEAM_ID = 'GSW';
 const BRIEF_GENERATION_HEARTBEAT_MS = 60_000;
 const MAX_BRIEF_PROGRESS_EVENTS = 12;
+type DataAnalysisLookup = { messages: Anthropic.MessageParam[]; traces: DataAnalystTrace[] };
 
 /**
  * POST /briefs
@@ -112,6 +113,9 @@ briefRoutes.post('/', async (c) => {
   if (!session_id || typeof session_id !== 'string') {
     return c.json({ error: 'session_id required' }, 400);
   }
+  if (!isUuid(session_id)) {
+    return c.json({ error: 'invalid_session_id' }, 400);
+  }
   if (!body.question || typeof body.question !== 'string' || !body.question.trim()) {
     return c.json({ error: 'question required' }, 400);
   }
@@ -119,6 +123,17 @@ briefRoutes.post('/', async (c) => {
   const question = parsedQuestion.question;
   if (!question) {
     return c.json({ error: 'question required' }, 400);
+  }
+  const sessionRes = await db
+    .from('sessions')
+    .select('id')
+    .eq('id', session_id)
+    .maybeSingle();
+  if (sessionRes.error) {
+    return c.json({ error: 'load_session_failed', detail: sessionRes.error.message }, 500);
+  }
+  if (!sessionRes.data) {
+    return c.json({ error: 'session_not_found' }, 404);
   }
   let inheritedMarketAnalysis: NflTransactionMarketAnalysis | null = null;
   if (body.inherited_market_brief_id !== undefined) {
@@ -157,6 +172,33 @@ briefRoutes.post('/', async (c) => {
     ?? requestedMode
     ?? 'brief';
 
+  // A transaction-market answer has two clocks: the deterministic database
+  // calculation (fast) and the model interpretation (slow). Complete the
+  // governed calculation before inserting the brief so the POST response
+  // itself contains the renderable artifact and never depends on Realtime or
+  // polling to make the calculation visible.
+  let preparedMarketLookup: DataAnalysisLookup | null = null;
+  let preparedMarketBody: DataAnalysisBriefBody | null = null;
+  let preparedProgress: BriefProgress | null = null;
+  if (transactionMarketQuestion) {
+    try {
+      preparedMarketLookup = await ensureNflTransactionMarketLookup(
+        question,
+        { messages: [{ role: 'user', content: question }], traces: [] },
+        inheritedMarketAnalysis?.query ?? null,
+      );
+      const analysis = latestNflTransactionMarketAnalysis(preparedMarketLookup.traces);
+      if (!analysis) throw new Error('Required NFL transaction-market analysis was not returned.');
+      preparedMarketBody = transactionMarketArtifactBody(analysis);
+      preparedProgress = marketArtifactBriefProgress();
+    } catch (error) {
+      return c.json({
+        error: 'transaction_market_analysis_failed',
+        detail: briefGenerationErrorMessage(error),
+      }, 503);
+    }
+  }
+
   // Insert generating brief.
   const insert = await db
     .from('briefs')
@@ -168,7 +210,8 @@ briefRoutes.post('/', async (c) => {
       template_base_id: templateSelection.base_template_id ?? null,
       custom_template_id: templateSelection.custom_template_id ?? null,
       template_instructions: templateSelection.instructions ?? null,
-      progress: initialBriefProgress(),
+      body: preparedMarketBody,
+      progress: preparedProgress ?? initialBriefProgress(),
       status: 'generating',
     })
     .select()
@@ -182,7 +225,7 @@ briefRoutes.post('/', async (c) => {
 
   // Kick off generation in the background — the route returns immediately.
   // Errors are caught and persisted as `status='failed'` rather than crashing.
-  void generateBriefForMode(brief, inheritedMarketAnalysis?.query ?? null).catch(async (err) => {
+  void generateBriefForMode(brief, inheritedMarketAnalysis?.query ?? null, preparedMarketLookup).catch(async (err) => {
     console.error('[briefs] generate failed', brief.id, err);
     const errorMessage = briefGenerationErrorMessage(err);
     const progress = failedBriefProgress(err);
@@ -664,8 +707,9 @@ export async function regenerateBriefById(
 export async function generateBriefForMode(
   brief: Brief,
   inheritedMarketQuery: NflTransactionMarketAnalysis['query'] | null = null,
+  preparedMarketLookup: DataAnalysisLookup | null = null,
 ) {
-  if (brief.mode === 'data_analyst') return generateDataAnalysisBrief(brief, inheritedMarketQuery);
+  if (brief.mode === 'data_analyst') return generateDataAnalysisBrief(brief, inheritedMarketQuery, preparedMarketLookup);
   return generateBrief(brief);
 }
 
@@ -1247,6 +1291,7 @@ async function maybeRunNflDataAnalysisPrivateCritic(args: {
 export async function generateDataAnalysisBrief(
   brief: Brief,
   inheritedMarketQuery: NflTransactionMarketAnalysis['query'] | null = null,
+  preparedMarketLookup: DataAnalysisLookup | null = null,
 ) {
   const startedAt = Date.now();
   const heartbeat = startBriefGenerationHeartbeat(brief);
@@ -1258,44 +1303,48 @@ export async function generateDataAnalysisBrief(
       { type: 'text', text: buildDataAnalysisTemplateSystemBlock(templateSelection), cache_control: { type: 'ephemeral' } },
     ];
 
-    await progress.mark(
-      'collecting_evidence',
-      12,
-      'Querying app data',
-      'Running bounded roster, cap, stats, context, or CBA lookups before answering.',
-      'data',
-    );
     const baseMessages: Anthropic.MessageParam[] = [{ role: 'user', content: brief.question }];
     const needsTransactionMarket = isNflTransactionMarketQuestion(brief.question) || Boolean(inheritedMarketQuery);
-    let dataLookup;
-    if (needsTransactionMarket) {
-      dataLookup = await ensureNflTransactionMarketLookup(
-        brief.question,
-        { messages: baseMessages, traces: [] },
-        inheritedMarketQuery,
+    if (!preparedMarketLookup) {
+      await progress.mark(
+        'collecting_evidence',
+        12,
+        'Querying app data',
+        'Running bounded roster, cap, stats, context, or CBA lookups before answering.',
+        'data',
       );
+    }
+    let dataLookup: DataAnalysisLookup;
+    if (needsTransactionMarket) {
+      dataLookup = preparedMarketLookup ?? await ensureNflTransactionMarketLookup(
+          brief.question,
+          { messages: baseMessages, traces: [] },
+          inheritedMarketQuery,
+        );
       const immediateMarketAnalysis = latestNflTransactionMarketAnalysis(dataLookup.traces);
       if (!immediateMarketAnalysis) {
         throw new Error('Required NFL transaction-market analysis was not returned.');
       }
-      const artifactProgress = await progress.mark(
-        'drafting',
-        36,
-        'Market calculation ready',
-        'Rendering the executed scope, series, comparables, methodology, and limitations while the interpretation is drafted.',
-        'data',
-      );
-      const provisionalBody = transactionMarketArtifactBody(immediateMarketAnalysis);
-      const persisted = await heartbeat.update({ body: provisionalBody });
-      if (!persisted) return;
-      publishBriefProgress(briefProgressStreamPayload({
-        id: brief.id,
-        status: 'generating',
-        error: null,
-        progress: artifactProgress,
-        updated_at: heartbeat.currentUpdatedAt(),
-        body: provisionalBody,
-      }));
+      if (!preparedMarketLookup) {
+        const artifactProgress = await progress.mark(
+          'drafting',
+          36,
+          'Market calculation ready',
+          'Rendering the executed scope, series, comparables, methodology, and limitations while the interpretation is drafted.',
+          'data',
+        );
+        const provisionalBody = transactionMarketArtifactBody(immediateMarketAnalysis);
+        const persisted = await heartbeat.update({ body: provisionalBody });
+        if (!persisted) return;
+        publishBriefProgress(briefProgressStreamPayload({
+          id: brief.id,
+          status: 'generating',
+          error: null,
+          progress: artifactProgress,
+          updated_at: heartbeat.currentUpdatedAt(),
+          body: provisionalBody,
+        }));
+      }
 
       const supplementalLookup = await buildMessagesWithDataAnalystLookups({
         model: BRIEF_MODEL,
@@ -2076,6 +2125,16 @@ function initialBriefProgress(label = 'Brief queued'): BriefProgress {
     label,
     detail: 'Waiting for the analyst job to start.',
     kind: 'stage',
+  });
+}
+
+export function marketArtifactBriefProgress(): BriefProgress {
+  return briefProgressSnapshot({
+    phase: 'drafting',
+    pct: 36,
+    label: 'Market calculation ready',
+    detail: 'Rendering the executed scope, series, comparables, methodology, and limitations while the interpretation is drafted.',
+    kind: 'data',
   });
 }
 

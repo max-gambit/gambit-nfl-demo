@@ -4,6 +4,16 @@ export const NYG_DEMO_WORKSPACE_KEY = 'nyg-demo' as const;
 export const NYG_HERO_SEED_KEY = 'nyg-cap-roster-2026' as const;
 export const NYG_HERO_SESSION_ID = '72000000-0000-4000-8000-000000000001';
 export const NYG_HERO_PROJECT_ID = '73000000-0000-4000-8000-000000000001';
+export const NYG_TRANSACTION_PRESENTER_SEED_KEY = 'nyg-transaction-market-presenter' as const;
+export const NYG_TRANSACTION_PRESENTER_SESSION_ID = '76000000-0000-4000-8000-000000000001';
+export const NYG_TRANSACTION_PRESENTER_BRIEF_IDS = [
+  '77000000-0000-4000-8000-000000000001',
+  '77000000-0000-4000-8000-000000000002',
+] as const;
+export const NYG_TRANSACTION_PRESENTER_QUESTIONS = [
+  'Which position markets have grown or shrunk over the last 10 years, and what does that imply for trade strategy?',
+  'Compare edge rushers with interior offensive linemen.',
+] as const;
 
 export const NYG_STAGE_LABELS: Record<ProjectStepId, string> = {
   research: 'Question',
@@ -55,9 +65,16 @@ export const NYG_TASKS: Array<{ id: string; step: ProjectStepId; label: string; 
 ];
 
 export function assertNygSeedOwnership(): void {
-  const ids = [NYG_HERO_SESSION_ID, NYG_HERO_PROJECT_ID, ...NYG_STAGE_NOTES.map((item) => item.id), ...NYG_TASKS.map((item) => item.id)];
+  const ids = [
+    NYG_HERO_SESSION_ID,
+    NYG_HERO_PROJECT_ID,
+    NYG_TRANSACTION_PRESENTER_SESSION_ID,
+    ...NYG_TRANSACTION_PRESENTER_BRIEF_IDS,
+    ...NYG_STAGE_NOTES.map((item) => item.id),
+    ...NYG_TASKS.map((item) => item.id),
+  ];
   if (new Set(ids).size !== ids.length) throw new Error('NYG demo seed identifiers must be unique');
-  if (!NYG_HERO_SEED_KEY || NYG_HERO_PROJECT.subject_team_id !== 'NYG') throw new Error('NYG demo seed ownership is invalid');
+  if (!NYG_HERO_SEED_KEY || !NYG_TRANSACTION_PRESENTER_SEED_KEY || NYG_HERO_PROJECT.subject_team_id !== 'NYG') throw new Error('NYG demo seed ownership is invalid');
   if (NYG_STAGE_NOTES.length !== 5 || new Set(NYG_STAGE_NOTES.map((item) => item.step)).size !== 5) {
     throw new Error('NYG demo seed must cover all five workspace stages exactly once');
   }

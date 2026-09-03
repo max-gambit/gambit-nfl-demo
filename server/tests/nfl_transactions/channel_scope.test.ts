@@ -3,11 +3,14 @@ import test from 'node:test';
 import {
   latestTransactionMarketBrief,
   latestTransactionMarketBriefForActiveAnalysis,
+  nflTransactionMarketFootballRead,
   transactionMarketAnalysisFromBrief,
 } from '@shared/nflTransactionMarket';
 import type { Brief, NflTransactionMarketAnalysis } from '@shared/types';
 import {
+  briefRoutes,
   briefProgressStreamPayload,
+  marketArtifactBriefProgress,
   transactionMarketArtifactBody,
 } from '../../src/routes/briefs.js';
 
@@ -71,6 +74,59 @@ test('deterministic market artifact is streamable while interpretation is still 
   });
 });
 
+test('initial market response progress is already renderable before interpretation', () => {
+  const progress = marketArtifactBriefProgress();
+  assert.equal(progress.phase, 'drafting');
+  assert.equal(progress.pct, 36);
+  assert.equal(progress.label, 'Market calculation ready');
+});
+
+test('EDGE and IOL comparison leads with a football conclusion while preserving signal boundaries', () => {
+  const analysis = {
+    ...marketAnalysis('analysis-edge-iol', ['EDGE', 'IOL']),
+    status: 'directional',
+    position_trends: [
+      marketTrend('EDGE', 1417, 'growing', 'growing', 'flat'),
+      marketTrend('IOL', 1722, 'growing', 'flat', 'growing'),
+    ],
+  } as unknown as NflTransactionMarketAnalysis;
+
+  const read = nflTransactionMarketFootballRead(analysis);
+  assert.match(read.conclusion, /EDGE movement has increased and premium trade compensation has strengthened/i);
+  assert.match(read.conclusion, /IOL movement has increased, but its contract and trade price signals do not agree/i);
+  assert.match(read.implication, /pay selectively for difference-making EDGE talent/i);
+  assert.match(read.implication, /IOL availability creates acquisition leverage/i);
+});
+
+test('football read does not turn insufficient price evidence into a supported price posture', () => {
+  const trend = marketTrend('EDGE', 1417, 'growing', 'growing', 'flat');
+  trend.trade_compensation.status = 'insufficient_evidence';
+  trend.contract_price.status = 'insufficient_evidence';
+  const analysis = {
+    ...marketAnalysis('analysis-edge-sparse-price', ['EDGE']),
+    status: 'directional',
+    position_trends: [trend],
+  } as unknown as NflTransactionMarketAnalysis;
+
+  const read = nflTransactionMarketFootballRead(analysis);
+  assert.match(read.conclusion, /price evidence is not strong enough to call/i);
+  assert.match(read.implication, /keep price posture provisional/i);
+  assert.doesNotMatch(`${read.conclusion} ${read.implication}`, /supported .*price/i);
+});
+
+test('brief creation rejects malformed session ids before market analysis', async () => {
+  const response = await briefRoutes.request('/', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      session_id: 'not-a-uuid',
+      question: 'Which position markets are growing?',
+    }),
+  });
+  assert.equal(response.status, 400);
+  assert.deepEqual(await response.json(), { error: 'invalid_session_id' });
+});
+
 function brief(id: string, analysis: NflTransactionMarketAnalysis | null): Brief {
   return {
     id,
@@ -110,4 +166,29 @@ function marketAnalysis(
       max_comparables: 12,
     },
   } as unknown as NflTransactionMarketAnalysis;
+}
+
+function marketTrend(
+  position: 'EDGE' | 'IOL',
+  eventCount: number,
+  mobilityDirection: 'growing' | 'flat',
+  tradeDirection: 'growing' | 'flat',
+  contractDirection: 'growing' | 'flat',
+) {
+  const signal = (direction: 'growing' | 'flat') => ({
+    status: 'supported',
+    direction,
+    baseline_value: 100,
+    recent_value: direction === 'growing' ? 120 : 100,
+  });
+  return {
+    position_group: position,
+    event_count: eventCount,
+    status: 'directional',
+    direction: 'mixed',
+    mobility: signal(mobilityDirection),
+    transaction_share: signal('flat'),
+    trade_compensation: signal(tradeDirection),
+    contract_price: signal(contractDirection),
+  };
 }

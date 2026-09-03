@@ -9,6 +9,9 @@ import {
   NYG_STAGE_LABELS,
   NYG_STAGE_NOTES,
   NYG_TASKS,
+  NYG_TRANSACTION_PRESENTER_BRIEF_IDS,
+  NYG_TRANSACTION_PRESENTER_QUESTIONS,
+  NYG_TRANSACTION_PRESENTER_SEED_KEY,
 } from '../../src/nfl_workspace/seed.js';
 
 test('Giants demo seed is scoped, stable, and covers the five football-operations stages', () => {
@@ -17,6 +20,9 @@ test('Giants demo seed is scoped, stable, and covers the five football-operation
   assert.equal(NYG_HERO_SEED_KEY, 'nyg-cap-roster-2026');
   assert.equal(NYG_HERO_PROJECT.subject_team_id, 'NYG');
   assert.equal(NYG_HERO_PROJECT.workflow_type, 'decision');
+  assert.equal(NYG_TRANSACTION_PRESENTER_SEED_KEY, 'nyg-transaction-market-presenter');
+  assert.equal(NYG_TRANSACTION_PRESENTER_BRIEF_IDS.length, 2);
+  assert.equal(NYG_TRANSACTION_PRESENTER_QUESTIONS[0], 'Which position markets have grown or shrunk over the last 10 years, and what does that imply for trade strategy?');
   assert.equal('apron_level' in NYG_HERO_PROJECT.counterparty_context, false);
   assert.deepEqual(Object.values(NYG_STAGE_LABELS), ['Question', 'Evidence', 'Scenarios', 'Decision', 'Action Plan']);
   assert.equal(NYG_STAGE_NOTES.length, 5);
@@ -25,10 +31,15 @@ test('Giants demo seed is scoped, stable, and covers the five football-operation
 
 test('normal database seed is NFL-only, non-destructive, and includes the presenter fixture', async () => {
   const source = await readFile(new URL('../../src/db/seed.ts', import.meta.url), 'utf8');
+  const presenterSource = await readFile(new URL('../../src/db/seed-nfl-demo-workspace.ts', import.meta.url), 'utf8');
   assert.doesNotMatch(source, /clearGeneratedUserContent|loadNba|seedNba|seedCbaCorpus/);
   assert.match(source, /seedNflDemoData/);
   assert.match(source, /seedNflTransactionMarketData/);
   assert.match(source, /seedNygDemoWorkspace/);
+  assert.match(presenterSource, /analyzeNflTransactionMarket/);
+  assert.match(presenterSource, /buildDeterministicNflTransactionMarketFallback/);
+  assert.match(presenterSource, /brief_sources'\)\.delete\(\)\.in\('brief_id'/);
+  assert.doesNotMatch(presenterSource, /EDGE movement has increased/);
 });
 
 test('Giants seed content does not contain active basketball or NBA terminology', () => {

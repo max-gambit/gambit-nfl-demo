@@ -59,12 +59,12 @@ export const createSessionsSlice: StateCreator<SessionsSlice, [], [], SessionsSl
       }));
 
     set((s) => {
-      // Validate the persisted activeSessionId. A fresh themed demo should
-      // land on the first-question composer instead of auto-opening stale
-      // generated briefs from an older tenant.
+      // Validate the persisted activeSessionId. When the curated demo has one
+      // visible channel, open it directly; multiple-channel workspaces still
+      // require an explicit choice rather than guessing the user's context.
       const persistedId = s.activeSessionId;
       const stillValid = persistedId && sessions.some((sess) => sess.id === persistedId);
-      const nextActiveId = stillValid ? persistedId : null;
+      const nextActiveId = stillValid ? persistedId : sessions.length === 1 ? sessions[0].id : null;
       return {
         sessions: sessions.map((sess) => ({
           ...sess,

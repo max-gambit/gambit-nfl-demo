@@ -5,12 +5,14 @@ import type {
   NflTransactionMarketSignal,
   NflTransactionMarketYearPoint,
 } from '@shared/types';
+import { nflTransactionMarketFootballRead } from '@shared/nflTransactionMarket';
 import { fire } from '../lib/events';
 import { useBriefs, useUi } from '../store';
 import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
 
 export function NflTransactionMarketAnalysisView({ analysis }: { analysis: NflTransactionMarketAnalysis }) {
   const trendRows = analysis.position_trends;
+  const footballRead = nflTransactionMarketFootballRead(analysis);
   const { activeBriefId, sourcesByBrief } = useBriefs();
   const { setSelectedSourceRef, setSourceFilterRefs, setHighlightedSourceRef } = useUi();
   const eventSourceRefs = new Map(
@@ -35,6 +37,24 @@ export function NflTransactionMarketAnalysisView({ analysis }: { analysis: NflTr
 
   return (
     <div style={{ display: 'grid', gap: SPACE.lg }} data-testid="nfl-transaction-market-analysis">
+      <section style={{
+        display: 'grid', gap: SPACE.sm, padding: `${SPACE.lg}px ${SPACE.xl}px`,
+        border: `1px solid ${F.fenway}`, borderLeft: `4px solid ${F.fenway}`,
+        borderRadius: RADIUS.md, background: F.fenwaySoft,
+      }}>
+        <span style={{
+          color: F.fenway, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs,
+          fontWeight: 700, letterSpacing: TRACKING.micro, textTransform: 'uppercase',
+        }}>Front-office read</span>
+        <h3 style={{
+          margin: 0, color: F.ink, fontFamily: 'var(--font-display)',
+          fontSize: TYPE.display.md, lineHeight: 1.35, letterSpacing: TRACKING.tight,
+        }}>{footballRead.conclusion}</h3>
+        <p style={{ margin: 0, color: F.inkSoft, fontSize: TYPE.body.md, lineHeight: 1.55 }}>
+          {footballRead.implication}
+        </p>
+      </section>
+
       <SnapshotHeader analysis={analysis} />
 
       <section>
@@ -227,7 +247,7 @@ function TrendRow({ trend, maxMobility }: { trend: NflPositionMarketTrend; maxMo
       </div>
       <div style={{ display: 'grid', justifyItems: 'end', gap: 2 }}>
         <span style={{ color: F.ink, fontVariantNumeric: 'tabular-nums', fontSize: TYPE.body.sm }}>
-          {formatRate(baseline)} → {formatRate(recent)}
+          {formatRateDetailed(baseline)} → {formatRateDetailed(recent)}
         </span>
         <span style={{ color: F.fgMuted, fontSize: TYPE.meta.xs }}>
           {formatChange(trend.mobility.relative_change_basis_points)}
@@ -279,7 +299,7 @@ function AnnualSeriesChart({ analysis }: { analysis: NflTransactionMarketAnalysi
             {plotted.length > 1 && <polyline fill="none" stroke={F.fenway} strokeWidth="2.5" vectorEffect="non-scaling-stroke" points={plotted.map((point) => `${point.x},${point.y}`).join(' ')} />}
             {plotted.map((point, index) => <circle key={`${position}-${index}`} cx={point.x} cy={point.y} r="2.5" fill={F.fenway} vectorEffect="non-scaling-stroke" />)}
           </svg>
-          <span style={{ justifySelf: 'end', color: F.inkSoft, fontVariantNumeric: 'tabular-nums', fontSize: TYPE.meta.md }}>{first == null || last == null ? 'No annual rate' : `${formatRate(first)} → ${formatRate(last)}`}</span>
+          <span style={{ justifySelf: 'end', color: F.inkSoft, fontVariantNumeric: 'tabular-nums', fontSize: TYPE.meta.md }}>{first == null || last == null ? 'No annual rate' : `${formatRateDetailed(first)} → ${formatRateDetailed(last)}`}</span>
         </div>;
       })}
       <div style={{ display: 'flex', justifyContent: 'space-between', padding: `${SPACE.xs}px ${SPACE.md}px ${SPACE.sm}px 70px`, color: F.fgMuted, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs }}>
@@ -388,11 +408,10 @@ function DirectionBadge({ direction, status }: { direction: NflPositionMarketTre
 
 function signalCell(signal: NflTransactionMarketSignal): string {
   if (signal.status === 'insufficient_evidence' || signal.baseline_value == null || signal.recent_value == null) return 'Insufficient';
+  const delta = signal.recent_value - signal.baseline_value;
   const values = signal.unit === 'events_per_100_player_seasons'
-    ? `${formatRate(signal.baseline_value)} → ${formatRate(signal.recent_value)}`
-    : signal.unit === 'apy_cap_basis_points'
-      ? `${formatBasisPoints(signal.baseline_value)} → ${formatBasisPoints(signal.recent_value)}`
-      : `${formatBasisPoints(signal.baseline_value)} → ${formatBasisPoints(signal.recent_value)}`;
+    ? `${formatRateDetailed(signal.baseline_value)} → ${formatRateDetailed(signal.recent_value)} · ${formatSigned(delta / 100, 2)} per 100`
+    : `${formatBasisPointsDetailed(signal.baseline_value)} → ${formatBasisPointsDetailed(signal.recent_value)} · ${formatSigned(delta, 0)} bp`;
   return `${values} (${signal.direction})`;
 }
 
@@ -406,8 +425,20 @@ function formatRate(basisPoints: number): string {
   return (basisPoints / 100).toFixed(1);
 }
 
+function formatRateDetailed(basisPoints: number): string {
+  return (basisPoints / 100).toFixed(2);
+}
+
 function formatBasisPoints(basisPoints: number): string {
   return `${(basisPoints / 100).toFixed(1)}%`;
+}
+
+function formatBasisPointsDetailed(basisPoints: number): string {
+  return `${(basisPoints / 100).toFixed(2)}%`;
+}
+
+function formatSigned(value: number, precision: number): string {
+  return `${value > 0 ? '+' : ''}${value.toFixed(precision)}`;
 }
 
 function formatChange(basisPoints: number | null): string {

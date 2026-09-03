@@ -63,6 +63,7 @@ export interface UiSlice {
   setRightPanelMode: (mode: RightPanelMode) => void;
   setRightPanelWidth: (w: number) => void;
   setRightPanelOpen: (open: boolean) => void;
+  setRailCollapsed: (collapsed: boolean) => void;
   togglePalette: () => void;
   toggleHelp: () => void;
   toggleSessionsExpanded: () => void;
@@ -108,6 +109,7 @@ export const createUiSlice: StateCreator<UiSlice, [], [], UiSlice> = (set) => ({
     rightPanelWidth: Math.min(RIGHT_PANEL_MAX_WIDTH, Math.max(RIGHT_PANEL_MIN_WIDTH, w)),
   }),
   setRightPanelOpen: (open) => set({ rightPanelOpen: open }),
+  setRailCollapsed: (collapsed) => set({ railCollapsed: collapsed }),
   togglePalette: () => set((s) => ({ paletteOpen: !s.paletteOpen })),
   toggleHelp: () => set((s) => ({ helpOpen: !s.helpOpen })),
   toggleSessionsExpanded: () => set((s) => ({ sessionsExpanded: !s.sessionsExpanded })),

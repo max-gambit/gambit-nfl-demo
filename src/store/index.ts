@@ -124,6 +124,7 @@ export const useUi = () => useStore(useShallow((s) => ({
   setRightPanelMode: s.setRightPanelMode,
   setRightPanelWidth: s.setRightPanelWidth,
   setRightPanelOpen: s.setRightPanelOpen,
+  setRailCollapsed: s.setRailCollapsed,
   togglePalette: s.togglePalette,
   toggleHelp: s.toggleHelp,
   toggleSessionsExpanded: s.toggleSessionsExpanded,
