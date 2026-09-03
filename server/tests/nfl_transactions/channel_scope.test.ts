@@ -1,12 +1,13 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  latestSellerMoveScenarioForSession,
   latestTransactionMarketBrief,
   latestTransactionMarketBriefForActiveAnalysis,
   nflTransactionMarketFootballRead,
   transactionMarketAnalysisFromBrief,
 } from '@shared/nflTransactionMarket';
-import type { Brief, NflTransactionMarketAnalysis } from '@shared/types';
+import type { Brief, NflSellerMoveScenarioState, NflTransactionMarketAnalysis } from '@shared/types';
 import {
   briefRoutes,
   briefProgressStreamPayload,
@@ -72,6 +73,42 @@ test('deterministic market artifact is streamable while interpretation is still 
     updated_at: '2026-09-02T12:00:01.000Z',
     body,
   });
+});
+
+test('seller proposal state remains inside its channel and is absent in a fresh workspace', () => {
+  const scenario: NflSellerMoveScenarioState = {
+    team_id: 'NYG',
+    player_id: 'burns',
+    player_name: 'Brian Burns',
+    player_query: 'Brian Burns',
+    position_group: 'EDGE',
+    pick_year: 2027,
+    pick_round: 2,
+    market_scope: { snapshot_id: 'snapshot', start_year: 2016, end_year: 2025, include_ytd: false, team_ids: [] },
+  };
+  const sellerBrief = {
+    ...brief('seller-brief', marketAnalysis('analysis-1', ['EDGE'])),
+    session_id: 'channel-a',
+  };
+  sellerBrief.body = {
+    ...transactionMarketArtifactBody(marketAnalysis('analysis-1', ['EDGE'])),
+    seller_move_analysis: {
+      schema_version: 'nfl_seller_move_conversation.v1',
+      status: 'clarification',
+      scenario,
+      result: null,
+      message: 'Which round should I use?',
+      show_comparables: false,
+    },
+  };
+
+  assert.deepEqual(latestSellerMoveScenarioForSession([sellerBrief], 'channel-a'), scenario);
+  const olderBrief = structuredClone(sellerBrief);
+  assert(olderBrief.body?.kind === 'data_analysis' && olderBrief.body.seller_move_analysis);
+  olderBrief.body.seller_move_analysis.scenario.pick_round = 3;
+  assert.equal(latestSellerMoveScenarioForSession([sellerBrief, olderBrief], 'channel-a')?.pick_round, 2);
+  assert.equal(latestSellerMoveScenarioForSession([sellerBrief], 'channel-b'), null);
+  assert.equal(latestSellerMoveScenarioForSession([], 'fresh-channel'), null);
 });
 
 test('initial market response progress is already renderable before interpretation', () => {

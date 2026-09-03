@@ -2,6 +2,7 @@ import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
 import { Cite } from '../ds/Cite';
 import type { DataAnalysisBriefBody } from '@shared/types';
 import { NflTransactionMarketAnalysisView } from './NflTransactionMarketAnalysis';
+import { NflSellerMoveAnalysis } from './NflSellerMoveAnalysis';
 import { fire } from '../lib/events';
 
 interface Props {
@@ -9,6 +10,9 @@ interface Props {
 }
 
 export function DataAnalysisCardBody({ body }: Props) {
+  if (body.seller_move_analysis) {
+    return <NflSellerMoveAnalysis artifact={body.seller_move_analysis} followups={body.followups} />;
+  }
   if (body.market_analysis) {
     return (
       <NflTransactionMarketAnalysisView

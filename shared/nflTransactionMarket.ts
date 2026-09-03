@@ -1,4 +1,9 @@
-import type { Brief, NflTransactionMarketAnalysis } from './types';
+import type {
+  Brief,
+  NflSellerMoveConversationArtifact,
+  NflSellerMoveScenarioState,
+  NflTransactionMarketAnalysis,
+} from './types';
 
 export interface NflTransactionMarketFootballRead {
   conclusion: string;
@@ -11,6 +16,32 @@ export function transactionMarketAnalysisFromBrief(
   return brief.body?.kind === 'data_analysis'
     ? brief.body.market_analysis ?? null
     : null;
+}
+
+export function sellerMoveAnalysisFromBrief(
+  brief: Pick<Brief, 'body'>,
+): NflSellerMoveConversationArtifact | null {
+  return brief.body?.kind === 'data_analysis'
+    ? brief.body.seller_move_analysis ?? null
+    : null;
+}
+
+export function sellerMoveScenarioFromBrief(
+  brief: Pick<Brief, 'body'>,
+): NflSellerMoveScenarioState | null {
+  return sellerMoveAnalysisFromBrief(brief)?.scenario ?? null;
+}
+
+export function latestSellerMoveScenarioForSession(
+  briefsNewestFirst: ReadonlyArray<Pick<Brief, 'body' | 'session_id'>>,
+  sessionId: string,
+): NflSellerMoveScenarioState | null {
+  for (const brief of briefsNewestFirst) {
+    if (brief.session_id !== sessionId) continue;
+    const scenario = sellerMoveScenarioFromBrief(brief);
+    if (scenario) return scenario;
+  }
+  return null;
 }
 
 export function latestTransactionMarketBrief(

@@ -65,8 +65,9 @@ export function buildNflSellerMoveOptions(
   );
   const capYear = Number.parseInt(seed.season, 10);
   if (!Number.isInteger(capYear)) throw new Error('current contract season is unavailable');
-  const players = seed.cap_rows.flatMap((row) => {
-    const positionGroup = currentPlayerPosition(row.player_name, row.position, snapshot);
+  const players = seed.cap_rows.filter((row) => row.team_id === normalizedTeam).flatMap((row) => {
+    const metric = seed.player_metrics.find((candidate) => candidate.team_id === normalizedTeam && candidate.player_id === row.player_id);
+    const positionGroup = currentPlayerPosition(row.player_name, row.position, snapshot, metric);
     if (
       !row.player_id
       || !positionGroup
@@ -123,7 +124,8 @@ export function calculateNflSellerMove(
   }
   const rosterRow = seed.roster_entries.find((row) => row.team_id === teamId && row.player_id === input.player_id);
   if (!rosterRow || rosterRow.roster_status !== 'active') throw new Error('selected player is not on the current active Giants roster');
-  const normalizedPosition = currentPlayerPosition(playerRow.player_name, playerRow.position, snapshot);
+  const metric = seed.player_metrics.find((row) => row.team_id === teamId && row.player_id === input.player_id);
+  const normalizedPosition = currentPlayerPosition(playerRow.player_name, playerRow.position, snapshot, metric);
   if (normalizedPosition !== input.position_group) throw new Error('selected player does not match the selected position group');
 
   const currentYear = Number.parseInt(seed.season, 10);
@@ -144,7 +146,6 @@ export function calculateNflSellerMove(
       : compareReturnValues(proposal, weakerBoundary) > 0
         ? 'below' as const
         : 'within' as const;
-  const metric = seed.player_metrics.find((row) => row.team_id === teamId && row.player_id === input.player_id);
   const depthEffect = nflDepthEffect(metric);
   const depthEvidence = nflDepthEvidence(metric);
   const roleSourceUrl = depthEvidence.source_status === 'captured'
@@ -186,9 +187,7 @@ export function calculateNflSellerMove(
     },
     market: {
       range,
-      range_label: range == null
-        ? 'Not enough comparable trades to set a historical range'
-        : `${capitalize(range)} the typical historical range for ${input.position_group}`,
+      range_label: marketRangeLabel(range, input.position_group, proposal, strongerBoundary, weakerBoundary),
       sample_size: sortedReturns.length,
       cohort_label: `${input.market_scope.start_year}–${input.market_scope.end_year}${input.market_scope.include_ytd ? ' including YTD' : ''} single-player ${input.position_group} trades with seller-side draft picks`,
       middle_range: strongerBoundary && weakerBoundary ? {
@@ -213,7 +212,7 @@ export function calculateNflSellerMove(
       basis: depthEvidence.basis,
       source_url: roleSourceUrl,
     },
-    comparables: relevantReturns.map((row) => comparableFromReturn(row, snapshot)),
+    comparables: relevantReturns.map((row) => comparableFromReturn(row, snapshot, proposal)),
     sources,
     limitations,
   };
@@ -318,7 +317,11 @@ function quantile(rows: HistoricalPickReturn[], percentile: number): HistoricalP
   return rows[Math.round((rows.length - 1) * percentile)]!;
 }
 
-function comparableFromReturn(row: HistoricalPickReturn, snapshot: NflTransactionMarketSnapshot): NflSellerMoveComparable {
+function comparableFromReturn(
+  row: HistoricalPickReturn,
+  snapshot: NflTransactionMarketSnapshot,
+  proposal: Pick<HistoricalPickReturn, 'pick_round' | 'pick_delay_years'>,
+): NflSellerMoveComparable {
   const source = snapshot.source_refs.find((candidate) => candidate.id === row.source_ref_id)
     ?? snapshot.source_refs.find((candidate) => row.event.source_ref_ids.includes(candidate.id));
   if (!source) throw new Error(`transaction source is missing for ${row.event.event_id}`);
@@ -335,9 +338,18 @@ function comparableFromReturn(row: HistoricalPickReturn, snapshot: NflTransactio
     pick_day: pickDay(row.pick_round),
     pick_delay_years: row.pick_delay_years,
     compensation_summary: row.compensation_summary,
+    comparison_to_proposal: comparableRelationship(row, proposal),
     source_name: source.name,
     source_url: source.url,
   };
+}
+
+function comparableRelationship(
+  row: Pick<HistoricalPickReturn, 'pick_round' | 'pick_delay_years'>,
+  proposal: Pick<HistoricalPickReturn, 'pick_round' | 'pick_delay_years'>,
+): NflSellerMoveComparable['comparison_to_proposal'] {
+  const difference = compareReturnValues(row, proposal);
+  return difference < 0 ? 'stronger' : difference > 0 ? 'weaker' : 'similar';
 }
 
 function sourceRefsForReturns(snapshot: NflTransactionMarketSnapshot, rows: HistoricalPickReturn[]) {
@@ -378,6 +390,7 @@ function currentPlayerPosition(
   playerName: string,
   position: string | null,
   snapshot: NflTransactionMarketSnapshot,
+  metric?: NflDemoSeed['player_metrics'][number],
 ): NflPositionMarketGroup | null {
   const normalizedName = normalizePlayerName(playerName);
   const historicallyMatched = new Set(
@@ -389,6 +402,16 @@ function currentPlayerPosition(
   );
   if (historicallyMatched.size === 1) return [...historicallyMatched][0]!;
   if (historicallyMatched.size > 1) return null;
+
+  // nflverse's current Giants depth chart lists the club in a base 3-4 and
+  // distinguishes the outside spots (SLB/WLB) from its inside linebackers.
+  // Use that sourced role detail to map current edge defenders such as Kayvon
+  // Thibodeaux instead of guessing from the roster's generic "LB" label.
+  const qualityFlags = new Set(metric?.quality_flags ?? []);
+  if (qualityFlags.has('depth_chart_group_base_3_4_d')
+    && (qualityFlags.has('depth_chart_position_slb') || qualityFlags.has('depth_chart_position_wlb'))) {
+    return 'EDGE';
+  }
 
   const value = (position ?? '').toUpperCase();
   if (['QB'].includes(value)) return 'QB';
@@ -448,4 +471,22 @@ function formatDollars(value: number): string {
 
 function capitalize(value: string): string {
   return `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
+}
+
+function marketRangeLabel(
+  range: NflSellerMoveResponse['market']['range'],
+  position: NflPositionMarketGroup,
+  proposal: Pick<HistoricalPickReturn, 'pick_round' | 'pick_delay_years'>,
+  strongerBoundary: HistoricalPickReturn | null,
+  weakerBoundary: HistoricalPickReturn | null,
+): string {
+  if (range == null) return 'Not enough comparable trades to set a historical range';
+  if (range === 'within') return `Within the typical historical range for ${position}`;
+  const boundary = range === 'above' ? strongerBoundary : weakerBoundary;
+  if (!boundary) return `${capitalize(range)} the typical historical range for ${position}`;
+  const roundGap = Math.abs(proposal.pick_round - boundary.pick_round);
+  const distance = roundGap > 0
+    ? `${roundGap} round${roundGap === 1 ? '' : 's'} ${range === 'above' ? 'stronger' : 'weaker'} than the edge of the middle range`
+    : `${Math.abs(proposal.pick_delay_years - boundary.pick_delay_years)} draft year${Math.abs(proposal.pick_delay_years - boundary.pick_delay_years) === 1 ? '' : 's'} ${range === 'above' ? 'sooner' : 'later'} than the edge of the middle range`;
+  return `${capitalize(range)} the typical historical range for ${position} · ${distance}`;
 }

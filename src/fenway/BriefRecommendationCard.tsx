@@ -422,7 +422,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
 
         {agentActionsBlock}
 
-        {!compact && <BriefActions />}
+        {!compact && <BriefActions allowRegenerate={!dataAnalysisBody?.seller_move_analysis} />}
 
         {onReply && (
           <div style={{

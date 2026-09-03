@@ -6,7 +6,7 @@ import { regenerateBrief } from '../api/briefs';
 import { BriefShareFlow } from './BriefShareFlow';
 import { Icon } from '../ds/Icon';
 
-export function BriefActions() {
+export function BriefActions({ allowRegenerate = true }: { allowRegenerate?: boolean }) {
   const { activeBriefId, briefs } = useBriefs();
   const {
     projects,
@@ -39,7 +39,10 @@ export function BriefActions() {
 
   // Slash-command bridge from the composer so `/regenerate` works without
   // aiming at the card footer.
-  useEffect(() => onEvt('v6d3cf:slash-regenerate', () => { void onRegenerate(); }), [briefId]);
+  useEffect(() => {
+    if (!allowRegenerate) return undefined;
+    return onEvt('v6d3cf:slash-regenerate', () => { void onRegenerate(); });
+  }, [allowRegenerate, briefId]);
 
   const onRegenerate = async () => {
     if (!briefId || regenerating) return;
@@ -371,7 +374,7 @@ export function BriefActions() {
       </div>
       <BriefShareFlow briefId={briefId} />
       <div style={{ flex: '1 1 12px', minWidth: 8 }} />
-      <button onClick={() => void onRegenerate()} disabled={!briefId || regenerating}
+      {allowRegenerate && <button onClick={() => void onRegenerate()} disabled={!briefId || regenerating}
         style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -388,7 +391,7 @@ export function BriefActions() {
         }}>
           <Icon name="refresh" size={12} />
           {regenerating ? 'Regenerating…' : 'Regenerate'}
-        </button>
+        </button>}
     </div>
   );
 }

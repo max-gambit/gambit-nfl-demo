@@ -27,6 +27,7 @@ test('move options expose only active Giants players with reconciled post-June t
   }
   const playersFor = (position: NflPositionMarketGroup) => options.positions.find((row) => row.position_group === position)?.players.map((player) => player.player_name) ?? [];
   assert(playersFor('EDGE').includes('Brian Burns'));
+  assert(playersFor('EDGE').includes('Kayvon Thibodeaux'));
   assert(!playersFor('LB').includes('Brian Burns'));
   assert(playersFor('IDL').includes('Shelby Harris'));
   assert(!playersFor('EDGE').includes('Shelby Harris'));

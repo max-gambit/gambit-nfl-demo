@@ -9,7 +9,6 @@ import { nflTransactionMarketFootballRead } from '@shared/nflTransactionMarket';
 import { fire } from '../lib/events';
 import { useBriefs, useUi } from '../store';
 import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
-import { NflModelMove } from './NflModelMove';
 
 interface Props {
   analysis: NflTransactionMarketAnalysis;
@@ -122,8 +121,6 @@ export function NflTransactionMarketAnalysisView({ analysis, interpretation = ''
           </div>
         </section>
       )}
-
-      <NflModelMove analysis={analysis} />
 
       {supplemental && (
         <section style={{ padding: SPACE.md, borderLeft: `3px solid ${F.borderStrong}`, background: F.cream50 }}>

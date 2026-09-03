@@ -63,7 +63,11 @@ import {
 import { buildSubmitBriefTool } from '../claude/tools.js';
 import { buildMessagesWithContextGraphLookups } from '../claude/tool_loop.js';
 import { stripBriefModePrefix } from '@shared/briefMode';
-import { transactionMarketAnalysisFromBrief } from '@shared/nflTransactionMarket';
+import {
+  latestSellerMoveScenarioForSession,
+  sellerMoveScenarioFromBrief,
+  transactionMarketAnalysisFromBrief,
+} from '@shared/nflTransactionMarket';
 import {
   BRIEF_TEMPLATE_DEFINITIONS,
   briefModeForTemplate,
@@ -76,12 +80,13 @@ import {
   isNflTransactionMarketQuestion,
   transactionMarketRequestFromQuestion,
 } from '../nfl_transactions/question.js';
+import { runNflSellerMoveConversationTurn } from '../nfl_transactions/seller_move_conversation.js';
 import type {
   AddBriefShareRecipientRequest, Brief, BriefMode, BriefProgress, BriefProgressEventKind, BriefProgressPhase, BriefProgressStreamEvent, BriefShare, BriefShareLink, BriefShareLinkResponse, BriefSource,
   BriefShareRecipientResponse, BriefShareSnapshot, CreateBriefRequest, CreateBriefResponse,
   CreateSavedBriefTemplateResponse, ListBriefTemplatesResponse, RegenerateBriefRequest,
   ResolveBriefShareLinkResponse, SavedBriefTemplate, SubmitBriefInput, TeamMember, CbaArticle, DataAnalystTrace,
-  DataAnalysisBriefBody, NflTransactionMarketAnalysis, SubmitDataAnalysisInput,
+  DataAnalysisBriefBody, NflSellerMoveConversationArtifact, NflTransactionMarketAnalysis, SubmitDataAnalysisInput,
 } from '@shared/types';
 
 export const briefRoutes = new Hono();
@@ -137,6 +142,7 @@ briefRoutes.post('/', async (c) => {
     return c.json({ error: 'session_not_found' }, 404);
   }
   let inheritedMarketAnalysis: NflTransactionMarketAnalysis | null = null;
+  let inheritedSellerMove = null as ReturnType<typeof sellerMoveScenarioFromBrief>;
   if (body.inherited_market_brief_id !== undefined) {
     if (typeof body.inherited_market_brief_id !== 'string' || !isUuid(body.inherited_market_brief_id)) {
       return c.json({ error: 'invalid_inherited_market_brief_id' }, 400);
@@ -157,16 +163,39 @@ briefRoutes.post('/', async (c) => {
     if (!inheritedMarketAnalysis) {
       return c.json({ error: 'inherited_market_scope_unavailable' }, 409);
     }
+    inheritedSellerMove = sellerMoveScenarioFromBrief(inheritedRes.data as Pick<Brief, 'body'>);
+    if (!inheritedSellerMove) {
+      const priorScenarioRes = await db
+        .from('briefs')
+        .select('body, session_id')
+        .eq('session_id', session_id)
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (priorScenarioRes.error) {
+        return c.json({ error: 'load_seller_move_context_failed', detail: priorScenarioRes.error.message }, 500);
+      }
+      // The database predicate is the primary boundary; the helper repeats it
+      // so scenario state cannot cross channels if this query is broadened later.
+      inheritedSellerMove = latestSellerMoveScenarioForSession(
+        (priorScenarioRes.data ?? []) as Array<Pick<Brief, 'body' | 'session_id'>>,
+        session_id,
+      );
+    }
   }
 
+  const preparedSellerMove = inheritedMarketAnalysis
+    ? await runNflSellerMoveConversationTurn(question, inheritedMarketAnalysis, inheritedSellerMove)
+    : null;
   const explicitMode = normalizeBriefMode(body.mode);
-  const transactionMarketQuestion = isNflTransactionMarketQuestion(question) || Boolean(inheritedMarketAnalysis);
-  const requestedMode = transactionMarketQuestion ? 'data_analyst' : explicitMode ?? parsedQuestion.mode;
+  const transactionMarketQuestion = !preparedSellerMove
+    && (isNflTransactionMarketQuestion(question) || Boolean(inheritedMarketAnalysis));
+  const marketContextActive = Boolean(preparedSellerMove) || transactionMarketQuestion;
+  const requestedMode = marketContextActive ? 'data_analyst' : explicitMode ?? parsedQuestion.mode;
   const templateParse = parseBriefTemplateSelection(body.template, body.question);
   if (templateParse.errors.length > 0) {
     return c.json({ error: 'invalid_template', detail: templateParse.errors }, 400);
   }
-  const templateSelection = transactionMarketQuestion || (body.template == null && requestedMode === 'data_analyst')
+  const templateSelection = marketContextActive || (body.template == null && requestedMode === 'data_analyst')
     ? { template_id: 'data_table' as const }
     : templateParse.selection;
   const mode = briefModeForTemplate(templateSelection)
@@ -181,7 +210,10 @@ briefRoutes.post('/', async (c) => {
   let preparedMarketLookup: DataAnalysisLookup | null = null;
   let preparedMarketBody: DataAnalysisBriefBody | null = null;
   let preparedProgress: BriefProgress | null = null;
-  if (transactionMarketQuestion) {
+  if (preparedSellerMove && inheritedMarketAnalysis) {
+    preparedMarketBody = sellerMoveArtifactBody(inheritedMarketAnalysis, preparedSellerMove);
+    preparedProgress = sellerMoveBriefProgress(preparedSellerMove);
+  } else if (transactionMarketQuestion) {
     try {
       preparedMarketLookup = await ensureNflTransactionMarketLookup(
         question,
@@ -211,9 +243,10 @@ briefRoutes.post('/', async (c) => {
       template_base_id: templateSelection.base_template_id ?? null,
       custom_template_id: templateSelection.custom_template_id ?? null,
       template_instructions: templateSelection.instructions ?? null,
+      thesis: preparedSellerMove ? preparedMarketBody?.answer ?? preparedSellerMove.message : null,
       body: preparedMarketBody,
       progress: preparedProgress ?? initialBriefProgress(),
-      status: 'generating',
+      status: preparedSellerMove ? 'ready' : 'generating',
     })
     .select()
     .single();
@@ -228,7 +261,9 @@ briefRoutes.post('/', async (c) => {
   // Persist both before returning so every visible comparable is drillable
   // while the optional model interpretation continues in the background.
   if (preparedMarketBody?.market_analysis) {
-    const immediateSources = deterministicMarketEvidenceRows(preparedMarketBody.market_analysis, 1)
+    const immediateSources = (preparedSellerMove
+      ? deterministicSellerMoveEvidenceRows(preparedSellerMove)
+      : deterministicMarketEvidenceRows(preparedMarketBody.market_analysis, 1))
       .map((source) => ({ ...source, brief_id: brief.id }));
     try {
       await insertMissingBriefSources(brief.id, immediateSources);
@@ -241,6 +276,13 @@ briefRoutes.post('/', async (c) => {
         .eq('id', brief.id);
       return c.json({ error: 'persist_market_sources_failed', detail }, 500);
     }
+  }
+
+  // Seller-move continuations are complete deterministic answers. They do not
+  // wait for or invite a model to reinterpret the user's terms or the math.
+  if (preparedSellerMove) {
+    const response: CreateBriefResponse = { brief };
+    return c.json(response, 201);
   }
 
   // Kick off generation in the background — the route returns immediately.
@@ -650,6 +692,9 @@ briefRoutes.post('/:id/regenerate', async (c) => {
   }
   const fresh = await regenerateBriefById(id, body.template);
   if (fresh === 'invalid_template') return c.json({ error: 'invalid_template' }, 400);
+  if (fresh === 'seller_move_regeneration_unsupported') {
+    return c.json({ error: 'seller_move_regeneration_unsupported', detail: 'Continue the trade conversation with a new question instead.' }, 409);
+  }
   if (!fresh) return c.json({ error: 'brief_not_found' }, 404);
   return c.json({ brief: fresh }, 202);
 });
@@ -663,10 +708,11 @@ briefRoutes.post('/:id/regenerate', async (c) => {
 export async function regenerateBriefById(
   id: string,
   templateOverride?: RegenerateBriefRequest['template'],
-): Promise<Brief | null | 'invalid_template'> {
+): Promise<Brief | null | 'invalid_template' | 'seller_move_regeneration_unsupported'> {
   const briefRes = await db.from('briefs').select('*').eq('id', id).maybeSingle();
   if (briefRes.error || !briefRes.data) return null;
   const existingBrief = briefRes.data as Brief;
+  if (sellerMoveScenarioFromBrief(existingBrief)) return 'seller_move_regeneration_unsupported';
   const inheritedMarketQuery = transactionMarketAnalysisFromBrief(existingBrief)?.query ?? null;
   const preservingTemplate = templateOverride === undefined;
   const templateParse = preservingTemplate
@@ -1485,6 +1531,10 @@ export async function generateDataAnalysisBrief(
       'write',
     );
 
+    // The channel can be removed while the optional interpretation is still
+    // running (for example after an isolated headless rehearsal). Do not
+    // write child evidence after its brief has gone away.
+    if (!(await heartbeat.isCurrent())) return;
     if (sourceRows.length > 0) {
       if (transactionMarketAnalysis) await insertMissingBriefSources(brief.id, sourceRows);
       else {
@@ -1492,8 +1542,6 @@ export async function generateDataAnalysisBrief(
         if (sourcesInsert.error) throw new Error(`brief_sources insert failed: ${sourcesInsert.error.message}`);
       }
     }
-
-    if (!(await heartbeat.isCurrent())) return;
 
     const readyProgress = progress.complete('Analysis ready', 'Findings, tables, calculations, and source cards are ready.');
     const updated = await db
@@ -1588,6 +1636,130 @@ export function transactionMarketArtifactBody(
   };
 }
 
+export function sellerMoveArtifactBody(
+  market: NflTransactionMarketAnalysis,
+  artifact: NflSellerMoveConversationArtifact,
+): DataAnalysisBriefBody {
+  const result = artifact.result;
+  const comparableRefs = result?.comparables.map((_, index) => index + 3) ?? [];
+  const answer = result
+    ? `${result.player.player_name}: New York would receive ${result.proposal.label}. ${result.market.range_label}. The trade creates ${formatSellerMoveDollars(result.cap.current_year_cap_space_created_dollars)} of ${result.cap.current_year} cap space and leaves ${formatSellerMoveDollars(result.cap.current_year_dead_money_dollars)} in dead money.`
+    : artifact.message ?? 'This trade cannot be calculated from the available public data.';
+  return {
+    kind: 'data_analysis',
+    answer,
+    key_findings: result ? [
+      {
+        label: 'Historical return',
+        body: `${result.market.range_label}; ${result.market.sample_size} usable trades in the comparison.`,
+        source_refs: comparableRefs,
+      },
+      {
+        label: 'Cap consequence',
+        body: `${formatSellerMoveDollars(result.cap.current_year_cap_space_created_dollars)} of current-year cap space and ${formatSellerMoveDollars(result.cap.current_year_dead_money_dollars)} of dead money.`,
+        source_refs: [1],
+      },
+      {
+        label: 'Depth consequence',
+        body: `${result.depth.label}. ${result.depth.basis}`,
+        source_refs: [2],
+      },
+    ] : [],
+    tables: [],
+    calculations: result ? [{
+      label: `${result.cap.current_year} cap space created`,
+      formula: result.cap.calculation,
+      value: formatSellerMoveDollars(result.cap.current_year_cap_space_created_dollars),
+      source_refs: [1],
+    }] : [],
+    caveats: result?.limitations ?? [],
+    followups: result ? [
+      `Make it a ${result.proposal.pick_round === 1 ? 'second' : 'first'}.`,
+      `Use ${result.proposal.pick_year === result.cap.current_year + 1 ? result.cap.current_year + 2 : result.cap.current_year + 1}.`,
+      'Show me the trades behind that.',
+    ] : [],
+    market_analysis: market,
+    seller_move_analysis: artifact,
+  };
+}
+
+export function deterministicSellerMoveEvidenceRows(
+  artifact: NflSellerMoveConversationArtifact,
+): Array<Omit<BriefSource, 'id' | 'brief_id'>> {
+  const result = artifact.result;
+  if (!result) return [];
+  const contract: Omit<BriefSource, 'id' | 'brief_id'> = {
+    ref_index: 1,
+    kind: 'CONTRACT',
+    source: 'OverTheCap',
+    title: `Contract · ${result.player.player_name}`,
+    updated_at: result.player.contract_as_of_date,
+    data: {
+      source_url: result.cap.contract_source_url,
+      rows: [
+        { k: 'Player', v: result.player.player_name },
+        { k: 'As of', v: result.player.contract_as_of_date },
+        { k: 'Current cap charge', v: formatSellerMoveDollars(result.cap.current_cap_number_dollars) },
+        { k: 'Cap space created', v: formatSellerMoveDollars(result.cap.current_year_cap_space_created_dollars) },
+        { k: 'Dead money', v: formatSellerMoveDollars(result.cap.current_year_dead_money_dollars) },
+        { k: 'Accounting timing', v: result.cap.accounting_timing },
+        { k: 'Used in this answer', v: 'Current-year cap and dead-money calculation' },
+      ],
+      seller_move_contract: true,
+      player_id: result.player.player_id,
+    },
+  };
+  const role: Omit<BriefSource, 'id' | 'brief_id'> = {
+    ref_index: 2,
+    kind: 'ANALYST_DATA',
+    source: 'NFLVERSE',
+    title: `Current role · ${result.player.player_name}`,
+    updated_at: result.player.contract_as_of_date,
+    data: {
+      ...(result.depth.source_url ? { source_url: result.depth.source_url } : {}),
+      rows: [
+        { k: 'Player', v: result.player.player_name },
+        { k: 'Position group', v: result.player.position_group },
+        { k: 'Depth consequence', v: result.depth.label },
+        { k: 'Basis', v: result.depth.basis },
+        { k: 'Used in this answer', v: 'Current role and depth consequence' },
+      ],
+      seller_move_role: true,
+      player_id: result.player.player_id,
+    },
+  };
+  const comparables = result.comparables.map((row, index): Omit<BriefSource, 'id' | 'brief_id'> => ({
+    ref_index: index + 3,
+    kind: 'ANALYST_DATA',
+    source: 'NFL_TRANSACTION_MARKET',
+    title: `Transaction · ${row.player_name}`,
+    updated_at: row.event_date ?? String(row.event_year),
+    data: {
+      source_url: row.source_url,
+      rows: [
+        { k: 'Date', v: row.event_date ?? String(row.event_year) },
+        { k: 'Player', v: row.player_name },
+        { k: 'Position', v: row.position_group },
+        { k: 'Teams', v: `${row.from_team_id} → ${row.to_team_id}` },
+        { k: 'Compensation', v: row.compensation_summary },
+        { k: 'Compared with proposal', v: row.comparison_to_proposal },
+        { k: 'Used in this answer', v: 'Historical seller-return comparison' },
+      ],
+      transaction: { event_id: row.event_id },
+      seller_move_comparable: true,
+    },
+  }));
+  return [contract, role, ...comparables];
+}
+
+function formatSellerMoveDollars(value: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
 export function deterministicMarketEvidenceRows(
   analysis: NflTransactionMarketAnalysis,
   startRefIndex: number,
@@ -1610,7 +1782,16 @@ async function insertMissingBriefSources(
   const missing = rows.filter((row) => !existingRefs.has(row.ref_index));
   if (missing.length === 0) return;
   const inserted = await db.from('brief_sources').insert(missing);
-  if (inserted.error) throw new Error(`brief_sources insert failed: ${inserted.error.message}`);
+  if (inserted.error) {
+    // A workspace may be deleted after the last heartbeat check but before
+    // this child insert. Confirm that narrow race before treating the foreign
+    // key failure as a real persistence error.
+    if (inserted.error.code === '23503') {
+      const parent = await db.from('briefs').select('id').eq('id', briefId).maybeSingle();
+      if (!parent.error && !parent.data) return;
+    }
+    throw new Error(`brief_sources insert failed: ${inserted.error.message}`);
+  }
 }
 
 function bindMarketSourceReferences(
@@ -2190,6 +2371,18 @@ export function marketArtifactBriefProgress(): BriefProgress {
     pct: 36,
     label: 'Market calculation ready',
     detail: 'Rendering the executed scope, series, comparables, methodology, and limitations while the interpretation is drafted.',
+    kind: 'data',
+  });
+}
+
+function sellerMoveBriefProgress(artifact: NflSellerMoveConversationArtifact): BriefProgress {
+  return briefProgressSnapshot({
+    phase: 'ready',
+    pct: 100,
+    label: artifact.status === 'answered' ? 'Trade check ready' : 'Answer ready',
+    detail: artifact.status === 'answered'
+      ? 'The proposed return, historical trades, contract figures, and depth consequence are ready.'
+      : artifact.message,
     kind: 'data',
   });
 }

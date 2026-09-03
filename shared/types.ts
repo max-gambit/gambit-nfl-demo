@@ -197,6 +197,8 @@ export interface DataAnalysisBriefBody {
   followups: string[];
   /** Server-attached deterministic artifact. The model never authors this payload. */
   market_analysis?: NflTransactionMarketAnalysis;
+  /** Server-attached deterministic seller-side trade continuation. */
+  seller_move_analysis?: NflSellerMoveConversationArtifact;
 }
 
 export type BriefBody = RecommendationBriefBody | DataAnalysisBriefBody;
@@ -2334,6 +2336,7 @@ export interface NflSellerMoveComparable {
   pick_day: 1 | 2 | 3;
   pick_delay_years: number;
   compensation_summary: string;
+  comparison_to_proposal: 'stronger' | 'similar' | 'weaker';
   source_name: string;
   source_url: string;
 }
@@ -2392,6 +2395,26 @@ export interface NflSellerMoveResponse {
   comparables: NflSellerMoveComparable[];
   sources: NflTransactionMarketSourceRef[];
   limitations: string[];
+}
+
+export interface NflSellerMoveScenarioState {
+  team_id: 'NYG';
+  player_id: string | null;
+  player_name: string | null;
+  player_query: string | null;
+  position_group: NflPositionMarketGroup | null;
+  pick_year: number | null;
+  pick_round: number | null;
+  market_scope: NflSellerMoveRequest['market_scope'];
+}
+
+export interface NflSellerMoveConversationArtifact {
+  schema_version: 'nfl_seller_move_conversation.v1';
+  status: 'answered' | 'clarification' | 'unavailable';
+  scenario: NflSellerMoveScenarioState;
+  result: NflSellerMoveResponse | null;
+  message: string | null;
+  show_comparables: boolean;
 }
 
 export type NflCapRosterLever =
