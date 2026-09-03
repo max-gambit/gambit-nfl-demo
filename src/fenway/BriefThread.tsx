@@ -273,7 +273,14 @@ function isDataAnalystTrace(value: unknown): value is DataAnalystTrace {
     typeof value === 'object' &&
     value !== null &&
     'tool_name' in value &&
-    ['list_available_datasets', 'query_nfl_data', 'query_nba_data', 'query_brief_workspace'].includes(String((value as { tool_name?: unknown }).tool_name)) &&
+    [
+      'list_available_datasets',
+      'query_nfl_data',
+      'query_nba_data',
+      'query_brief_workspace',
+      'analyze_nfl_transaction_market',
+      'query_nfl_transaction_comparables',
+    ].includes(String((value as { tool_name?: unknown }).tool_name)) &&
     Array.isArray((value as { datasets?: unknown }).datasets)
   );
 }

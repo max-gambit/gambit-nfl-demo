@@ -4,6 +4,7 @@ import type {
   NflTransactionMarketAnalysis,
   SubmitDataAnalysisInput,
 } from '@shared/types';
+import { teamIdsFromQuestion } from '../nfl_transactions/question.js';
 
 export interface NflTransactionMarketGuardrailResult {
   ok: boolean;
@@ -33,6 +34,10 @@ export function evaluateNflTransactionMarketDraft(
       issues.push(`Numeric token ${number} is absent from the deterministic artifact.`);
     }
   }
+  validateDeclaredPeriods(text, analysis, issues);
+  validateDeclaredScope(text, analysis, issues);
+  validateDeclaredTransactionTypes(text, analysis, issues);
+  validatePositionSignalNumbers(text, analysis, issues);
   if (/\b(caused|causal|because of this transaction|led directly to|drove the market)\b/i.test(text)
     && analysis.influential_transactions.length > 0) {
     issues.push('Leave-one-out influence is statistical sensitivity, not causal influence.');
@@ -61,11 +66,12 @@ export function evaluateNflTransactionMarketDraft(
       issues.push(`Citation ${url} was not returned by the deterministic tool.`);
     }
   }
-  for (const sentence of text.split(/[.\n]/)) {
+  for (const sentence of proseSentences(text)) {
     if (!/\b(?:traded|signed|acquired|released|extended)\b/i.test(sentence)) continue;
-    for (const quotedName of properNameCandidates(sentence)) {
-      if (!artifactNames.has(quotedName.toLowerCase())) {
-        issues.push(`Comparable ${quotedName} was not returned by the deterministic tool.`);
+    for (const candidate of actionNameCandidates(sentence)) {
+      if (teamIdsFromQuestion(candidate).length > 0) continue;
+      if (!matchesArtifactName(candidate, artifactNames)) {
+        issues.push(`Comparable ${candidate} was not returned by the deterministic tool.`);
       }
     }
   }
@@ -246,7 +252,7 @@ function allowedNumericTokens(analysis: NflTransactionMarketAnalysis): Set<strin
 }
 
 function numericTokens(text: string): string[] {
-  return [...text.matchAll(/(?<![A-Za-z0-9_])(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?(?![A-Za-z0-9_])/g)]
+  return [...text.matchAll(/(?<![A-Za-z0-9_.])(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?(?![A-Za-z0-9_.])/g)]
     .map((match) => match[0].replaceAll(',', ''));
 }
 
@@ -265,6 +271,166 @@ function overlap(left: string, right: string): boolean {
   return [...a].filter((word) => b.has(word)).length >= 2;
 }
 
-function properNameCandidates(text: string): string[] {
-  return [...text.matchAll(/\b([A-Z][a-z]+[ \t]+[A-Z][a-z]+)\b/g)].map((match) => match[1]);
+function validateDeclaredPeriods(
+  text: string,
+  analysis: NflTransactionMarketAnalysis,
+  issues: string[],
+): void {
+  const allowed = new Set([
+    analysis.query.baseline_years,
+    analysis.query.recent_years,
+    [analysis.query.start_year, analysis.query.end_year] as [number, number],
+  ].map(([start, end]) => `${start}:${end}`));
+  for (const match of text.matchAll(/\b((?:19|20)\d{2})\s*(?:[–—-]|to|through)\s*((?:19|20)\d{2})\b/gi)) {
+    const pair = `${Number(match[1])}:${Number(match[2])}`;
+    if (!allowed.has(pair)) issues.push(`Period ${match[1]}–${match[2]} does not match the executed analysis windows.`);
+  }
+}
+
+function validateDeclaredScope(
+  text: string,
+  analysis: NflTransactionMarketAnalysis,
+  issues: string[],
+): void {
+  const expected = new Set(analysis.query.team_ids);
+  for (const sentence of proseSentences(text)) {
+    if (!/\b(?:executed filters?|executed scope|analysis (?:covers?|covered|for)|filtered to|team scope)\b/i.test(sentence)) continue;
+    const leaguewide = /\b(?:leaguewide|league-wide|across the nfl|nfl-wide|all teams?)\b/i.test(sentence);
+    if (leaguewide && expected.size > 0) {
+      issues.push('The prose claims a leaguewide scope, but the executed analysis is team-filtered.');
+    }
+    const claimed = new Set(teamIdsFromQuestion(sentence));
+    if (claimed.size > 0 && !sameSet(claimed, expected)) {
+      issues.push(`The prose team scope (${[...claimed].join(', ')}) does not match the executed filters (${[...expected].join(', ') || 'leaguewide'}).`);
+    }
+  }
+}
+
+function validateDeclaredTransactionTypes(
+  text: string,
+  analysis: NflTransactionMarketAnalysis,
+  issues: string[],
+): void {
+  const actual = new Set(analysis.query.transaction_types);
+  if (/\b(?:trades? only|only trades?)\b/i.test(text) && !sameSet(actual, new Set(['trade']))) {
+    issues.push('The prose claims trades-only scope, but the executed transaction filters differ.');
+  }
+  const contractTypes = new Set(['free_agent_signing', 're_signing', 'extension', 'tag']);
+  if (/\b(?:contracts? only|only contracts?)\b/i.test(text) && !sameSet(actual, contractTypes)) {
+    issues.push('The prose claims contracts-only scope, but the executed transaction filters differ.');
+  }
+  const materialTypes = new Set(['trade', 'free_agent_signing', 're_signing', 'extension', 'tag', 'waiver_claim', 'release']);
+  if (/\b(?:all (?:material moves?|transaction types?)|every material move)\b/i.test(text) && !sameSet(actual, materialTypes)) {
+    issues.push('The prose claims the full material-moves cohort, but the executed transaction filters differ.');
+  }
+}
+
+function validatePositionSignalNumbers(
+  text: string,
+  analysis: NflTransactionMarketAnalysis,
+  issues: string[],
+): void {
+  for (const sentence of proseSentences(text)) {
+    const mentioned = analysis.position_trends.filter((trend) => (
+      new RegExp(`\\b${trend.position_group}\\b`, 'i').test(sentence)
+    ));
+    if (mentioned.length !== 1) continue;
+    const trend = mentioned[0];
+    for (const clause of sentence.split(';')) {
+      const signal = signalForClaim(clause, trend);
+      if (signal == null) continue;
+      const allowed = typeof signal === 'number'
+        ? new Set([normalizeNumber(String(signal))])
+        : signalNumericVariants(signal, clause);
+      // Coverage caveats commonly state the position's total event count next
+      // to a signal-specific sample. Both values are bound to this row.
+      allowed.add(normalizeNumber(String(trend.event_count)));
+      for (const token of numericTokens(clause)) {
+        const value = Number(token);
+        if ((value >= 1900 && value <= 2100) || ['5', '10', '20', '85', '95', '100'].includes(normalizeNumber(token))) continue;
+        if (!allowed.has(normalizeNumber(token))) {
+          issues.push(`Numeric token ${token} is not attached to the claimed ${trend.position_group} signal in the deterministic artifact.`);
+        }
+      }
+    }
+  }
+}
+
+function signalForClaim(
+  clause: string,
+  trend: NflPositionMarketTrend,
+): NflPositionMarketTrend['mobility'] | number | null {
+  if (/\b(?:trade price|compensation|premium[- ]pick|day[- ]one|day[- ]two|pick share)\b/i.test(clause)) return trend.trade_compensation;
+  if (/\b(?:contract price|apy|guaranteed share|salary[- ]cap price)\b/i.test(clause)) return trend.contract_price;
+  if (/\b(?:move share|share of (?:league )?material moves)\b/i.test(clause)) return trend.transaction_share;
+  if (/\b(?:mobility|material[- ]move rate|events? per 100)\b/i.test(clause)) return trend.mobility;
+  if (/\b(?:material events?|event count|transactions? observed)\b/i.test(clause)) return trend.event_count;
+  return null;
+}
+
+function signalNumericVariants(
+  signal: NflPositionMarketTrend['mobility'],
+  clause: string,
+): Set<string> {
+  const values = new Set<string>();
+  for (const candidate of [
+    signal.overall_value,
+    signal.baseline_value,
+    signal.recent_value,
+    signal.relative_change_basis_points,
+  ]) {
+    for (const token of artifactNumericVariants(candidate)) values.add(token);
+  }
+  if (/\b(?:sample(?: size)?|observations?|contracts? observed|trades? observed)\b/i.test(clause)) {
+    values.add(normalizeNumber(String(signal.sample_size)));
+  }
+  return values;
+}
+
+function artifactNumericVariants(value: unknown): Set<string> {
+  const values = new Set<string>();
+  const visit = (candidate: unknown) => {
+    if (typeof candidate === 'number' && Number.isFinite(candidate)) {
+      values.add(normalizeNumber(String(candidate)));
+      values.add(normalizeNumber((candidate / 100).toFixed(1)));
+      values.add(normalizeNumber(Math.round(candidate / 1_000).toString()));
+      values.add(normalizeNumber((candidate / 1_000_000).toFixed(1)));
+    } else if (Array.isArray(candidate)) {
+      candidate.forEach(visit);
+    } else if (candidate && typeof candidate === 'object') {
+      Object.values(candidate as Record<string, unknown>).forEach(visit);
+    }
+  };
+  visit(value);
+  return values;
+}
+
+function normalizeNumber(value: string): string {
+  return Number(value).toString();
+}
+
+function proseSentences(text: string): string[] {
+  // Decimal points are part of governed numeric values, not sentence breaks.
+  return text.split(/\n|(?<!\d)\.|\.(?!\d)/);
+}
+
+function sameSet(left: Set<string>, right: Set<string>): boolean {
+  return left.size === right.size && [...left].every((value) => right.has(value));
+}
+
+function actionNameCandidates(text: string): string[] {
+  const names = new Set<string>();
+  const token = "[A-Z][A-Za-z'’-]+";
+  const subject = new RegExp(`\\b(${token}(?:[ \\t]+${token})?)\\s+(?:was\\s+)?(?:traded|signed|acquired|released|extended)\\b`, 'g');
+  const object = new RegExp(`\\b(?:traded|signed|acquired|released|extended)\\s+(${token}(?:[ \\t]+${token})?)\\b`, 'g');
+  for (const match of text.matchAll(subject)) names.add(match[1]);
+  for (const match of text.matchAll(object)) names.add(match[1]);
+  return [...names];
+}
+
+function matchesArtifactName(candidate: string, artifactNames: Set<string>): boolean {
+  const normalized = candidate.toLowerCase();
+  if (artifactNames.has(normalized)) return true;
+  if (normalized.includes(' ')) return false;
+  return [...artifactNames].some((name) => name.split(/\s+/).at(-1) === normalized);
 }

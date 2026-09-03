@@ -36,6 +36,13 @@ test('explicit follow-up filters override inherited scope', () => {
 
   const influence = transactionMarketRequestFromQuestion('Which recent transactions most influenced that conclusion?', inherited);
   assert.equal(influence.analysis_mode, 'recent_influence');
+
+  const scopedToPhiladelphia = { ...inherited, team_ids: ['PHI'] };
+  const giants = transactionMarketRequestFromQuestion('Show me Giants trades only.', scopedToPhiladelphia);
+  assert.deepEqual(giants.team_ids, ['NYG']);
+
+  const leaguewide = transactionMarketRequestFromQuestion('Show me trades across the NFL.', scopedToPhiladelphia);
+  assert.equal(leaguewide.team_ids, undefined);
 });
 
 test('parses unplanned trade and position variations', () => {
@@ -53,5 +60,20 @@ test('recognizes hyphenated material-move acceptance wording', () => {
   assert.equal(
     isNflTransactionMarketQuestion('Compare safety and running-back material-move rates before and after 2020.'),
     true,
+  );
+});
+
+test('fresh questions resolve explicit team names and safe uppercase ids', () => {
+  assert.deepEqual(
+    transactionMarketRequestFromQuestion('Compare the Giants trade market after 2020.').team_ids,
+    ['NYG'],
+  );
+  assert.deepEqual(
+    transactionMarketRequestFromQuestion('Compare NYG with PHI trades after 2020.').team_ids,
+    ['NYG', 'PHI'],
+  );
+  assert.equal(
+    transactionMarketRequestFromQuestion('No team filter; compare trades leaguewide.').team_ids,
+    undefined,
   );
 });

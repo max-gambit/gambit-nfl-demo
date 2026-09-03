@@ -52,6 +52,53 @@ test('trades-only fallback answers the governed premium-pick ranking directly', 
   assert.deepEqual(evaluateNflTransactionMarketDraft(draft, analysisFixture()), { ok: true, issues: [] });
 });
 
+test('guardrail rejects mismatched periods and transaction filters even when their numbers exist elsewhere in the artifact', () => {
+  const analysis = analyzeNflTransactionMarketSnapshot({
+    analysis_mode: 'ten_year_trend',
+    start_year: 2016,
+    end_year: 2025,
+    position_groups: ['EDGE'],
+    max_comparables: 5,
+  }, snapshotFixture(), { generatedAt: '2026-09-02T00:00:00.000Z' });
+  const draft = buildDeterministicNflTransactionMarketFallback(analysis);
+  draft.answer = 'Executed filters were 2017–2024 and trades only.';
+
+  const result = evaluateNflTransactionMarketDraft(draft, analysis);
+  assert.equal(result.ok, false);
+  assert.ok(result.issues.some((issue) => /period/i.test(issue)));
+  assert.ok(result.issues.some((issue) => /trades-only/i.test(issue)));
+});
+
+test('guardrail rejects an unreturned single-name transaction and mismatched signal attribution', () => {
+  const analysis = analysisFixture();
+  const draft = buildDeterministicNflTransactionMarketFallback(analysis);
+  const unrelatedArtifactNumber = analysis.position_trends[0].trade_compensation.sample_size;
+  draft.answer += ` Mahomes was traded in 2024. EDGE trade price was ${unrelatedArtifactNumber}.`;
+
+  const result = evaluateNflTransactionMarketDraft(draft, analysis);
+  assert.equal(result.ok, false);
+  assert.ok(result.issues.some((issue) => /Mahomes/iu.test(issue)));
+  assert.ok(result.issues.some((issue) => /claimed EDGE signal/i.test(issue)));
+});
+
+test('guardrail rejects a declared team scope that differs from the executed filter', () => {
+  const analysis = analyzeNflTransactionMarketSnapshot({
+    analysis_mode: 'ten_year_trend',
+    start_year: 2016,
+    end_year: 2025,
+    team_ids: ['PHI'],
+    position_groups: ['EDGE'],
+    transaction_types: ['trade'],
+    max_comparables: 5,
+  }, snapshotFixture(), { generatedAt: '2026-09-02T00:00:00.000Z' });
+  const draft = buildDeterministicNflTransactionMarketFallback(analysis);
+  draft.answer += ' The executed scope was the Giants.';
+
+  const result = evaluateNflTransactionMarketDraft(draft, analysis);
+  assert.equal(result.ok, false);
+  assert.ok(result.issues.some((issue) => /team scope/i.test(issue)));
+});
+
 function analysisFixture() {
   return analyzeNflTransactionMarketSnapshot({
     analysis_mode: 'ten_year_trend',

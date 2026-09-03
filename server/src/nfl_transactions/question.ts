@@ -5,6 +5,7 @@ import type {
   NflTransactionMarketResolvedQuery,
   NflTransactionType,
 } from '@shared/types';
+import { TEAM_ALIASES } from '../context_graph/schema.js';
 
 const DEFAULT_START_YEAR = 2016;
 const DEFAULT_END_YEAR = 2025;
@@ -50,6 +51,7 @@ export function transactionMarketRequestFromQuestion(
   const normalized = question.trim();
   const positions = positionGroupsFromQuestion(normalized);
   const explicitTypes = transactionTypesFromQuestion(normalized);
+  const explicitTeams = teamIdsFromQuestion(normalized);
   const years = yearScopeFromQuestion(normalized);
   const analysisMode = analysisModeFromQuestion(normalized, inherited?.analysis_mode);
   const request: NflTransactionMarketRequest = {
@@ -57,7 +59,7 @@ export function transactionMarketRequestFromQuestion(
     start_year: years.start_year ?? inherited?.start_year ?? DEFAULT_START_YEAR,
     end_year: years.end_year ?? inherited?.end_year ?? DEFAULT_END_YEAR,
     comparison_year: years.comparison_year ?? inherited?.comparison_year ?? undefined,
-    team_ids: inherited?.team_ids.length ? inherited.team_ids : undefined,
+    team_ids: explicitTeams.length ? explicitTeams : inherited?.team_ids.length ? inherited.team_ids : undefined,
     position_groups: positions.length ? positions : inherited?.position_groups.length ? inherited.position_groups : undefined,
     transaction_types: explicitTypes ?? (inherited?.transaction_types.length ? inherited.transaction_types : DEFAULT_MATERIAL_TYPES),
     include_ytd: years.include_ytd ?? inherited?.include_ytd ?? false,
@@ -72,6 +74,22 @@ export function positionGroupsFromQuestion(question: string): NflPositionMarketG
   return POSITION_PATTERNS
     .filter(([, pattern]) => pattern.test(question))
     .map(([position]) => position);
+}
+
+/**
+ * Resolve explicitly named NFL teams without allowing short provider codes to
+ * match ordinary prose (for example, "no" must not become New Orleans).
+ */
+export function teamIdsFromQuestion(question: string): string[] {
+  const matches = Object.entries(TEAM_ALIASES)
+    .sort(([left], [right]) => right.length - left.length)
+    .flatMap(([alias, teamId]) => {
+      const escaped = alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const flags = alias.length <= 3 && /^[A-Z]+$/.test(alias) ? 'g' : 'gi';
+      const pattern = new RegExp(`(?<![A-Za-z0-9])${escaped}(?![A-Za-z0-9])`, flags);
+      return pattern.test(question) ? [teamId] : [];
+    });
+  return [...new Set(matches)];
 }
 
 function transactionTypesFromQuestion(question: string): NflTransactionType[] | null {
