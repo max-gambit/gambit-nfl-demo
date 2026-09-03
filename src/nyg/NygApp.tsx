@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CbaSection, GetCurrentNflTeamResponse, NflCapRosterAction, NflCapRosterBranch, NflCapRosterDecisionResponse, NflCapRosterExplanationResponse, NflDataHealthResponse, NflWorkspaceSummary } from '@shared/types';
 import { getCurrentNflCapSheet } from '../api/nfl';
+import { resolveBriefShareToken } from '../api/briefs';
 import { explainNflCapRoster, getNflPresenterPreflight, modelNflCapRoster } from '../api/nflDecision';
 import { getNflRuleArticle, listNflRules } from '../api/nflRules';
 import { createNflWorkspace, listNflWorkspaces } from '../api/nflWorkspace';
 import { AnalysisWorkspace } from '../analysis/AnalysisWorkspace';
 import { on as onEvt } from '../lib/events';
+import { useBriefs, useSessions, useToasts, useUi } from '../store';
 import './nyg.css';
 
 type View = 'analysis' | 'briefing' | 'workspaces' | 'roster' | 'rulebook' | 'settings';
@@ -39,7 +41,16 @@ export function NygApp() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [resetEpoch, setResetEpoch] = useState(0);
+  const [deepLinkHandled, setDeepLinkHandled] = useState(false);
   const requestSequence = useRef(0);
+  const { sessionsLoaded, setActiveSession } = useSessions();
+  const { briefs, briefsLoaded, setActiveBrief } = useBriefs();
+  const { pushToast } = useToasts();
+  const {
+    setExpandedBrief,
+    setRightPanelMode,
+    setRightPanelOpen,
+  } = useUi();
 
   async function load(nextTarget = target, nextPlayers = protectedPlayers, nextGroups = protectedGroups, nextAssumption = assumption) {
     const requestId = ++requestSequence.current;
@@ -72,6 +83,71 @@ export function NygApp() {
         .catch((caught) => setError(caught instanceof Error ? caught.message : String(caught)));
     }
   }), []);
+
+  useEffect(() => {
+    if (presenter || deepLinkHandled || !sessionsLoaded || !briefsLoaded) return;
+    const params = new URLSearchParams(window.location.search);
+    const linkedBriefId = params.get('brief');
+    const shareToken = params.get('share');
+    if (!linkedBriefId && !shareToken) {
+      setDeepLinkHandled(true);
+      return;
+    }
+
+    let cancelled = false;
+    const activate = async () => {
+      try {
+        let briefId = linkedBriefId;
+        let sessionId: string | null = null;
+        if (shareToken) {
+          const resolved = await resolveBriefShareToken(shareToken);
+          briefId = resolved.brief_id;
+          sessionId = resolved.session_id;
+        } else if (briefId) {
+          sessionId = briefs.find((brief) => brief.id === briefId)?.session_id ?? null;
+        }
+        if (!briefId || cancelled) return;
+        if (sessionId) setActiveSession(sessionId);
+        setActiveBrief(briefId);
+        setExpandedBrief(briefId);
+        setRightPanelMode('thread');
+        setRightPanelOpen(true);
+        setView('analysis');
+        setAnalysisMode('workspace');
+      } catch (caught) {
+        if (!cancelled) {
+          pushToast({
+            tone: 'error',
+            message: 'Couldn’t open shared brief',
+            detail: caught instanceof Error ? caught.message : 'Share link could not be resolved.',
+          });
+        }
+      } finally {
+        if (!cancelled) {
+          params.delete('brief');
+          params.delete('share');
+          const next = params.toString();
+          window.history.replaceState({}, '', `${window.location.pathname}${next ? `?${next}` : ''}${window.location.hash}`);
+          setDeepLinkHandled(true);
+        }
+      }
+    };
+
+    void activate();
+    return () => { cancelled = true; };
+  }, [
+    briefs,
+    briefsLoaded,
+    deepLinkHandled,
+    presenter,
+    pushToast,
+    sessionsLoaded,
+    setActiveBrief,
+    setActiveSession,
+    setExpandedBrief,
+    setRightPanelMode,
+    setRightPanelOpen,
+  ]);
 
   async function createWorkspace(question: string): Promise<void> {
     const trimmed = question.trim();

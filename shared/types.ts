@@ -2193,6 +2193,8 @@ export interface NflTransactionMarketYearPoint {
 export interface NflTransactionMarketSignal {
   status: NflTransactionMarketStatus;
   direction: NflMarketDirection;
+  /** Full completed-year cohort value; comparison windows remain separate. */
+  overall_value: number | null;
   baseline_value: number | null;
   recent_value: number | null;
   relative_change_basis_points: number | null;

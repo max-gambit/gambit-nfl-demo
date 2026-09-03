@@ -41,7 +41,9 @@ export async function buildCapRosterDecision(
     return actionCandidates(row, allowed, metricByPlayer.get(row.player_id), ruleByFamily);
   }));
   const target = input.target_relief_dollars;
-  const preservePool = candidates.filter((action) => action.depth_effect === 'none' || action.depth_effect === 'low');
+  const preservePool = candidates
+    .filter((action) => action.depth_effect === 'none' || action.depth_effect === 'low')
+    .sort(actionSortBalanced);
   const balancedPool = [...candidates].sort(actionSortBalanced);
   const maximizePool = [...candidates].sort((a, b) => b.relief_dollars - a.relief_dollars || a.player_name.localeCompare(b.player_name));
   const commonBlockers = excludedDirectional

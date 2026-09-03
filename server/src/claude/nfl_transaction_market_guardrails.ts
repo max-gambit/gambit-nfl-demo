@@ -87,11 +87,25 @@ export function buildNflTransactionMarketSystemBlock(analysis: NflTransactionMar
 export function buildDeterministicNflTransactionMarketFallback(
   analysis: NflTransactionMarketAnalysis,
 ): SubmitDataAnalysisInput {
-  const usable = analysis.position_trends.filter((trend) => trend.event_count > 0);
+  // Keep every requested position visible, including zero-event cohorts. A
+  // missing market is itself governed evidence and must not disappear from
+  // the deterministic fallback.
+  const usable = analysis.position_trends;
+  const tradeOnly = analysis.query.transaction_types.length === 1 && analysis.query.transaction_types[0] === 'trade';
+  const premiumTradeRanking = usable
+    .filter((trend) => trend.trade_compensation.status !== 'insufficient_evidence'
+      && trend.trade_compensation.overall_value != null)
+    .sort((a, b) => (
+      b.trade_compensation.overall_value! - a.trade_compensation.overall_value!
+      || b.trade_compensation.sample_size - a.trade_compensation.sample_size
+      || a.position_group.localeCompare(b.position_group)
+    ));
   const growing = usable.filter((trend) => trend.status === 'supported' && trend.direction === 'growing').map((trend) => trend.position_group);
   const shrinking = usable.filter((trend) => trend.status === 'supported' && trend.direction === 'shrinking').map((trend) => trend.position_group);
   const answer = analysis.status === 'insufficient_evidence'
     ? 'The current public-data snapshot does not support a firm market conclusion for the executed filters. The calculated series and comparables are shown below, but the sample and identity gates require an abstention.'
+    : tradeOnly && premiumTradeRanking.length > 0
+      ? `Across all completed years in ${analysis.query.start_year}–${analysis.query.end_year}, the highest observed day-one or day-two pick shares among allocable single-player trades were ${premiumTradeRanking.slice(0, 3).map((trend) => `${trend.position_group} ${formatBasisPoints(trend.trade_compensation.overall_value!)}`).join(', ')}. Multi-player and unknown-compensation deals remain comparables but are not assigned a fabricated per-player price.`
     : [
       growing.length ? `${growing.join(', ')} show supported market growth across at least two non-conflicting signals.` : 'No position clears the supported multi-signal growth gate.',
       shrinking.length ? `${shrinking.join(', ')} show supported market shrinkage.` : 'No position clears the supported multi-signal shrinkage gate.',
@@ -101,7 +115,7 @@ export function buildDeterministicNflTransactionMarketFallback(
   const ref = sources[0]?.ref_index ?? 1;
   return {
     answer,
-    key_findings: usable.slice(0, 6).map((trend) => ({
+    key_findings: (tradeOnly ? premiumTradeRanking : usable).slice(0, 6).map((trend) => ({
       label: `${trend.position_group} · ${trend.direction.replaceAll('_', ' ')}`,
       body: `${trend.event_count} material events. Mobility: ${signalSummary(trend.mobility)}; move share: ${signalSummary(trend.transaction_share)}; contract price: ${signalSummary(trend.contract_price)}; trade price: ${signalSummary(trend.trade_compensation)}.`,
       source_refs: [ref],
@@ -194,7 +208,8 @@ function signalSummary(signal: NflPositionMarketTrend['mobility']): string {
   const format = signal.unit === 'events_per_100_player_seasons'
     ? (value: number) => (value / 100).toFixed(1)
     : (value: number) => formatBasisPoints(value);
-  return `${format(signal.baseline_value)} → ${format(signal.recent_value)} (${signal.direction}; ${signal.status})`;
+  const overall = signal.overall_value == null ? '' : `; all completed years ${format(signal.overall_value)}`;
+  return `${format(signal.baseline_value)} → ${format(signal.recent_value)} (${signal.direction}; ${signal.status}${overall})`;
 }
 
 function formatBasisPoints(value: number): string {

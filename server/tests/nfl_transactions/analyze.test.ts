@@ -69,6 +69,7 @@ test('post-2020 period comparison resolves non-overlapping cohorts and recompute
 
 test('2026 YTD is returned as context but excluded from completed-year comparison windows', () => {
   const snapshot = fixtureSnapshot();
+  const completed = analyzeNflTransactionMarketSnapshot(defaultRequest(), structuredClone(snapshot), { generatedAt: GENERATED_AT });
   snapshot.events.push(...positionYearEvents('EDGE', 2026, 20, 'recent'));
   const result = analyzeNflTransactionMarketSnapshot({
     ...defaultRequest(),
@@ -79,6 +80,10 @@ test('2026 YTD is returned as context but excluded from completed-year compariso
   assert.deepEqual(result.query.recent_years, [2023, 2025]);
   assert.equal(result.query.end_year, 2026);
   assert.equal(result.position_trends.find((trend) => trend.position_group === 'EDGE')?.mobility.recent_value, 600);
+  assert.equal(
+    result.position_trends.find((trend) => trend.position_group === 'EDGE')?.mobility.overall_value,
+    completed.position_trends.find((trend) => trend.position_group === 'EDGE')?.mobility.overall_value,
+  );
   assert.equal(result.yearly_series.find((row) => row.year === 2026 && row.position_group === 'EDGE')?.event_count, 20);
   assert.equal(result.yearly_series.find((row) => row.year === 2026 && row.position_group === 'EDGE')?.mobility_per_100_basis_points, null);
 });
@@ -96,6 +101,29 @@ test('trades-only filtering removes contract price observations without changing
   assert.equal(edge.contract_price.status, 'insufficient_evidence');
   assert.deepEqual([edge.mobility.baseline_value, edge.mobility.recent_value], [200, 300]);
   assert.ok(result.comparables.every((event) => event.transaction_type === 'trade'));
+});
+
+test('since-year trade questions expose an all-years day-one or day-two compensation share', () => {
+  const snapshot = fixtureSnapshot();
+  const result = analyzeNflTransactionMarketSnapshot({
+    analysis_mode: 'ten_year_trend',
+    start_year: 2018,
+    end_year: 2025,
+    position_groups: ['EDGE'],
+    transaction_types: ['trade'],
+  }, snapshot, { generatedAt: GENERATED_AT });
+  const eligible = snapshot.events.filter((event) => (
+    event.position_group === 'EDGE'
+    && event.transaction_type === 'trade'
+    && event.event_year >= 2018
+    && event.event_year <= 2025
+  ));
+  const premium = eligible.filter((event) => Math.min(...(event.compensation_pick_rounds ?? [99])) <= 3).length;
+
+  assert.equal(
+    result.position_trends[0].trade_compensation.overall_value,
+    Math.round((premium / eligible.length) * 10_000),
+  );
 });
 
 test('missing and wrong-scope roster denominators stay null instead of borrowing a league value', () => {
@@ -231,6 +259,71 @@ test('unallocated in-scope identities lower the confidence gate instead of disap
   assert.ok(result.coverage.position_match_basis_points < 8_500);
   assert.equal(result.status, 'insufficient_evidence');
   assert.ok(result.limitations.some((item) => item.includes('12 in-scope events lack an allocated position')));
+});
+
+test('identity confidence is gated independently for each requested position', () => {
+  const snapshot = fixtureSnapshot();
+  for (let index = 0; index < 12; index += 1) {
+    snapshot.events.push({
+      ...releaseEvent(`edge-ambiguous-${index}`, 2024, 'EDGE'),
+      position_group: null,
+      raw_position: 'DE',
+      identity_confidence: 'unmatched',
+      normalization_basis: 'ambiguous DE/OLB mapping excluded from precise EDGE comparison',
+    });
+  }
+  const result = analyzeNflTransactionMarketSnapshot(defaultRequest(), snapshot, { generatedAt: GENERATED_AT });
+
+  assert.equal(result.position_trends.find((trend) => trend.position_group === 'EDGE')?.status, 'insufficient_evidence');
+  assert.equal(result.position_trends.find((trend) => trend.position_group === 'IOL')?.status, 'supported');
+  assert.equal(result.status, 'directional');
+});
+
+test('price-signal identity gates use only the transaction type behind that price', () => {
+  const snapshot = fixtureSnapshot();
+  for (let index = 0; index < 4; index += 1) {
+    snapshot.events.push(baseEvent({
+      id: `EDGE-2016-extra-contract-${index}`,
+      year: 2016,
+      position: 'EDGE',
+      type: 'free_agent_signing',
+      contractValue: 40_000_000,
+      contractApy: 10_000_000,
+      guaranteed: 20_000_000,
+    }));
+  }
+  snapshot.events.push(baseEvent({
+    id: 'EDGE-2025-extra-contract',
+    year: 2025,
+    position: 'EDGE',
+    type: 'free_agent_signing',
+    contractValue: 80_000_000,
+    contractApy: 20_000_000,
+    guaranteed: 48_000_000,
+  }));
+  for (const event of snapshot.events.filter((row) => row.position_group === 'EDGE' && row.transaction_type === 'trade')) {
+    event.identity_confidence = 'directional';
+  }
+  const result = analyzeNflTransactionMarketSnapshot({
+    ...defaultRequest(),
+    position_groups: ['EDGE'],
+  }, snapshot, { generatedAt: GENERATED_AT });
+  const edge = result.position_trends[0];
+
+  assert.equal(edge.contract_price.status, 'supported');
+  assert.notEqual(edge.trade_compensation.status, 'supported');
+});
+
+test('a requested zero-event position remains visible and prevents an overall supported label', () => {
+  const result = analyzeNflTransactionMarketSnapshot({
+    ...defaultRequest(),
+    position_groups: ['EDGE', 'ST'],
+  }, fixtureSnapshot(), { generatedAt: GENERATED_AT });
+
+  assert.equal(result.position_trends.find((trend) => trend.position_group === 'EDGE')?.status, 'supported');
+  assert.equal(result.position_trends.find((trend) => trend.position_group === 'ST')?.status, 'insufficient_evidence');
+  assert.equal(result.position_trends.find((trend) => trend.position_group === 'ST')?.event_count, 0);
+  assert.equal(result.status, 'directional');
 });
 
 test('fractional contract, guarantee, APY, and cap dollars are rejected', () => {

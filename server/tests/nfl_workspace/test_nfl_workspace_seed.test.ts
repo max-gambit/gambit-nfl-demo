@@ -27,6 +27,7 @@ test('normal database seed is NFL-only, non-destructive, and includes the presen
   const source = await readFile(new URL('../../src/db/seed.ts', import.meta.url), 'utf8');
   assert.doesNotMatch(source, /clearGeneratedUserContent|loadNba|seedNba|seedCbaCorpus/);
   assert.match(source, /seedNflDemoData/);
+  assert.match(source, /seedNflTransactionMarketData/);
   assert.match(source, /seedNygDemoWorkspace/);
 });
 

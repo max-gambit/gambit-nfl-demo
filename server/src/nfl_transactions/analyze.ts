@@ -331,22 +331,36 @@ function buildPositionTrend(
   thresholds: Readonly<NflTransactionMarketThresholds>,
 ): NflPositionMarketTrend {
   const events = cohortEvents.filter((event) => event.position_group === position);
+  const completedEndYear = query.include_ytd ? query.end_year - 1 : query.end_year;
+  const completedEvents = events.filter((event) => event.event_year <= completedEndYear);
   const baselineEvents = events.filter((event) => inPeriod(event.event_year, query.baseline_years));
   const recentEvents = events.filter((event) => inPeriod(event.event_year, query.recent_years));
-  const baselineIdentityEvents = identityAuditEvents.filter((event) => inPeriod(event.event_year, query.baseline_years));
-  const recentIdentityEvents = identityAuditEvents.filter((event) => inPeriod(event.event_year, query.recent_years));
+  const positionIdentityEvents = identityAuditEvents.filter((event) => (
+    event.event_year <= completedEndYear && identityEventAppliesToPosition(event, position)
+  ));
+  const baselineIdentityEvents = positionIdentityEvents.filter((event) => inPeriod(event.event_year, query.baseline_years));
+  const recentIdentityEvents = positionIdentityEvents.filter((event) => inPeriod(event.event_year, query.recent_years));
+  const contractIdentityEvents = positionIdentityEvents.filter((event) => CONTRACT_TRANSACTION_TYPES.has(event.transaction_type));
+  const baselineContractIdentityEvents = contractIdentityEvents.filter((event) => inPeriod(event.event_year, query.baseline_years));
+  const recentContractIdentityEvents = contractIdentityEvents.filter((event) => inPeriod(event.event_year, query.recent_years));
+  const tradeIdentityEvents = positionIdentityEvents.filter((event) => event.transaction_type === 'trade');
+  const baselineTradeIdentityEvents = tradeIdentityEvents.filter((event) => inPeriod(event.event_year, query.baseline_years));
+  const recentTradeIdentityEvents = tradeIdentityEvents.filter((event) => inPeriod(event.event_year, query.recent_years));
   const baselineLeagueCount = leagueEvents.filter((event) => inPeriod(event.event_year, query.baseline_years)).length;
   const recentLeagueCount = leagueEvents.filter((event) => inPeriod(event.event_year, query.recent_years)).length;
+  const completedLeagueCount = leagueEvents.filter((event) => event.event_year <= completedEndYear).length;
   const baselineDenominator = periodRosterDenominator(snapshot, query, position, query.baseline_years);
   const recentDenominator = periodRosterDenominator(snapshot, query, position, query.recent_years);
+  const completedDenominator = periodRosterDenominator(snapshot, query, position, [query.start_year, completedEndYear]);
 
   const mobility = buildStandardSignal({
+    overallValue: rateBasisPoints(completedEvents.length, completedDenominator),
     baselineValue: rateBasisPoints(baselineEvents.length, baselineDenominator),
     recentValue: rateBasisPoints(recentEvents.length, recentDenominator),
     baselineEvents,
     recentEvents,
-    overallEvents: events,
-    identityOverallEvents: identityAuditEvents,
+    overallEvents: completedEvents,
+    identityOverallEvents: positionIdentityEvents,
     identityBaselineEvents: baselineIdentityEvents,
     identityRecentEvents: recentIdentityEvents,
     minimumOverall: thresholds.minimum_events_overall,
@@ -357,12 +371,13 @@ function buildPositionTrend(
     detail: `Roster denominators are ${baselineDenominator} and ${recentDenominator} player-seasons.`,
   });
   const transactionShare = buildStandardSignal({
+    overallValue: rateBasisPoints(completedEvents.length, completedLeagueCount),
     baselineValue: rateBasisPoints(baselineEvents.length, baselineLeagueCount),
     recentValue: rateBasisPoints(recentEvents.length, recentLeagueCount),
     baselineEvents,
     recentEvents,
-    overallEvents: events,
-    identityOverallEvents: identityAuditEvents,
+    overallEvents: completedEvents,
+    identityOverallEvents: positionIdentityEvents,
     identityBaselineEvents: baselineIdentityEvents,
     identityRecentEvents: recentIdentityEvents,
     minimumOverall: thresholds.minimum_events_overall,
@@ -372,14 +387,40 @@ function buildPositionTrend(
     thresholds,
     detail: `League move denominators are ${baselineLeagueCount} and ${recentLeagueCount} events.`,
   });
-  const contractPrice = buildContractSignal(events, baselineEvents, recentEvents, identityAuditEvents, baselineIdentityEvents, recentIdentityEvents, capByYear, thresholds);
-  const tradeCompensation = buildCompensationSignal(events, baselineEvents, recentEvents, identityAuditEvents, baselineIdentityEvents, recentIdentityEvents, thresholds);
+  const contractPrice = buildContractSignal(
+    completedEvents,
+    baselineEvents,
+    recentEvents,
+    contractIdentityEvents,
+    baselineContractIdentityEvents,
+    recentContractIdentityEvents,
+    capByYear,
+    thresholds,
+  );
+  const tradeCompensation = buildCompensationSignal(
+    completedEvents,
+    baselineEvents,
+    recentEvents,
+    tradeIdentityEvents,
+    baselineTradeIdentityEvents,
+    recentTradeIdentityEvents,
+    thresholds,
+  );
   const classification = classifySignals([mobility, transactionShare, contractPrice, tradeCompensation]);
+  const positionIdentityStatus = identityStatus(positionIdentityEvents, thresholds);
+  const positionStatus = positionIdentityStatus === 'insufficient_evidence'
+    ? 'insufficient_evidence'
+    : positionIdentityStatus === 'directional' && classification.status === 'supported'
+      ? 'directional'
+      : classification.status;
+  const positionDirection = positionStatus === 'insufficient_evidence'
+    ? 'insufficient_evidence'
+    : classification.direction;
 
   return {
     position_group: position,
-    status: classification.status,
-    direction: classification.direction,
+    status: positionStatus,
+    direction: positionDirection,
     event_count: events.length,
     mobility,
     transaction_share: transactionShare,
@@ -389,6 +430,7 @@ function buildPositionTrend(
 }
 
 interface StandardSignalArgs {
+  overallValue: number | null;
   baselineValue: number | null;
   recentValue: number | null;
   baselineEvents: NflTransactionMarketEvent[];
@@ -423,6 +465,7 @@ function buildStandardSignal(args: StandardSignalArgs): NflTransactionMarketSign
   return {
     status,
     direction,
+    overall_value: args.overallValue,
     baseline_value: args.baselineValue,
     recent_value: args.recentValue,
     relative_change_basis_points: comparable ? relativeChangeBasisPoints(args.baselineValue!, args.recentValue!) : null,
@@ -449,6 +492,7 @@ function buildContractSignal(
   const recentGuarantees = recentEvents.filter((event) => guaranteedShareBasisPoints(event) != null);
   const baselineValue = medianInteger(baselinePriced.map((event) => contractApyCapBasisPoints(event, capByYear)!).filter(isNumber));
   const recentValue = medianInteger(recentPriced.map((event) => contractApyCapBasisPoints(event, capByYear)!).filter(isNumber));
+  const overallValue = medianInteger(allPriced.map((event) => contractApyCapBasisPoints(event, capByYear)!).filter(isNumber));
   const baselineGuarantee = medianInteger(baselineGuarantees.map((event) => guaranteedShareBasisPoints(event)!).filter(isNumber));
   const recentGuarantee = medianInteger(recentGuarantees.map((event) => guaranteedShareBasisPoints(event)!).filter(isNumber));
   const apyGate = signalGate(
@@ -489,6 +533,7 @@ function buildContractSignal(
   return {
     status,
     direction,
+    overall_value: overallValue,
     baseline_value: baselineValue,
     recent_value: recentValue,
     relative_change_basis_points: hasApyComparison ? relativeChangeBasisPoints(baselineValue!, recentValue!) : null,
@@ -513,6 +558,7 @@ function buildCompensationSignal(
   const baselineMix = compensationMix(baselineTrades);
   const recentMix = compensationMix(recentTrades);
   return buildStandardSignal({
+    overallValue: premiumCompensationShare(compensationMix(allTrades)),
     baselineValue: premiumCompensationShare(baselineMix),
     recentValue: premiumCompensationShare(recentMix),
     baselineEvents: baselineTrades,
@@ -801,17 +847,30 @@ function matchesIdentityAuditCohort(event: NflTransactionMarketEvent, query: Nfl
   }
   if (event.position_group != null) return query.position_groups.includes(event.position_group);
   if (query.position_groups.length === ALL_POSITION_GROUPS.size) return true;
-  const raw = (event.raw_position ?? '').toUpperCase().trim();
+  const possible = possibleUnallocatedPositionGroups(event.raw_position);
+  // Fully missing roles remain in the all-position audit, while targeted
+  // position conclusions include only ambiguity that can apply to that group.
+  if (possible.size === 0) return false;
+  return query.position_groups.some((position) => possible.has(position));
+}
+
+function identityEventAppliesToPosition(
+  event: NflTransactionMarketEvent,
+  position: NflPositionMarketGroup,
+): boolean {
+  if (event.position_group != null) return event.position_group === position;
+  return possibleUnallocatedPositionGroups(event.raw_position).has(position);
+}
+
+function possibleUnallocatedPositionGroups(rawPosition: string | null | undefined): Set<NflPositionMarketGroup> {
+  const raw = (rawPosition ?? '').toUpperCase().trim();
   const possible = new Set<NflPositionMarketGroup>();
   if (raw === 'DE' || raw === 'OLB') possible.add('EDGE');
   if (raw === 'DL') { possible.add('EDGE'); possible.add('IDL'); }
   if (raw === 'OL') { possible.add('OT'); possible.add('IOL'); }
   if (raw === 'DB') { possible.add('CB'); possible.add('S'); }
   if (raw === 'SAF') possible.add('S');
-  // Fully missing roles are rare, but remain in every requested audit cohort
-  // because silently assigning them away would inflate confidence.
-  if (possible.size === 0) return true;
-  return query.position_groups.some((position) => possible.has(position));
+  return possible;
 }
 
 function signalGate(
@@ -836,6 +895,16 @@ function identityBasisPoints(events: NflTransactionMarketEvent[]): number {
   if (events.length === 0) return 0;
   const matched = events.filter((event) => event.identity_confidence === 'matched').length;
   return Math.round((matched / events.length) * 10_000);
+}
+
+function identityStatus(
+  events: NflTransactionMarketEvent[],
+  thresholds: Readonly<NflTransactionMarketThresholds>,
+): NflTransactionMarketStatus {
+  const identity = identityBasisPoints(events);
+  if (identity >= thresholds.supported_identity_basis_points) return 'supported';
+  if (identity >= thresholds.directional_identity_basis_points) return 'directional';
+  return 'insufficient_evidence';
 }
 
 function numericDirection(
@@ -880,7 +949,7 @@ function analysisStatus(trends: NflPositionMarketTrend[]): NflTransactionMarketS
   if (withEvents.length === 0 || withEvents.every((trend) => trend.status === 'insufficient_evidence')) {
     return 'insufficient_evidence';
   }
-  return withEvents.every((trend) => trend.status === 'supported') ? 'supported' : 'directional';
+  return trends.every((trend) => trend.status === 'supported') ? 'supported' : 'directional';
 }
 
 function methodology(

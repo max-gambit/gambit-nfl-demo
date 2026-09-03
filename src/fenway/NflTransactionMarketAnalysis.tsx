@@ -293,7 +293,9 @@ function SignalMetric({ label, signal }: { label: string; signal: NflTransaction
   return <div style={{ minWidth: 0 }}>
     <span style={{ display: 'block', color: F.fgMuted, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs, textTransform: 'uppercase', letterSpacing: TRACKING.micro }}>{label}</span>
     <strong style={{ display: 'block', marginTop: 3, color: F.inkSoft, fontSize: TYPE.body.sm, fontWeight: 650, overflowWrap: 'anywhere' }}>{signalCell(signal)}</strong>
-    <span style={{ color: F.fgMuted, fontSize: TYPE.meta.xs }}>n={signal.sample_size.toLocaleString()} · {signal.status.replaceAll('_', ' ')}</span>
+    <span style={{ color: F.fgMuted, fontSize: TYPE.meta.xs }}>
+      n={signal.sample_size.toLocaleString()} · all completed years {signal.overall_value == null ? 'unavailable' : formatSignalValue(signal, signal.overall_value)} · {signal.status.replaceAll('_', ' ')}
+    </span>
   </div>;
 }
 
@@ -392,6 +394,12 @@ function signalCell(signal: NflTransactionMarketSignal): string {
       ? `${formatBasisPoints(signal.baseline_value)} → ${formatBasisPoints(signal.recent_value)}`
       : `${formatBasisPoints(signal.baseline_value)} → ${formatBasisPoints(signal.recent_value)}`;
   return `${values} (${signal.direction})`;
+}
+
+function formatSignalValue(signal: NflTransactionMarketSignal, value: number): string {
+  return signal.unit === 'events_per_100_player_seasons'
+    ? formatRate(value)
+    : formatBasisPoints(value);
 }
 
 function formatRate(basisPoints: number): string {

@@ -37,6 +37,15 @@ test('cap roster branches use positive integer relief and reconcile components',
   assert.equal(result.branches.flatMap((branch) => branch.actions).some((action) => action.player_name === 'Brian Burns'), false);
 });
 
+test('preserve-depth selects the smallest source-order-independent low-impact action set', async () => {
+  const result = await fixtureRequest({ target_relief_dollars: 3_000_000, protected_player_ids: [] });
+  const preserve = result.branches.find((branch) => branch.id === 'preserve_depth');
+
+  assert.ok(preserve?.target_met);
+  assert.equal(preserve.actions.length, 1);
+  assert.ok(preserve.actions[0].relief_dollars >= 3_000_000);
+});
+
 test('protected position groups never enter transaction branches', async () => {
   const result = await fixtureRequest({ protected_position_groups: ['OL'] });
   const transactions = result.branches.flatMap((branch) => branch.actions);
