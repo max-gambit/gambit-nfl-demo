@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 import {
   buildNflCurrentAnswer,
   classifyNflCurrentQuestion,
@@ -87,6 +90,15 @@ test('missing or fallback current data returns a plain unavailable answer', asyn
   assert.match(failed.body.answer, /not available from the local database/i);
   assert.deepEqual(fallback.sources, []);
   assert.deepEqual(failed.sources, []);
+});
+
+test('the preserved-question retry path rebuilds current Giants answers deterministically', async () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
+  const route = await readFile(path.join(repoRoot, 'server', 'src', 'routes', 'briefs.ts'), 'utf8');
+
+  assert.match(route, /classifyNflCurrentQuestion\(existingBrief\.question\)/);
+  assert.match(route, /return regenerateCurrentNflBrief\(existingBrief, currentQuestionKind\)/);
+  assert.match(route, /async function regenerateCurrentNflBrief[\s\S]*buildNflCurrentAnswer\(questionKind\)[\s\S]*status: 'ready'/);
 });
 
 async function nygSeed(): Promise<NflDemoSeed> {

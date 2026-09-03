@@ -85,7 +85,7 @@ import { runNflSellerMoveConversationTurn } from '../nfl_transactions/seller_mov
 import { classifyNflAnalysisTurn } from '../nfl_transactions/intent.js';
 import { buildNflRuleAnswer } from '../nfl_rules/analysis.js';
 import { loadNflRulesCorpus } from '../nfl_rules/seed.js';
-import { buildNflCurrentAnswer } from '../nfl_current/analysis.js';
+import { buildNflCurrentAnswer, classifyNflCurrentQuestion, type NflCurrentQuestionKind } from '../nfl_current/analysis.js';
 import type {
   AddBriefShareRecipientRequest, Brief, BriefMode, BriefProgress, BriefProgressEventKind, BriefProgressPhase, BriefProgressStreamEvent, BriefShare, BriefShareLink, BriefShareLinkResponse, BriefSource,
   BriefShareRecipientResponse, BriefShareSnapshot, CreateBriefRequest, CreateBriefResponse,
@@ -703,10 +703,9 @@ briefRoutes.post('/:id/share/link', async (c) => {
 /**
  * POST /briefs/:id/regenerate
  *
- * Re-runs `generateBrief` for an existing brief: deletes the prior
- * options/sources, clears thesis/body, sets status='generating', then dispatches
- * the same Claude tool call. Chat history (chat_turns) is preserved; the
- * recommendation card just rebuilds from scratch.
+ * Rebuilds an existing brief from its preserved question. Deterministic NFL
+ * questions stay on their source-backed path; other briefs rerun generation.
+ * Chat history (chat_turns) is preserved.
  */
 briefRoutes.post('/:id/regenerate', async (c) => {
   const id = c.req.param('id');
@@ -741,6 +740,10 @@ export async function regenerateBriefById(
   const existingBrief = briefRes.data as Brief;
   if (sellerMoveScenarioFromBrief(existingBrief)) return 'seller_move_regeneration_unsupported';
   const inheritedMarketQuery = transactionMarketAnalysisFromBrief(existingBrief)?.query ?? null;
+  const currentQuestionKind = classifyNflCurrentQuestion(existingBrief.question);
+  if (currentQuestionKind) {
+    return regenerateCurrentNflBrief(existingBrief, currentQuestionKind);
+  }
   const preservingTemplate = templateOverride === undefined;
   const templateParse = preservingTemplate
     ? { selection: templateSelectionFromBrief(existingBrief), errors: [] as string[] }
@@ -799,6 +802,69 @@ export async function regenerateBriefById(
     }));
   });
 
+  return fresh;
+}
+
+async function regenerateCurrentNflBrief(
+  existingBrief: Brief,
+  questionKind: NflCurrentQuestionKind,
+): Promise<Brief | null> {
+  const startedAt = Date.now();
+  const prepared = await buildNflCurrentAnswer(questionKind);
+  const progress = readyBriefProgress('Current Giants answer ready', 'The current public team data has been checked.');
+
+  invalidateActiveBriefGeneration(existingBrief.id);
+  await db.from('brief_options').delete().eq('brief_id', existingBrief.id);
+  await db.from('brief_sources').delete().eq('brief_id', existingBrief.id);
+
+  if (prepared.sources.length > 0) {
+    try {
+      await insertMissingBriefSources(
+        existingBrief.id,
+        prepared.sources.map((source) => ({ ...source, brief_id: existingBrief.id })),
+      );
+    } catch (error) {
+      const failedProgress = failedBriefProgress(error);
+      const detail = briefGenerationErrorMessage(error);
+      await db.from('briefs').update({
+        status: 'failed',
+        error: detail,
+        progress: failedProgress,
+        updated_at: failedProgress.updated_at,
+      }).eq('id', existingBrief.id);
+      throw error;
+    }
+  }
+
+  const reset = await db
+    .from('briefs')
+    .update({
+      thesis: prepared.body.answer,
+      body: prepared.body,
+      mode: 'data_analyst',
+      template_id: 'data_table',
+      template_base_id: null,
+      custom_template_id: null,
+      template_instructions: null,
+      progress,
+      status: 'ready',
+      error: null,
+      duration_ms: Date.now() - startedAt,
+      updated_at: progress.updated_at,
+    })
+    .eq('id', existingBrief.id)
+    .select()
+    .single();
+  if (reset.error || !reset.data) return null;
+  const fresh = reset.data as Brief;
+
+  publishBriefProgress(briefProgressStreamPayload({
+    id: fresh.id,
+    status: 'ready',
+    error: null,
+    progress,
+    updated_at: progress.updated_at,
+  }));
   return fresh;
 }
 
