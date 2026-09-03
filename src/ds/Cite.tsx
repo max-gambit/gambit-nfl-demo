@@ -21,7 +21,7 @@ interface CiteProps {
 export function Cite({ n, label }: CiteProps) {
   const refIndex = typeof n === 'number' ? n : Number(n);
   const { activeBriefId, sourcesByBrief } = useBriefs();
-  const { setHighlightedSourceRef, setSourceFilterRef, setRailCollapsed } = useUi();
+  const { setHighlightedSourceRef, setSourceFilterRef } = useUi();
   const [hovered, setHovered] = useState(false);
 
   const sources = activeBriefId ? (sourcesByBrief[activeBriefId] ?? []) : [];
@@ -58,7 +58,6 @@ export function Cite({ n, label }: CiteProps) {
     }
     setSourceFilterRef(refIndex);
     setHighlightedSourceRef(refIndex);
-    setRailCollapsed(false);
     fire('v6d3cf:open-evidence', { ref: refIndex });
   };
 
@@ -66,7 +65,6 @@ export function Cite({ n, label }: CiteProps) {
     e.stopPropagation();
     setSourceFilterRef(refIndex);
     setHighlightedSourceRef(refIndex);
-    setRailCollapsed(false);
     fire('v6d3cf:open-evidence', { ref: refIndex });
   };
 
@@ -172,7 +170,7 @@ export function Cite({ n, label }: CiteProps) {
               {dataRows.slice(0, 4).map((r, i) => (
                 <span key={i} style={{ display: 'contents' }}>
                   <span style={{ color: F.fgMuted }}>{r.k}</span>
-                  <span style={{ color: F.ink, fontWeight: 600 }}>{r.v}</span>
+                  <span style={{ color: F.ink, fontWeight: 600 }}>{citeRowValue(r.k, r.v)}</span>
                 </span>
               ))}
             </span>
@@ -199,4 +197,13 @@ export function Cite({ n, label }: CiteProps) {
       )}
     </span>
   );
+}
+
+function citeRowValue(label: string, value: string): string {
+  if (!/(?:date|as of|retrieved)$/i.test(label)) return value;
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})(?:T.*)?$/);
+  if (!match) return value;
+  const [, year, month, day] = match;
+  return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
+    .format(new Date(Date.UTC(Number(year), Number(month) - 1, Number(day))));
 }

@@ -20,24 +20,24 @@ test('basic Giants cap and roster questions have a bounded deterministic route',
   assert.equal(classifyNflCurrentQuestion('Which position markets have grown?'), null);
 });
 
-test('current cap answer states the loaded figure without mislabeling it as cap space', async () => {
+test('current cap answer uses the captured team total and reconciles its components', async () => {
   const seed = await nygSeed();
   const result = await buildNflCurrentAnswer('cap_space', { loadTeam: currentLoader(seed) });
-  const supported = seed.cap_rows.filter((row) => row.cap_number_2026 != null
-    && row.source_status === 'captured'
-    && (row.contract_ledger_confidence === 'captured' || row.contract_ledger_confidence === 'derived'));
-  const estimated = seed.cap_rows.filter((row) => row.cap_number_2026 != null && !supported.includes(row));
-  const expected = supported.reduce((total, row) => total + row.cap_number_2026!, 0);
-  const excluded = estimated.reduce((total, row) => total + row.cap_number_2026!, 0);
+  const summary = seed.team_cap_summaries?.find((row) => row.team_id === 'NYG');
+  assert.ok(summary);
 
-  assert.match(result.body.answer, /does not support an exact Giants 2026 cap-space figure/i);
-  assert.match(result.body.answer, new RegExp(expected.toLocaleString('en-US').replace(/,/g, ',')));
-  assert.match(result.body.answer, new RegExp(excluded.toLocaleString('en-US').replace(/,/g, ',')));
-  assert.match(result.body.answer, /estimated roster placeholders.*excluded/i);
-  assert.match(result.body.answer, /Sep 2, 2026/);
-  assert.equal(result.sources.length, 1);
+  assert.match(result.body.answer, /Giants currently have approximately \$10,392,701 in 2026 cap space/i);
+  assert.match(result.body.answer, /Sep 3, 2026/);
+  assert.equal(
+    summary.top_51_cap_spending_dollars + summary.dead_money_dollars + summary.current_cap_space_dollars,
+    summary.applied_team_cap_dollars,
+  );
+  assert.match(result.body.caveats[0] ?? '', /carryover and other adjustments.*remain unavailable/i);
+  assert.equal(result.sources.length, 3);
   assert.equal(result.sources[0]?.data?.current_team_cap_summary, true);
-  assert.match(String(result.sources[0]?.data?.contribution), /separates them from estimated placeholders/i);
+  assert.equal(result.sources[0]?.data?.source_url, 'https://overthecap.com/salary-cap-space');
+  assert.equal(result.sources[1]?.data?.source_url, 'https://overthecap.com/calculator/new-york-giants');
+  assert.equal(result.sources[2]?.data?.source_url, 'https://operations.nfl.com/calendar-events/nfl-free-agency/nfl-salary-cap');
 });
 
 test('largest cap hits are sorted from current active-roster contract rows', async () => {
@@ -99,6 +99,15 @@ test('the preserved-question retry path rebuilds current Giants answers determin
   assert.match(route, /classifyNflCurrentQuestion\(existingBrief\.question\)/);
   assert.match(route, /return regenerateCurrentNflBrief\(existingBrief, currentQuestionKind\)/);
   assert.match(route, /async function regenerateCurrentNflBrief[\s\S]*buildNflCurrentAnswer\(questionKind\)[\s\S]*status: 'ready'/);
+});
+
+test('team-cap migration backfills the current Giants row for migration-only installs', async () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
+  const migration = await readFile(path.join(repoRoot, 'supabase', 'migrations', '20260903000100_nfl_team_cap_summary.sql'), 'utf8');
+
+  assert.match(migration, /update nfl_cap_sheets cs[\s\S]*current_cap_space_2026 = 10392701/);
+  assert.match(migration, /team_cap_summary[\s\S]*source_status', 'captured'/);
+  assert.match(migration, /where cs\.snapshot_id = latest_snapshot\.id[\s\S]*cs\.team_id = 'NYG'/);
 });
 
 async function nygSeed(): Promise<NflDemoSeed> {

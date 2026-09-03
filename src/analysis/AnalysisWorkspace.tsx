@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { RailChannels } from '../briefs/RailChannels';
-import { BriefRightPanel } from '../fenway/BriefRightPanel';
 import { ChannelHeader } from '../fenway/ChannelHeader';
 import { LeftRail } from '../fenway/LeftRail';
 import { SessionFeed } from '../fenway/SessionFeed';
@@ -18,13 +17,14 @@ import {
 
 /** The primary question -> analysis -> evidence -> follow-up workspace. */
 export function AnalysisWorkspace() {
-  const [evidenceDrawerOpen, setEvidenceDrawerOpen] = useState(false);
+  const [channelDrawerOpen, setChannelDrawerOpen] = useState(false);
   const { sessionsLoaded, loadSessions } = useSessions();
   const {
+    briefs,
+    sourcesByBrief,
     activeBriefId,
     loadAllBriefs,
     loadBriefData,
-    loadTurns,
     loadArtifacts,
     subscribeBriefUpdates,
     subscribeArtifactInserts,
@@ -34,12 +34,24 @@ export function AnalysisWorkspace() {
   const { loadMonitors, subscribeMonitors, acknowledgeBriefAlerts } = useMonitors();
   const {
     railCollapsed,
+    rightPanelOpen,
+    setRightPanelOpen,
     setSelectedOptionRef,
     setSourceFilterRefs,
     setSelectedSourceRef,
     toggleRailCollapsed,
   } = useUi();
   const startNewChannel = useNewChannel();
+  const activeBrief = useMemo(
+    () => briefs.find((brief) => brief.id === activeBriefId) ?? null,
+    [briefs, activeBriefId],
+  );
+  const hasEvidence = Boolean(
+    activeBrief?.status === 'ready'
+    && activeBrief.body
+    && activeBriefId
+    && (sourcesByBrief[activeBriefId]?.length ?? 0) > 0,
+  );
 
   useEffect(() => {
     void loadSessions();
@@ -73,17 +85,16 @@ export function AnalysisWorkspace() {
     if (activeBriefId) {
       void acknowledgeBriefAlerts(activeBriefId);
       void loadBriefData(activeBriefId);
-      void loadTurns(activeBriefId);
       void loadArtifacts(activeBriefId);
     }
     setSelectedOptionRef(null);
     setSourceFilterRefs(null);
     setSelectedSourceRef(null);
+    setChannelDrawerOpen(false);
   }, [
     activeBriefId,
     acknowledgeBriefAlerts,
     loadBriefData,
-    loadTurns,
     loadArtifacts,
     setSelectedOptionRef,
     setSourceFilterRefs,
@@ -106,7 +117,11 @@ export function AnalysisWorkspace() {
     return () => window.removeEventListener('keydown', onKey);
   }, [startNewChannel]);
 
-  useEffect(() => onEvt('v6d3cf:open-evidence', () => setEvidenceDrawerOpen(true)), []);
+  useEffect(() => {
+    if (hasEvidence) setRightPanelOpen(true);
+  }, [activeBriefId, hasEvidence, setRightPanelOpen]);
+
+  useEffect(() => onEvt('v6d3cf:open-evidence', () => setRightPanelOpen(true)), [setRightPanelOpen]);
 
   if (!sessionsLoaded) {
     return (
@@ -120,31 +135,50 @@ export function AnalysisWorkspace() {
   return (
     <div className="analysis-workspace">
       <div className="analysis-workspace-canvas">
-        {evidenceDrawerOpen && (
+        {(channelDrawerOpen || (hasEvidence && rightPanelOpen)) && (
           <button
             type="button"
             className="analysis-evidence-backdrop"
-            aria-label="Close evidence panel"
-            onClick={() => setEvidenceDrawerOpen(false)}
+            aria-label="Close open panel"
+            onClick={() => {
+              setChannelDrawerOpen(false);
+              setRightPanelOpen(false);
+            }}
           />
         )}
-        <div className={`analysis-evidence-rail${evidenceDrawerOpen ? ' open' : ''}`}>
+        <div className={`analysis-channel-rail${channelDrawerOpen ? ' open' : ''}`}>
           <LeftRail
-            extra={<RailChannels />}
+            contentOverride={<RailChannels />}
             collapsed={railCollapsed}
             onToggle={toggleRailCollapsed}
+            side="left"
           />
         </div>
         <main className="analysis-workspace-main">
           <button
             type="button"
-            className="analysis-evidence-trigger"
-            onClick={() => setEvidenceDrawerOpen(true)}
-          >Evidence</button>
-          <ChannelHeader />
+            className="analysis-channels-trigger"
+            onClick={() => setChannelDrawerOpen(true)}
+          >Channels</button>
+          {hasEvidence && (
+            <button
+              type="button"
+              className="analysis-evidence-trigger"
+              onClick={() => setRightPanelOpen(true)}
+            >Evidence</button>
+          )}
+          <ChannelHeader evidenceAvailable={hasEvidence} />
           <SessionFeed />
         </main>
-        <BriefRightPanel />
+        {hasEvidence && (
+          <div className={`analysis-evidence-rail${rightPanelOpen ? ' open' : ''}`}>
+            <LeftRail
+              collapsed={!rightPanelOpen}
+              onToggle={() => setRightPanelOpen(!rightPanelOpen)}
+              side="right"
+            />
+          </div>
+        )}
       </div>
       <Toaster />
     </div>

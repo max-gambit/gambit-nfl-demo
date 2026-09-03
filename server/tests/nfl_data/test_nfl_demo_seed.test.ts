@@ -34,6 +34,15 @@ test('NFL demo seed validates all-32 static roster cap and metric rows', async (
   assert.equal(seed.player_metrics.filter((row) => row.metric_coverage_level === 'strong').length > 1_000, true);
   assert.equal(seed.player_metrics.every((row) => Array.isArray(row.metric_families ?? [])), true);
   assert.equal(seed.player_metrics.length, summary.roster_row_count);
+  const giantsCap = seed.team_cap_summaries?.find((row) => row.team_id === 'NYG');
+  assert.ok(giantsCap);
+  assert.equal(giantsCap.current_cap_space_dollars, 10_392_701);
+  assert.equal(
+    giantsCap.top_51_cap_spending_dollars + giantsCap.dead_money_dollars + giantsCap.current_cap_space_dollars,
+    giantsCap.applied_team_cap_dollars,
+  );
+  assert.equal(giantsCap.carryover_dollars, null);
+  assert.equal(giantsCap.adjustments_dollars, null);
 });
 
 test('NFL demo seed exposes full Giants roster and cap levers', async () => {
@@ -41,6 +50,7 @@ test('NFL demo seed exposes full Giants roster and cap levers', async () => {
   const detail = nflTeamDetail(seed, 'NYG');
 
   assert.equal(detail?.team.team_id, 'NYG');
+  assert.equal(detail?.team_cap_summary?.current_cap_space_dollars, 10_392_701);
   assert.equal((detail?.roster_entries.length ?? 0) >= 90, true);
   assert.equal(detail?.cap_rows.filter((row) => row.player_id).length, detail?.roster_entries.length);
   assert.equal(detail?.roster_entries.some((row) => row.player_name === 'Andrew Thomas'), true);

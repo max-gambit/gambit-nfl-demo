@@ -207,7 +207,7 @@ export function OptionsTable({ embedded = false }: OptionsTableProps) {
   } = useBriefs();
   const {
     setSourceFilterRefs, setHighlightedSourceRef, setSelectedSourceRef,
-    setSelectedOptionRef, setExpandedBrief, setRightPanelMode, setRightPanelOpen,
+    setSelectedOptionRef,
   } = useUi();
   const { pushToast } = useToasts();
   const filterRef = useRef<HTMLDivElement>(null);
@@ -341,19 +341,16 @@ export function OptionsTable({ embedded = false }: OptionsTableProps) {
     const details = detailsFor(row);
     const evidenceRefs = evidenceRefsFor(row);
     setActiveBrief(activeBriefId);
-    setExpandedBrief(activeBriefId);
-    setRightPanelMode('thread');
-    setRightPanelOpen(true);
     setSelectedOptionRef(row.ref_index);
     window.setTimeout(() => {
-      fire('v6d3cf:prefill-reply-composer', {
+      fire('v6d3cf:prefill-composer', {
         text: optionFollowupPrompt(row, details, evidenceRefs),
       });
     }, 0);
     pushToast({
       tone: 'info',
-      message: `Option [${row.ref_index}] staged`,
-      detail: 'Right panel opened with a focused follow-up draft.',
+      message: 'Follow-up ready',
+      detail: 'The Analysis composer now contains the option follow-up.',
     });
   };
 

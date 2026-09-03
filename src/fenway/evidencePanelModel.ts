@@ -225,6 +225,12 @@ export function classifyEvidenceSource(source: BriefSource): EvidenceSourceClass
   if (source.data?.current_team_cap_summary === true) {
     return classification(source, 'cap', 'cap', cleanTitle(source.title), sourceContribution(source, 'Establishes the current cap figures used in this answer.'), 'clipboard', teamLabel);
   }
+  if (source.data?.current_team_cap_calculation === true) {
+    return classification(source, 'cap', 'cap', cleanTitle(source.title), sourceContribution(source, 'Establishes the applied team cap and accounting used in this answer.'), 'clipboard', teamLabel);
+  }
+  if (source.data?.current_league_cap === true) {
+    return classification(source, 'cap', 'cap', cleanTitle(source.title), sourceContribution(source, 'Establishes the official league salary-cap baseline.'), 'shield', teamLabel);
+  }
   if (source.data?.current_team_contract === true) {
     return classification(source, 'contract', 'cap', cleanTitle(source.title), sourceContribution(source, 'Establishes the player cap hit used in the ranking.'), 'doc', teamLabel);
   }
@@ -263,7 +269,15 @@ export function classifyEvidenceSource(source: BriefSource): EvidenceSourceClass
     return classification(source, 'contract', 'contract', 'Contract mechanics', 'Shows salary structure, guarantees, and contract-specific constraints.', 'doc', teamLabel);
   }
   if (source.kind === 'NEWS' || source.kind === 'PROJECTION') {
-    return classification(source, 'market', 'market', 'Market signal', 'Adds reporting, projection, or market context around the decision.', 'search', teamLabel);
+    return classification(
+      source,
+      'market',
+      'market',
+      cleanTitle(source.title) || 'Public market report',
+      sourceContribution(source, 'Shows the public report or projection cited in this answer.'),
+      'search',
+      teamLabel,
+    );
   }
   if (source.kind === 'CAP' || /\bcap\b|apron|payroll|salary|guarantee|nba_cap_sheet|cap_sheet/.test(text)) {
     return classification(source, 'cap', groupForAppData(source, teamLabel), 'Cap sheet and apron position', 'Shows payroll, salary guarantees, and constraint posture.', 'clipboard', teamLabel);
@@ -284,7 +298,16 @@ export function classifyEvidenceSource(source: BriefSource): EvidenceSourceClass
 export function formatEvidenceFreshness(source: BriefSource): string | null {
   const rows = dataRows(source);
   const asOf = rowValue(rows, 'As of') ?? rowValue(rows, 'Roster as of') ?? rowValue(rows, 'Cap as of') ?? rowValue(rows, 'Stats as of');
-  return meaningful(asOf) ?? meaningful(source.updated_at);
+  const value = meaningful(asOf) ?? meaningful(source.updated_at);
+  return value ? humanEvidenceDate(value) : null;
+}
+
+function humanEvidenceDate(value: string): string {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})(?:T.*)?$/);
+  if (!match) return value;
+  const [, year, month, day] = match;
+  return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
+    .format(new Date(Date.UTC(Number(year), Number(month) - 1, Number(day))));
 }
 
 function defaultClaimSpecs(activeBrief: Brief | null, options: BriefOption[]): AuditClaimSpec[] {
@@ -624,15 +647,23 @@ function groupKeyFor(source: BriefSource, groupRole: EvidenceRole, teamLabel: st
   if (groupRole === 'cba') return 'cba';
   if (groupRole === 'context') return `context:${teamLabel ?? source.ref_index}`;
   if (groupRole === 'supporting') return `supporting:${source.kind}:${source.source ?? 'unknown'}:${source.ref_index}`;
+  if (groupRole === 'market' && isTransactionHistorySource(source)) return 'market:transactions';
+  if (groupRole === 'market') return `market:${source.kind}:${source.source ?? source.ref_index}`;
   return `${groupRole}:${teamLabel ?? source.source ?? source.ref_index}`;
+}
+
+function isTransactionHistorySource(source: BriefSource): boolean {
+  if (source.data?.seller_move_comparable === true || Boolean(source.data?.transaction)) return true;
+  const text = `${source.source ?? ''} ${source.title}`.toLowerCase();
+  return /nflverse trades|transaction history|historical transaction/.test(text);
 }
 
 function groupTitle(classification: EvidenceSourceClassification): string {
   if (classification.groupRole === 'current_team_data') {
     return classification.teamLabel ? `${classification.teamLabel} current team data` : 'Current team data';
   }
-  if (classification.groupRole === 'market' && classification.groupKey === 'market:NFL_TRANSACTION_MARKET') {
-    return 'Historical transaction market';
+  if (classification.groupRole === 'market' && classification.groupKey === 'market:transactions') {
+    return 'Additional market transactions';
   }
   return classification.title;
 }
@@ -646,7 +677,7 @@ function groupProof(role: EvidenceRole): string {
     case 'cba': return 'Flags transaction-rule constraints that affect execution.';
     case 'context': return 'Adds strategic posture, priorities, and team context.';
     case 'contract': return 'Shows salary structure, guarantees, and contract-specific constraints.';
-    case 'market': return 'Adds reporting, projection, or market context around the decision.';
+    case 'market': return 'Shows the public market material cited in this answer.';
     case 'supporting': return 'Supports the reasoning behind this answer.';
   }
 }
@@ -843,10 +874,10 @@ function subtitleForModel(
   backgroundRefCount: number,
 ): string {
   if (hasFocus) {
-    const scope = selectedOptionRef !== null ? `option [${selectedOptionRef}]` : 'focused refs';
-    return `Audit: ${scope} · ${checkedCount} ${checkedCount === 1 ? 'check' : 'checks'}`;
+    const scope = selectedOptionRef !== null ? 'Selected option' : 'Selected citation';
+    return `${scope} · ${checkedCount} supporting ${checkedCount === 1 ? 'item' : 'items'}`;
   }
-  return `Audit: ${checkedCount} ${checkedCount === 1 ? 'claim' : 'claims'} checked · ${backgroundRefCount} background refs`;
+  return `${checkedCount} supporting ${checkedCount === 1 ? 'item' : 'items'}${backgroundRefCount ? ' · more sources available' : ''}`;
 }
 
 function dominantRole(rows: EvidenceCheckRow[]): EvidenceRole {
@@ -960,8 +991,11 @@ function freshestLabel(labels: (string | null)[]): string | null {
 
 function compactAuditTitle(spec: AuditClaimSpec, rows: EvidenceCheckRow[]): string {
   if (spec.type === 'option') return compactOptionTitle(spec.title, rows);
+  if (spec.key.startsWith('calculation:')) return clampHeadline(spec.title, 46);
 
   if (rows.some((row) => row.source.data?.current_team_cap_summary === true)) return 'Giants 2026 cap position';
+  if (rows.some((row) => row.source.data?.current_team_cap_calculation === true)) return 'Giants 2026 cap accounting';
+  if (rows.some((row) => row.source.data?.current_league_cap === true)) return 'Official 2026 league salary cap';
   if (rows.some((row) => row.source.data?.current_team_contract === true)) return 'Largest Giants 2026 cap hits';
   if (rows.some((row) => row.source.data?.current_team_roster === true || row.source.data?.current_team_depth === true)) return 'Current Giants cornerback roles';
   if (rows.some((row) => row.source.data?.seller_move_contract === true)) return 'Contract and cap calculation';

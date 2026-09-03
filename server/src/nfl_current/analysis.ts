@@ -56,52 +56,96 @@ export async function buildNflCurrentAnswer(
 }
 
 function capSpaceAnswer(seed: NflDemoSeed): PreparedNflCurrentAnswer {
-  const pricedRows = seed.cap_rows.filter((row) => row.team_id === 'NYG' && row.cap_number_2026 != null && supportedCapRow(row));
-  if (pricedRows.length === 0) return unavailableCurrentAnswer('cap_space');
-  const listedCharges = pricedRows.reduce((total, row) => total + row.cap_number_2026!, 0);
-  const estimatedRows = seed.cap_rows.filter((row) => row.team_id === 'NYG' && row.cap_number_2026 != null && !supportedCapRow(row));
-  const estimatedCharges = estimatedRows.reduce((total, row) => total + row.cap_number_2026!, 0);
-  const asOf = readableDate(seed.as_of_date);
-  const otcSource = sourceRef(seed, 'overthecap_contract_ledger_v1');
+  const summary = seed.team_cap_summaries?.find((row) => row.team_id === 'NYG' && row.season === '2026');
+  if (!summary || summary.source_status !== 'captured') return unavailableCurrentAnswer('cap_space');
+  const asOf = readableDate(summary.as_of_date);
+  const capSpaceSource = sourceRef(seed, 'overthecap_2026_cap_space_20260903');
+  const calculatorSource = sourceRef(seed, 'overthecap_nyg_calculator_20260903');
+  const leagueSource = sourceRef(seed, 'nfl_official_2026_salary_cap');
   return {
     body: {
       kind: 'data_analysis',
-      answer: `The current public cap sheet does not support an exact Giants 2026 cap-space figure. As of ${asOf}, the source-backed contract rows total ${money(listedCharges)} in player cap charges. The loaded ledger also contains ${money(estimatedCharges)} in estimated roster placeholders, which is excluded from that subtotal, and it does not include the club carryover and adjustments needed to turn charges into cap room.`,
-      key_findings: [{
-        label: 'What the current cap sheet supports',
-        body: `${money(listedCharges)} across ${pricedRows.length} captured or defensibly derived 2026 player cap charges as of ${asOf}.`,
-        source_refs: [1],
-      }],
+      answer: `The Giants currently have approximately ${money(summary.current_cap_space_dollars)} in 2026 cap space as of ${asOf}. Over The Cap applies a ${money(summary.applied_team_cap_dollars)} team salary cap, with ${money(summary.top_51_cap_spending_dollars)} in Top 51 active spending and ${money(summary.dead_money_dollars)} in dead money.`,
+      key_findings: [
+        {
+          label: 'Current 2026 room',
+          body: `${money(summary.current_cap_space_dollars)} under ${summary.accounting_basis.toLowerCase()} as of ${asOf}.`,
+          source_refs: [1],
+        },
+        {
+          label: 'Team accounting baseline',
+          body: `${money(summary.applied_team_cap_dollars)} applied team cap with ${money(summary.dead_money_dollars)} in dead money.`,
+          source_refs: [2],
+        },
+        {
+          label: 'League baseline',
+          body: `The official 2026 league salary cap is ${money(summary.league_cap_dollars)} before club-specific carryover and adjustments.`,
+          source_refs: [3],
+        },
+      ],
       tables: [],
       calculations: [{
-        label: 'Listed 2026 player cap charges',
-        formula: `${pricedRows.length} loaded player cap charges summed in integer dollars`,
-        value: money(listedCharges),
-        source_refs: [1],
+        label: 'Current cap space',
+        formula: `${money(summary.applied_team_cap_dollars)} applied team cap − ${money(summary.top_51_cap_spending_dollars)} Top 51 spending − ${money(summary.dead_money_dollars)} dead money`,
+        value: money(summary.current_cap_space_dollars),
+        source_refs: [1, 2],
       }],
-      caveats: [`${estimatedRows.length} estimated roster placeholders totaling ${money(estimatedCharges)} are excluded from the source-backed subtotal. Cap room also requires the league cap, club carryover, adjustments, and applicable offseason accounting; those fields are not present in the loaded team view, so no cap-space number is being inferred.`],
+      caveats: [`This is an offseason Top 51 figure and can change with transactions or league accounting updates. The current public pages expose the applied team cap but do not separately publish the Giants' carryover and other adjustments, so those two component fields remain unavailable rather than inferred.`],
       followups: [],
     },
-    sources: [{
-      ref_index: 1,
-      kind: 'CAP',
-      source: 'OverTheCap',
-      title: 'Giants 2026 contract-backed cap charges',
-      updated_at: seed.as_of_date,
-      data: {
-        source_url: otcSource?.url ?? 'https://overthecap.com/salary-cap/new-york-giants',
-        authority_label: 'Public contract and cap source',
-        contribution: 'Establishes the captured or defensibly derived 2026 player cap charges and separates them from estimated placeholders; those charges are not, by themselves, a club cap-space figure.',
-        current_team_cap_summary: true,
-        rows: [
-          { k: 'As of', v: asOf },
-          { k: 'Source-backed player cap charges', v: money(listedCharges) },
-          { k: 'Captured or derived rows included', v: String(pricedRows.length) },
-          { k: 'Estimated placeholders excluded', v: `${estimatedRows.length} rows · ${money(estimatedCharges)}` },
-          { k: 'Not included', v: 'Club carryover and adjustments needed for exact cap room' },
-        ],
+    sources: [
+      {
+        ref_index: 1,
+        kind: 'CAP',
+        source: 'Over The Cap',
+        title: 'Giants 2026 cap-space table',
+        updated_at: summary.as_of_date,
+        data: {
+          source_url: capSpaceSource?.url ?? summary.source_urls[0],
+          authority_label: 'Current public team cap table',
+          contribution: `Establishes New York's ${money(summary.current_cap_space_dollars)} current cap-space figure and its Top 51 active-spending total.`,
+          current_team_cap_summary: true,
+          rows: [
+            { k: 'As of', v: asOf },
+            { k: 'Current 2026 cap space', v: money(summary.current_cap_space_dollars) },
+            { k: 'Top 51 active spending', v: money(summary.top_51_cap_spending_dollars) },
+            { k: 'Dead money', v: money(summary.dead_money_dollars) },
+          ],
+        },
       },
-    }],
+      {
+        ref_index: 2,
+        kind: 'CAP',
+        source: 'Over The Cap',
+        title: 'Giants 2026 cap calculator',
+        updated_at: summary.as_of_date,
+        data: {
+          source_url: calculatorSource?.url ?? summary.source_urls[1],
+          authority_label: 'Current public team cap calculator',
+          contribution: `Establishes the ${money(summary.applied_team_cap_dollars)} applied team cap, ${money(summary.dead_money_dollars)} existing dead money, and offseason Top 51 accounting basis.`,
+          current_team_cap_calculation: true,
+          rows: [
+            { k: 'Applied team cap', v: money(summary.applied_team_cap_dollars) },
+            { k: 'Accounting', v: summary.accounting_basis },
+            { k: 'Carryover and adjustments', v: 'Not separately published on the loaded current pages' },
+          ],
+        },
+      },
+      {
+        ref_index: 3,
+        kind: 'RULE',
+        source: 'NFL Football Operations',
+        title: '2026 league salary cap',
+        updated_at: '2026 season',
+        data: {
+          source_url: leagueSource?.url ?? summary.source_urls[2],
+          authority_label: 'Official league source',
+          contribution: `Establishes the ${money(summary.league_cap_dollars)} 2026 league salary cap before club-specific carryover and adjustments.`,
+          current_league_cap: true,
+          rows: [{ k: '2026 league salary cap', v: money(summary.league_cap_dollars) }],
+        },
+      },
+    ],
   };
 }
 
@@ -158,13 +202,25 @@ function startingCornerbacksAnswer(seed: NflDemoSeed): PreparedNflCurrentAnswer 
     body: {
       kind: 'data_analysis',
       answer: `${answer} Sources are current through ${asOf}.`,
-      key_findings: [{
-        label: 'Depth-chart certainty',
-        body: explicitNames.length > 0
-          ? `${joinNames(explicitNames)} has an explicit first-at-position depth-chart marker; the other listed roles are inferred.`
-          : 'The current depth-chart source does not provide a complete first-team cornerback group.',
-        source_refs: [1, 2, 3],
-      }],
+      key_findings: [
+        {
+          label: 'Current roster',
+          body: `${activeCorners.length} active Giants corners were considered.`,
+          source_refs: [1],
+        },
+        {
+          label: 'Depth-chart certainty',
+          body: explicitNames.length > 0
+            ? `${joinNames(explicitNames)} has an explicit first-at-position depth-chart marker; the other listed roles are inferred.`
+            : 'The current depth-chart source does not provide a complete first-team cornerback group.',
+          source_refs: [2],
+        },
+        {
+          label: 'Recent role support',
+          body: 'Recent public snap and start history supports the explicitly labeled working-role inferences.',
+          source_refs: [3],
+        },
+      ],
       tables: [{
         title: 'Current cornerback working group',
         columns: ['Player', 'How the role is supported'],

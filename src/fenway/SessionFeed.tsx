@@ -23,11 +23,11 @@ const CONTENT_MAX_WIDTH = 760;
  *   - One brief is "focused" at a time (the rest render as compact rows).
  *   - Effective focus = `expandedBriefId` (if it belongs to active session)
  *     else most-recent brief in the channel. Explicit clicks override.
- *   - The focused brief renders the full recommendation card with a "Reply"
- *     button at the bottom that opens the right-panel thread mode.
+ *   - The focused brief renders the full recommendation card; follow-ups use
+ *     the always-visible channel composer so the conversation stays in one place.
  *   - Channel composer pinned at the bottom creates new briefs in the active
- *     session. Submitting auto-focuses the new brief AND opens its thread
- *     in the right panel so follow-ups land where the user expects.
+ *     session. Submitting auto-focuses the new brief; its answer evidence opens
+ *     in the right panel when the validated sources arrive.
  */
 export function SessionFeed() {
   const { sessions, activeSessionId, patchSessionLabel, insertSession, setActiveSession } = useSessions();
@@ -37,7 +37,7 @@ export function SessionFeed() {
     loadBriefData, loadArtifacts,
   } = useBriefs();
   const {
-    expandedBriefId, setExpandedBrief, setRightPanelMode, setRightPanelOpen,
+    expandedBriefId, setExpandedBrief, setRightPanelOpen,
   } = useUi();
   const { pushToast } = useToasts();
   const [submitting, setSubmitting] = useState(false);
@@ -259,9 +259,8 @@ export function SessionFeed() {
       }
       insertBrief(brief);
       // Keep the primary Analysis composer in control. The new answer takes the
-      // canvas immediately; the optional thread stays collapsed.
+      // canvas immediately; its evidence panel reopens when sources arrive.
       setExpandedBrief(brief.id);
-      setRightPanelMode('list');
       setRightPanelOpen(false);
     } catch (err) {
       pushToast({
@@ -403,11 +402,6 @@ function FeedRow({ brief, isFocused, focusedRef, onCompactClick }: {
    *  brief at the same viewport position after the layout commits. */
   onCompactClick: (briefId: string, originEl: HTMLElement) => void;
 }) {
-  const {
-    setExpandedBrief, setRightPanelMode, setRightPanelOpen,
-    rightPanelOpen, rightPanelMode, expandedBriefId,
-  } = useUi();
-
   if (!isFocused) {
     return (
       <>
@@ -420,32 +414,6 @@ function FeedRow({ brief, isFocused, focusedRef, onCompactClick }: {
     );
   }
 
-  // Whether the right panel is currently showing this brief's thread —
-  // determines whether a card click opens or closes it.
-  const isShowingThisThread = rightPanelOpen
-    && rightPanelMode === 'thread'
-    && expandedBriefId === brief.id;
-
-  const toggleThread = () => {
-    if (isShowingThisThread) {
-      setRightPanelOpen(false);
-    } else {
-      setExpandedBrief(brief.id);
-      setRightPanelMode('thread');
-      setRightPanelOpen(true);
-    }
-  };
-
-  // Click anywhere on the focused card to toggle the thread panel for this
-  // brief. Skip if the click landed on an interactive element (buttons /
-  // OptionsTable controls / source pills); those handle their own actions
-  // and we don't want to double-fire.
-  const onCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLElement;
-    if (target.closest('button, a, input, textarea, select, summary, details, [role="button"]')) return;
-    toggleThread();
-  };
-
   return (
     // `scrollMarginTop` on the wrapper is a fallback target. The click handler
     // actually scrolls the inner [data-recommendation-card] div, so the user
@@ -455,11 +423,14 @@ function FeedRow({ brief, isFocused, focusedRef, onCompactClick }: {
     <div
       ref={focusedRef ?? undefined}
       data-brief-id={brief.id}
-      style={{ scrollMarginTop: SPACE.md, cursor: 'pointer' }}
-      onClick={onCardClick}
+      style={{ scrollMarginTop: SPACE.md }}
     >
       <UserQuestionBubble brief={brief} />
-      <BriefRecommendationCard brief={brief} embedTable onReply={toggleThread} isInThread={isShowingThisThread} />
+      <BriefRecommendationCard
+        brief={brief}
+        embedTable
+        isInThread={false}
+      />
     </div>
   );
 }

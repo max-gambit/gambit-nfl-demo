@@ -15,9 +15,10 @@ interface LeftRailProps {
   contentOverride?: ReactNode;
   collapsed?: boolean;
   onToggle?: () => void;
+  side?: 'left' | 'right';
 }
 
-export function LeftRail({ extra = null, contentOverride = null, collapsed = false, onToggle }: LeftRailProps) {
+export function LeftRail({ extra = null, contentOverride = null, collapsed = false, onToggle, side = 'left' }: LeftRailProps) {
   const [hoverRef, setHoverRef] = useState<number | null>(null);
   const [showBackground, setShowBackground] = useState(false);
   const [expandedEvidenceKeys, setExpandedEvidenceKeys] = useState<Set<string>>(() => new Set());
@@ -88,11 +89,11 @@ export function LeftRail({ extra = null, contentOverride = null, collapsed = fal
     return (
       <nav style={{
         width: 36, background: F.paper,
-        borderRight: `1px solid ${F.border}`,
+        [side === 'right' ? 'borderLeft' : 'borderRight']: `1px solid ${F.border}`,
         display: 'flex', flexDirection: 'column', alignItems: 'center',
         flexShrink: 0, paddingTop: 10, position: 'relative', overflow: 'visible',
       }}>
-        <RailToggle collapsed onToggle={onToggle} />
+        <RailToggle collapsed onToggle={onToggle} side={side} />
       </nav>
     );
   }
@@ -101,11 +102,11 @@ export function LeftRail({ extra = null, contentOverride = null, collapsed = fal
     return (
       <nav className="gd-scroll" style={{
         width: 296, background: F.paper,
-        borderRight: `1px solid ${F.border}`,
+        [side === 'right' ? 'borderLeft' : 'borderRight']: `1px solid ${F.border}`,
         display: 'flex', flexDirection: 'column', flexShrink: 0,
         overflow: 'visible', position: 'relative',
       }}>
-        <RailToggle onToggle={onToggle} />
+        <RailToggle onToggle={onToggle} side={side} />
         {contentOverride}
       </nav>
     );
@@ -117,8 +118,8 @@ export function LeftRail({ extra = null, contentOverride = null, collapsed = fal
   if (selectedSource) {
     return (
       <nav style={{
-        width: 420, background: F.paper,
-        borderRight: `1px solid ${F.border}`,
+        width: 380, background: F.paper,
+        [side === 'right' ? 'borderLeft' : 'borderRight']: `1px solid ${F.border}`,
         display: 'flex', flexDirection: 'column', flexShrink: 0,
         position: 'relative', minHeight: 0,
       }}>
@@ -131,11 +132,11 @@ export function LeftRail({ extra = null, contentOverride = null, collapsed = fal
     return (
       <nav className="gd-scroll" style={{
         width: 320, background: F.paper,
-        borderRight: `1px solid ${F.border}`,
+        [side === 'right' ? 'borderLeft' : 'borderRight']: `1px solid ${F.border}`,
         display: 'flex', flexDirection: 'column', flexShrink: 0,
         overflow: 'visible', position: 'relative',
       }}>
-        <RailToggle onToggle={onToggle} />
+        <RailToggle onToggle={onToggle} side={side} />
         <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>{extra}</div>
       </nav>
     );
@@ -143,12 +144,12 @@ export function LeftRail({ extra = null, contentOverride = null, collapsed = fal
 
   return (
     <nav className="gd-scroll" style={{
-      width: 320, background: F.paper,
-      borderRight: `1px solid ${F.border}`,
+      width: 360, background: F.paper,
+      [side === 'right' ? 'borderLeft' : 'borderRight']: `1px solid ${F.border}`,
       display: 'flex', flexDirection: 'column', flexShrink: 0,
       overflow: 'visible', position: 'relative',
     }}>
-      <RailToggle onToggle={onToggle} />
+      <RailToggle onToggle={onToggle} side={side} />
       <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
         {extra}
         <EvidencePackHeader model={evidenceModel} />
@@ -236,11 +237,12 @@ export function LeftRail({ extra = null, contentOverride = null, collapsed = fal
   );
 }
 
-function RailToggle({ collapsed = false, onToggle }: { collapsed?: boolean; onToggle?: () => void }) {
+function RailToggle({ collapsed = false, onToggle, side }: { collapsed?: boolean; onToggle?: () => void; side: 'left' | 'right' }) {
+  const pointsRight = side === 'left' ? collapsed : !collapsed;
   return (
-    <button onClick={onToggle} title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'} aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+    <button onClick={onToggle} title={collapsed ? `Open ${side} panel` : `Close ${side} panel`} aria-label={collapsed ? `Open ${side} panel` : `Close ${side} panel`}
       style={{
-        position: 'absolute', top: 14, right: -8, zIndex: 5,
+        position: 'absolute', top: 14, [side === 'right' ? 'left' : 'right']: -8, zIndex: 5,
         width: 16, height: 16, padding: 0,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         background: F.surface, border: `1px solid ${F.border}`,
@@ -250,7 +252,7 @@ function RailToggle({ collapsed = false, onToggle }: { collapsed?: boolean; onTo
       onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
       onMouseLeave={(e) => { e.currentTarget.style.opacity = collapsed ? '1' : '0.7'; }}>
       <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d={collapsed ? 'M9 6l6 6-6 6' : 'M15 6l-6 6 6 6'} />
+        <path d={pointsRight ? 'M9 6l6 6-6 6' : 'M15 6l-6 6 6 6'} />
       </svg>
     </button>
   );
@@ -450,7 +452,7 @@ function EvidenceCard({
 
 function itemTypeLabel(item: EvidencePackItem): string {
   if (item.type === 'option') return 'Option hinge';
-  if (item.type === 'background') return 'Additional source';
+  if (item.type === 'background') return 'Supporting material';
   return 'Evidence';
 }
 

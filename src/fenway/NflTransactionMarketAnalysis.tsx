@@ -365,7 +365,7 @@ function CoverageAndSources({ analysis }: { analysis: NflTransactionMarketAnalys
       <Metric label="Player moves analyzed" value={analysis.coverage.event_count.toLocaleString()} />
       <Metric label="Trades" value={analysis.coverage.trade_count.toLocaleString()} />
       <Metric label="Contracts with terms" value={analysis.coverage.priced_contract_count.toLocaleString()} />
-      <Metric label="Player records matched" value={formatPercentDetailed(analysis.coverage.position_match_basis_points)} />
+      <Metric label="Identity coverage" value={formatPercentDetailed(analysis.coverage.position_match_basis_points)} />
     </div>
     <div style={{ display: 'grid', gap: SPACE.xs, padding: SPACE.md, background: F.cream50, border: `1px solid ${F.border}`, borderRadius: RADIUS.md }}>
       {analysis.limitations.map((limitation, index) => (
@@ -373,7 +373,7 @@ function CoverageAndSources({ analysis }: { analysis: NflTransactionMarketAnalys
       ))}
       {analysis.source_refs.map((source) => (
         <div key={source.id} style={{ color: F.fgMuted, fontSize: TYPE.meta.md, lineHeight: 1.45 }}>
-          <strong style={{ color: F.ink }}>{source.name}</strong> · as of {source.as_of_date} · retrieved {formatDate(source.retrieved_at)} · SHA-256 {source.checksum_sha256.slice(0, 12)}…
+          <strong style={{ color: F.ink }}>{source.name}</strong> · as of {formatDate(source.as_of_date)} · retrieved {formatDate(source.retrieved_at)} · SHA-256 {source.checksum_sha256.slice(0, 12)}…
         </div>
       ))}
     </div>
@@ -399,7 +399,7 @@ function ComparableSection({ title, rows, sourceRefs, onOpen, showInfluence = fa
         }}>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: SPACE.sm }}>
             <strong style={{ color: F.ink, fontSize: TYPE.body.sm }}>{row.player_name}</strong>
-            <span style={{ color: F.fgMuted, fontSize: TYPE.meta.xs }}>{row.event_date ?? row.event_year} · {row.date_precision} date</span>
+            <span style={{ color: F.fgMuted, fontSize: TYPE.meta.xs }}>{row.event_date ? formatDate(row.event_date) : row.event_year}</span>
           </div>
           <div style={{ color: F.inkSoft, fontSize: TYPE.body.sm, lineHeight: 1.45 }}>
             {row.position_group ?? 'Position unresolved'} · {moveLabel(row.transaction_type)}
@@ -407,14 +407,11 @@ function ComparableSection({ title, rows, sourceRefs, onOpen, showInfluence = fa
             {row.compensation_summary ? ` · ${row.compensation_summary}` : ''}
             {row.contract_apy_dollars != null ? ` · ${formatDollars(row.contract_apy_dollars)} APY` : ''}
           </div>
-          <div style={{ color: F.fgMuted, fontSize: TYPE.meta.md }}>
-            Player record: {row.identity_confidence}
-            {row.raw_position ? ` · Source position: ${row.raw_position}` : ''}
-            {row.normalization_basis ? ` · Position mapping: ${row.normalization_basis}` : ''}
-            {showInfluence && row.influence_explanation ? ` · ${row.influence_explanation}` : ''}
-          </div>
+          {showInfluence && row.influence_explanation && (
+            <div style={{ color: F.fgMuted, fontSize: TYPE.meta.md }}>{row.influence_explanation}</div>
+          )}
           <div style={{ color: sourceRef == null ? F.fgMuted : F.fenway, fontSize: TYPE.meta.xs, fontWeight: 700 }}>
-            {sourceRef == null ? 'Source detail unavailable for this saved result' : `Open exact evidence [${sourceRef}] →`}
+            {sourceRef == null ? 'Transaction source unavailable for this saved result' : 'Open transaction source →'}
           </div>
         </button>;
       })}

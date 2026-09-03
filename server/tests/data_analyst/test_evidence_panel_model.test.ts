@@ -83,7 +83,7 @@ test('historical market evidence shows the market definition and four best trans
   assert.equal(model.checkedItems[0]?.title, 'Historical market definition');
   assert.match(model.checkedItems[0]?.proof ?? '', /EDGE/);
   assert.match(model.checkedItems[0]?.proof ?? '', /IOL/);
-  assert.ok(model.backgroundItems.some((item) => item.title === 'Historical transaction market'));
+  assert.ok(model.backgroundItems.some((item) => item.title === 'Additional market transactions'));
   assert.equal(representedRefs.size, sources.length);
   for (const source of sources) assert.ok(model.refToItemKey[source.ref_index]);
 
@@ -95,17 +95,57 @@ test('historical market evidence shows the market definition and four best trans
 
 test('Analysis evidence surfaces use plain user-facing labels', async () => {
   const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
-  const [leftRail, detail, cite] = await Promise.all([
+  const [leftRail, detail, cite, evidenceModel] = await Promise.all([
     readFile(path.join(repoRoot, 'src', 'fenway', 'LeftRail.tsx'), 'utf8'),
     readFile(path.join(repoRoot, 'src', 'fenway', 'NflSourceDetail.tsx'), 'utf8'),
     readFile(path.join(repoRoot, 'src', 'ds', 'Cite.tsx'), 'utf8'),
+    readFile(path.join(repoRoot, 'src', 'fenway', 'evidencePanelModel.ts'), 'utf8'),
   ]);
 
   assert.match(leftRail, /Evidence for this answer/);
   assert.match(leftRail, /Show all sources/);
   assert.doesNotMatch(leftRail, /Show background evidence|Background evidence|Sources checked/);
-  assert.doesNotMatch(detail, /label="Source status"|>Rows</);
+  assert.doesNotMatch(leftRail, /Additional source/);
+  assert.doesNotMatch(detail, /NFL_TRANSACTION_MARKET|Player Record|Position Mapping|pff_position|label="Source status"|>Rows</);
+  assert.doesNotMatch(evidenceModel, /Adds reporting, projection, or market context/);
+  assert.match(detail, /directFact\(data, 'article', 'Article'\)/);
+  assert.match(detail, /directFact\(data, 'excerpt', 'What it says'\)/);
+  assert.match(detail, /top cap contracts|contract field coverage|roster players|exact location/i);
   assert.match(cite, /setSourceFilterRef\(refIndex\);[\s\S]*setHighlightedSourceRef\(refIndex\)/);
+});
+
+test('Analysis keeps channels on the left and evidence on the right without a second answer thread', async () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
+  const [workspace, feed, options] = await Promise.all([
+    readFile(path.join(repoRoot, 'src', 'analysis', 'AnalysisWorkspace.tsx'), 'utf8'),
+    readFile(path.join(repoRoot, 'src', 'fenway', 'SessionFeed.tsx'), 'utf8'),
+    readFile(path.join(repoRoot, 'src', 'fenway', 'OptionsTable.tsx'), 'utf8'),
+  ]);
+
+  assert.match(workspace, /analysis-channel-rail[\s\S]*contentOverride=\{<RailChannels \/>\}[\s\S]*analysis-workspace-main[\s\S]*analysis-evidence-rail/);
+  assert.doesNotMatch(workspace, /BriefRightPanel/);
+  assert.match(workspace, /if \(hasEvidence\) setRightPanelOpen\(true\)/);
+  assert.doesNotMatch(feed, /rightPanelMode === 'thread'|setRightPanelMode\('thread'\)/);
+  assert.match(options, /fire\('v6d3cf:prefill-composer'/);
+  assert.doesNotMatch(options, /fire\('v6d3cf:prefill-reply-composer'/);
+});
+
+test('only transaction-history sources enter the additional-market group', () => {
+  const body: DataAnalysisBriefBody = {
+    kind: 'data_analysis', answer: 'Answer.', key_findings: [], tables: [], calculations: [], caveats: [], followups: [],
+  };
+  const transaction = sourceRow(1, 'ANALYST_DATA', 'Player transaction', {
+    transaction: { event_id: 'event-1' },
+    rows: [{ k: 'Date', v: '2025-10-01' }],
+  });
+  transaction.source = 'nflverse transaction history';
+  const report = sourceRow(2, 'NEWS', 'Market report', { rows: [{ k: 'As of', v: '2026-09-03' }] });
+  report.source = 'Public report';
+  const model = buildEvidencePackModel(brief(body), [transaction, report], [], null, null);
+
+  const transactionGroup = model.backgroundItems.find((item) => item.title === 'Additional market transactions');
+  assert.deepEqual(transactionGroup?.refs, [1]);
+  assert.ok(model.backgroundItems.some((item) => item.refs.includes(2) && item.title !== 'Additional market transactions'));
 });
 
 function brief(body: DataAnalysisBriefBody | null, status: Brief['status'] = 'ready'): Brief {

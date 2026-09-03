@@ -1881,6 +1881,25 @@ export interface NflSourceRef {
   url: string;
 }
 
+export interface NflTeamCapSummary {
+  team_id: string;
+  season: string;
+  as_of_date: string;
+  current_cap_space_dollars: number;
+  effective_cap_space_dollars: number | null;
+  league_cap_dollars: number;
+  applied_team_cap_dollars: number;
+  carryover_dollars: number | null;
+  adjustments_dollars: number | null;
+  top_51_cap_spending_dollars: number;
+  dead_money_dollars: number;
+  accounting_basis: string;
+  accounting_note: string;
+  source_status: 'captured' | 'source-needed';
+  source_urls: string[];
+  source_content_sha256: Record<string, string>;
+}
+
 export interface NflDemoTotals {
   season: string;
   as_of_date: string;
@@ -1913,6 +1932,7 @@ export interface GetCurrentNflTeamResponse {
   roster_entries: NflRosterEntry[];
   cap_rows: NflCapRow[];
   player_metrics: NflPlayerMetricRow[];
+  team_cap_summary: NflTeamCapSummary | null;
   source_refs: NflSourceRef[];
   notes: string[];
   source_mode?: NflCoverageSourceMode;

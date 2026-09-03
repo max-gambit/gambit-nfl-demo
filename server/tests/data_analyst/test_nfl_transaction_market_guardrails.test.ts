@@ -44,7 +44,9 @@ test('transaction evidence rows include the exact returned transactions', () => 
 
   assert.ok(rows.length > 0);
   assert.equal(rows[0].data && typeof rows[0].data === 'object' && 'transaction' in rows[0].data, true);
-  assert.match(rows[0].title, /^Transaction · /);
+  assert.match(rows[0].title, / transaction$/);
+  assert.equal(rows[0].source, 'nflverse transaction history');
+  assert.doesNotMatch(JSON.stringify(rows), /NFL_TRANSACTION_MARKET|Player record|Position mapping|Raw position|Normalization/);
 });
 
 test('artifact-grounded fallback itself passes deterministic checks', () => {

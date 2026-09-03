@@ -13,7 +13,7 @@ import { renameSession } from '../api/sessions';
  *   - "+ New brief" shortcut (focuses the channel composer)
  *   - "⇉ Toggle right panel" affordance
  */
-export function ChannelHeader({ readOnly = false }: { readOnly?: boolean }) {
+export function ChannelHeader({ readOnly = false, evidenceAvailable = true }: { readOnly?: boolean; evidenceAvailable?: boolean }) {
   const { briefs } = useBriefs();
   const { sessions, activeSessionId, patchSessionLabel } = useSessions();
   const { monitors } = useMonitors();
@@ -95,9 +95,9 @@ export function ChannelHeader({ readOnly = false }: { readOnly?: boolean }) {
         New brief
       </button>}
 
-      <button onClick={() => setRightPanelOpen(!rightPanelOpen)}
-        title={rightPanelOpen ? 'Hide right panel' : 'Show right panel'}
-        aria-label={rightPanelOpen ? 'Hide right panel' : 'Show right panel'}
+      {evidenceAvailable && <button className="analysis-header-evidence-toggle" onClick={() => setRightPanelOpen(!rightPanelOpen)}
+        title={rightPanelOpen ? 'Hide evidence' : 'Show evidence'}
+        aria-label={rightPanelOpen ? 'Hide evidence' : 'Show evidence'}
         style={{
           padding: 0, width: 28, height: 28,
           background: rightPanelOpen ? F.cream100 : 'transparent',
@@ -109,7 +109,7 @@ export function ChannelHeader({ readOnly = false }: { readOnly?: boolean }) {
           <rect x="3" y="4" width="18" height="16" rx="2" />
           <line x1="15" y1="4" x2="15" y2="20" />
         </svg>
-      </button>
+      </button>}
     </div>
   );
 }
