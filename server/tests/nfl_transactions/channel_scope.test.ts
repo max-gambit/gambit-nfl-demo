@@ -93,7 +93,7 @@ test('EDGE and IOL comparison leads with a football conclusion while preserving 
 
   const read = nflTransactionMarketFootballRead(analysis);
   assert.match(read.conclusion, /EDGE movement has increased and premium trade compensation has strengthened/i);
-  assert.match(read.conclusion, /IOL movement has increased, but its contract and trade price signals do not agree/i);
+  assert.match(read.conclusion, /IOL movement has increased, but its contract-cost and premium-pick trade signals do not agree/i);
   assert.match(read.implication, /pay selectively for difference-making EDGE talent/i);
   assert.match(read.implication, /IOL availability creates acquisition leverage/i);
 });
@@ -112,6 +112,28 @@ test('football read does not turn insufficient price evidence into a supported p
   assert.match(read.conclusion, /price evidence is not strong enough to call/i);
   assert.match(read.implication, /keep price posture provisional/i);
   assert.doesNotMatch(`${read.conclusion} ${read.implication}`, /supported .*price/i);
+});
+
+test('trades-only football read labels only completed years when YTD is included', () => {
+  const baseTrend = marketTrend('EDGE', 1417, 'growing', 'growing', 'flat');
+  const trend = {
+    ...baseTrend,
+    trade_compensation: { ...baseTrend.trade_compensation, overall_value: 2910 },
+  };
+  const analysis = {
+    ...marketAnalysis('analysis-ytd', ['EDGE']),
+    status: 'directional',
+    query: {
+      ...marketAnalysis('analysis-ytd-query', ['EDGE']).query,
+      end_year: 2026,
+      include_ytd: true,
+    },
+    position_trends: [trend],
+  } as unknown as NflTransactionMarketAnalysis;
+
+  const read = nflTransactionMarketFootballRead(analysis);
+  assert.match(read.conclusion, /2016–2025/);
+  assert.doesNotMatch(read.conclusion, /2016–2026/);
 });
 
 test('brief creation rejects malformed session ids before market analysis', async () => {

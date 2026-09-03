@@ -136,7 +136,7 @@ export function BriefThread({ brief, bindReplyFocus = true, autoFocus = false }:
     } catch (err) {
       pushToast({
         tone: 'error',
-        message: 'Couldn’t start agent',
+        message: 'Couldn’t continue analysis',
         detail: err instanceof Error ? err.message : 'Server unreachable.',
       });
     }

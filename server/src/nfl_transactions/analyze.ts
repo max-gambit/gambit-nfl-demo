@@ -634,17 +634,50 @@ function buildInfluentialTransactions(
   capByYear: ReadonlyMap<number, number>,
 ): NflTransactionComparable[] {
   const recentEvents = cohortEvents.filter((event) => inPeriod(event.event_year, query.recent_years));
-  const originalByPosition = new Map(query.position_groups.map((position) => [
-    position,
-    recentStatistics(position, snapshot, query, leagueEvents, cohortEvents, capByYear),
-  ]));
+  const recentLeagueCount = leagueEvents.filter((event) => inPeriod(event.event_year, query.recent_years)).length;
+  const stateByPosition = new Map(query.position_groups.map((position) => {
+    const events = recentEvents.filter((event) => event.position_group === position);
+    const contractPrices = events
+      .map((event) => contractApyCapBasisPoints(event, capByYear))
+      .filter(isNumber)
+      .sort((left, right) => left - right);
+    const tradeBands = events.map(allocableCompensationBand).filter(isCompensationBand);
+    const premiumTrades = tradeBands.filter((band) => band === 'round_1' || band === 'rounds_2_3').length;
+    const denominator = periodRosterDenominator(snapshot, query, position, query.recent_years);
+    return [position, {
+      event_count: events.length,
+      denominator,
+      contract_prices: contractPrices,
+      allocable_trades: tradeBands.length,
+      premium_trades: premiumTrades,
+      original: {
+        mobility: rateBasisPoints(events.length, denominator),
+        transaction_share: rateBasisPoints(events.length, recentLeagueCount),
+        contract_price: medianSortedInteger(contractPrices),
+        trade_compensation: rateBasisPoints(premiumTrades, tradeBands.length),
+      } satisfies RecentStatistics,
+    }] as const;
+  }));
   return recentEvents.flatMap((event) => {
     if (!event.position_group) return [];
-    const withoutLeague = leagueEvents.filter((candidate) => candidate.event_id !== event.event_id);
-    const withoutCohort = cohortEvents.filter((candidate) => candidate.event_id !== event.event_id);
-    const original = originalByPosition.get(event.position_group);
-    if (!original) return [];
-    const removed = recentStatistics(event.position_group, snapshot, query, withoutLeague, withoutCohort, capByYear);
+    const state = stateByPosition.get(event.position_group);
+    if (!state) return [];
+    const contractPrice = contractApyCapBasisPoints(event, capByYear);
+    const tradeBand = allocableCompensationBand(event);
+    const removed: RecentStatistics = {
+      mobility: rateBasisPoints(state.event_count - 1, state.denominator),
+      transaction_share: rateBasisPoints(state.event_count - 1, recentLeagueCount - 1),
+      contract_price: contractPrice == null
+        ? state.original.contract_price
+        : medianSortedIntegerWithoutOne(state.contract_prices, contractPrice),
+      trade_compensation: tradeBand == null
+        ? state.original.trade_compensation
+        : rateBasisPoints(
+          state.premium_trades - (tradeBand === 'round_1' || tradeBand === 'rounds_2_3' ? 1 : 0),
+          state.allocable_trades - 1,
+        ),
+    };
+    const original = state.original;
     const deltas = (Object.keys(original) as Array<keyof RecentStatistics>).flatMap((key) => {
       const before = original[key];
       const after = removed[key];
@@ -669,25 +702,30 @@ interface RecentStatistics {
   trade_compensation: number | null;
 }
 
-function recentStatistics(
-  position: NflPositionMarketGroup,
-  snapshot: NflTransactionMarketSnapshot,
-  query: NflTransactionMarketResolvedQuery,
-  leagueEvents: NflTransactionMarketEvent[],
-  cohortEvents: NflTransactionMarketEvent[],
-  capByYear: ReadonlyMap<number, number>,
-): RecentStatistics {
-  const events = cohortEvents.filter((event) => event.position_group === position && inPeriod(event.event_year, query.recent_years));
-  const leagueCount = leagueEvents.filter((event) => inPeriod(event.event_year, query.recent_years)).length;
-  const denom = periodRosterDenominator(snapshot, query, position, query.recent_years);
-  const contractPrices = events.map((event) => contractApyCapBasisPoints(event, capByYear)).filter(isNumber);
-  const tradeMix = compensationMix(events.filter((event) => allocableCompensationBand(event) != null));
-  return {
-    mobility: rateBasisPoints(events.length, denom),
-    transaction_share: rateBasisPoints(events.length, leagueCount),
-    contract_price: medianInteger(contractPrices),
-    trade_compensation: premiumCompensationShare(tradeMix),
-  };
+function medianSortedInteger(values: readonly number[]): number | null {
+  if (values.length === 0) return null;
+  const midpoint = Math.floor(values.length / 2);
+  return values.length % 2 === 1
+    ? values[midpoint]
+    : Math.round((values[midpoint - 1] + values[midpoint]) / 2);
+}
+
+function medianSortedIntegerWithoutOne(values: readonly number[], removedValue: number): number | null {
+  if (values.length <= 1) return null;
+  let low = 0;
+  let high = values.length;
+  while (low < high) {
+    const midpoint = Math.floor((low + high) / 2);
+    if (values[midpoint] < removedValue) low = midpoint + 1;
+    else high = midpoint;
+  }
+  const removedIndex = low;
+  const remainingLength = values.length - 1;
+  const valueAt = (index: number) => values[index < removedIndex ? index : index + 1];
+  const midpoint = Math.floor(remainingLength / 2);
+  return remainingLength % 2 === 1
+    ? valueAt(midpoint)
+    : Math.round((valueAt(midpoint - 1) + valueAt(midpoint)) / 2);
 }
 
 function comparableFromEvent(
@@ -1228,6 +1266,10 @@ function statisticLabel(key: keyof RecentStatistics): string {
 }
 
 function isNumber(value: number | null): value is number {
+  return value != null;
+}
+
+function isCompensationBand(value: NflTradeCompensationBand | null): value is NflTradeCompensationBand {
   return value != null;
 }
 

@@ -152,7 +152,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
       console.error('[brief-card] runAgent failed', err);
       pushToast({
         tone: 'error',
-        message: 'Couldn’t start agent',
+        message: 'Couldn’t start analysis',
         detail: err instanceof Error ? err.message : 'Server unreachable.',
       });
     }
@@ -201,10 +201,10 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
           }}>G</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontFamily: 'var(--font-sans)', fontSize: TYPE.body.md, fontWeight: 500, color: F.ink }}>
-              Gambit Data Analyst
+              Gambit Analyst
             </div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.md, color: F.fgMuted, marginTop: 1 }}>
-              Market data ready · interpretation in progress
+              Market answer ready · interpretation in progress
             </div>
           </div>
           <span style={{
@@ -221,7 +221,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
           fontSize: TYPE.body.sm,
           color: F.fgMuted,
         }}>
-          {brief.progress?.detail ?? 'Drafting the evidence-bound interpretation.'}
+          Writing the football interpretation…
         </div>
       </div>
     );
@@ -244,9 +244,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
     );
   }
 
-  const sourcesNote = brief.duration_ms
-    ? `${sources.length || 0} sources · ${(brief.duration_ms / 1000).toFixed(1)}s`
-    : `${sources.length || 0} sources`;
+  const sourcesNote = sources.length > 0 ? `${sources.length} sources checked` : 'Public source analysis';
 
   // Shared button styles — Phase 10 button system anticipated. Three
   // variants: primary (filled fenway), secondary (outline), tertiary (text).
@@ -310,7 +308,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
         letterSpacing: TRACKING.micro, textTransform: 'uppercase',
         marginBottom: SPACE.sm,
       }}>
-        {isDataAnalyst ? 'Data answer' : presentationFirst ? 'Current lean' : 'Working thesis'}
+        {isDataAnalyst ? 'Market answer' : presentationFirst ? 'Current lean' : 'Working thesis'}
       </div>
       <p style={{
         margin: 0,
@@ -349,18 +347,18 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
           }}>G</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontFamily: 'var(--font-sans)', fontSize: TYPE.body.md, fontWeight: 500, color: F.ink }}>
-              {isDataAnalyst ? 'Gambit Data Analyst' : 'Gambit Analyst'}
+              Gambit Analyst
             </div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.md, color: F.fgMuted, marginTop: 1 }}>{sourcesNote}</div>
           </div>
-          <BriefTemplatePicker
+          {!presenter && !dataAnalysisBody?.market_analysis && <BriefTemplatePicker
             selected={templateSelection}
             onChange={(selection) => void changeTemplate(selection)}
             draftQuestion={brief.question}
             disabled={changingTemplate}
             align="right"
             placement="below"
-          />
+          />}
         </div>
 
         <div style={{
@@ -393,7 +391,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
           )}
         </div>
 
-        {sources.length > 0 && (
+        {sources.length > 0 && !dataAnalysisBody?.market_analysis && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: SPACE.sm,
             marginTop: SPACE.md, flexWrap: 'wrap',
@@ -429,7 +427,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
 
         {!presenter && !compact && <BriefActions />}
 
-        {onReply && (
+        {!presenter && onReply && (
           <div style={{
             marginTop: SPACE.md, paddingTop: SPACE.md,
             borderTop: `1px dashed ${F.border}`,

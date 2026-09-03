@@ -107,20 +107,12 @@ export function buildDeterministicNflTransactionMarketFallback(
       || b.trade_compensation.sample_size - a.trade_compensation.sample_size
       || a.position_group.localeCompare(b.position_group)
     ));
-  const growing = usable.filter((trend) => trend.status === 'supported' && trend.direction === 'growing').map((trend) => trend.position_group);
-  const shrinking = usable.filter((trend) => trend.status === 'supported' && trend.direction === 'shrinking').map((trend) => trend.position_group);
   const footballRead = nflTransactionMarketFootballRead(analysis);
   const answer = analysis.status === 'insufficient_evidence'
-    ? 'The current public-data snapshot does not support a firm market conclusion for the executed filters. The calculated series and comparables are shown below, but the sample and identity gates require an abstention.'
+    ? 'The current public data does not support a market conclusion for the requested scope. The calculated series and transactions are still available, but the stated coverage gaps need to be resolved before setting a trade posture.'
     : tradeOnly && premiumTradeRanking.length > 0
       ? `Across all completed years in ${analysis.query.start_year}–${analysis.query.end_year}, the highest observed day-one or day-two pick shares among allocable single-player trades were ${premiumTradeRanking.slice(0, 3).map((trend) => `${trend.position_group} ${formatBasisPoints(trend.trade_compensation.overall_value!)}`).join(', ')}. Multi-player and unknown-compensation deals remain comparables but are not assigned a fabricated per-player price.`
-    : [
-      footballRead.conclusion,
-      footballRead.implication,
-      growing.length ? `${growing.join(', ')} clear the supported multi-signal growth gate.` : '',
-      shrinking.length ? `${shrinking.join(', ')} clear the supported multi-signal shrinkage gate.` : '',
-      'The classification rules and evidence gates remain visible below.',
-    ].filter(Boolean).join(' ');
+    : [footballRead.conclusion, footballRead.implication].join(' ');
   const sources = deterministicMarketSourceRows(analysis, 1);
   const ref = sources[0]?.ref_index ?? 1;
   return {
@@ -197,6 +189,41 @@ export function deterministicMarketSourceRows(
   }));
 }
 
+export function deterministicMarketEventSourceRows(
+  analysis: NflTransactionMarketAnalysis,
+  startRefIndex: number,
+): Omit<BriefSource, 'id' | 'brief_id'>[] {
+  const rows = [...analysis.comparables, ...analysis.influential_transactions]
+    .filter((row, index, all) => all.findIndex((candidate) => candidate.event_id === row.event_id) === index);
+  return rows.map((row, index) => {
+    const upstream = analysis.source_refs.find((source) => row.source_ref_ids.includes(source.id));
+    return {
+      ref_index: startRefIndex + index,
+      kind: 'ANALYST_DATA' as const,
+      source: 'NFL_TRANSACTION_MARKET',
+      title: `Transaction · ${row.player_name}`,
+      updated_at: row.event_date ?? String(row.event_year),
+      data: {
+        ...(upstream ? { source_url: upstream.url } : {}),
+        rows: [
+          { k: 'Date', v: row.event_date ?? `${row.event_year} (${row.date_precision} date)` },
+          { k: 'Move', v: row.transaction_type.replaceAll('_', ' ') },
+          { k: 'Position', v: row.position_group ?? 'unresolved' },
+          { k: 'Teams', v: `${row.from_team_id ?? '—'} → ${row.to_team_id ?? '—'}` },
+          { k: 'Player record', v: row.identity_confidence },
+          { k: 'Compensation', v: row.compensation_summary ?? row.compensation_band ?? 'not available' },
+          { k: 'Contract terms', v: row.contract_apy_dollars == null ? 'not available' : `$${row.contract_apy_dollars.toLocaleString()} APY` },
+          { k: 'Used in this answer', v: analysis.influential_transactions.some((candidate) => candidate.event_id === row.event_id) ? 'Key transaction and comparison check' : 'Supporting transaction' },
+          { k: 'Source position', v: row.raw_position ?? 'not available' },
+          { k: 'Position mapping', v: row.normalization_basis ?? (row.position_group ? 'Provider role mapped to the displayed position family' : 'Source role could not be mapped precisely') },
+        ],
+        transaction: row,
+        snapshot_id: analysis.snapshot_id,
+      },
+    };
+  });
+}
+
 export function deterministicMarketChatAnswer(analysis: NflTransactionMarketAnalysis): string {
   const draft = buildDeterministicNflTransactionMarketFallback(analysis);
   const lines = [draft.answer, '', `Executed filters: ${analysis.query.start_year}–${analysis.query.end_year}; ${analysis.query.position_groups.join(', ')}; ${analysis.query.transaction_types.join(', ')}.`, ''];
@@ -208,7 +235,7 @@ export function deterministicMarketChatAnswer(analysis: NflTransactionMarketAnal
       lines.push(`- ${row.event_date ?? row.event_year} · ${row.player_name} · ${row.position_group ?? 'position unresolved'} · ${row.transaction_type.replaceAll('_', ' ')}${row.compensation_summary ? ` · ${row.compensation_summary}` : ''}`);
     }
   }
-  lines.push('', `Coverage: ${analysis.coverage.event_count} material events; ${formatBasisPoints(analysis.coverage.position_match_basis_points)} precise identity coverage.`);
+  lines.push('', `Coverage: ${analysis.coverage.event_count} player moves analyzed; ${formatBasisPoints(analysis.coverage.position_match_basis_points)} of player records matched.`);
   for (const limitation of analysis.limitations) lines.push(`- ${limitation}`);
   return lines.join('\n');
 }

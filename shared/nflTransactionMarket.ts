@@ -45,8 +45,8 @@ export function nflTransactionMarketFootballRead(
 ): NflTransactionMarketFootballRead {
   if (analysis.status === 'insufficient_evidence') {
     return {
-      conclusion: 'The current public-data cohort is not strong enough to support a market call.',
-      implication: 'For New York: keep the result directional and resolve the displayed coverage gaps before setting a trade posture.',
+      conclusion: 'The current public data is not strong enough to support a market call.',
+      implication: 'For New York: treat this as an early read and close the stated data gaps before setting a trade posture.',
     };
   }
 
@@ -56,6 +56,36 @@ export function nflTransactionMarketFootballRead(
   const edge = ranked.find((trend) => trend.position_group === 'EDGE');
   const iol = ranked.find((trend) => trend.position_group === 'IOL');
   const exactEdgeIolComparison = ranked.length === 2 && Boolean(edge && iol);
+  const tradeOnly = analysis.query.transaction_types.length === 1
+    && analysis.query.transaction_types[0] === 'trade';
+
+  if (analysis.query.analysis_mode === 'recent_influence' && analysis.influential_transactions.length > 0) {
+    const names = analysis.influential_transactions.slice(0, 4).map((row) => row.player_name);
+    return {
+      conclusion: `${joinNames(names)} are the recent transactions that most change the reported market result when tested one at a time.`,
+      implication: 'For New York: use these deals as the first sensitivity checks on the conclusion, not as proof that any one transaction caused the market trend.',
+    };
+  }
+
+  if (tradeOnly) {
+    const premiumPickLeaders = [...ranked]
+      .filter((trend) => trend.trade_compensation.status !== 'insufficient_evidence'
+        && trend.trade_compensation.overall_value != null)
+      .sort((left, right) => (
+        right.trade_compensation.overall_value! - left.trade_compensation.overall_value!
+        || right.trade_compensation.sample_size - left.trade_compensation.sample_size
+      ))
+      .slice(0, 3);
+    if (premiumPickLeaders.length > 0) {
+      const completedEndYear = analysis.query.include_ytd
+        ? analysis.query.end_year - 1
+        : analysis.query.end_year;
+      return {
+        conclusion: `${premiumPickLeaders.map((trend) => `${trend.position_group} (${formatPercent(trend.trade_compensation.overall_value!)})`).join(', ')} posted the highest observed shares of trades returning day-one or day-two picks from ${analysis.query.start_year}–${completedEndYear}.`,
+        implication: 'For New York: use those league rates to set opening price expectations, then anchor the actual call to role fit and the closest returned transactions.',
+      };
+    }
+  }
 
   if (exactEdgeIolComparison && edge && iol) {
     const edgeMovement = movementClause(edge.position_group, edge.mobility.direction);
@@ -64,7 +94,7 @@ export function nflTransactionMarketFootballRead(
       : 'premium trade compensation is not precise enough to call';
     const iolMovement = movementClause(iol.position_group, iol.mobility.direction);
     const iolPrice = priceSignalsConflict(iol)
-      ? 'its contract and trade price signals do not agree'
+      ? 'its contract-cost and premium-pick trade signals do not agree'
       : usablePriceSignal(iol)
         ? priceClause('its clearest price signal', usablePriceSignal(iol)!.direction)
         : 'its price evidence is not strong enough to call';
@@ -73,8 +103,8 @@ export function nflTransactionMarketFootballRead(
       && ['growing', 'flat'].includes(edge.trade_compensation.direction)
       ? 'pay selectively for difference-making EDGE talent'
       : signalIsUsable(edge.trade_compensation)
-        ? 'price EDGE targets to the supported compensation band'
-        : 'keep EDGE price discipline provisional until the compensation sample clears the evidence gate';
+        ? 'price EDGE targets to the observed compensation range'
+        : 'keep EDGE price discipline provisional until more comparable trades are available';
     const iolAction = iol.mobility.direction === 'growing'
       ? 'test whether greater IOL availability creates acquisition leverage'
       : 'validate IOL availability before assuming acquisition leverage';
@@ -89,7 +119,7 @@ export function nflTransactionMarketFootballRead(
     const movement = movementClause(trend.position_group, trend.mobility.direction);
     const priceSignal = usablePriceSignal(trend);
     if (priceSignalsConflict(trend)) {
-      return `${movement}, while its contract and trade price signals do not agree`;
+      return `${movement}, while its contract-cost and premium-pick trade signals do not agree`;
     }
     return priceSignal
       ? `${movement}; ${priceClause('its clearest price signal', priceSignal.direction)}`
@@ -97,14 +127,14 @@ export function nflTransactionMarketFootballRead(
   });
   const conclusion = lead.length > 0
     ? `${lead.join('. ')}.`
-    : 'The current cohort does not contain a position signal strong enough to summarize.';
+    : 'The requested scope does not contain a position signal strong enough to summarize.';
   const primary = ranked[0];
   const primaryPrice = primary ? usablePriceSignal(primary) : null;
   const implication = primary
     ? primaryPrice
-      ? `For New York: negotiate to the supported ${primary.position_group} activity and price signals, while keeping the broader classification rules visible below.`
-      : `For New York: use the ${primary.position_group} activity signal, but keep price posture provisional until the displayed evidence gate clears.`
-    : 'For New York: do not set a trade posture until a supported position signal is available.';
+      ? `For New York: negotiate to the observed ${primary.position_group} movement and price range, then test the call against the closest player-level transactions.`
+      : `For New York: use the ${primary.position_group} movement read, but keep price posture provisional until more comparable deals are available.`
+    : 'For New York: do not set a trade posture until the public data supports a position-level read.';
   return { conclusion, implication };
 }
 
@@ -142,4 +172,14 @@ function signalIsUsable(
   signal: NflTransactionMarketAnalysis['position_trends'][number]['trade_compensation'],
 ): boolean {
   return signal.status !== 'insufficient_evidence';
+}
+
+function formatPercent(basisPoints: number): string {
+  return `${(basisPoints / 100).toFixed(1)}%`;
+}
+
+function joinNames(names: string[]): string {
+  if (names.length <= 1) return names[0] ?? 'No single transaction';
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(', ')}, and ${names.at(-1)}`;
 }

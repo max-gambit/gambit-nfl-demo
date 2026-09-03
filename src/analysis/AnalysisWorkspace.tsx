@@ -65,9 +65,7 @@ export function AnalysisWorkspace({ presenter = false }: AnalysisWorkspaceProps)
       : sessions.length === 1 && tyBrief?.session_id === sessions[0].id ? sessions[0] : null;
     if (!presentationSession) return;
 
-    const targetBrief = [...briefs]
-      .filter((brief) => brief.session_id === presentationSession.id && brief.body?.kind === 'data_analysis' && brief.body.market_analysis)
-      .sort((left, right) => new Date(right.created_at).getTime() - new Date(left.created_at).getTime())[0] ?? tyBrief;
+    const targetBrief = tyBrief;
     if (!targetBrief) return;
 
     presentationInitialized.current = true;
@@ -170,7 +168,7 @@ export function AnalysisWorkspace({ presenter = false }: AnalysisWorkspaceProps)
     return (
       <div className="analysis-loading" role="status">
         <strong>Opening Analysis…</strong>
-        <span>Loading the Giants decision workspace and evidence graph.</span>
+        <span>Loading the Giants questions and evidence.</span>
       </div>
     );
   }
@@ -198,7 +196,7 @@ export function AnalysisWorkspace({ presenter = false }: AnalysisWorkspaceProps)
             type="button"
             className="analysis-evidence-trigger"
             onClick={() => setEvidenceDrawerOpen(true)}
-          >Evidence pack</button>
+          >Why this answer</button>
           <ChannelHeader readOnly={presenter} />
           <SessionFeed presenter={presenter} />
         </main>

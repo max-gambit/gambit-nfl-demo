@@ -266,17 +266,23 @@ async function selectAll(
   orderColumns: string[],
   snapshotId?: string,
 ): Promise<Record<string, unknown>[]> {
-  const result: Record<string, unknown>[] = [];
-  for (let start = 0; ; start += 1_000) {
+  let countQuery = client.from(table).select('*', { count: 'exact', head: true });
+  if (snapshotId) countQuery = countQuery.eq('snapshot_id', snapshotId);
+  const countResponse = await countQuery;
+  throwIfError(countResponse, `${table} count`);
+  const rowCount = countResponse.count ?? 0;
+  if (rowCount === 0) return [];
+
+  const pages = await Promise.all(Array.from({ length: Math.ceil(rowCount / 1_000) }, async (_, page) => {
+    const start = page * 1_000;
     let query = client.from(table).select('*');
     if (snapshotId) query = query.eq('snapshot_id', snapshotId);
     for (const column of orderColumns) query = query.order(column, { ascending: true });
     const response = await query.range(start, start + 999);
     throwIfError(response, `${table} load`);
-    const rows = (response.data ?? []) as Record<string, unknown>[];
-    result.push(...rows);
-    if (rows.length < 1_000) return result;
-  }
+    return (response.data ?? []) as Record<string, unknown>[];
+  }));
+  return pages.flat();
 }
 
 function throwIfError(result: { error: { message: string } | null }, label: string): void {

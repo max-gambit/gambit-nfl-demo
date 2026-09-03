@@ -16,7 +16,7 @@ export function NflSourceDetail({ source, onBack }: { source: BriefSource; onBac
       <button type="button" onClick={onBack} style={{
         border: 'none', background: 'transparent', color: F.fenway,
         padding: 0, cursor: 'pointer', fontWeight: 700, fontSize: TYPE.body.sm,
-      }}>← Evidence pack</button>
+      }}>← Why this answer</button>
       <div style={{ marginTop: SPACE['2xl'] }}>
         <span style={{
           fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs, fontWeight: 700,

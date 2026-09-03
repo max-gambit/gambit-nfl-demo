@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   buildDeterministicNflTransactionMarketFallback,
+  deterministicMarketEventSourceRows,
   deterministicMarketChatAnswer,
   evaluateNflTransactionMarketDraft,
 } from '../../src/claude/nfl_transaction_market_guardrails.js';
@@ -35,6 +36,15 @@ test('deterministic fallback carries method, source provenance, filters, and lim
   assert.ok(draft.caveats.length > 0);
   assert.match(text, /Executed filters: 2016–2025/);
   assert.match(text, /Supporting transactions:/);
+});
+
+test('presenter evidence rows include the exact returned transactions', () => {
+  const analysis = analysisFixture();
+  const rows = deterministicMarketEventSourceRows(analysis, analysis.source_refs.length + 1);
+
+  assert.ok(rows.length > 0);
+  assert.equal(rows[0].data && typeof rows[0].data === 'object' && 'transaction' in rows[0].data, true);
+  assert.match(rows[0].title, /^Transaction · /);
 });
 
 test('artifact-grounded fallback itself passes deterministic checks', () => {

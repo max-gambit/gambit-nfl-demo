@@ -296,11 +296,11 @@ export function SessionFeed({ presenter = false }: { presenter?: boolean }) {
         }
       }
       insertBrief(brief);
-      // Focus the new brief in the feed AND open its thread in the right panel
-      // so the user can immediately follow up while it generates.
+      // Keep the primary Analysis composer in control. The new answer takes the
+      // canvas immediately; the optional thread stays collapsed.
       setExpandedBrief(brief.id);
-      setRightPanelMode('thread');
-      setRightPanelOpen(true);
+      setRightPanelMode('list');
+      setRightPanelOpen(false);
       setDraftQuestion('');
     } catch (err) {
       pushToast({
@@ -338,7 +338,7 @@ export function SessionFeed({ presenter = false }: { presenter?: boolean }) {
     } catch (err) {
       pushToast({
         tone: 'error',
-        message: 'Couldn’t start agent',
+        message: 'Couldn’t start analysis',
         detail: err instanceof Error ? err.message : 'Server unreachable.',
       });
     }
@@ -444,13 +444,13 @@ export function SessionFeed({ presenter = false }: { presenter?: boolean }) {
           pointerEvents: 'auto',
         }}>
           <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto' }}>
-            <TemplateToolbar
+            {!latestMarketBrief && <TemplateToolbar
               selected={displayedTemplateSelection}
               suggestedTemplateId={suggestedTemplateId}
               draftQuestion={draftQuestion}
               onChange={chooseTemplate}
               disabled={submitting}
-            />
+            />}
             <Composer
               key={activeSessionId ?? 'no-session'}
               onSubmit={submitNewBrief}
@@ -517,7 +517,7 @@ function FeedRow({ brief, isFocused, focusedRef, onCompactClick, presenter }: {
   // and we don't want to double-fire.
   const onCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
-    if (target.closest('button, a, input, textarea, select, [role="button"]')) return;
+    if (target.closest('button, a, input, textarea, select, summary, details, [role="button"]')) return;
     toggleThread();
   };
 

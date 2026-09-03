@@ -439,7 +439,7 @@ function EvidenceCard({
 function itemTypeLabel(item: EvidencePackItem): string {
   if (item.type === 'option') return 'Option hinge';
   if (item.type === 'background') return 'Background evidence';
-  return 'Checked claim';
+  return 'Source checked';
 }
 
 function EvidenceChildRow({ row, onOpenSource }: { row: EvidenceCheckRow; onOpenSource: (refIndex: number) => void }) {
@@ -536,13 +536,13 @@ function EmptyEvidenceState({ focusActive }: { focusActive: boolean }) {
       color: F.fgMuted,
       lineHeight: 1.5,
     }}>
-      {focusActive ? 'No evidence matched this option.' : 'Evidence checks will appear here once the brief finishes.'}
+      {focusActive ? 'No source matched this option.' : 'Sources will appear here once the answer finishes.'}
     </div>
   );
 }
 
 function primarySectionTitle(sectionTitle: string, focusActive: boolean, visibleCount: number, totalRefs: number): string {
   if (focusActive) return sectionTitle;
-  if (visibleCount === 0 && totalRefs > 0) return 'Evidence loaded for this brief';
+  if (visibleCount === 0 && totalRefs > 0) return 'Sources for this answer';
   return sectionTitle;
 }

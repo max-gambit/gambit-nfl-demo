@@ -2,6 +2,7 @@ import { db } from './client.js';
 import type { NflTransactionMarketAnalysis } from '@shared/types';
 import {
   buildDeterministicNflTransactionMarketFallback,
+  deterministicMarketEventSourceRows,
   deterministicMarketSourceRows,
 } from '../claude/nfl_transaction_market_guardrails.js';
 import { analyzeNflTransactionMarket } from '../nfl_transactions/analyze.js';
@@ -132,13 +133,15 @@ async function seedTransactionMarketPresenter(now: string): Promise<void> {
     db.from('brief_sources').delete().in('brief_id', [...NYG_TRANSACTION_PRESENTER_BRIEF_IDS]),
     'clear owned transaction-market presenter sources',
   );
-  const sourceRows = analyses.flatMap((analysis, briefIndex) => (
-    deterministicMarketSourceRows(analysis, 1).map((source, sourceIndex) => ({
+  const sourceRows = analyses.flatMap((analysis, briefIndex) => {
+    const snapshotRows = deterministicMarketSourceRows(analysis, 1);
+    const eventRows = deterministicMarketEventSourceRows(analysis, snapshotRows.length + 1);
+    return [...snapshotRows, ...eventRows].map((source, sourceIndex) => ({
       ...source,
       id: presenterSourceId(briefIndex, sourceIndex),
       brief_id: NYG_TRANSACTION_PRESENTER_BRIEF_IDS[briefIndex],
-    }))
-  ));
+    }));
+  });
   await checked(db.from('brief_sources').upsert(sourceRows, { onConflict: 'id' }), 'upsert transaction-market presenter sources');
 }
 

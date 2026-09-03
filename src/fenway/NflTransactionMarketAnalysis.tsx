@@ -10,11 +10,16 @@ import { fire } from '../lib/events';
 import { useBriefs, useUi } from '../store';
 import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
 
-export function NflTransactionMarketAnalysisView({ analysis }: { analysis: NflTransactionMarketAnalysis }) {
-  const trendRows = analysis.position_trends;
+interface Props {
+  analysis: NflTransactionMarketAnalysis;
+  interpretation?: string;
+  followups?: string[];
+}
+
+export function NflTransactionMarketAnalysisView({ analysis, interpretation = '', followups = [] }: Props) {
   const footballRead = nflTransactionMarketFootballRead(analysis);
   const { activeBriefId, sourcesByBrief } = useBriefs();
-  const { setSelectedSourceRef, setSourceFilterRefs, setHighlightedSourceRef } = useUi();
+  const { setSelectedSourceRef, setSourceFilterRefs, setHighlightedSourceRef, setRailCollapsed } = useUi();
   const eventSourceRefs = new Map(
     (activeBriefId ? sourcesByBrief[activeBriefId] ?? [] : [])
       .flatMap((source) => {
@@ -22,246 +27,224 @@ export function NflTransactionMarketAnalysisView({ analysis }: { analysis: NflTr
         return eventId ? [[eventId, source.ref_index] as const] : [];
       }),
   );
-  const maxMobility = Math.max(1, ...trendRows.flatMap((trend) => [
-    trend.mobility.baseline_value ?? 0,
-    trend.mobility.recent_value ?? 0,
-  ]));
   const openComparableEvidence = (row: NflTransactionComparable) => {
     const ref = eventSourceRefs.get(row.event_id);
     if (ref == null) return;
     setSourceFilterRefs([ref]);
     setHighlightedSourceRef(ref);
     setSelectedSourceRef(ref);
+    setRailCollapsed(false);
     fire('v6d3cf:open-evidence', { ref });
   };
+  const visibleTrends = primaryTrendRows(analysis);
+  const keyTransactions = (
+    analysis.influential_transactions.length > 0
+      ? analysis.influential_transactions
+      : analysis.comparables
+  ).slice(0, 4);
+  const supplemental = supplementalInterpretation(interpretationForDisplay(interpretation), footballRead);
 
   return (
-    <div style={{ display: 'grid', gap: SPACE.lg }} data-testid="nfl-transaction-market-analysis">
+    <div style={{ display: 'grid', gap: SPACE.xl }} data-testid="nfl-transaction-market-analysis">
       <section style={{
-        display: 'grid', gap: SPACE.sm, padding: `${SPACE.lg}px ${SPACE.xl}px`,
+        display: 'grid', gap: SPACE.md, padding: `${SPACE.xl}px ${SPACE['2xl']}px`,
         border: `1px solid ${F.fenway}`, borderLeft: `4px solid ${F.fenway}`,
         borderRadius: RADIUS.md, background: F.fenwaySoft,
       }}>
-        <span style={{
-          color: F.fenway, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs,
-          fontWeight: 700, letterSpacing: TRACKING.micro, textTransform: 'uppercase',
-        }}>Front-office read</span>
-        <h3 style={{
-          margin: 0, color: F.ink, fontFamily: 'var(--font-display)',
-          fontSize: TYPE.display.md, lineHeight: 1.35, letterSpacing: TRACKING.tight,
-        }}>{footballRead.conclusion}</h3>
-        <p style={{ margin: 0, color: F.inkSoft, fontSize: TYPE.body.md, lineHeight: 1.55 }}>
-          {footballRead.implication}
-        </p>
+        <div>
+          <SectionLabel>Bottom line</SectionLabel>
+          <h3 style={{
+            margin: 0, color: F.ink, fontFamily: 'var(--font-display)',
+            fontSize: TYPE.display.md, lineHeight: 1.35, letterSpacing: TRACKING.tight,
+          }}>{footballRead.conclusion}</h3>
+        </div>
+        <div style={{ borderTop: `1px solid ${F.borderStrong}`, paddingTop: SPACE.md }}>
+          <span style={{
+            display: 'block', marginBottom: 4, color: F.fenway,
+            fontFamily: 'var(--font-sans)', fontSize: TYPE.meta.md,
+            fontWeight: 700, letterSpacing: TRACKING.micro, textTransform: 'uppercase',
+          }}>What this means for New York</span>
+          <p style={{ margin: 0, color: F.ink, fontSize: TYPE.body.lg, lineHeight: 1.5, fontWeight: 600 }}>
+            {newYorkImplication(footballRead.implication)}
+          </p>
+        </div>
       </section>
 
-      <SnapshotHeader analysis={analysis} />
-
       <section>
-        <SectionLabel>Position-market trend</SectionLabel>
-        <div style={{
-          border: `1px solid ${F.border}`,
-          borderRadius: RADIUS.md,
-          overflow: 'hidden',
-          background: F.surface,
-        }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap',
-            gap: SPACE.sm, padding: `${SPACE.sm}px ${SPACE.md}px`, borderBottom: `1px solid ${F.border}`,
-          }}>
-            <span style={{ color: F.fgMuted, fontSize: TYPE.body.sm }}>
-              Material moves per 100 roster player-seasons
-            </span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: SPACE.md, color: F.fgMuted, fontSize: TYPE.meta.md }}>
-              <Legend color={F.borderStrong} label={`${analysis.query.baseline_years[0]}–${analysis.query.baseline_years[1]}`} />
-              <Legend color={F.fenway} label={`${analysis.query.recent_years[0]}–${analysis.query.recent_years[1]}`} />
-            </span>
-          </div>
-          <div style={{ display: 'grid' }}>
-            {trendRows.map((trend) => (
-              <TrendRow key={trend.position_group} trend={trend} maxMobility={maxMobility} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: SPACE.sm, flexWrap: 'wrap' }}>
+          <SectionLabel>Market comparison</SectionLabel>
+          <span style={{ color: F.fgMuted, fontSize: TYPE.meta.md }}>
+            {analysis.query.baseline_years.join('–')} vs {analysis.query.recent_years.join('–')}
+          </span>
+        </div>
+        <div style={{ overflowX: 'auto', border: `1px solid ${F.border}`, borderRadius: RADIUS.md, background: F.surface }}>
+          <table style={{ width: '100%', minWidth: 690, borderCollapse: 'collapse', fontSize: TYPE.body.sm }}>
+            <thead>
+              <tr>
+                {['Position', 'Overall read', 'Player movement', 'Contract cost vs. cap', 'Premium-pick trades'].map((label) => (
+                  <th key={label} style={tableHeaderStyle}>{label}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {visibleTrends.map((trend, index) => (
+                <tr key={trend.position_group}>
+                  <td style={tableCellStyle(index, visibleTrends.length)}><strong style={{ color: F.ink }}>{trend.position_group}</strong></td>
+                  <td style={tableCellStyle(index, visibleTrends.length)}><OverallRead trend={trend} /></td>
+                  <td style={tableCellStyle(index, visibleTrends.length)}><SignalRead signal={trend.mobility} /></td>
+                  <td style={tableCellStyle(index, visibleTrends.length)}><SignalRead signal={trend.contract_price} /></td>
+                  <td style={tableCellStyle(index, visibleTrends.length)}><SignalRead signal={trend.trade_compensation} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {analysis.position_trends.length > visibleTrends.length && (
+          <p style={{ margin: `${SPACE.xs}px 0 0`, color: F.fgMuted, fontSize: TYPE.meta.md }}>
+            Showing the six most decision-relevant position reads. The full comparison is available below.
+          </p>
+        )}
+      </section>
+
+      {keyTransactions.length > 0 && (
+        <section>
+          <SectionLabel>{analysis.influential_transactions.length > 0 ? 'Transactions that most affect the result' : 'Key transactions'}</SectionLabel>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: SPACE.sm }}>
+            {keyTransactions.map((row) => (
+              <KeyTransaction
+                key={row.event_id}
+                row={row}
+                sourceRef={eventSourceRefs.get(row.event_id)}
+                onOpen={openComparableEvidence}
+              />
             ))}
           </div>
-        </div>
-      </section>
-
-      <AnnualSeriesChart analysis={analysis} />
-
-      <section>
-        <SectionLabel>Signal comparison</SectionLabel>
-        <div style={{ display: 'grid', gap: SPACE.sm }}>
-          {trendRows.map((trend) => (
-            <article key={trend.position_group} style={{ padding: SPACE.md, border: `1px solid ${F.border}`, borderRadius: RADIUS.md, background: F.surface }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: SPACE.sm }}>
-                <strong style={{ color: F.ink }}>{trend.position_group} · <DirectionBadge direction={trend.direction} status={trend.status} /></strong>
-                <span style={{ color: F.fgMuted, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs }}>{trend.event_count.toLocaleString()} material events</span>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))', gap: SPACE.sm, marginTop: SPACE.sm }}>
-                <SignalMetric label="Mobility" signal={trend.mobility} />
-                <SignalMetric label="Move share" signal={trend.transaction_share} />
-                <SignalMetric label="Contract price" signal={trend.contract_price} />
-                <SignalMetric label="Trade price" signal={trend.trade_compensation} />
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <StrategyImplications trends={trendRows} />
-
-      <section>
-        <SectionLabel>Method and cohort</SectionLabel>
-        <div style={{
-          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: SPACE.sm,
-        }}>
-          <MethodCard title="Cohort" body={analysis.methodology.cohort} />
-          <MethodCard title="Mobility" body={analysis.methodology.mobility} />
-          <MethodCard title="Trade price" body={analysis.methodology.trade_price} />
-          <MethodCard title="Contract price" body={analysis.methodology.contract_price} />
-          <MethodCard title="Classification" body={analysis.methodology.classification} />
-          <MethodCard title="Influence" body={analysis.methodology.influence} />
-        </div>
-        <p style={{ margin: `${SPACE.sm}px 0 0`, color: F.fgMuted, fontSize: TYPE.meta.md, lineHeight: 1.45 }}>
-          Minimum samples: {analysis.methodology.minimum_samples}
-        </p>
-      </section>
-
-      {analysis.comparables.length > 0 && (
-        <ComparableSection title="Supporting transactions and comparables" rows={analysis.comparables} sourceRefs={eventSourceRefs} onOpen={openComparableEvidence} />
-      )}
-      {analysis.influential_transactions.length > 0 && (
-        <ComparableSection title="Largest leave-one-out sensitivities" rows={analysis.influential_transactions} sourceRefs={eventSourceRefs} onOpen={openComparableEvidence} showInfluence />
+        </section>
       )}
 
-      <section>
-        <SectionLabel>Coverage and limitations</SectionLabel>
-        <div style={{
-          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-          gap: SPACE.sm, marginBottom: SPACE.sm,
-        }}>
-          <Metric label="Material events" value={analysis.coverage.event_count.toLocaleString()} />
-          <Metric label="Trades" value={analysis.coverage.trade_count.toLocaleString()} />
-          <Metric label="Priced contracts" value={analysis.coverage.priced_contract_count.toLocaleString()} />
-          <Metric label="Identity coverage" value={formatBasisPoints(analysis.coverage.position_match_basis_points)} />
+      {supplemental && (
+        <section style={{ padding: SPACE.md, borderLeft: `3px solid ${F.borderStrong}`, background: F.cream50 }}>
+          <SectionLabel>Analyst interpretation</SectionLabel>
+          <p style={{ margin: 0, color: F.inkSoft, fontSize: TYPE.body.md, lineHeight: 1.6 }}>{supplemental}</p>
+        </section>
+      )}
+
+      {followups.length > 0 && (
+        <section>
+          <SectionLabel>Next questions</SectionLabel>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: SPACE.xs }}>
+            {followups.slice(0, 4).map((followup) => (
+              <span key={followup} style={{
+                color: F.fenway, background: F.fenwaySoft, border: `1px solid ${F.fenway}`,
+                borderRadius: RADIUS.pill, padding: `${SPACE.xs - 1}px ${SPACE.sm}px`, fontSize: TYPE.body.sm,
+              }}>{followup}</span>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <details style={{ border: `1px solid ${F.border}`, borderRadius: RADIUS.md, background: F.surface }}>
+        <summary style={{
+          cursor: 'pointer', padding: `${SPACE.md}px ${SPACE.lg}px`, color: F.ink,
+          fontFamily: 'var(--font-sans)', fontSize: TYPE.body.md, fontWeight: 700,
+        }}>See calculation and sources</summary>
+        <div style={{ display: 'grid', gap: SPACE.xl, padding: `0 ${SPACE.lg}px ${SPACE.lg}px` }}>
+          <ScopeSummary analysis={analysis} />
+          <AnnualSeriesChart analysis={analysis} />
+          <FullSignalComparison trends={analysis.position_trends} />
+          <Methodology analysis={analysis} />
+          {analysis.comparables.length > 0 && (
+            <ComparableSection title="Supporting transactions" rows={analysis.comparables} sourceRefs={eventSourceRefs} onOpen={openComparableEvidence} />
+          )}
+          {analysis.influential_transactions.length > 0 && (
+            <ComparableSection title="Transactions that most affect the result" rows={analysis.influential_transactions} sourceRefs={eventSourceRefs} onOpen={openComparableEvidence} showInfluence />
+          )}
+          <CoverageAndSources analysis={analysis} />
         </div>
-        <div style={{
-          display: 'grid', gap: SPACE.xs, padding: SPACE.md,
-          background: analysis.status === 'supported' ? F.cream50 : F.amberSoft,
-          border: `1px solid ${analysis.status === 'supported' ? F.border : F.amber}`,
-          borderRadius: RADIUS.md,
-        }}>
-          {analysis.limitations.map((limitation, index) => (
-            <div key={index} style={{ color: F.fgMuted, fontSize: TYPE.body.sm, lineHeight: 1.5 }}>{limitation}</div>
-          ))}
-          {analysis.source_refs.map((source) => (
-            <div key={source.id} style={{ color: F.fgMuted, fontSize: TYPE.meta.md, lineHeight: 1.45 }}>
-              <strong style={{ color: F.ink }}>{source.name}</strong> · as of {source.as_of_date} · retrieved {formatDate(source.retrieved_at)} · SHA-256 {source.checksum_sha256.slice(0, 12)}…
-            </div>
-          ))}
-        </div>
-      </section>
+      </details>
     </div>
   );
 }
 
-function StrategyImplications({ trends }: { trends: NflPositionMarketTrend[] }) {
-  const rows = trends
-    .filter((trend) => trend.status !== 'insufficient_evidence')
-    .sort((a, b) => statusRank(b) - statusRank(a) || b.event_count - a.event_count)
+function primaryTrendRows(analysis: NflTransactionMarketAnalysis): NflPositionMarketTrend[] {
+  if (analysis.position_trends.length <= 6) return analysis.position_trends;
+  const tradeOnly = analysis.query.transaction_types.length === 1 && analysis.query.transaction_types[0] === 'trade';
+  return [...analysis.position_trends]
+    .sort((left, right) => tradeOnly
+      ? (right.trade_compensation.overall_value ?? -1) - (left.trade_compensation.overall_value ?? -1)
+      : right.event_count - left.event_count || statusRank(right) - statusRank(left))
     .slice(0, 6);
-  if (rows.length === 0) return null;
-  return <section>
-    <SectionLabel>Trade-strategy implications</SectionLabel>
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: SPACE.sm }}>
-      {rows.map((trend) => <div key={trend.position_group} style={{ padding: SPACE.md, border: `1px solid ${F.border}`, borderRadius: RADIUS.md, background: F.surface }}>
-        <strong style={{ display: 'block', color: F.ink, fontSize: TYPE.body.sm, marginBottom: 4 }}>
-          {trend.position_group} · {trend.direction.replaceAll('_', ' ')}
-        </strong>
-        <span style={{ color: F.fgMuted, fontSize: TYPE.body.sm, lineHeight: 1.5 }}>
-          {strategyText(trend)}
-        </span>
-      </div>)}
-    </div>
-  </section>;
-}
-
-function strategyText(trend: NflPositionMarketTrend): string {
-  if (trend.direction === 'growing' && trend.status === 'supported') {
-    return 'Expect a more active market: start counterparty work earlier, establish a price ceiling from the returned comparables, and avoid waiting for a single deadline-day option.';
-  }
-  if (trend.direction === 'shrinking' && trend.status === 'supported') {
-    return 'Treat a thinner market as a sourcing constraint, not automatic leverage: widen the comparable window and validate availability before setting an aggressive ask.';
-  }
-  if (trend.direction === 'flat' && trend.status === 'supported') {
-    return 'Activity and price are broadly stable under the governed thresholds; use role fit and specific compensation bands to separate otherwise similar calls.';
-  }
-  return 'Signals are mixed or directional. Negotiate to the supported activity or price signal only, and keep the broader market claim out of the decision memo.';
 }
 
 function statusRank(trend: NflPositionMarketTrend): number {
   return trend.status === 'supported' ? 2 : trend.status === 'directional' ? 1 : 0;
 }
 
-function SnapshotHeader({ analysis }: { analysis: NflTransactionMarketAnalysis }) {
-  return (
-    <section style={{
-      display: 'grid', gap: SPACE.sm, padding: SPACE.md,
-      border: `1px solid ${analysis.status === 'supported' ? F.fenway : F.amber}`,
-      borderRadius: RADIUS.md,
-      background: analysis.status === 'supported' ? F.fenwaySoft : F.amberSoft,
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: SPACE.sm, justifyContent: 'space-between', flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: SPACE.sm, flexWrap: 'wrap' }}>
-          <strong style={{ color: F.ink, fontSize: TYPE.body.md }}>Live transaction-market calculation</strong>
-          <StatusBadge status={analysis.status} />
-        </div>
-        <span style={{ color: F.fgMuted, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs }}>
-          Snapshot {analysis.snapshot_id.slice(0, 12)} · {formatDate(analysis.generated_at)}
-        </span>
-      </div>
-      <div style={{ color: F.inkSoft, fontSize: TYPE.body.sm, lineHeight: 1.5 }}>
-        Executed filters: {analysis.query.start_year}–{analysis.query.end_year}
-        {analysis.query.include_ytd ? ' including labeled 2026 YTD' : ''}
-        {' · '}{analysis.query.position_groups.length ? analysis.query.position_groups.join(', ') : 'all position groups'}
-        {' · '}{analysis.query.transaction_types.join(', ').replaceAll('_', ' ')}
-        {analysis.query.team_ids.length ? ` · ${analysis.query.team_ids.join(', ')}` : ' · leaguewide'}
-      </div>
-    </section>
-  );
+function OverallRead({ trend }: { trend: NflPositionMarketTrend }) {
+  return <strong style={{ color: trend.status === 'supported' ? F.ink : F.inkSoft, fontWeight: 650 }}>{overallReadText(trend)}</strong>;
 }
 
-function TrendRow({ trend, maxMobility }: { trend: NflPositionMarketTrend; maxMobility: number }) {
-  const baseline = trend.mobility.baseline_value ?? 0;
-  const recent = trend.mobility.recent_value ?? 0;
-  return (
-    <div style={{
-      display: 'grid', gridTemplateColumns: '48px minmax(120px, 1fr) minmax(116px, auto)',
-      gap: SPACE.sm, alignItems: 'center', padding: `${SPACE.sm}px ${SPACE.md}px`,
-      borderBottom: `1px solid ${F.border}`,
-    }}>
-      <strong style={{ color: F.ink, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.md }}>{trend.position_group}</strong>
-      <div style={{ display: 'grid', gap: 4 }} aria-label={`${trend.position_group} mobility comparison`}>
-        <Bar value={baseline} max={maxMobility} color={F.borderStrong} />
-        <Bar value={recent} max={maxMobility} color={F.fenway} />
-      </div>
-      <div style={{ display: 'grid', justifyItems: 'end', gap: 2 }}>
-        <span style={{ color: F.ink, fontVariantNumeric: 'tabular-nums', fontSize: TYPE.body.sm }}>
-          {formatRateDetailed(baseline)} → {formatRateDetailed(recent)}
-        </span>
-        <span style={{ color: F.fgMuted, fontSize: TYPE.meta.xs }}>
-          {formatChange(trend.mobility.relative_change_basis_points)}
-        </span>
-      </div>
-    </div>
-  );
+function SignalRead({ signal }: { signal: NflTransactionMarketSignal }) {
+  if (signal.status === 'insufficient_evidence' || signal.baseline_value == null || signal.recent_value == null) {
+    return <span style={{ color: F.fgMuted }}>Not enough data</span>;
+  }
+  const percent = signal.unit !== 'events_per_100_player_seasons';
+  return <span style={{ display: 'grid', gap: 2 }}>
+    <strong style={{ color: F.inkSoft, fontWeight: 650 }}>{directionLabel(signal.direction)}</strong>
+    <span style={{ color: F.fgMuted, fontVariantNumeric: 'tabular-nums', fontSize: TYPE.meta.md }}>
+      {percent ? formatPercentDetailed(signal.baseline_value) : formatRateDetailed(signal.baseline_value)} →{' '}
+      {percent ? formatPercentDetailed(signal.recent_value) : formatRateDetailed(signal.recent_value)}
+    </span>
+  </span>;
 }
 
-function Bar({ value, max, color }: { value: number; max: number; color: string }) {
-  const width = Math.max(value > 0 ? 2 : 0, Math.min(100, (value / max) * 100));
-  return <div style={{ height: 6, borderRadius: RADIUS.pill, background: F.cream100, overflow: 'hidden' }}>
-    <div style={{ width: `${width}%`, height: '100%', background: color, borderRadius: RADIUS.pill }} />
-  </div>;
+function KeyTransaction({ row, sourceRef, onOpen }: {
+  row: NflTransactionComparable;
+  sourceRef: number | undefined;
+  onOpen: (row: NflTransactionComparable) => void;
+}) {
+  return <button
+    type="button"
+    disabled={sourceRef == null}
+    onClick={() => onOpen(row)}
+    aria-label={`Open evidence for ${row.player_name}`}
+    style={{
+      display: 'grid', gap: 4, padding: SPACE.md, width: '100%', textAlign: 'left',
+      border: `1px solid ${F.border}`, borderRadius: RADIUS.md, background: F.surface,
+      color: 'inherit', cursor: sourceRef == null ? 'default' : 'pointer',
+    }}
+  >
+    <strong style={{ color: F.ink, fontSize: TYPE.body.md }}>{row.player_name}</strong>
+    <span style={{ color: F.inkSoft, fontSize: TYPE.body.sm }}>
+      {row.position_group ?? 'Position unresolved'} · {moveLabel(row.transaction_type)}
+      {row.from_team_id || row.to_team_id ? ` · ${row.from_team_id ?? 'FA'} → ${row.to_team_id ?? 'FA'}` : ''}
+    </span>
+    <span style={{ color: F.fgMuted, fontSize: TYPE.meta.md }}>
+      {formatDate(row.event_date ?? String(row.event_year))}
+      {row.compensation_summary ? ` · ${row.compensation_summary}` : ''}
+      {row.contract_apy_dollars != null ? ` · ${formatDollars(row.contract_apy_dollars)} APY` : ''}
+    </span>
+    <span style={{ color: sourceRef == null ? F.fgMuted : F.fenway, fontSize: TYPE.meta.md, fontWeight: 700 }}>
+      {sourceRef == null ? 'Source detail available after a live refresh' : 'Open transaction evidence →'}
+    </span>
+  </button>;
+}
+
+function ScopeSummary({ analysis }: { analysis: NflTransactionMarketAnalysis }) {
+  return <section style={{ display: 'grid', gap: SPACE.xs, padding: SPACE.md, background: F.cream50, borderRadius: RADIUS.md }}>
+    <SectionLabel>Market scope</SectionLabel>
+    <strong style={{ color: F.ink }}>{evidenceStatusLabel(analysis.status)}</strong>
+    <span style={{ color: F.inkSoft, fontSize: TYPE.body.sm, lineHeight: 1.5 }}>
+      {analysis.query.start_year}–{analysis.query.end_year}
+      {analysis.query.include_ytd ? ' including labeled 2026 YTD' : ''}
+      {' · '}{analysis.query.position_groups.length ? analysis.query.position_groups.join(', ') : 'all positions'}
+      {' · '}{analysis.query.transaction_types.map(moveLabel).join(', ')}
+      {analysis.query.team_ids.length ? ` · ${analysis.query.team_ids.join(', ')}` : ' · leaguewide'}
+    </span>
+    <span style={{ color: F.fgMuted, fontSize: TYPE.meta.md }}>
+      Calculated {formatDate(analysis.generated_at)} · snapshot {analysis.snapshot_id.slice(0, 12)}
+    </span>
+  </section>;
 }
 
 function AnnualSeriesChart({ analysis }: { analysis: NflTransactionMarketAnalysis }) {
@@ -276,10 +259,10 @@ function AnnualSeriesChart({ analysis }: { analysis: NflTransactionMarketAnalysi
   if (!years.length || !chartRows.length) return null;
 
   return <section>
-    <SectionLabel>Full annual mobility series</SectionLabel>
+    <SectionLabel>Year-by-year player movement</SectionLabel>
     <div style={{ border: `1px solid ${F.border}`, borderRadius: RADIUS.md, background: F.surface, overflow: 'hidden' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: SPACE.sm, padding: `${SPACE.sm}px ${SPACE.md}px`, borderBottom: `1px solid ${F.border}`, color: F.fgMuted, fontSize: TYPE.meta.md }}>
-        <span>Question-time calculation · material moves per 100 player-seasons</span>
+        <span>Player moves per 100 roster player-seasons</span>
         <span>{years[0]}–{years.at(-1)}</span>
       </div>
       {chartRows.map(([position, points]) => {
@@ -294,12 +277,14 @@ function AnnualSeriesChart({ analysis }: { analysis: NflTransactionMarketAnalysi
         const last = plotted.at(-1)?.value ?? null;
         return <div key={position} style={{ display: 'grid', gridTemplateColumns: '46px minmax(150px, 1fr) 92px', gap: SPACE.sm, alignItems: 'center', padding: `${SPACE.xs + 2}px ${SPACE.md}px`, borderBottom: `1px solid ${F.border}` }}>
           <strong style={{ color: F.ink, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.md }}>{position}</strong>
-          <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" role="img" aria-label={`${position} annual mobility from ${years[0]} to ${years.at(-1)}`} style={{ width: '100%', height, overflow: 'visible' }}>
+          <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" role="img" aria-label={`${position} annual player movement from ${years[0]} to ${years.at(-1)}`} style={{ width: '100%', height, overflow: 'visible' }}>
             <line x1="0" x2={width} y1={height - 4} y2={height - 4} stroke={F.border} strokeWidth="1" />
             {plotted.length > 1 && <polyline fill="none" stroke={F.fenway} strokeWidth="2.5" vectorEffect="non-scaling-stroke" points={plotted.map((point) => `${point.x},${point.y}`).join(' ')} />}
             {plotted.map((point, index) => <circle key={`${position}-${index}`} cx={point.x} cy={point.y} r="2.5" fill={F.fenway} vectorEffect="non-scaling-stroke" />)}
           </svg>
-          <span style={{ justifySelf: 'end', color: F.inkSoft, fontVariantNumeric: 'tabular-nums', fontSize: TYPE.meta.md }}>{first == null || last == null ? 'No annual rate' : `${formatRateDetailed(first)} → ${formatRateDetailed(last)}`}</span>
+          <span style={{ justifySelf: 'end', color: F.inkSoft, fontVariantNumeric: 'tabular-nums', fontSize: TYPE.meta.md }}>
+            {first == null || last == null ? 'No annual rate' : `${formatRateDetailed(first)} → ${formatRateDetailed(last)}`}
+          </span>
         </div>;
       })}
       <div style={{ display: 'flex', justifyContent: 'space-between', padding: `${SPACE.xs}px ${SPACE.md}px ${SPACE.sm}px 70px`, color: F.fgMuted, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs }}>
@@ -309,14 +294,75 @@ function AnnualSeriesChart({ analysis }: { analysis: NflTransactionMarketAnalysi
   </section>;
 }
 
+function FullSignalComparison({ trends }: { trends: NflPositionMarketTrend[] }) {
+  return <section>
+    <SectionLabel>Full signal comparison</SectionLabel>
+    <div style={{ display: 'grid', gap: SPACE.sm }}>
+      {trends.map((trend) => (
+        <article key={trend.position_group} style={{ padding: SPACE.md, border: `1px solid ${F.border}`, borderRadius: RADIUS.md, background: F.surface }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: SPACE.sm, flexWrap: 'wrap' }}>
+            <strong style={{ color: F.ink }}>{trend.position_group} · {overallReadText(trend)}</strong>
+            <span style={{ color: F.fgMuted, fontSize: TYPE.meta.md }}>{trend.event_count.toLocaleString()} player moves analyzed</span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: SPACE.sm, marginTop: SPACE.sm }}>
+            <SignalMetric label="How often players moved" signal={trend.mobility} />
+            <SignalMetric label="Share of league movement" signal={trend.transaction_share} />
+            <SignalMetric label="Contract cost versus cap" signal={trend.contract_price} />
+            <SignalMetric label="Trades returning premium picks" signal={trend.trade_compensation} />
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>;
+}
+
 function SignalMetric({ label, signal }: { label: string; signal: NflTransactionMarketSignal }) {
   return <div style={{ minWidth: 0 }}>
-    <span style={{ display: 'block', color: F.fgMuted, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs, textTransform: 'uppercase', letterSpacing: TRACKING.micro }}>{label}</span>
-    <strong style={{ display: 'block', marginTop: 3, color: F.inkSoft, fontSize: TYPE.body.sm, fontWeight: 650, overflowWrap: 'anywhere' }}>{signalCell(signal)}</strong>
+    <span style={{ display: 'block', color: F.fgMuted, fontSize: TYPE.meta.xs, textTransform: 'uppercase', letterSpacing: TRACKING.micro }}>{label}</span>
+    <strong style={{ display: 'block', marginTop: 3, color: F.inkSoft, fontSize: TYPE.body.sm, overflowWrap: 'anywhere' }}>{technicalSignalCell(signal)}</strong>
     <span style={{ color: F.fgMuted, fontSize: TYPE.meta.xs }}>
-      n={signal.sample_size.toLocaleString()} · all completed years {signal.overall_value == null ? 'unavailable' : formatSignalValue(signal, signal.overall_value)} · {signal.status.replaceAll('_', ' ')}
+      {signal.sample_size.toLocaleString()} records · {evidenceStatusLabel(signal.status)}
     </span>
   </div>;
+}
+
+function Methodology({ analysis }: { analysis: NflTransactionMarketAnalysis }) {
+  return <section>
+    <SectionLabel>Calculation method</SectionLabel>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: SPACE.sm }}>
+      <MethodCard title="Comparison period" body={analysis.methodology.cohort} />
+      <MethodCard title="How player movement was measured" body={analysis.methodology.mobility} />
+      <MethodCard title="Trades returning premium picks" body={analysis.methodology.trade_price} />
+      <MethodCard title="Contract cost versus cap" body={analysis.methodology.contract_price} />
+      <MethodCard title="How the overall read was set" body={analysis.methodology.classification} />
+      <MethodCard title="Transactions that most affect the result" body={analysis.methodology.influence} />
+    </div>
+    <p style={{ margin: `${SPACE.sm}px 0 0`, color: F.fgMuted, fontSize: TYPE.meta.md, lineHeight: 1.45 }}>
+      Minimum records: {analysis.methodology.minimum_samples}
+    </p>
+  </section>;
+}
+
+function CoverageAndSources({ analysis }: { analysis: NflTransactionMarketAnalysis }) {
+  return <section>
+    <SectionLabel>Coverage, limits, and sources</SectionLabel>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: SPACE.sm, marginBottom: SPACE.sm }}>
+      <Metric label="Player moves analyzed" value={analysis.coverage.event_count.toLocaleString()} />
+      <Metric label="Trades" value={analysis.coverage.trade_count.toLocaleString()} />
+      <Metric label="Contracts with terms" value={analysis.coverage.priced_contract_count.toLocaleString()} />
+      <Metric label="Player records matched" value={formatPercentDetailed(analysis.coverage.position_match_basis_points)} />
+    </div>
+    <div style={{ display: 'grid', gap: SPACE.xs, padding: SPACE.md, background: F.cream50, border: `1px solid ${F.border}`, borderRadius: RADIUS.md }}>
+      {analysis.limitations.map((limitation, index) => (
+        <div key={index} style={{ color: F.fgMuted, fontSize: TYPE.body.sm, lineHeight: 1.5 }}>{limitation}</div>
+      ))}
+      {analysis.source_refs.map((source) => (
+        <div key={source.id} style={{ color: F.fgMuted, fontSize: TYPE.meta.md, lineHeight: 1.45 }}>
+          <strong style={{ color: F.ink }}>{source.name}</strong> · as of {source.as_of_date} · retrieved {formatDate(source.retrieved_at)} · SHA-256 {source.checksum_sha256.slice(0, 12)}…
+        </div>
+      ))}
+    </div>
+  </section>;
 }
 
 function ComparableSection({ title, rows, sourceRefs, onOpen, showInfluence = false }: {
@@ -326,43 +372,39 @@ function ComparableSection({ title, rows, sourceRefs, onOpen, showInfluence = fa
   onOpen: (row: NflTransactionComparable) => void;
   showInfluence?: boolean;
 }) {
-  return (
-    <section>
-      <SectionLabel>{title}</SectionLabel>
-      <div style={{ display: 'grid', gap: SPACE.sm }}>
-        {rows.map((row) => {
-          const sourceRef = sourceRefs.get(row.event_id);
-          return <button type="button" key={row.event_id} disabled={sourceRef == null} onClick={() => onOpen(row)} aria-label={`Open evidence for ${row.player_name}`} style={{
-            display: 'grid', gap: SPACE.xs, padding: SPACE.md,
-            border: `1px solid ${F.border}`, borderRadius: RADIUS.md, background: F.surface,
-            width: '100%', textAlign: 'left', color: 'inherit', cursor: sourceRef == null ? 'default' : 'pointer',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: SPACE.sm }}>
-              <strong style={{ color: F.ink, fontSize: TYPE.body.sm }}>{row.player_name}</strong>
-              <span style={{ color: F.fgMuted, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs }}>
-                {row.event_date ?? row.event_year} · {row.date_precision} precision
-              </span>
-            </div>
-            <div style={{ color: F.inkSoft, fontSize: TYPE.body.sm, lineHeight: 1.45 }}>
-              {row.position_group ?? 'Position unresolved'} · {row.transaction_type.replaceAll('_', ' ')}
-              {row.from_team_id || row.to_team_id ? ` · ${row.from_team_id ?? 'FA'} → ${row.to_team_id ?? 'FA'}` : ''}
-              {row.compensation_summary ? ` · ${row.compensation_summary}` : ''}
-              {row.contract_apy_dollars != null ? ` · ${formatDollars(row.contract_apy_dollars)} APY` : ''}
-            </div>
-            <div style={{ color: F.fgMuted, fontSize: TYPE.meta.md }}>
-              Identity: {row.identity_confidence}
-              {row.raw_position ? ` · Raw role: ${row.raw_position}` : ''}
-              {row.normalization_basis ? ` · Normalized via ${row.normalization_basis}` : ''}
-              {showInfluence && row.influence_explanation ? ` · ${row.influence_explanation}` : ''}
-            </div>
-            <div style={{ color: sourceRef == null ? F.fgMuted : F.fenway, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs, fontWeight: 700 }}>
-              {sourceRef == null ? 'Evidence detail unavailable for this saved result' : `Open exact evidence [${sourceRef}] →`}
-            </div>
-          </button>;
-        })}
-      </div>
-    </section>
-  );
+  return <section>
+    <SectionLabel>{title}</SectionLabel>
+    <div style={{ display: 'grid', gap: SPACE.sm }}>
+      {rows.map((row) => {
+        const sourceRef = sourceRefs.get(row.event_id);
+        return <button type="button" key={row.event_id} disabled={sourceRef == null} onClick={() => onOpen(row)} aria-label={`Open evidence for ${row.player_name}`} style={{
+          display: 'grid', gap: SPACE.xs, padding: SPACE.md, border: `1px solid ${F.border}`,
+          borderRadius: RADIUS.md, background: F.surface, width: '100%', textAlign: 'left',
+          color: 'inherit', cursor: sourceRef == null ? 'default' : 'pointer',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: SPACE.sm }}>
+            <strong style={{ color: F.ink, fontSize: TYPE.body.sm }}>{row.player_name}</strong>
+            <span style={{ color: F.fgMuted, fontSize: TYPE.meta.xs }}>{row.event_date ?? row.event_year} · {row.date_precision} date</span>
+          </div>
+          <div style={{ color: F.inkSoft, fontSize: TYPE.body.sm, lineHeight: 1.45 }}>
+            {row.position_group ?? 'Position unresolved'} · {moveLabel(row.transaction_type)}
+            {row.from_team_id || row.to_team_id ? ` · ${row.from_team_id ?? 'FA'} → ${row.to_team_id ?? 'FA'}` : ''}
+            {row.compensation_summary ? ` · ${row.compensation_summary}` : ''}
+            {row.contract_apy_dollars != null ? ` · ${formatDollars(row.contract_apy_dollars)} APY` : ''}
+          </div>
+          <div style={{ color: F.fgMuted, fontSize: TYPE.meta.md }}>
+            Player record: {row.identity_confidence}
+            {row.raw_position ? ` · Source position: ${row.raw_position}` : ''}
+            {row.normalization_basis ? ` · Position mapping: ${row.normalization_basis}` : ''}
+            {showInfluence && row.influence_explanation ? ` · ${row.influence_explanation}` : ''}
+          </div>
+          <div style={{ color: sourceRef == null ? F.fgMuted : F.fenway, fontSize: TYPE.meta.xs, fontWeight: 700 }}>
+            {sourceRef == null ? 'Source detail unavailable for this saved result' : `Open exact evidence [${sourceRef}] →`}
+          </div>
+        </button>;
+      })}
+    </div>
+  </section>;
 }
 
 function MethodCard({ title, body }: { title: string; body: string }) {
@@ -374,77 +416,94 @@ function MethodCard({ title, body }: { title: string; body: string }) {
 
 function Metric({ label, value }: { label: string; value: string }) {
   return <div style={{ padding: SPACE.md, border: `1px solid ${F.border}`, borderRadius: RADIUS.md, background: F.surface }}>
-    <div style={{ color: F.fgMuted, fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs, textTransform: 'uppercase', letterSpacing: TRACKING.micro }}>{label}</div>
+    <div style={{ color: F.fgMuted, fontSize: TYPE.meta.xs, textTransform: 'uppercase', letterSpacing: TRACKING.micro }}>{label}</div>
     <div style={{ marginTop: 4, color: F.ink, fontFamily: 'var(--font-display)', fontSize: TYPE.display.md }}>{value}</div>
   </div>;
 }
 
-function Legend({ color, label }: { color: string; label: string }) {
-  return <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-    <span style={{ width: 14, height: 4, borderRadius: 4, background: color }} />{label}
-  </span>;
+function overallReadText(trend: NflPositionMarketTrend): string {
+  if (trend.status === 'insufficient_evidence') return 'Not enough data';
+  if (trend.direction === 'mixed') return 'Mixed signals';
+  return `${trend.status === 'supported' ? 'Clear' : 'Likely'} ${directionNoun(trend.direction)}`;
 }
 
-function StatusBadge({ status }: { status: NflTransactionMarketAnalysis['status'] }) {
-  const supported = status === 'supported';
-  return <span style={{
-    padding: `2px ${SPACE.xs + 2}px`, borderRadius: RADIUS.pill,
-    border: `1px solid ${supported ? F.fenway : F.amber}`,
-    background: supported ? F.surface : F.amberSoft,
-    color: supported ? F.fenway : F.amber,
-    fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs, fontWeight: 700,
-    letterSpacing: TRACKING.micro, textTransform: 'uppercase',
-  }}>{status.replaceAll('_', ' ')}</span>;
+function evidenceStatusLabel(status: NflTransactionMarketAnalysis['status']): string {
+  if (status === 'supported') return 'Strong evidence';
+  if (status === 'directional') return 'Likely trend';
+  return 'Not enough evidence';
 }
 
-function DirectionBadge({ direction, status }: { direction: NflPositionMarketTrend['direction']; status: NflPositionMarketTrend['status'] }) {
-  const color = status === 'supported' && direction === 'growing'
-    ? F.fenway
-    : status === 'supported' && direction === 'shrinking'
-      ? F.inkSoft
-      : F.fgMuted;
-  return <span style={{ color, fontWeight: 700, textTransform: 'capitalize' }}>{direction.replaceAll('_', ' ')}</span>;
+function directionNoun(direction: NflPositionMarketTrend['direction']): string {
+  if (direction === 'growing') return 'growth';
+  if (direction === 'shrinking') return 'decline';
+  if (direction === 'flat') return 'stability';
+  return direction === 'mixed' ? 'mixed signals' : 'uncertainty';
 }
 
-function signalCell(signal: NflTransactionMarketSignal): string {
-  if (signal.status === 'insufficient_evidence' || signal.baseline_value == null || signal.recent_value == null) return 'Insufficient';
+function directionLabel(direction: NflTransactionMarketSignal['direction']): string {
+  if (direction === 'growing') return 'Up';
+  if (direction === 'shrinking') return 'Down';
+  if (direction === 'flat') return 'Stable';
+  if (direction === 'mixed') return 'Mixed';
+  return 'Not enough data';
+}
+
+function technicalSignalCell(signal: NflTransactionMarketSignal): string {
+  if (signal.status === 'insufficient_evidence' || signal.baseline_value == null || signal.recent_value == null) return 'Not enough evidence';
   const delta = signal.recent_value - signal.baseline_value;
   const values = signal.unit === 'events_per_100_player_seasons'
     ? `${formatRateDetailed(signal.baseline_value)} → ${formatRateDetailed(signal.recent_value)} · ${formatSigned(delta / 100, 2)} per 100`
-    : `${formatBasisPointsDetailed(signal.baseline_value)} → ${formatBasisPointsDetailed(signal.recent_value)} · ${formatSigned(delta, 0)} bp`;
-  return `${values} (${signal.direction})`;
+    : `${formatPercentDetailed(signal.baseline_value)} → ${formatPercentDetailed(signal.recent_value)} · ${formatSigned(delta, 0)} bp`;
+  return `${values} (${directionLabel(signal.direction).toLowerCase()})`;
 }
 
-function formatSignalValue(signal: NflTransactionMarketSignal, value: number): string {
-  return signal.unit === 'events_per_100_player_seasons'
-    ? formatRate(value)
-    : formatBasisPoints(value);
+function interpretationForDisplay(value: string): string {
+  return value
+    .replace(/clear the supported multi-signal growth gate/gi, 'show a clear growth trend')
+    .replace(/clear the supported multi-signal shrinkage gate/gi, 'show a clear decline')
+    .replace(/classification rules and evidence gates/gi, 'calculation rules and source limits')
+    .replace(/\bmaterial events\b/gi, 'player moves analyzed')
+    .replace(/\bmobility\b/gi, 'player movement')
+    .replace(/\bmove share\b/gi, 'share of league player movement')
+    .replace(/\bcontract price\b/gi, 'contract cost versus the cap')
+    .replace(/\btrade price\b/gi, 'premium-pick trade return')
+    .replace(/\bidentity coverage\b/gi, 'player records matched')
+    .replace(/\bcohort\b/gi, 'comparison period')
+    .trim();
 }
 
-function formatRate(basisPoints: number): string {
-  return (basisPoints / 100).toFixed(1);
+function supplementalInterpretation(value: string, read: { conclusion: string; implication: string }): string | null {
+  if (!value) return null;
+  const cleanedConclusion = interpretationForDisplay(read.conclusion);
+  const cleanedImplication = interpretationForDisplay(read.implication);
+  const remainder = value
+    .replace(cleanedConclusion, '')
+    .replace(cleanedImplication, '')
+    .replace(/The calculation rules and source limits remain visible below\.?/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return remainder.length >= 24 ? remainder : null;
+}
+
+function newYorkImplication(value: string): string {
+  const stripped = value.replace(/^For New York:\s*/i, '');
+  return stripped.replace(/^./, (letter) => letter.toUpperCase());
+}
+
+function moveLabel(value: string): string {
+  return value.replaceAll('_', ' ').replace(/^./, (letter) => letter.toUpperCase());
 }
 
 function formatRateDetailed(basisPoints: number): string {
   return (basisPoints / 100).toFixed(2);
 }
 
-function formatBasisPoints(basisPoints: number): string {
-  return `${(basisPoints / 100).toFixed(1)}%`;
-}
-
-function formatBasisPointsDetailed(basisPoints: number): string {
+function formatPercentDetailed(basisPoints: number): string {
   return `${(basisPoints / 100).toFixed(2)}%`;
 }
 
 function formatSigned(value: number, precision: number): string {
   return `${value > 0 ? '+' : ''}${value.toFixed(precision)}`;
-}
-
-function formatChange(basisPoints: number | null): string {
-  if (basisPoints == null) return 'change unavailable';
-  const value = basisPoints / 100;
-  return `${value > 0 ? '+' : ''}${value.toFixed(1)}%`;
 }
 
 function formatDollars(value: number): string {
@@ -454,6 +513,12 @@ function formatDollars(value: number): string {
 }
 
 function formatDate(value: string): string {
+  if (/^\d{4}$/.test(value)) return value;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [year, month, day] = value.split('-').map(Number);
+    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      .format(new Date(year, month - 1, day));
+  }
   const parsed = Date.parse(value);
   return Number.isFinite(parsed)
     ? new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(parsed))
@@ -477,10 +542,10 @@ function SectionLabel({ children }: { children: string }) {
 
 const tableHeaderStyle = {
   textAlign: 'left' as const,
-  padding: `${SPACE.xs + 2}px ${SPACE.sm}px`,
+  padding: `${SPACE.sm}px ${SPACE.md}px`,
   background: F.cream50,
   color: F.fgMuted,
-  fontFamily: 'var(--font-mono)',
+  fontFamily: 'var(--font-sans)',
   fontSize: TYPE.meta.xs,
   fontWeight: 700,
   letterSpacing: TRACKING.micro,
@@ -490,10 +555,9 @@ const tableHeaderStyle = {
 
 function tableCellStyle(index: number, total: number) {
   return {
-    padding: `${SPACE.xs + 2}px ${SPACE.sm}px`,
+    padding: `${SPACE.sm}px ${SPACE.md}px`,
     color: F.inkSoft,
     borderBottom: index === total - 1 ? 'none' : `1px solid ${F.border}`,
-    fontVariantNumeric: 'tabular-nums',
-    whiteSpace: 'nowrap' as const,
+    verticalAlign: 'top' as const,
   };
 }

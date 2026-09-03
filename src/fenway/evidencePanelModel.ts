@@ -142,11 +142,11 @@ export function buildEvidencePackModel(
   const usedRefs = uniqueSorted(checkedItems.flatMap((item) => item.refs)).length;
   const backgroundRefCount = uniqueSorted(backgroundItems.flatMap((item) => item.refs)).length;
   const sectionTitle = hasFocus
-    ? selectedOptionRef !== null ? `Audit for option [${selectedOptionRef}]` : 'Focused audit'
-    : 'Claims checked for this answer';
+    ? selectedOptionRef !== null ? `Sources for option [${selectedOptionRef}]` : 'Focused sources'
+    : 'Sources checked for this answer';
 
   return {
-    title: 'Evidence Pack',
+    title: 'Why this answer',
     subtitle: subtitleForModel(hasFocus, selectedOptionRef, checkedItems.length, backgroundRefCount),
     sectionTitle,
     totalRefs: sources.length,

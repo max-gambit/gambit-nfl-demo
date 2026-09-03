@@ -16,6 +16,7 @@ import {
 import {
   buildDeterministicNflTransactionMarketFallback,
   buildNflTransactionMarketSystemBlock,
+  deterministicMarketEventSourceRows,
   deterministicMarketSourceRows,
   evaluateNflTransactionMarketDraft,
   latestNflTransactionMarketAnalysis,
@@ -76,7 +77,7 @@ import {
   transactionMarketRequestFromQuestion,
 } from '../nfl_transactions/question.js';
 import type {
-  AddBriefShareRecipientRequest, Brief, BriefMode, BriefProgress, BriefProgressEventKind, BriefProgressPhase, BriefProgressStreamEvent, BriefShare, BriefShareLink, BriefShareLinkResponse,
+  AddBriefShareRecipientRequest, Brief, BriefMode, BriefProgress, BriefProgressEventKind, BriefProgressPhase, BriefProgressStreamEvent, BriefShare, BriefShareLink, BriefShareLinkResponse, BriefSource,
   BriefShareRecipientResponse, BriefShareSnapshot, CreateBriefRequest, CreateBriefResponse,
   CreateSavedBriefTemplateResponse, ListBriefTemplatesResponse, RegenerateBriefRequest,
   ResolveBriefShareLinkResponse, SavedBriefTemplate, SubmitBriefInput, TeamMember, CbaArticle, DataAnalystTrace,
@@ -222,6 +223,25 @@ briefRoutes.post('/', async (c) => {
   }
 
   const brief = insert.data as Brief;
+
+  // The calculation and its transaction evidence share the same fast clock.
+  // Persist both before returning so every visible comparable is drillable
+  // while the optional model interpretation continues in the background.
+  if (preparedMarketBody?.market_analysis) {
+    const immediateSources = deterministicMarketEvidenceRows(preparedMarketBody.market_analysis, 1)
+      .map((source) => ({ ...source, brief_id: brief.id }));
+    try {
+      await insertMissingBriefSources(brief.id, immediateSources);
+    } catch (error) {
+      const progress = failedBriefProgress(error);
+      const detail = error instanceof Error ? error.message : String(error);
+      await db
+        .from('briefs')
+        .update({ status: 'failed', error: detail, progress, updated_at: progress.updated_at })
+        .eq('id', brief.id);
+      return c.json({ error: 'persist_market_sources_failed', detail }, 500);
+    }
+  }
 
   // Kick off generation in the background — the route returns immediately.
   // Errors are caught and persisted as `status='failed'` rather than crashing.
@@ -1336,6 +1356,11 @@ export async function generateDataAnalysisBrief(
         const provisionalBody = transactionMarketArtifactBody(immediateMarketAnalysis);
         const persisted = await heartbeat.update({ body: provisionalBody });
         if (!persisted) return;
+        await insertMissingBriefSources(
+          brief.id,
+          deterministicMarketEvidenceRows(immediateMarketAnalysis, 1)
+            .map((source) => ({ ...source, brief_id: brief.id })),
+        );
         publishBriefProgress(briefProgressStreamPayload({
           id: brief.id,
           status: 'generating',
@@ -1426,7 +1451,7 @@ export async function generateDataAnalysisBrief(
     if (transactionMarketAnalysis) {
       const validation = evaluateNflTransactionMarketDraft(input, transactionMarketAnalysis);
       if (!validation.ok) input = buildDeterministicNflTransactionMarketFallback(transactionMarketAnalysis);
-      input = bindMarketSourceReferences(input, deterministicMarketSourceRows(transactionMarketAnalysis, 1));
+      input = bindMarketSourceReferences(input, deterministicMarketEvidenceRows(transactionMarketAnalysis, 1));
     }
     await progress.mark(
       'matching_sources',
@@ -1438,7 +1463,9 @@ export async function generateDataAnalysisBrief(
     const maxSourceRefIndex = input.sources.reduce((max, source) => Math.max(max, source.ref_index), 0);
     const traceSources = dataAnalystTracesToBriefSources(dataLookup.traces, maxSourceRefIndex + 1)
       .filter((source) => !transactionMarketAnalysis
-        || (!source.title.startsWith('Source snapshot ·') && source.title !== 'App data · NFL historical transaction market'));
+        || (!source.title.startsWith('Source snapshot ·')
+          && !source.title.startsWith('Transaction ·')
+          && source.title !== 'App data · NFL historical transaction market'));
     const existingSources = [...input.sources, ...traceSources];
     const maxExistingSourceRefIndex = existingSources.reduce((max, source) => Math.max(max, source.ref_index), 0);
     const cbaSources = dataAnalysisCbaCitationSources(
@@ -1448,7 +1475,8 @@ export async function generateDataAnalysisBrief(
       maxExistingSourceRefIndex + 1,
       existingSources,
     );
-    const sourceRows = [...existingSources, ...cbaSources].map((s) => ({ ...s, brief_id: brief.id }));
+    const sourcesToInsert = [...existingSources, ...cbaSources];
+    const sourceRows = sourcesToInsert.map((s) => ({ ...s, brief_id: brief.id }));
     await progress.mark(
       'saving',
       94,
@@ -1458,8 +1486,11 @@ export async function generateDataAnalysisBrief(
     );
 
     if (sourceRows.length > 0) {
-      const sourcesInsert = await db.from('brief_sources').insert(sourceRows);
-      if (sourcesInsert.error) throw new Error(`brief_sources insert failed: ${sourcesInsert.error.message}`);
+      if (transactionMarketAnalysis) await insertMissingBriefSources(brief.id, sourceRows);
+      else {
+        const sourcesInsert = await db.from('brief_sources').insert(sourceRows);
+        if (sourcesInsert.error) throw new Error(`brief_sources insert failed: ${sourcesInsert.error.message}`);
+      }
     }
 
     if (!(await heartbeat.isCurrent())) return;
@@ -1555,6 +1586,31 @@ export function transactionMarketArtifactBody(
     followups: [],
     market_analysis: analysis,
   };
+}
+
+export function deterministicMarketEvidenceRows(
+  analysis: NflTransactionMarketAnalysis,
+  startRefIndex: number,
+) {
+  const snapshots = deterministicMarketSourceRows(analysis, startRefIndex);
+  return [
+    ...snapshots,
+    ...deterministicMarketEventSourceRows(analysis, startRefIndex + snapshots.length),
+  ];
+}
+
+async function insertMissingBriefSources(
+  briefId: string,
+  rows: Array<Omit<BriefSource, 'id'>>,
+): Promise<void> {
+  if (rows.length === 0) return;
+  const existing = await db.from('brief_sources').select('ref_index').eq('brief_id', briefId);
+  if (existing.error) throw new Error(`brief_sources lookup failed: ${existing.error.message}`);
+  const existingRefs = new Set((existing.data ?? []).map((row) => Number(row.ref_index)));
+  const missing = rows.filter((row) => !existingRefs.has(row.ref_index));
+  if (missing.length === 0) return;
+  const inserted = await db.from('brief_sources').insert(missing);
+  if (inserted.error) throw new Error(`brief_sources insert failed: ${inserted.error.message}`);
 }
 
 function bindMarketSourceReferences(
