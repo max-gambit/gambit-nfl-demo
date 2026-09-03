@@ -62,6 +62,7 @@ import {
 import { buildSubmitBriefTool } from '../claude/tools.js';
 import { buildMessagesWithContextGraphLookups } from '../claude/tool_loop.js';
 import { stripBriefModePrefix } from '@shared/briefMode';
+import { transactionMarketAnalysisFromBrief } from '@shared/nflTransactionMarket';
 import {
   BRIEF_TEMPLATE_DEFINITIONS,
   briefModeForTemplate,
@@ -79,7 +80,7 @@ import type {
   BriefShareRecipientResponse, BriefShareSnapshot, CreateBriefRequest, CreateBriefResponse,
   CreateSavedBriefTemplateResponse, ListBriefTemplatesResponse, RegenerateBriefRequest,
   ResolveBriefShareLinkResponse, SavedBriefTemplate, SubmitBriefInput, TeamMember, CbaArticle, DataAnalystTrace,
-  NflTransactionMarketAnalysis, SubmitDataAnalysisInput,
+  DataAnalysisBriefBody, NflTransactionMarketAnalysis, SubmitDataAnalysisInput,
 } from '@shared/types';
 
 export const briefRoutes = new Hono();
@@ -119,8 +120,31 @@ briefRoutes.post('/', async (c) => {
   if (!question) {
     return c.json({ error: 'question required' }, 400);
   }
+  let inheritedMarketAnalysis: NflTransactionMarketAnalysis | null = null;
+  if (body.inherited_market_brief_id !== undefined) {
+    if (typeof body.inherited_market_brief_id !== 'string' || !isUuid(body.inherited_market_brief_id)) {
+      return c.json({ error: 'invalid_inherited_market_brief_id' }, 400);
+    }
+    const inheritedRes = await db
+      .from('briefs')
+      .select('id, session_id, body')
+      .eq('id', body.inherited_market_brief_id)
+      .eq('session_id', session_id)
+      .maybeSingle();
+    if (inheritedRes.error) {
+      return c.json({ error: 'load_inherited_market_scope_failed', detail: inheritedRes.error.message }, 500);
+    }
+    if (!inheritedRes.data) {
+      return c.json({ error: 'inherited_market_brief_not_found' }, 409);
+    }
+    inheritedMarketAnalysis = transactionMarketAnalysisFromBrief(inheritedRes.data as Pick<Brief, 'body'>);
+    if (!inheritedMarketAnalysis) {
+      return c.json({ error: 'inherited_market_scope_unavailable' }, 409);
+    }
+  }
+
   const explicitMode = normalizeBriefMode(body.mode);
-  const transactionMarketQuestion = isNflTransactionMarketQuestion(question);
+  const transactionMarketQuestion = isNflTransactionMarketQuestion(question) || Boolean(inheritedMarketAnalysis);
   const requestedMode = transactionMarketQuestion ? 'data_analyst' : explicitMode ?? parsedQuestion.mode;
   const templateParse = parseBriefTemplateSelection(body.template, body.question);
   if (templateParse.errors.length > 0) {
@@ -158,7 +182,7 @@ briefRoutes.post('/', async (c) => {
 
   // Kick off generation in the background — the route returns immediately.
   // Errors are caught and persisted as `status='failed'` rather than crashing.
-  void generateBriefForMode(brief).catch(async (err) => {
+  void generateBriefForMode(brief, inheritedMarketAnalysis?.query ?? null).catch(async (err) => {
     console.error('[briefs] generate failed', brief.id, err);
     const errorMessage = briefGenerationErrorMessage(err);
     const progress = failedBriefProgress(err);
@@ -580,6 +604,7 @@ export async function regenerateBriefById(
   const briefRes = await db.from('briefs').select('*').eq('id', id).maybeSingle();
   if (briefRes.error || !briefRes.data) return null;
   const existingBrief = briefRes.data as Brief;
+  const inheritedMarketQuery = transactionMarketAnalysisFromBrief(existingBrief)?.query ?? null;
   const preservingTemplate = templateOverride === undefined;
   const templateParse = preservingTemplate
     ? { selection: templateSelectionFromBrief(existingBrief), errors: [] as string[] }
@@ -616,7 +641,7 @@ export async function regenerateBriefById(
   if (reset.error || !reset.data) return null;
   const fresh = reset.data as Brief;
 
-  void generateBriefForMode(fresh).catch(async (err) => {
+  void generateBriefForMode(fresh, inheritedMarketQuery).catch(async (err) => {
     console.error('[briefs] regenerate failed', fresh.id, err);
     const errorMessage = briefGenerationErrorMessage(err);
     const progress = failedBriefProgress(err);
@@ -636,8 +661,11 @@ export async function regenerateBriefById(
   return fresh;
 }
 
-export async function generateBriefForMode(brief: Brief) {
-  if (brief.mode === 'data_analyst') return generateDataAnalysisBrief(brief);
+export async function generateBriefForMode(
+  brief: Brief,
+  inheritedMarketQuery: NflTransactionMarketAnalysis['query'] | null = null,
+) {
+  if (brief.mode === 'data_analyst') return generateDataAnalysisBrief(brief, inheritedMarketQuery);
   return generateBrief(brief);
 }
 
@@ -1216,7 +1244,10 @@ async function maybeRunNflDataAnalysisPrivateCritic(args: {
   }
 }
 
-export async function generateDataAnalysisBrief(brief: Brief) {
+export async function generateDataAnalysisBrief(
+  brief: Brief,
+  inheritedMarketQuery: NflTransactionMarketAnalysis['query'] | null = null,
+) {
   const startedAt = Date.now();
   const heartbeat = startBriefGenerationHeartbeat(brief);
   const progress = createBriefProgressTracker(brief, heartbeat);
@@ -1234,15 +1265,58 @@ export async function generateDataAnalysisBrief(brief: Brief) {
       'Running bounded roster, cap, stats, context, or CBA lookups before answering.',
       'data',
     );
-    let dataLookup = await buildMessagesWithDataAnalystLookups({
-      model: BRIEF_MODEL,
-      max_tokens: 8192,
-      system,
-      messages: [
-        { role: 'user', content: brief.question },
-      ],
-    });
-    dataLookup = await ensureNflTransactionMarketLookup(brief.question, dataLookup);
+    const baseMessages: Anthropic.MessageParam[] = [{ role: 'user', content: brief.question }];
+    const needsTransactionMarket = isNflTransactionMarketQuestion(brief.question) || Boolean(inheritedMarketQuery);
+    let dataLookup;
+    if (needsTransactionMarket) {
+      dataLookup = await ensureNflTransactionMarketLookup(
+        brief.question,
+        { messages: baseMessages, traces: [] },
+        inheritedMarketQuery,
+      );
+      const immediateMarketAnalysis = latestNflTransactionMarketAnalysis(dataLookup.traces);
+      if (!immediateMarketAnalysis) {
+        throw new Error('Required NFL transaction-market analysis was not returned.');
+      }
+      const artifactProgress = await progress.mark(
+        'drafting',
+        36,
+        'Market calculation ready',
+        'Rendering the executed scope, series, comparables, methodology, and limitations while the interpretation is drafted.',
+        'data',
+      );
+      const provisionalBody = transactionMarketArtifactBody(immediateMarketAnalysis);
+      const persisted = await heartbeat.update({ body: provisionalBody });
+      if (!persisted) return;
+      publishBriefProgress(briefProgressStreamPayload({
+        id: brief.id,
+        status: 'generating',
+        error: null,
+        progress: artifactProgress,
+        updated_at: heartbeat.currentUpdatedAt(),
+        body: provisionalBody,
+      }));
+
+      const supplementalLookup = await buildMessagesWithDataAnalystLookups({
+        model: BRIEF_MODEL,
+        max_tokens: 8192,
+        system,
+        messages: dataLookup.messages,
+      }, {
+        excludeToolNames: ['analyze_nfl_transaction_market', 'query_nfl_transaction_comparables'],
+      });
+      dataLookup = {
+        messages: supplementalLookup.messages,
+        traces: [...dataLookup.traces, ...supplementalLookup.traces],
+      };
+    } else {
+      dataLookup = await buildMessagesWithDataAnalystLookups({
+        model: BRIEF_MODEL,
+        max_tokens: 8192,
+        system,
+        messages: baseMessages,
+      });
+    }
     dataLookup = await ensureNflRosterCapDataLookup(brief.question, dataLookup);
     const transactionMarketAnalysis = latestNflTransactionMarketAnalysis(dataLookup.traces);
     const composedNflContext = buildNflContextComposerForDataAnalyst(brief.question, dataLookup.traces, dataLookup.messages);
@@ -1416,6 +1490,21 @@ export async function ensureNflTransactionMarketLookup(
       },
     ],
     traces: [...lookup.traces, trace],
+  };
+}
+
+export function transactionMarketArtifactBody(
+  analysis: NflTransactionMarketAnalysis,
+): DataAnalysisBriefBody {
+  return {
+    kind: 'data_analysis',
+    answer: '',
+    key_findings: [],
+    tables: [],
+    calculations: [],
+    caveats: [],
+    followups: [],
+    market_analysis: analysis,
   };
 }
 
@@ -1902,7 +1991,7 @@ type BriefProgressListener = (payload: BriefProgressStreamEvent) => void;
 const briefProgressListeners = new Map<string, Set<BriefProgressListener>>();
 
 export function briefProgressStreamPayload(
-  brief: Pick<Brief, 'id' | 'status' | 'progress' | 'error' | 'updated_at'>,
+  brief: Pick<Brief, 'id' | 'status' | 'progress' | 'error' | 'updated_at'> & Partial<Pick<Brief, 'body'>>,
 ): BriefProgressStreamEvent {
   return {
     brief_id: brief.id,
@@ -1910,18 +1999,19 @@ export function briefProgressStreamPayload(
     progress: brief.progress,
     updated_at: brief.updated_at,
     error: brief.error ?? null,
+    ...(brief.body !== undefined ? { body: brief.body } : {}),
   };
 }
 
 async function loadBriefProgressStreamPayload(briefId: string): Promise<BriefProgressStreamEvent | null> {
   const res = await db
     .from('briefs')
-    .select('id, status, progress, error, updated_at')
+    .select('id, status, progress, error, updated_at, body')
     .eq('id', briefId)
     .maybeSingle();
   if (res.error) throw new Error(res.error.message);
   if (!res.data) return null;
-  return briefProgressStreamPayload(res.data as Pick<Brief, 'id' | 'status' | 'progress' | 'error' | 'updated_at'>);
+  return briefProgressStreamPayload(res.data as Pick<Brief, 'id' | 'status' | 'progress' | 'error' | 'updated_at' | 'body'>);
 }
 
 function subscribeBriefProgress(briefId: string, listener: BriefProgressListener): () => void {

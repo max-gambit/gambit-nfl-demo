@@ -337,15 +337,18 @@ export interface DataAnalystStreamCallbacks {
 
 export async function buildMessagesWithDataAnalystLookups(
   params: Anthropic.MessageCreateParamsNonStreaming,
+  options: { excludeToolNames?: DataAnalystToolName[] } = {},
 ): Promise<MessagesWithDataAnalystTraces> {
   let messages = [...params.messages];
   const traces: DataAnalystTrace[] = [];
+  const excludedToolNames = new Set(options.excludeToolNames ?? []);
+  const availableTools = dataAnalystTools.filter((tool) => !excludedToolNames.has(tool.name as DataAnalystToolName));
 
   for (let round = 0; round < MAX_TOOL_ROUNDS; round += 1) {
     const response = await createClaudeMessage({
       ...params,
       messages,
-      tools: dataAnalystTools,
+      tools: availableTools,
       tool_choice: { type: 'auto' },
       stream: false,
     });

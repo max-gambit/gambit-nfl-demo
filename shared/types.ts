@@ -58,6 +58,8 @@ export interface BriefProgressStreamEvent {
   progress: BriefProgress | null;
   updated_at: string;
   error: string | null;
+  /** Present when a deterministic artifact is ready before interpretation. */
+  body?: BriefBody | null;
 }
 
 export type BriefTemplateId =
@@ -2639,6 +2641,8 @@ export interface CreateBriefRequest {
   question: string;
   mode?: BriefMode;
   template?: BriefTemplateSelection | BriefTemplateId;
+  /** Prior brief whose executed transaction-market query should seed this question. */
+  inherited_market_brief_id?: string;
 }
 
 export interface CreateBriefResponse {

@@ -15,6 +15,7 @@ import {
 import { runAgent } from '../api/agent';
 import { stripBriefModePrefix } from '@shared/briefMode';
 import { briefModeForTemplate, inferBriefTemplateFromQuestion } from '@shared/briefTemplates';
+import { latestTransactionMarketBriefForActiveAnalysis } from '@shared/nflTransactionMarket';
 import type { AgentKind, Brief, BriefTemplateId, BriefTemplateSelection } from '@shared/types';
 
 const CONTENT_MAX_WIDTH = 760;
@@ -52,6 +53,7 @@ export function SessionFeed({ presenter = false }: { presenter?: boolean }) {
   const [templateManuallySelected, setTemplateManuallySelected] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const focusedRef = useRef<HTMLDivElement>(null);
+  const pendingMarketBriefIdsRef = useRef(new Set<string>());
 
   const session = sessions.find((s) => s.id === activeSessionId) ?? null;
   const suggestedTemplateId = useMemo<BriefTemplateId>(
@@ -74,7 +76,6 @@ export function SessionFeed({ presenter = false }: { presenter?: boolean }) {
       .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
     [briefs, activeSessionId],
   );
-
   // Effective focused brief: explicit selection wins; otherwise default to
   // most-recent in the channel. This means a freshly-loaded channel always
   // has *one* expanded card without forcing a write to expandedBriefId.
@@ -85,6 +86,14 @@ export function SessionFeed({ presenter = false }: { presenter?: boolean }) {
     const last = channelBriefs[channelBriefs.length - 1];
     return last?.id ?? null;
   }, [expandedBriefId, channelBriefs]);
+  const latestMarketBrief = useMemo(
+    () => latestTransactionMarketBriefForActiveAnalysis(
+      channelBriefs,
+      effectiveFocusedId,
+      pendingMarketBriefIdsRef.current,
+    ),
+    [channelBriefs, effectiveFocusedId],
+  );
 
   // Sync activeBriefId with the focused card so OptionsTable / cap strip / etc.
   // follow the user's attention naturally.
@@ -245,10 +254,13 @@ export function SessionFeed({ presenter = false }: { presenter?: boolean }) {
   const submitNewBrief = async (text: string) => {
     const parsed = stripBriefModePrefix(text);
     const q = parsed.question.trim();
-    const template = parsed.mode === 'data_analyst'
+    const continuesMarketAnalysis = Boolean(activeSessionId && latestMarketBrief);
+    const template = continuesMarketAnalysis || parsed.mode === 'data_analyst'
       ? { template_id: 'data_table' as const }
       : (templateManuallySelected ? templateSelection : { template_id: inferBriefTemplateFromQuestion(text) });
-    const mode = briefModeForTemplate(template) ?? parsed.mode ?? 'brief';
+    const mode = continuesMarketAnalysis
+      ? 'data_analyst'
+      : briefModeForTemplate(template) ?? parsed.mode ?? 'brief';
     if (!q || submitting) return;
     setSubmitting(true);
     try {
@@ -261,7 +273,15 @@ export function SessionFeed({ presenter = false }: { presenter?: boolean }) {
         setActiveSession(created.session.id);
         brief = created.brief;
       } else {
-        brief = await createBrief({ session_id: activeSessionId, question: q, mode, template });
+        const inheritedMarketBrief = latestMarketBrief;
+        brief = await createBrief({
+          session_id: activeSessionId,
+          question: q,
+          mode,
+          template,
+          ...(inheritedMarketBrief ? { inherited_market_brief_id: inheritedMarketBrief.id } : {}),
+        });
+        if (inheritedMarketBrief) pendingMarketBriefIdsRef.current.add(brief.id);
 
         // Auto-rename Untitled channels from the first question — this is the
         // signal that the user has actually committed to this channel. Fire-
