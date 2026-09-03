@@ -140,7 +140,7 @@ export function AnalysisWorkspace() {
             type="button"
             className="analysis-evidence-trigger"
             onClick={() => setEvidenceDrawerOpen(true)}
-          >Why this answer</button>
+          >Evidence</button>
           <ChannelHeader />
           <SessionFeed />
         </main>

@@ -84,6 +84,8 @@ import {
 import { runNflSellerMoveConversationTurn } from '../nfl_transactions/seller_move_conversation.js';
 import { classifyNflAnalysisTurn } from '../nfl_transactions/intent.js';
 import { buildNflRuleAnswer } from '../nfl_rules/analysis.js';
+import { loadNflRulesCorpus } from '../nfl_rules/seed.js';
+import { buildNflCurrentAnswer } from '../nfl_current/analysis.js';
 import type {
   AddBriefShareRecipientRequest, Brief, BriefMode, BriefProgress, BriefProgressEventKind, BriefProgressPhase, BriefProgressStreamEvent, BriefShare, BriefShareLink, BriefShareLinkResponse, BriefSource,
   BriefShareRecipientResponse, BriefShareSnapshot, CreateBriefRequest, CreateBriefResponse,
@@ -191,12 +193,16 @@ briefRoutes.post('/', async (c) => {
       sources: [],
     }))
     : null;
+  const preparedCurrentAnswer = intent.kind === 'current_team'
+    ? await buildNflCurrentAnswer(intent.question_kind)
+    : null;
   const explicitMode = normalizeBriefMode(body.mode);
   const transactionMarketQuestion = intent.kind === 'transaction_market';
   const immediateClarification = intent.kind === 'seller_modifier_without_context';
   const marketContextActive = intent.kind === 'seller_move'
     || transactionMarketQuestion
     || Boolean(preparedRuleAnswer)
+    || intent.kind === 'current_team'
     || immediateClarification;
   const requestedMode = marketContextActive
     ? 'data_analyst'
@@ -212,7 +218,7 @@ briefRoutes.post('/', async (c) => {
     ?? requestedMode
     ?? 'brief';
 
-  // Deterministic market, seller, and rule answers are complete before insert,
+  // Deterministic market, current-team, seller, and rule answers are complete before insert,
   // so the POST response itself is renderable and never waits on model prose.
   let preparedMarketBody: DataAnalysisBriefBody | null = null;
   let preparedProgress: BriefProgress | null = null;
@@ -223,7 +229,7 @@ briefRoutes.post('/', async (c) => {
   } else if (preparedSellerMove && preparedSellerTurn) {
     preparedMarketBody = sellerMoveArtifactBody(preparedSellerTurn.market, preparedSellerMove);
     preparedProgress = sellerMoveBriefProgress(preparedSellerMove);
-    preparedSources = deterministicSellerMoveEvidenceRows(preparedSellerMove);
+    preparedSources = await deterministicSellerMoveEvidenceRows(preparedSellerMove);
   } else if (immediateClarification) {
     preparedMarketBody = sellerModifierClarificationBody();
     preparedProgress = readyBriefProgress('Clarification ready', 'The proposed trade needs a player, draft year, and round.');
@@ -231,6 +237,11 @@ briefRoutes.post('/', async (c) => {
     preparedMarketBody = preparedRuleAnswer.body;
     preparedProgress = readyBriefProgress('Rule answer ready', 'The controlling public rule and exact source location are ready.');
     preparedSources = preparedRuleAnswer.sources;
+  } else if (intent.kind === 'current_team') {
+    const currentAnswer = preparedCurrentAnswer!;
+    preparedMarketBody = currentAnswer.body;
+    preparedProgress = readyBriefProgress('Current Giants answer ready', 'The current public team data has been checked.');
+    preparedSources = currentAnswer.sources;
   } else if (transactionMarketQuestion) {
     try {
       const preparedMarketLookup = await ensureNflTransactionMarketLookup(
@@ -1850,7 +1861,7 @@ export function sellerMoveArtifactBody(
   artifact: NflSellerMoveConversationArtifact,
 ): DataAnalysisBriefBody {
   const result = artifact.result;
-  const comparableRefs = result?.comparables.map((_, index) => index + 3) ?? [];
+  const comparableRefs = result?.comparables.map((_, index) => index + 4) ?? [];
   const answer = result
     ? `${result.player.player_name}: New York would receive ${result.proposal.label}. ${result.market.range_label}. The trade creates ${formatSellerMoveDollars(result.cap.current_year_cap_space_created_dollars)} of ${result.cap.current_year} cap space and leaves ${formatSellerMoveDollars(result.cap.current_year_dead_money_dollars)} in dead money.`
     : artifact.message ?? 'This trade cannot be calculated from the available public data.';
@@ -1867,6 +1878,11 @@ export function sellerMoveArtifactBody(
         label: 'Cap consequence',
         body: `${formatSellerMoveDollars(result.cap.current_year_cap_space_created_dollars)} of current-year cap space and ${formatSellerMoveDollars(result.cap.current_year_dead_money_dollars)} of dead money.`,
         source_refs: [1],
+      },
+      {
+        label: 'Trade accounting rule',
+        body: `${result.cap.accounting_timing}; the loaded contract schedule supplies the cap figures shown.`,
+        source_refs: [3],
       },
       {
         label: 'Depth consequence',
@@ -1892,9 +1908,9 @@ export function sellerMoveArtifactBody(
   };
 }
 
-export function deterministicSellerMoveEvidenceRows(
+export async function deterministicSellerMoveEvidenceRows(
   artifact: NflSellerMoveConversationArtifact,
-): Array<Omit<BriefSource, 'id' | 'brief_id'>> {
+): Promise<Array<Omit<BriefSource, 'id' | 'brief_id'>>> {
   const result = artifact.result;
   if (!result) return [];
   const contract: Omit<BriefSource, 'id' | 'brief_id'> = {
@@ -1914,6 +1930,8 @@ export function deterministicSellerMoveEvidenceRows(
         { k: 'Accounting timing', v: result.cap.accounting_timing },
         { k: 'Used in this answer', v: 'Current-year cap and dead-money calculation' },
       ],
+      authority_label: 'Public player contract source',
+      contribution: 'Establishes the current cap charge, cap space created, and dead money used in the trade calculation.',
       seller_move_contract: true,
       player_id: result.player.player_id,
     },
@@ -1933,12 +1951,34 @@ export function deterministicSellerMoveEvidenceRows(
         { k: 'Basis', v: result.depth.basis },
         { k: 'Used in this answer', v: 'Current role and depth consequence' },
       ],
+      authority_label: 'Public roster and role data',
+      contribution: 'Supports the current role and depth consequence shown for the proposed move.',
       seller_move_role: true,
       player_id: result.player.player_id,
     },
   };
+  const tradeRule = (await loadNflRulesCorpus()).rules.find((rule) => rule.rule_family === 'trades');
+  const rule: Omit<BriefSource, 'id' | 'brief_id'> | null = tradeRule ? {
+    ref_index: 3,
+    kind: 'CBA',
+    source: tradeRule.source_document,
+    title: 'Trade cap accounting rule',
+    updated_at: tradeRule.effective_date,
+    data: {
+      source_url: tradeRule.source_url,
+      authority_label: 'Executed NFL-NFLPA collective bargaining agreement',
+      contribution: 'Establishes the timing rule used for the assigning club’s signing-bonus treatment.',
+      rows: [
+        { k: 'Rule', v: tradeRule.summary },
+        { k: 'Exact location', v: tradeRule.source_locator },
+        { k: 'Still to confirm', v: 'League approval, acquiring-club obligations, guarantees, and the live deadline' },
+      ],
+      seller_move_rule: true,
+      rule_family: tradeRule.rule_family,
+    },
+  } : null;
   const comparables = result.comparables.map((row, index): Omit<BriefSource, 'id' | 'brief_id'> => ({
-    ref_index: index + 3,
+    ref_index: index + 4,
     kind: 'ANALYST_DATA',
     source: 'NFL_TRANSACTION_MARKET',
     title: `Transaction · ${row.player_name}`,
@@ -1954,11 +1994,13 @@ export function deterministicSellerMoveEvidenceRows(
         { k: 'Compared with proposal', v: row.comparison_to_proposal },
         { k: 'Used in this answer', v: 'Historical seller-return comparison' },
       ],
+      authority_label: 'Public historical transaction record',
+      contribution: 'Provides a same-position seller return used to compare the proposed draft pick.',
       transaction: { event_id: row.event_id },
       seller_move_comparable: true,
     },
   }));
-  return [contract, role, ...comparables];
+  return [contract, role, ...(rule ? [rule] : []), ...comparables];
 }
 
 function formatSellerMoveDollars(value: number): string {

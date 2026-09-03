@@ -241,7 +241,9 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
     );
   }
 
-  const sourcesNote = sources.length > 0 ? `${sources.length} sources checked` : 'Public source analysis';
+  const sourcesNote = isDataAnalyst
+    ? (sources.length > 0 ? 'Source-backed answer' : 'Public source analysis')
+    : (sources.length > 0 ? `${sources.length} sources checked` : 'Public source analysis');
 
   // Shared button styles — Phase 10 button system anticipated. Three
   // variants: primary (filled fenway), secondary (outline), tertiary (text).
@@ -388,7 +390,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
           )}
         </div>
 
-        {sources.length > 0 && !dataAnalysisBody?.market_analysis && (
+        {sources.length > 0 && !isDataAnalyst && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: SPACE.sm,
             marginTop: SPACE.md, flexWrap: 'wrap',

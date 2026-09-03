@@ -21,7 +21,7 @@ interface CiteProps {
 export function Cite({ n, label }: CiteProps) {
   const refIndex = typeof n === 'number' ? n : Number(n);
   const { activeBriefId, sourcesByBrief } = useBriefs();
-  const { setHighlightedSourceRef, setSourceFilterRef } = useUi();
+  const { setHighlightedSourceRef, setSourceFilterRef, setRailCollapsed } = useUi();
   const [hovered, setHovered] = useState(false);
 
   const sources = activeBriefId ? (sourcesByBrief[activeBriefId] ?? []) : [];
@@ -30,7 +30,9 @@ export function Cite({ n, label }: CiteProps) {
   const data = (source?.data && typeof source.data === 'object') ? source.data as Record<string, unknown> : {};
   const dataRows = (Array.isArray(data.rows) ? data.rows : []) as { k: string; v: string }[];
   const excerpt = typeof data.excerpt === 'string' ? data.excerpt : null;
-  const url = typeof data.url === 'string' ? data.url : null;
+  const url = typeof data.source_url === 'string'
+    ? data.source_url
+    : typeof data.url === 'string' ? data.url : null;
   const isCba = source?.kind === 'CBA';
   const cbaArticle = isCba && typeof data.article === 'string' ? data.article : null;
   const cbaSection = isCba && typeof data.section === 'string' ? data.section : null;
@@ -54,14 +56,18 @@ export function Cite({ n, label }: CiteProps) {
       window.open(url, '_blank', 'noopener,noreferrer');
       return;
     }
-    setSourceFilterRef(null);
+    setSourceFilterRef(refIndex);
     setHighlightedSourceRef(refIndex);
+    setRailCollapsed(false);
+    fire('v6d3cf:open-evidence', { ref: refIndex });
   };
 
   const onOpenInRail = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSourceFilterRef(refIndex);
     setHighlightedSourceRef(refIndex);
+    setRailCollapsed(false);
+    fire('v6d3cf:open-evidence', { ref: refIndex });
   };
 
   return (
@@ -180,7 +186,7 @@ export function Cite({ n, label }: CiteProps) {
               border: 'none', borderRadius: 5,
               fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 600,
               cursor: 'pointer',
-            }}>Open Evidence Pack →</button>
+            }}>Open evidence →</button>
             {url && (
               <span style={{
                 fontFamily: 'var(--font-mono)', fontSize: 9.5, color: F.fgFaint,

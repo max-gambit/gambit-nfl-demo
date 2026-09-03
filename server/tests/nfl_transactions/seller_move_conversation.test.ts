@@ -11,6 +11,7 @@ import {
   resolveNflSellerMoveConversationTurn,
 } from '../../src/nfl_transactions/seller_move_conversation.js';
 import { loadReviewedNflTransactionSnapshot } from '../../src/nfl_transactions/seed.js';
+import { deterministicSellerMoveEvidenceRows } from '../../src/routes/briefs.js';
 
 const GENERATED_AT = '2026-09-03T16:00:00.000Z';
 
@@ -35,6 +36,20 @@ test('a market-analysis continuation resolves a full Giants seller proposal', as
   assert.equal(artifact.result?.proposal.pick_year, 2027);
   assert.equal(artifact.result?.proposal.pick_round, 2);
   assert(artifact.result?.comparables.length);
+});
+
+test('seller answers cite contract, role, the trade rule, and historical comparables', async () => {
+  const fixture = await liveFixture();
+  const artifact = answer(fixture, 'What if we moved Brian Burns for a 2027 second?', null);
+  const sources = await deterministicSellerMoveEvidenceRows(artifact);
+
+  assert.equal(sources[0]?.data?.seller_move_contract, true);
+  assert.equal(sources[1]?.data?.seller_move_role, true);
+  assert.equal(sources[2]?.ref_index, 3);
+  assert.equal(sources[2]?.data?.seller_move_rule, true);
+  assert.match(String(sources[2]?.data?.source_url), /^https:/);
+  assert.equal(sources[3]?.ref_index, 4);
+  assert.equal(sources[3]?.data?.seller_move_comparable, true);
 });
 
 test('round-only continuation changes the proposal and market evidence but not player-dependent figures', async () => {
@@ -83,7 +98,18 @@ test('incomplete and unknown-player proposals ask one concise clarification', as
   assert.equal(missingReturn.status, 'clarification');
   assert.equal(missingReturn.message, 'What draft year and round should New York receive?');
   assert.equal(unknownPlayer.status, 'clarification');
-  assert.match(unknownPlayer.message ?? '', /could not match that name to the current Giants roster/i);
+  assert.match(unknownPlayer.message ?? '', /could not find Smith in the current Giants roster or cap sheet/i);
+});
+
+test('Dexter Lawrence follows the loaded current roster truth and suggests sourced Giants linemen', async () => {
+  const fixture = await liveFixture();
+  const dexter = resolve(fixture, 'What if we moved Dexter Lawrence for a 2027 second?', null);
+
+  assert.equal(fixture.seed.roster_entries.some((row) => row.team_id === 'NYG' && row.player_name === 'Dexter Lawrence'), false);
+  assert.equal(dexter.status, 'clarification');
+  assert.match(dexter.message ?? '', /could not find Dexter Lawrence in the current Giants roster or cap sheet as of 2026-09-02/i);
+  assert.match(dexter.message ?? '', /same position with usable contract data include/i);
+  assert.match(dexter.message ?? '', /DJ Reader|Darius Alexander|Bobby Jamison-Travis/i);
 });
 
 test('player resolution distinguishes roster match, incomplete contract data, ambiguity, and typo suggestions', async () => {

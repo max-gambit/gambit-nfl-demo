@@ -4,11 +4,13 @@ import type {
 } from '@shared/types';
 import { isNflTransactionMarketQuestion, positionGroupsFromQuestion } from './question.js';
 import { parseNflSellerMoveTurn } from './seller_move_conversation.js';
+import { classifyNflCurrentQuestion, type NflCurrentQuestionKind } from '../nfl_current/analysis.js';
 
 export type NflAnalysisTurnIntent =
   | { kind: 'rules' }
   | { kind: 'seller_move' }
   | { kind: 'seller_modifier_without_context' }
+  | { kind: 'current_team'; question_kind: NflCurrentQuestionKind }
   | { kind: 'transaction_market'; inherited_query: NflTransactionMarketResolvedQuery | null }
   | { kind: 'general' };
 
@@ -34,6 +36,9 @@ export function classifyNflAnalysisTurn(
   if (!context.seller_scenario && isSellerMoveModifier(value)) {
     return { kind: 'seller_modifier_without_context' };
   }
+
+  const currentQuestion = classifyNflCurrentQuestion(value);
+  if (currentQuestion) return { kind: 'current_team', question_kind: currentQuestion };
 
   if (context.market_query && isNflTransactionMarketFollowup(value)) {
     return { kind: 'transaction_market', inherited_query: context.market_query };

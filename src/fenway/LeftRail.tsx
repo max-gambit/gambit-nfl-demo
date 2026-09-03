@@ -127,6 +127,20 @@ export function LeftRail({ extra = null, contentOverride = null, collapsed = fal
     );
   }
 
+  if (!evidenceModel.hasCompletedAnswer) {
+    return (
+      <nav className="gd-scroll" style={{
+        width: 320, background: F.paper,
+        borderRight: `1px solid ${F.border}`,
+        display: 'flex', flexDirection: 'column', flexShrink: 0,
+        overflow: 'visible', position: 'relative',
+      }}>
+        <RailToggle onToggle={onToggle} />
+        <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>{extra}</div>
+      </nav>
+    );
+  }
+
   return (
     <nav className="gd-scroll" style={{
       width: 320, background: F.paper,
@@ -150,7 +164,7 @@ export function LeftRail({ extra = null, contentOverride = null, collapsed = fal
               fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.sm, fontWeight: 600,
               color: F.fenway, letterSpacing: TRACKING.caps, textTransform: 'uppercase',
             }}>
-              {selectedOptionRef !== null ? `Option [${selectedOptionRef}] evidence` : 'Focused evidence'} · {sourceFilterRefs.map((ref) => `[${ref}]`).join(' ')}
+              {selectedOptionRef !== null ? 'Selected option evidence' : 'Cited evidence'}
             </span>
             <div style={{ flex: 1 }} />
             <button onClick={() => setSourceFilterRefs(null)} style={{
@@ -196,8 +210,8 @@ export function LeftRail({ extra = null, contentOverride = null, collapsed = fal
               fontSize: TYPE.body.sm,
               fontWeight: 600,
             }}>
-              <span>{showBackground ? 'Hide background evidence' : 'Show background evidence'}</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.md }}>{backgroundItems.length}</span>
+              <span>{showBackground ? 'Hide additional sources' : 'Show all sources'}</span>
+              <span aria-hidden="true">{showBackground ? '−' : '+'}</span>
             </button>
             {showBackground && (
               <div style={{ marginTop: SPACE.sm }}>
@@ -350,6 +364,15 @@ function EvidenceCard({
             WebkitLineClamp: 2,
             overflow: 'hidden',
           }}>{item.title}</div>
+          {item.proof && (
+            <div style={{
+              marginTop: 4,
+              fontFamily: 'var(--font-sans)',
+              fontSize: TYPE.body.sm,
+              color: F.inkSoft,
+              lineHeight: 1.35,
+            }}>{item.proof}</div>
+          )}
           <div style={{
             marginTop: SPACE.sm,
             display: 'flex',
@@ -364,7 +387,6 @@ function EvidenceCard({
             {item.meta && <span>{item.meta}</span>}
             {item.freshness && item.meta && <span>·</span>}
             {item.freshness && <span>{item.freshness}</span>}
-            <RefChips refs={item.refs} compact />
           </div>
         </div>
 
@@ -391,16 +413,6 @@ function EvidenceCard({
           display: 'grid',
           gap: SPACE.xs,
         }}>
-          {item.proof && (
-            <div style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: TYPE.body.sm,
-              color: F.inkSoft,
-              lineHeight: 1.35,
-            }}>
-              {item.proof}
-            </div>
-          )}
           {item.claim && (
             <div style={{
               padding: `${SPACE.xs + 2}px ${SPACE.sm}px`,
@@ -424,7 +436,7 @@ function EvidenceCard({
                 color: F.fgMuted,
                 letterSpacing: TRACKING.micro,
                 textTransform: 'uppercase',
-              }}>Supporting records</div>
+              }}>Details</div>
               {item.rows.map((row) => (
                 <EvidenceChildRow key={row.key} row={row} onOpenSource={onOpenSource} />
               ))}
@@ -438,8 +450,8 @@ function EvidenceCard({
 
 function itemTypeLabel(item: EvidencePackItem): string {
   if (item.type === 'option') return 'Option hinge';
-  if (item.type === 'background') return 'Background evidence';
-  return 'Source checked';
+  if (item.type === 'background') return 'Additional source';
+  return 'Evidence';
 }
 
 function EvidenceChildRow({ row, onOpenSource }: { row: EvidenceCheckRow; onOpenSource: (refIndex: number) => void }) {
@@ -490,39 +502,8 @@ function EvidenceChildRow({ row, onOpenSource }: { row: EvidenceCheckRow; onOpen
           </span>
         )}
       </span>
-      <span style={{
-        fontFamily: 'var(--font-mono)',
-        fontSize: TYPE.meta.sm,
-        color: F.fenway,
-        fontWeight: 700,
-      }}>[{row.refIndex}]</span>
+      <span aria-hidden="true" style={{ color: F.fenway, fontWeight: 700 }}>→</span>
     </button>
-  );
-}
-
-function RefChips({ refs, compact = false }: { refs: number[]; compact?: boolean }) {
-  return (
-    <div style={{
-      display: 'inline-flex',
-      flexWrap: 'wrap',
-      gap: 3,
-      marginTop: compact ? 0 : SPACE.sm,
-      verticalAlign: 'middle',
-    }}>
-      {refs.map((ref) => (
-        <span key={ref} style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: compact ? TYPE.meta.xs : TYPE.meta.sm,
-          color: F.fenway,
-          background: F.fenwaySoft,
-          border: `1px solid ${F.border}`,
-          borderRadius: RADIUS.sm,
-          padding: compact ? `0 ${SPACE.xs}px` : `1px ${SPACE.xs + 1}px`,
-          fontWeight: 700,
-          lineHeight: compact ? 1.35 : undefined,
-        }}>[{ref}]</span>
-      ))}
-    </div>
   );
 }
 
@@ -536,13 +517,13 @@ function EmptyEvidenceState({ focusActive }: { focusActive: boolean }) {
       color: F.fgMuted,
       lineHeight: 1.5,
     }}>
-      {focusActive ? 'No source matched this option.' : 'Sources will appear here once the answer finishes.'}
+      {focusActive ? 'No source matched this citation.' : 'No material evidence was attached to this answer.'}
     </div>
   );
 }
 
 function primarySectionTitle(sectionTitle: string, focusActive: boolean, visibleCount: number, totalRefs: number): string {
   if (focusActive) return sectionTitle;
-  if (visibleCount === 0 && totalRefs > 0) return 'Sources for this answer';
+  if (visibleCount === 0 && totalRefs > 0) return 'Evidence for this answer';
   return sectionTitle;
 }

@@ -11,16 +11,36 @@ const HIDDEN_KEYS = new Set([
   'source_ref_ids',
   'raw_source_record',
   'snapshot_id',
+  'rows',
+  'contribution',
+  'authority_label',
+  'authority_type',
+  'source_status',
+  'evidence_status',
+  'provenance',
+  'source_hash',
+  'checksum_sha256',
+  'rule_family',
+  'transaction',
   'seller_move_contract',
   'seller_move_role',
+  'seller_move_rule',
   'seller_move_comparable',
+  'current_team_cap_summary',
+  'current_team_contract',
+  'current_team_roster',
+  'current_team_depth',
+  'current_team_role_history',
 ]);
 const MAX_RECORDS = 30;
 
 export function NflSourceDetail({ source, onBack }: { source: BriefSource; onBack: () => void }) {
   const data = isRecord(source.data) ? source.data : {};
   const asOf = firstStringDeep(data, ['as_of_date', 'as_of', 'season']) ?? source.updated_at;
-  const boundary = firstStringDeep(data, ['source_status', 'evidence_status', 'provenance']) ?? 'Captured public source';
+  const boundary = firstStringDeep(data, ['authority_label', 'authority', 'source_document']) ?? sourceAuthority(source);
+  const contribution = typeof data.contribution === 'string' ? data.contribution : null;
+  const rows = detailRows(data);
+  const remainingData = Object.fromEntries(Object.entries(data).filter(([key]) => !HIDDEN_KEYS.has(key) && !URL_KEYS.has(key)));
   const sourceUrls = collectUrls(data);
 
   return (
@@ -28,23 +48,33 @@ export function NflSourceDetail({ source, onBack }: { source: BriefSource; onBac
       <button type="button" onClick={onBack} style={{
         border: 'none', background: 'transparent', color: F.fenway,
         padding: 0, cursor: 'pointer', fontWeight: 700, fontSize: TYPE.body.sm,
-      }}>← Why this answer</button>
+      }}>← Evidence for this answer</button>
       <div style={{ marginTop: SPACE['2xl'] }}>
         <span style={{
           fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs, fontWeight: 700,
           color: F.fenway, textTransform: 'uppercase', letterSpacing: TRACKING.micro,
         }}>{sourceKindLabel(source)}</span>
         <h2 style={{ margin: `${SPACE.sm}px 0`, fontFamily: 'var(--font-display)', fontSize: TYPE.display.lg }}>{source.title}</h2>
-        <p style={{ margin: 0, color: F.fgMuted, fontSize: TYPE.body.sm }}>{source.source ?? 'Public NFL source'} · ref [{source.ref_index}]</p>
+        <p style={{ margin: 0, color: F.fgMuted, fontSize: TYPE.body.sm }}>{source.source ?? 'Public NFL source'}</p>
       </div>
       <dl style={{ margin: `${SPACE['2xl']}px 0`, borderTop: `1px solid ${F.border}` }}>
         <Fact label="As of" value={asOf ?? 'Not supplied'} />
-        <Fact label="Source status" value={boundary} />
+        <Fact label="Authority" value={boundary} />
       </dl>
 
-      {Object.keys(data).length > 0 ? <StructuredValue value={data} /> : (
-        <EmptyState>This source did not include structured detail data.</EmptyState>
-      )}
+      {contribution && <section style={{ marginBottom: SPACE.xl }}>
+        <SectionLabel>What this establishes</SectionLabel>
+        <p style={{ margin: 0, color: F.inkSoft, fontSize: TYPE.body.sm, lineHeight: 1.5 }}>{contribution}</p>
+      </section>}
+
+      {rows.length > 0 && <section style={{ marginBottom: SPACE.xl }}>
+        <SectionLabel>Details</SectionLabel>
+        <dl style={{ margin: 0, borderTop: `1px solid ${F.border}` }}>
+          {rows.map((row, index) => <Fact key={`${row.k}-${index}`} label={row.k} value={row.v} />)}
+        </dl>
+      </section>}
+
+      {hasVisibleData(remainingData) && <StructuredValue value={remainingData} />}
 
       {sourceUrls.length > 0 && (
         <section style={{ marginTop: SPACE.xl }}>
@@ -55,7 +85,7 @@ export function NflSourceDetail({ source, onBack }: { source: BriefSource; onBac
                 color: F.fenway, fontSize: TYPE.body.sm, fontWeight: 700, overflowWrap: 'anywhere',
               }}>Open {sourceLabel(url)} ↗</a>
             ))}
-            {sourceUrls.length > 12 && <small style={{ color: F.fgMuted }}>Showing 12 of {sourceUrls.length} captured links.</small>}
+            {sourceUrls.length > 12 && <small style={{ color: F.fgMuted }}>Additional source links are available.</small>}
           </div>
         </section>
       )}
@@ -216,4 +246,19 @@ function sourceKindLabel(source: BriefSource): string {
   if (source.data?.seller_move_role === true) return 'Roster source';
   if (source.data?.seller_move_comparable === true) return 'Transaction source';
   return 'Public data';
+}
+
+function detailRows(data: Record<string, unknown>): Array<{ k: string; v: string }> {
+  if (!Array.isArray(data.rows)) return [];
+  return data.rows.flatMap((row) => {
+    if (!isRecord(row) || typeof row.k !== 'string') return [];
+    return [{ k: row.k, v: displayValue(row.v) }];
+  });
+}
+
+function sourceAuthority(source: BriefSource): string {
+  if (source.kind === 'CBA') return 'Executed NFL-NFLPA collective bargaining agreement';
+  if (source.kind === 'ROSTER') return 'Official public roster';
+  if (source.kind === 'CONTRACT' || source.kind === 'CAP') return 'Public contract and cap source';
+  return 'Public NFL data source';
 }

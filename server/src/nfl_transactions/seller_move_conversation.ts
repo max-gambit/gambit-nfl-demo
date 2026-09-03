@@ -181,9 +181,14 @@ export function resolveNflSellerMoveConversationTurn(
     }
     if (resolution.kind === 'missing') {
       const suggestions = resolution.suggestions.length
-        ? ` Did you mean ${joinNames(resolution.suggestions)}?`
+        ? resolution.suggestionKind === 'same_position'
+          ? ` Giants players at the same position with usable contract data include ${joinNames(resolution.suggestions)}.`
+          : ` Did you mean ${joinNames(resolution.suggestions)}?`
         : '';
-      return clarificationArtifact(scenario, `I could not match that name to the current Giants roster.${suggestions}`);
+      return clarificationArtifact(
+        scenario,
+        `I could not find ${scenario.player_query} in the current Giants roster or cap sheet as of ${seed.as_of_date}.${suggestions}`,
+      );
     }
     scenario.player_id = resolution.player.player_id;
     scenario.player_name = resolution.player.player_name;
@@ -248,7 +253,7 @@ type PlayerResolution =
   | { kind: 'resolved'; player: NflSellerMovePlayerOption }
   | { kind: 'ambiguous'; names: string[] }
   | { kind: 'unsupported'; playerName: string }
-  | { kind: 'missing'; suggestions: string[] };
+  | { kind: 'missing'; suggestions: string[]; suggestionKind: 'same_position' | 'name' };
 
 function resolvePlayer(query: string, seed: NflDemoSeed, snapshot: NflTransactionMarketSnapshot): PlayerResolution {
   const options = buildNflSellerMoveOptions(seed, 'NYG', POSITION_GROUPS, snapshot).positions.flatMap((position) => position.players);
@@ -260,10 +265,33 @@ function resolvePlayer(query: string, seed: NflDemoSeed, snapshot: NflTransactio
   const rosterMatches = matchingNames(query, activeRoster.map((row) => row.player_name));
   if (rosterMatches.length === 1) return { kind: 'unsupported', playerName: rosterMatches[0] };
   if (rosterMatches.length > 1) return { kind: 'ambiguous', names: rosterMatches };
-  return {
-    kind: 'missing',
-    suggestions: suggestedNames(query, activeRoster.map((row) => row.player_name)),
-  };
+  const samePosition = samePositionSuggestions(query, options, seed, snapshot);
+  return samePosition
+    ? { kind: 'missing', suggestions: samePosition, suggestionKind: 'same_position' }
+    : { kind: 'missing', suggestions: suggestedNames(query, activeRoster.map((row) => row.player_name)), suggestionKind: 'name' };
+}
+
+function samePositionSuggestions(
+  query: string,
+  options: NflSellerMovePlayerOption[],
+  seed: NflDemoSeed,
+  snapshot: NflTransactionMarketSnapshot,
+): string[] | null {
+  const needle = normalizeName(query);
+  const positionGroups = new Set(snapshot.events
+    .filter((event) => event.identity_confidence === 'matched'
+      && event.position_group != null
+      && normalizeName(event.player_name) === needle)
+    .map((event) => event.position_group!));
+  if (positionGroups.size !== 1) return null;
+  const capByPlayer = new Map(seed.cap_rows.map((row) => [row.player_id, row.cap_number_2026 ?? -1]));
+  const suggestions = options
+    .filter((player) => positionGroups.has(player.position_group))
+    .sort((left, right) => (capByPlayer.get(right.player_id) ?? -1) - (capByPlayer.get(left.player_id) ?? -1)
+      || left.player_name.localeCompare(right.player_name))
+    .slice(0, 3)
+    .map((player) => player.player_name);
+  return suggestions.length ? suggestions : null;
 }
 
 function suggestedNames(query: string, names: string[]): string[] {

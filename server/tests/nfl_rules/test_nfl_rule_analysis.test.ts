@@ -9,9 +9,19 @@ test('post-June trade question returns a plain-language answer with exact CBA lo
   assert.match(result.body.answer, /advance post-June 1 designation is a release mechanism/i);
   assert.doesNotMatch(result.body.answer, /submit_brief|options|sources|required fields/i);
   assert.equal(result.sources[0]?.kind, 'CBA');
+  assert.equal(result.sources.length, 1);
   const rows = result.sources[0]?.data?.rows as Array<{ k: string; v: string }>;
   assert.match(rows.find((row) => row.k === 'Exact location')?.v ?? '', /Article 13, Section 6/);
   assert.match(String(result.sources[0]?.data?.source_url), /March-15-2020-NFL-NFLPA/);
+});
+
+test('rule answers use one deduplicated authority and a natural caveat', async () => {
+  const result = await buildNflRuleAnswer('Can the Giants restructure a contract?');
+
+  assert.equal(result.sources.length, 1);
+  assert.match(result.body.caveats[0] ?? '', /does not show whether a specific player can be restructured/i);
+  assert.doesNotMatch(result.body.caveats[0] ?? '', /does not prove a unilateral restructure right/i);
+  assert.match(String(result.sources[0]?.data?.contribution), /supports the rule stated in this answer/i);
 });
 
 test('every rule family recognized by conversational routing can clear retrieval scoring', async () => {

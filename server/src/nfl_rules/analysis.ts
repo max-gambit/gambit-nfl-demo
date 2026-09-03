@@ -32,9 +32,9 @@ export async function buildNflRuleAnswer(question: string): Promise<PreparedNflR
   const primary = matches[0].rule;
   const answer = primary.rule_family === 'post_june_1_accounting'
     ? 'For a trade completed after June 1, the original club generally carries the current-year bonus charge and moves acceleration tied to future years into the following league year. An advance post-June 1 designation is a release mechanism, not a way to designate a trade early. The exact cap result still depends on the player’s bonus schedule, guarantees, and the actual trade date.'
-    : `${primary.summary} ${plainBoundary(primary.analysis_boundary)}`;
+    : `${primary.summary} ${plainBoundary(primary)}`;
 
-  const selected = matches.map((item) => item.rule);
+  const selected = [primary];
   const sources = selected.map((rule, index): Omit<BriefSource, 'id' | 'brief_id'> => ({
     ref_index: index + 1,
     kind: 'CBA',
@@ -43,13 +43,15 @@ export async function buildNflRuleAnswer(question: string): Promise<PreparedNflR
     updated_at: rule.effective_date,
     data: {
       source_url: rule.source_url,
+      authority_label: 'Executed NFL-NFLPA collective bargaining agreement',
+      contribution: `${rule.source_locator} supports the rule stated in this answer.`,
       rows: [
         { k: 'Rule', v: rule.title },
         { k: 'Authority', v: rule.source_document },
         { k: 'Exact location', v: rule.source_locator },
         { k: 'Effective date', v: rule.effective_date },
         { k: 'What it says', v: rule.summary },
-        { k: 'What still needs checking', v: plainBoundary(rule.analysis_boundary) },
+        { k: 'What still needs checking', v: plainBoundary(rule) },
       ],
       rule_family: rule.rule_family,
     },
@@ -66,7 +68,7 @@ export async function buildNflRuleAnswer(question: string): Promise<PreparedNflR
       }],
       tables: [],
       calculations: [],
-      caveats: [plainBoundary(primary.analysis_boundary)],
+      caveats: [plainBoundary(primary)],
       followups: [],
     },
     sources,
@@ -95,12 +97,31 @@ function scoreRule(rule: NflRuleRow, question: string): number {
   return score;
 }
 
-function plainBoundary(value: string): string {
-  return value
-    .replace(/^Do not infer\s+/i, 'This source does not establish ')
-    .replace(/^The rule neither proves\s+/i, 'This rule does not prove ')
-    .replace(/^Designation availability,/i, 'Before relying on it, confirm designation availability,')
-    .replace(/^Trade approval,/i, 'Before relying on it, confirm trade approval,')
-    .replace(/^Without sourced/i, 'Without sourced')
-    .trim();
+function plainBoundary(rule: NflRuleRow): string {
+  switch (rule.rule_family) {
+    case 'restructure_conversion':
+      return 'The CBA rule does not show whether a specific player can be restructured or how much room that contract could create.';
+    case 'post_june_1_accounting':
+      return 'Before acting, confirm the player’s bonus schedule, guarantees, transaction date, and whether the proposed designation is available.';
+    case 'franchise_transition_tag':
+      return 'Confirm the current league-year tender amount and the player’s eligibility before using this rule in a decision.';
+    case 'rookie_contract_options':
+      return 'Confirm the player’s draft round, accrued contract year, option tier, and current deadline before acting.';
+    case 'practice_squad_roster_management':
+      return 'Confirm the current league memo, player eligibility, prior elevations, and active-roster limits before acting.';
+    case 'injury_lists':
+      return 'A public roster label does not establish a medical prognosis, return date, or guaranteed-salary treatment.';
+    case 'waivers':
+      return 'Confirm credited seasons, transaction timing, and the live waiver order before acting.';
+    case 'compensatory_picks':
+      return 'This section does not establish the free-agent compensatory formula, so no compensatory-pick projection is being made.';
+    case 'trades':
+      return 'Before acting, confirm league approval, the acquiring club’s obligations, contract guarantees, and the current trade deadline.';
+    case 'salary_cap_accounting':
+      return 'This public material is not a club cap certification; exact room and league adjustments still require current club and league records.';
+    case 'extensions':
+      return 'Without sourced proposed terms, no exact extension savings are being claimed.';
+    default:
+      return rule.analysis_boundary;
+  }
 }
