@@ -201,7 +201,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
               Gambit Analyst
             </div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.md, color: F.fgMuted, marginTop: 1 }}>
-              Market answer ready · interpretation in progress
+              Live analysis ready · football interpretation in progress
             </div>
           </div>
           <span style={{

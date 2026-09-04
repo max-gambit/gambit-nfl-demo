@@ -12,6 +12,7 @@ import {
   sellerMarketForTurn,
 } from '../../src/nfl_transactions/seller_move_conversation.js';
 import { loadReviewedNflTransactionSnapshot } from '../../src/nfl_transactions/seed.js';
+import { evaluateNflArtifactInterpretation } from '../../src/claude/nfl_transaction_market_guardrails.js';
 import { deterministicSellerMoveEvidenceRows, sellerMoveArtifactBody } from '../../src/routes/briefs.js';
 
 const GENERATED_AT = '2026-09-03T16:00:00.000Z';
@@ -81,8 +82,38 @@ test('compound seller bodies request both live result surfaces', async () => {
   const body = sellerMoveArtifactBody(fixture.market, artifact, true);
 
   assert.equal(body.combined_market_seller_analysis, true);
+  assert.equal(body.analysis_interpretation_status, 'pending');
   assert.equal(body.market_analysis, fixture.market);
   assert.equal(body.seller_move_analysis, artifact);
+});
+
+test('seller interpretation must preserve the calculated player and historical range', async () => {
+  const fixture = await liveFixture();
+  const artifact = answer(fixture, 'What if we moved Brian Burns for a 2027 second?', null);
+  const result = artifact.result!;
+  assert(result.market.range);
+  const grounded = `${result.player.player_name} for the proposed pick sits ${result.market.range} the historical range. For New York, the cap and depth costs should be weighed against that market return.`;
+  const wrongRange = result.market.range === 'above' ? 'below' : 'above';
+  const unsupported = `${result.player.player_name} for the proposed pick sits ${wrongRange} the historical range. For New York, the cap and depth costs should be weighed against that market return.`;
+
+  assert.deepEqual(evaluateNflArtifactInterpretation(grounded, fixture.market, artifact), { ok: true, issues: [] });
+  const rejected = evaluateNflArtifactInterpretation(unsupported, fixture.market, artifact);
+  assert.equal(rejected.ok, false);
+  assert(rejected.issues.some((issue) => /calculation says/i.test(issue)));
+});
+
+test('seller interpretation cannot swap cap space and dead money or change the proposed pick', async () => {
+  const fixture = await liveFixture();
+  const artifact = answer(fixture, 'What if we moved Brian Burns for a 2027 second?', null);
+  const result = artifact.result!;
+  assert(result.market.range);
+  const swapped = `${result.player.player_name} for a 2028 first sits ${result.market.range} the historical range. New York would create $${result.cap.current_year_dead_money_dollars.toLocaleString('en-US')} in cap space and carry $${result.cap.current_year_cap_space_created_dollars.toLocaleString('en-US')} in dead money.`;
+  const rejected = evaluateNflArtifactInterpretation(swapped, fixture.market, artifact);
+
+  assert.equal(rejected.ok, false);
+  assert(rejected.issues.some((issue) => /cap space figure/i.test(issue)));
+  assert(rejected.issues.some((issue) => /dead money figure/i.test(issue)));
+  assert(rejected.issues.some((issue) => /changes the user proposal/i.test(issue)));
 });
 
 test('seller answers cite contract, role, the trade rule, and historical comparables', async () => {
@@ -243,7 +274,10 @@ test('the active Analysis path contains no embedded form or retired cap room', a
 
   assert.doesNotMatch(marketView, /NflModelMove|Model a move|Seller-side check/);
   assert.doesNotMatch(dataBody, /NflModelMove|Model a move|Seller-side check/);
-  assert.match(dataBody, /combined_market_seller_analysis[\s\S]+NflTransactionMarketAnalysisView[\s\S]+NflSellerMoveAnalysis/);
+  assert.match(dataBody, /combined_market_seller_analysis[\s\S]+NflSellerMoveAnalysis[\s\S]+NflTransactionMarketAnalysisView/);
+  assert.doesNotMatch(marketView, /nflTransactionMarketFootballRead/);
+  assert.match(marketView, /nfl-ai-football-read/);
+  assert.match(marketView, /legacyInterpretationStatus/);
 });
 
 let fixturePromise: Promise<Awaited<ReturnType<typeof buildLiveFixture>>> | null = null;

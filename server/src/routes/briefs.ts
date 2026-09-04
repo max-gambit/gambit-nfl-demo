@@ -18,6 +18,7 @@ import {
   buildNflTransactionMarketSystemBlock,
   deterministicMarketEventSourceRows,
   deterministicMarketSourceRows,
+  evaluateNflArtifactInterpretation,
   evaluateNflTransactionMarketDraft,
   latestNflTransactionMarketAnalysis,
 } from '../claude/nfl_transaction_market_guardrails.js';
@@ -65,7 +66,6 @@ import { buildMessagesWithContextGraphLookups } from '../claude/tool_loop.js';
 import { inferBriefModeFromQuestion, stripBriefModePrefix } from '@shared/briefMode';
 import {
   latestSellerMoveScenarioForSession,
-  nflTransactionMarketFootballRead,
   sellerMoveScenarioFromBrief,
   transactionMarketAnalysisFromBrief,
 } from '@shared/nflTransactionMarket';
@@ -98,8 +98,13 @@ export const briefRoutes = new Hono();
 const DEFAULT_SHARE_TEAM_ID = 'GSW';
 const BRIEF_GENERATION_HEARTBEAT_MS = 60_000;
 export const BRIEF_GENERATION_DEADLINE_MS = 14_000;
+export const NFL_ARTIFACT_INTERPRETATION_DEADLINE_MS = 30_000;
 const MAX_BRIEF_PROGRESS_EVENTS = 12;
 type DataAnalysisLookup = { messages: Anthropic.MessageParam[]; traces: DataAnalystTrace[] };
+type NflArtifactInterpretationContext = {
+  market: NflTransactionMarketAnalysis;
+  seller_move: NflSellerMoveConversationArtifact | null;
+};
 export type BriefGenerationGuard = { isActive: () => boolean };
 const ALWAYS_ACTIVE_GENERATION: BriefGenerationGuard = { isActive: () => true };
 const activeBriefGenerations = new Map<string, symbol>();
@@ -218,11 +223,13 @@ briefRoutes.post('/', async (c) => {
     ?? requestedMode
     ?? 'brief';
 
-  // Deterministic market, current-team, seller, and rule answers are complete before insert,
-  // so the POST response itself is renderable and never waits on model prose.
+  // Source-backed calculations are complete before insert so the POST response
+  // is immediately renderable. Market and seller results then receive a
+  // separate, bounded model-written football interpretation.
   let preparedMarketBody: DataAnalysisBriefBody | null = null;
   let preparedProgress: BriefProgress | null = null;
   let preparedSources: Array<Omit<BriefSource, 'id' | 'brief_id'>> = [];
+  let preparedInterpretation: NflArtifactInterpretationContext | null = null;
   if (intent.kind === 'seller_move' && !preparedSellerTurn) {
     preparedMarketBody = unavailableSellerAnswerBody();
     preparedProgress = readyBriefProgress('Trade check unavailable', 'The public contract or transaction source could not be loaded.');
@@ -240,6 +247,12 @@ briefRoutes.post('/', async (c) => {
         ...deterministicMarketEvidenceRows(preparedSellerTurn.market, sellerSources.length + 1),
       ]
       : sellerSources;
+    if (preparedSellerMove.status === 'answered') {
+      preparedInterpretation = {
+        market: preparedSellerTurn.market,
+        seller_move: preparedSellerMove,
+      };
+    }
   } else if (immediateClarification) {
     preparedMarketBody = sellerModifierClarificationBody();
     preparedProgress = readyBriefProgress('Clarification ready', 'The proposed trade needs a player, draft year, and round.');
@@ -262,14 +275,23 @@ briefRoutes.post('/', async (c) => {
       const analysis = latestNflTransactionMarketAnalysis(preparedMarketLookup.traces);
       if (!analysis) throw new Error('Required NFL transaction-market analysis was not returned.');
       preparedMarketBody = transactionMarketArtifactBody(analysis);
-      preparedProgress = readyBriefProgress('Market answer ready', 'The live calculation, comparison, transactions, and sources are ready.');
+      preparedProgress = marketArtifactBriefProgress();
       preparedSources = deterministicMarketEvidenceRows(analysis, 1);
+      preparedInterpretation = { market: analysis, seller_move: null };
     } catch (error) {
       return c.json({
         error: 'transaction_market_analysis_failed',
         detail: briefGenerationErrorMessage(error),
       }, 503);
     }
+  }
+
+  if (preparedMarketBody && preparedInterpretation) {
+    preparedMarketBody = {
+      ...preparedMarketBody,
+      analysis_interpretation_status: 'pending',
+    };
+    preparedProgress = marketArtifactBriefProgress();
   }
 
   // Insert generating brief.
@@ -283,10 +305,10 @@ briefRoutes.post('/', async (c) => {
       template_base_id: templateSelection.base_template_id ?? null,
       custom_template_id: templateSelection.custom_template_id ?? null,
       template_instructions: templateSelection.instructions ?? null,
-      thesis: preparedMarketBody?.answer ?? null,
+      thesis: preparedMarketBody?.answer || null,
       body: preparedMarketBody,
       progress: preparedProgress ?? initialBriefProgress(),
-      status: preparedMarketBody ? 'ready' : 'generating',
+      status: preparedInterpretation || !preparedMarketBody ? 'generating' : 'ready',
     })
     .select()
     .single();
@@ -314,8 +336,17 @@ briefRoutes.post('/', async (c) => {
     }
   }
 
-  // Deterministic answers are complete before this response. They do not wait
-  // for or invite a model to reinterpret sourced rules, terms, or calculations.
+  if (preparedMarketBody && preparedInterpretation) {
+    void generateNflArtifactInterpretationWithDeadline(
+      brief,
+      preparedMarketBody,
+      preparedInterpretation,
+    );
+    const response: CreateBriefResponse = { brief };
+    return c.json(response, 201);
+  }
+
+  // Direct factual and clarification answers are complete before this response.
   if (preparedMarketBody) {
     const response: CreateBriefResponse = { brief };
     return c.json(response, 201);
@@ -1598,6 +1629,210 @@ async function maybeRunNflDataAnalysisPrivateCritic(args: {
   }
 }
 
+export async function composeNflArtifactInterpretation(
+  args: {
+    question: string;
+    market: NflTransactionMarketAnalysis;
+    seller_move: NflSellerMoveConversationArtifact | null;
+  },
+  callModel: typeof createClaudeMessage = createClaudeMessage,
+): Promise<string> {
+  const sellerResult = args.seller_move?.result ?? null;
+  const formattedMarketFacts = buildDeterministicNflTransactionMarketFallback(args.market);
+  const tradeOnly = args.market.query.transaction_types.length === 1
+    && args.market.query.transaction_types[0] === 'trade';
+  const system: Anthropic.TextBlockParam[] = [
+    {
+      type: 'text',
+      text: [
+        'You are Gambit’s NFL front-office analyst. Write the football judgment; do not merely repeat the table.',
+        'The server-calculated market and contract facts below are authoritative. Reason across the signals, reconcile conflicts, and explain the practical implication for the New York Giants.',
+        'Lead with the direct conclusion. Be specific about what changed, what did not, and why that matters for trade posture.',
+        sellerResult
+          ? 'The named-player trade is only a user-proposed scenario. Evaluate its historical range and football tradeoffs without recommending that New York execute it.'
+          : 'Do not invent a player move or proposed trade.',
+        sellerResult?.market.range
+          ? `For the proposed return, explicitly include the exact phrase “${sellerResult.market.range} the historical range” from the calculation.`
+          : sellerResult
+            ? 'The proposed return does not have enough comparison data for an above, within, or below classification; say that plainly.'
+            : '',
+        'Use only facts, transactions, periods, and figures present in the supplied data. Never imply causation from statistical influence.',
+        tradeOnly
+          ? 'This query is trades-only. Describe transaction share as the position’s share of league trades, never as a share of all material moves.'
+          : 'Describe the transaction scope exactly as listed in the supplied data.',
+        'Avoid internal product language such as deterministic, artifact, runtime, preflight, evidence boundary, supported gate, or model.',
+        'Return two short plain-English paragraphs, no headings or bullets, totaling at most 150 words.',
+      ].join('\n'),
+    },
+    { type: 'text', text: buildNflTransactionMarketSystemBlock(args.market) },
+    {
+      type: 'text',
+      text: [
+        '=== HUMAN-READABLE CALCULATION VALUES ===',
+        'Raw signal fields are stored as basis points. Use the formatted values below for units; do not describe raw basis-point integers as events per 100 players.',
+        JSON.stringify({
+          key_findings: formattedMarketFacts.key_findings,
+          tables: formattedMarketFacts.tables,
+          calculations: formattedMarketFacts.calculations,
+          caveats: formattedMarketFacts.caveats,
+        }),
+      ].join('\n'),
+    },
+    ...(sellerResult ? [{
+      type: 'text' as const,
+      text: [
+        '=== USER-PROPOSED GIANTS SELLER SCENARIO ===',
+        'These proposal, cap, depth, and comparable values were calculated by the server. Distinguish the user proposal from sourced facts.',
+        JSON.stringify(args.seller_move),
+      ].join('\n'),
+    }] : []),
+  ];
+  const messages: Anthropic.MessageParam[] = [{
+    role: 'user',
+    content: `Question: ${args.question}\n\nWrite the grounded football interpretation now.`,
+  }];
+
+  const first = await callModel({
+    model: BRIEF_MODEL,
+    max_tokens: 1200,
+    system,
+    messages,
+  });
+  let answer = nflArtifactInterpretationText(first);
+  let validation = evaluateNflArtifactInterpretation(answer, args.market, args.seller_move);
+  if (validation.ok) return answer;
+
+  const revised = await callModel({
+    model: BRIEF_MODEL,
+    max_tokens: 1200,
+    system,
+    messages: [
+      ...messages,
+      { role: 'assistant', content: answer },
+      {
+        role: 'user',
+        content: `Revise once using only the supplied facts. Correct these grounding problems:\n- ${validation.issues.join('\n- ')}\nReturn only the two corrected paragraphs.`,
+      },
+    ],
+  });
+  answer = nflArtifactInterpretationText(revised);
+  validation = evaluateNflArtifactInterpretation(answer, args.market, args.seller_move);
+  if (!validation.ok) {
+    throw new Error(`nfl_artifact_interpretation_rejected: ${validation.issues.join(' | ')}`);
+  }
+  return answer;
+}
+
+async function generateNflArtifactInterpretationWithDeadline(
+  brief: Brief,
+  immediateBody: DataAnalysisBriefBody,
+  context: NflArtifactInterpretationContext,
+): Promise<void> {
+  const startedAt = Date.now();
+  const generation = beginBriefGeneration(brief.id);
+  let timer: NodeJS.Timeout | null = null;
+  try {
+    const answer = await Promise.race([
+      composeNflArtifactInterpretation({
+        question: brief.question,
+        market: context.market,
+        seller_move: context.seller_move,
+      }),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(
+          () => reject(new Error('nfl_artifact_interpretation_deadline_exceeded')),
+          NFL_ARTIFACT_INTERPRETATION_DEADLINE_MS,
+        );
+      }),
+    ]);
+    if (!generation.isActive()) return;
+    const body: DataAnalysisBriefBody = {
+      ...immediateBody,
+      answer,
+      analysis_interpretation_status: 'ready',
+    };
+    const progress = readyBriefProgress(
+      'Analysis ready',
+      'The live calculation, football interpretation, and source cards are ready.',
+    );
+    const updated = await db
+      .from('briefs')
+      .update({
+        thesis: answer,
+        body,
+        status: 'ready',
+        error: null,
+        progress,
+        duration_ms: Date.now() - startedAt,
+        updated_at: progress.updated_at,
+      })
+      .eq('id', brief.id)
+      .eq('status', 'generating')
+      .select('updated_at')
+      .maybeSingle();
+    if (updated.error) throw new Error(`NFL interpretation update failed: ${updated.error.message}`);
+    if (!updated.data) return;
+    publishBriefProgress(briefProgressStreamPayload({
+      id: brief.id,
+      status: 'ready',
+      error: null,
+      progress,
+      updated_at: (updated.data as Pick<Brief, 'updated_at'>).updated_at,
+      body,
+    }));
+  } catch (error) {
+    if (!generation.isActive()) return;
+    console.warn('[briefs] NFL football interpretation unavailable; keeping sourced result', brief.id, error);
+    const body: DataAnalysisBriefBody = {
+      ...immediateBody,
+      analysis_interpretation_status: 'unavailable',
+    };
+    const progress = readyBriefProgress(
+      'Live analysis ready',
+      'The sourced calculation is ready; the football interpretation is unavailable.',
+    );
+    const updated = await db
+      .from('briefs')
+      .update({
+        body,
+        status: 'ready',
+        error: null,
+        progress,
+        duration_ms: Date.now() - startedAt,
+        updated_at: progress.updated_at,
+      })
+      .eq('id', brief.id)
+      .eq('status', 'generating')
+      .select('updated_at')
+      .maybeSingle();
+    if (updated.error) {
+      console.error('[briefs] failed to settle sourced NFL result', brief.id, updated.error);
+      return;
+    }
+    if (!updated.data) return;
+    publishBriefProgress(briefProgressStreamPayload({
+      id: brief.id,
+      status: 'ready',
+      error: null,
+      progress,
+      updated_at: (updated.data as Pick<Brief, 'updated_at'>).updated_at,
+      body,
+    }));
+  } finally {
+    if (timer) clearTimeout(timer);
+    generation.stop();
+  }
+}
+
+function nflArtifactInterpretationText(response: Anthropic.Message): string {
+  const text = response.content
+    .flatMap((block) => block.type === 'text' ? [block.text] : [])
+    .join('\n')
+    .trim();
+  if (!text) throw new Error(`nfl_artifact_interpretation_missing_text: ${response.stop_reason ?? 'unknown'}`);
+  return text;
+}
+
 export async function generateDataAnalysisBrief(
   brief: Brief,
   inheritedMarketQuery: NflTransactionMarketAnalysis['query'] | null = null,
@@ -1805,6 +2040,7 @@ export async function generateDataAnalysisBrief(
           caveats: input.caveats,
           followups: input.followups,
           ...(transactionMarketAnalysis ? { market_analysis: transactionMarketAnalysis } : {}),
+          ...(transactionMarketAnalysis ? { analysis_interpretation_status: 'ready' as const } : {}),
         },
         status: 'ready',
         progress: readyProgress,
@@ -1878,21 +2114,16 @@ export async function ensureNflTransactionMarketLookup(
 export function transactionMarketArtifactBody(
   analysis: NflTransactionMarketAnalysis,
 ): DataAnalysisBriefBody {
-  const read = Array.isArray(analysis.position_trends)
-    ? nflTransactionMarketFootballRead(analysis)
-    : {
-      conclusion: 'The live market calculation is ready.',
-      implication: 'For New York: review the executed position scope and supporting transactions before setting a trade posture.',
-    };
   return {
     kind: 'data_analysis',
-    answer: `${read.conclusion} ${read.implication}`,
+    answer: '',
     key_findings: [],
     tables: [],
     calculations: [],
     caveats: [],
     followups: [],
     market_analysis: analysis,
+    analysis_interpretation_status: 'pending',
   };
 }
 
@@ -1939,12 +2170,9 @@ export function sellerMoveArtifactBody(
 ): DataAnalysisBriefBody {
   const result = artifact.result;
   const comparableRefs = result?.comparables.map((_, index) => index + 4) ?? [];
-  const answer = result
-    ? `${result.player.player_name}: New York would receive ${result.proposal.label}. ${result.market.range_label}. The trade creates ${formatSellerMoveDollars(result.cap.current_year_cap_space_created_dollars)} of ${result.cap.current_year} cap space and leaves ${formatSellerMoveDollars(result.cap.current_year_dead_money_dollars)} in dead money.`
-    : artifact.message ?? 'This trade cannot be calculated from the available public data.';
   return {
     kind: 'data_analysis',
-    answer,
+    answer: result ? '' : artifact.message ?? 'This trade cannot be calculated from the available public data.',
     key_findings: result ? [
       {
         label: 'Historical return',
@@ -1982,6 +2210,7 @@ export function sellerMoveArtifactBody(
     ] : [],
     market_analysis: market,
     seller_move_analysis: artifact,
+    ...(result ? { analysis_interpretation_status: 'pending' as const } : {}),
     ...(showMarketAnalysis ? { combined_market_seller_analysis: true } : {}),
   };
 }
@@ -2728,10 +2957,10 @@ function initialBriefProgress(label = 'Brief queued'): BriefProgress {
 
 export function marketArtifactBriefProgress(): BriefProgress {
   return briefProgressSnapshot({
-    phase: 'ready',
-    pct: 100,
-    label: 'Market answer ready',
-    detail: 'The live calculation, comparison, transactions, and sources are ready.',
+    phase: 'drafting',
+    pct: 60,
+    label: 'Live analysis ready',
+    detail: 'The calculation and sources are ready; the football interpretation is being written.',
     kind: 'data',
   });
 }

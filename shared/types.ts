@@ -201,6 +201,8 @@ export interface DataAnalysisBriefBody {
   seller_move_analysis?: NflSellerMoveConversationArtifact;
   /** The user asked for a market read and a seller check in the same turn. */
   combined_market_seller_analysis?: boolean;
+  /** The sourced result renders first; the model-written football read follows. */
+  analysis_interpretation_status?: 'pending' | 'ready' | 'unavailable';
 }
 
 export type BriefBody = RecommendationBriefBody | DataAnalysisBriefBody;

@@ -1,6 +1,7 @@
 import type {
   BriefSource,
   NflPositionMarketTrend,
+  NflSellerMoveConversationArtifact,
   NflTransactionMarketAnalysis,
   SubmitDataAnalysisInput,
 } from '@shared/types';
@@ -21,17 +22,23 @@ export function latestNflTransactionMarketAnalysis(
 export function evaluateNflTransactionMarketDraft(
   draft: SubmitDataAnalysisInput,
   analysis: NflTransactionMarketAnalysis,
+  sellerMoveAnalysis: NflSellerMoveConversationArtifact | null = null,
 ): NflTransactionMarketGuardrailResult {
   const text = dataAnalysisText(draft);
   const issues: string[] = [];
-  const allowedPositions = new Set(analysis.query.position_groups);
+  const sellerResult = sellerMoveAnalysis?.result ?? null;
+  const allowedPositions = new Set([
+    ...analysis.query.position_groups,
+    ...(sellerResult ? [sellerResult.player.position_group] : []),
+  ]);
   const artifactNames = new Set([
     ...analysis.comparables,
     ...analysis.influential_transactions,
+    ...(sellerResult ? [sellerResult.player, ...sellerResult.comparables] : []),
   ].map((row) => row.player_name.toLowerCase()));
 
   for (const number of numericTokens(text)) {
-    if (!allowedNumericTokens(analysis).has(number)) {
+    if (!allowedNumericTokens(analysis, sellerMoveAnalysis).has(number)) {
       issues.push(`Numeric token ${number} is absent from the deterministic artifact.`);
     }
   }
@@ -50,10 +57,14 @@ export function evaluateNflTransactionMarketDraft(
     issues.push('The answer omits the deterministic mobility methodology.');
   }
 
-  const unsupportedPrice = analysis.position_trends.some((trend) => (
-    (trend.contract_price.status === 'insufficient_evidence' || trend.trade_compensation.status === 'insufficient_evidence')
-    && new RegExp(`\\b${trend.position_group}\\b[^.]{0,160}\\b(price|premium|expensive|cheap|cost)`, 'i').test(text)
-  ));
+  const unsupportedPrice = analysis.position_trends.some((trend) => proseSentences(text).some((sentence) => {
+    if (!new RegExp(`\\b${trend.position_group}\\b`, 'i').test(sentence)) return false;
+    if (/\b(?:insufficient|unavailable|not enough|cannot support|does not support)\b/i.test(sentence)) return false;
+    return (trend.contract_price.status === 'insufficient_evidence'
+        && /\b(?:contract (?:price|cost)|apy|guarantee|expensive|cheap)\b/i.test(sentence))
+      || (trend.trade_compensation.status === 'insufficient_evidence'
+        && /\b(?:trade (?:price|return)|compensation|premium[- ]pick)\b/i.test(sentence));
+  }));
   if (unsupportedPrice) issues.push('The answer makes a price claim for a position with an insufficient price sample.');
 
   for (const match of text.matchAll(/\b(QB|RB|WR|TE|OT|IOL|EDGE|IDL|LB|CB|S|ST)\b/g)) {
@@ -77,7 +88,31 @@ export function evaluateNflTransactionMarketDraft(
     }
   }
 
+  validateSellerMoveInterpretation(draft.answer, sellerMoveAnalysis, issues);
+
   return { ok: issues.length === 0, issues: [...new Set(issues)] };
+}
+
+/**
+ * Validate model-written football reasoning while keeping the calculation,
+ * methodology, limitations, and source list server-owned.
+ */
+export function evaluateNflArtifactInterpretation(
+  answer: string,
+  analysis: NflTransactionMarketAnalysis,
+  sellerMoveAnalysis: NflSellerMoveConversationArtifact | null = null,
+): NflTransactionMarketGuardrailResult {
+  const governedBody = buildDeterministicNflTransactionMarketFallback(analysis);
+  const validation = evaluateNflTransactionMarketDraft({ ...governedBody, answer }, analysis, sellerMoveAnalysis);
+  const answerNumbers = new Set(numericTokens(answer));
+  const issues = validation.issues.filter((issue) => {
+    const numeric = issue.match(/^Numeric token ([\d.]+) /)?.[1];
+    return numeric == null || answerNumbers.has(numeric);
+  });
+  validateInterpretationDirections(answer, analysis, issues);
+  validateSellerMoneyClaims(answer, sellerMoveAnalysis, issues);
+  validateSellerProposalClaims(answer, sellerMoveAnalysis, issues);
+  return { ok: issues.length === 0, issues };
 }
 
 export function buildNflTransactionMarketSystemBlock(analysis: NflTransactionMarketAnalysis): string {
@@ -266,7 +301,10 @@ function dataAnalysisText(draft: SubmitDataAnalysisInput): string {
   ].join('\n');
 }
 
-function allowedNumericTokens(analysis: NflTransactionMarketAnalysis): Set<string> {
+function allowedNumericTokens(
+  analysis: NflTransactionMarketAnalysis,
+  sellerMoveAnalysis: NflSellerMoveConversationArtifact | null = null,
+): Set<string> {
   const values = new Set<string>(['0', '1', '2', '3', '5', '10', '20', '85', '95', '100']);
   const visit = (value: unknown) => {
     if (typeof value === 'number' && Number.isFinite(value)) {
@@ -277,6 +315,8 @@ function allowedNumericTokens(analysis: NflTransactionMarketAnalysis): Set<strin
         values.add(Math.round(candidate / 1_000).toString());
         values.add((candidate / 1_000_000).toFixed(1).replace(/\.0$/, ''));
       }
+    } else if (typeof value === 'string') {
+      for (const token of numericTokens(value)) values.add(token);
     } else if (Array.isArray(value)) {
       value.forEach(visit);
     } else if (value && typeof value === 'object') {
@@ -284,6 +324,7 @@ function allowedNumericTokens(analysis: NflTransactionMarketAnalysis): Set<strin
     }
   };
   visit(analysis);
+  visit(sellerMoveAnalysis);
   for (const trend of analysis.position_trends) {
     for (const signal of [trend.mobility, trend.transaction_share, trend.contract_price, trend.trade_compensation]) {
       if (signal.baseline_value != null && signal.recent_value != null) {
@@ -293,6 +334,212 @@ function allowedNumericTokens(analysis: NflTransactionMarketAnalysis): Set<strin
   }
   values.add(String(analysis.query.end_year - analysis.query.start_year + 1));
   return values;
+}
+
+function validateSellerMoveInterpretation(
+  answer: string,
+  sellerMoveAnalysis: NflSellerMoveConversationArtifact | null,
+  issues: string[],
+): void {
+  const result = sellerMoveAnalysis?.result;
+  if (!result) return;
+  if (!answer.toLowerCase().includes(result.player.player_name.toLowerCase())) {
+    issues.push(`The interpretation omits the proposed player, ${result.player.player_name}.`);
+  }
+
+  const statedRanges = new Set(
+    [...answer.toLowerCase().matchAll(/\b(?:(above|below)(?:[-\s]+the)?(?:[-\s]+typical|[-\s]+historical|[-\s]+market)?[-\s]+range|within(?:[-\s]+the)?(?:[-\s]+typical|[-\s]+historical|[-\s]+market)?[-\s]+range)\b/g)]
+      .map((match) => match[1] ?? 'within'),
+  );
+  if (result.market.range) {
+    if (!statedRanges.has(result.market.range)) {
+      issues.push(`The interpretation does not state the calculated ${result.market.range}-range market result.`);
+    }
+    for (const stated of statedRanges) {
+      if (stated !== result.market.range) {
+        issues.push(`The interpretation calls the proposed return ${stated}, but the calculation says ${result.market.range}.`);
+      }
+    }
+  } else if (statedRanges.size > 0) {
+    issues.push('The interpretation assigns a historical range despite insufficient comparison data.');
+  }
+}
+
+function validateInterpretationDirections(
+  answer: string,
+  analysis: NflTransactionMarketAnalysis,
+  issues: string[],
+): void {
+  for (const sentence of proseSentences(answer)) {
+    const mentioned = analysis.position_trends.filter((trend) => (
+      new RegExp(`\\b${trend.position_group}\\b`, 'i').test(sentence)
+    ));
+    if (mentioned.length !== 1) continue;
+    const trend = mentioned[0];
+    for (const clause of interpretationClauses(sentence)) {
+      const claimed = claimedDirection(clause);
+      if (!claimed) continue;
+      const signal = signalForClaim(clause, trend);
+      const expected = typeof signal === 'object' && signal != null ? signal.direction : trend.direction;
+      const status = typeof signal === 'object' && signal != null ? signal.status : trend.status;
+      if (status === 'insufficient_evidence') {
+        issues.push(`The interpretation assigns ${claimed} direction to ${trend.position_group} despite insufficient evidence.`);
+      } else if (expected !== claimed) {
+        issues.push(`The interpretation calls the ${trend.position_group} ${signalLabel(clause)} ${claimed}, but the calculation says ${expected}.`);
+      }
+    }
+  }
+}
+
+function claimedDirection(value: string): NflPositionMarketTrend['direction'] | null {
+  const matches = new Set<NflPositionMarketTrend['direction']>();
+  if (/\b(?:growing|growth|increased|increasing|rose|rising|expanded|strengthened)\b/i.test(value)) matches.add('growing');
+  if (/\b(?:shrinking|shrank|declined|declining|decreased|fell|falling|cooled|contracted|fewer)\b/i.test(value)) matches.add('shrinking');
+  if (/\b(?:flat|stable|steady|unchanged|held)\b/i.test(value)) matches.add('flat');
+  if (/\b(?:mixed|conflicting|conflict|diverged|diverging|disagree)\b/i.test(value)) matches.add('mixed');
+  return matches.size === 1 ? [...matches][0] : null;
+}
+
+function signalLabel(value: string): string {
+  if (/\b(?:compensation|premium[- ]pick|day[- ]one|day[- ]two|pick share|trade return)\b/i.test(value)) return 'trade-return signal';
+  if (/\b(?:contract|apy|guarantee)\b/i.test(value)) return 'contract-cost signal';
+  if (/\b(?:move share|share of)\b/i.test(value)) return 'share-of-moves signal';
+  if (/\b(?:movement|mobility|activity|volume|per 100)\b/i.test(value)) return 'player-movement signal';
+  return 'overall market read';
+}
+
+function validateSellerMoneyClaims(
+  answer: string,
+  sellerMoveAnalysis: NflSellerMoveConversationArtifact | null,
+  issues: string[],
+): void {
+  const result = sellerMoveAnalysis?.result;
+  if (!result) return;
+  for (const sentence of proseSentences(answer)) {
+    for (const claim of moneyClaims(sentence)) {
+      const field = nearestMoneyField(sentence, claim.index);
+      if (!field) {
+        issues.push(`The interpretation includes an unbound money claim (${claim.raw}).`);
+        continue;
+      }
+      let expected: number[];
+      if (field === 'cap_space') {
+        expected = [result.cap.current_year_cap_space_created_dollars];
+      } else if (field === 'dead_money') {
+        expected = [
+          result.cap.current_year_dead_money_dollars,
+          ...(result.cap.next_year ? [result.cap.next_year.accelerated_dead_money_dollars] : []),
+        ];
+      } else if (field === 'scheduled_cap') {
+        expected = [
+          result.cap.current_cap_number_dollars,
+          ...(result.cap.next_year ? [result.cap.next_year.scheduled_cap_dollars] : []),
+        ];
+      } else {
+        expected = result.cap.next_year ? [result.cap.next_year.cap_effect_dollars] : [];
+      }
+      if (!expected.some((value) => moneyClaimMatches(claim, value))) {
+        issues.push(`The ${field.replaceAll('_', ' ')} figure ${claim.raw} does not match that field in the seller calculation.`);
+      }
+    }
+  }
+}
+
+function validateSellerProposalClaims(
+  answer: string,
+  sellerMoveAnalysis: NflSellerMoveConversationArtifact | null,
+  issues: string[],
+): void {
+  const result = sellerMoveAnalysis?.result;
+  if (!result) return;
+  const player = escapeRegExp(result.player.player_name);
+  const round = '(first|second|third|fourth|fifth|sixth|seventh|[1-7](?:st|nd|rd|th)?|R[1-7]|Round\\s+[1-7])';
+  const patterns = [
+    new RegExp(`\\b(20\\d{2})\\s+${round}(?:[-\\s]+round)?(?:[-\\s]+pick)?[^.!?]{0,35}\\bfor\\s+${player}\\b`, 'gi'),
+    new RegExp(`\\b${player}\\b[^.!?]{0,35}\\bfor\\s+(?:a\\s+)?(20\\d{2})\\s+${round}`, 'gi'),
+  ];
+  for (const pattern of patterns) {
+    for (const match of answer.matchAll(pattern)) {
+      const year = Number(match[1]);
+      const pickRound = parseRoundClaim(match[2]);
+      if (year !== result.proposal.pick_year || pickRound !== result.proposal.pick_round) {
+        issues.push(`The interpretation changes the user proposal to ${year} round ${pickRound ?? 'unknown'}.`);
+      }
+    }
+  }
+}
+
+type MoneyClaim = {
+  raw: string;
+  amount: number;
+  unit: 'dollars' | 'thousand' | 'million';
+  decimals: number;
+  index: number;
+};
+
+function moneyClaims(value: string): MoneyClaim[] {
+  const claims: MoneyClaim[] = [];
+  const pattern = /(\$)?\s*(\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s*(million|thousand|[mk])?\b/gi;
+  for (const match of value.matchAll(pattern)) {
+    if (!match[1] && !match[3]) continue;
+    const numeric = Number(match[2].replaceAll(',', ''));
+    if (!Number.isFinite(numeric)) continue;
+    const suffix = (match[3] ?? '').toLowerCase();
+    claims.push({
+      raw: match[0].trim(),
+      amount: numeric,
+      unit: suffix === 'm' || suffix === 'million' ? 'million' : suffix === 'k' || suffix === 'thousand' ? 'thousand' : 'dollars',
+      decimals: match[2].split('.')[1]?.length ?? 0,
+      index: match.index ?? 0,
+    });
+  }
+  return claims;
+}
+
+function nearestMoneyField(
+  value: string,
+  claimIndex: number,
+): 'cap_space' | 'dead_money' | 'scheduled_cap' | 'cap_effect' | null {
+  const patterns: Array<{
+    field: 'cap_space' | 'dead_money' | 'scheduled_cap' | 'cap_effect';
+    regex: RegExp;
+  }> = [
+    { field: 'cap_space', regex: /\b(?:cap space|space created|cap savings|cap relief)\b/gi },
+    { field: 'dead_money', regex: /\b(?:dead money|dead cap|accelerat(?:ed|ing|ion)|dead)\b/gi },
+    { field: 'scheduled_cap', regex: /\b(?:scheduled cap|cap number|cap hit)\b/gi },
+    { field: 'cap_effect', regex: /\b(?:next[- ]year cap effect|cap effect)\b/gi },
+  ];
+  const afterClaim = value.slice(claimIndex);
+  const afterCandidates = patterns.flatMap(({ field, regex }) => (
+    [...afterClaim.matchAll(regex)].map((match) => ({ field, distance: match.index ?? 0 }))
+  ));
+  if (afterCandidates.length > 0) {
+    return afterCandidates.sort((left, right) => left.distance - right.distance)[0].field;
+  }
+  const candidates = patterns.flatMap(({ field, regex }) => (
+    [...value.matchAll(regex)].map((match) => ({ field, distance: Math.abs((match.index ?? 0) - claimIndex) }))
+  ));
+  return candidates.sort((left, right) => left.distance - right.distance)[0]?.field ?? null;
+}
+
+function moneyClaimMatches(claim: MoneyClaim, expectedDollars: number): boolean {
+  const expected = Math.abs(expectedDollars);
+  const divisor = claim.unit === 'million' ? 1_000_000 : claim.unit === 'thousand' ? 1_000 : 1;
+  return claim.amount === Number((expected / divisor).toFixed(claim.decimals));
+}
+
+function parseRoundClaim(value: string): number | null {
+  const normalized = value.toLowerCase()
+    .replace(/^round\s+/, '')
+    .replace(/^([1-7])(?:st|nd|rd|th)$/, '$1')
+    .replace(/^r/, '');
+  const words: Record<string, number> = { first: 1, second: 2, third: 3, fourth: 4, fifth: 5, sixth: 6, seventh: 7 };
+  const parsed = words[normalized] ?? Number(normalized);
+  return Number.isInteger(parsed) && parsed >= 1 && parsed <= 7 ? parsed : null;
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function numericTokens(text: string): string[] {
@@ -380,15 +627,15 @@ function validatePositionSignalNumbers(
     ));
     if (mentioned.length !== 1) continue;
     const trend = mentioned[0];
-    for (const clause of sentence.split(';')) {
+    for (const clause of interpretationClauses(sentence)) {
       const signal = signalForClaim(clause, trend);
       if (signal == null) continue;
       const allowed = typeof signal === 'number'
         ? new Set([normalizeNumber(String(signal))])
         : signalNumericVariants(signal, clause);
-      // Coverage caveats commonly state the position's total event count next
-      // to a signal-specific sample. Both values are bound to this row.
-      allowed.add(normalizeNumber(String(trend.event_count)));
+      if (/\b(?:event count|events? (?:analyzed|observed)|cohort (?:of )?\d+ events?)\b/i.test(clause)) {
+        allowed.add(normalizeNumber(String(trend.event_count)));
+      }
       for (const token of numericTokens(clause)) {
         const value = Number(token);
         if ((value >= 1900 && value <= 2100) || ['5', '10', '20', '85', '95', '100'].includes(normalizeNumber(token))) continue;
@@ -406,8 +653,8 @@ function signalForClaim(
 ): NflPositionMarketTrend['mobility'] | number | null {
   if (/\b(?:trade price|compensation|premium[- ]pick|day[- ]one|day[- ]two|pick share)\b/i.test(clause)) return trend.trade_compensation;
   if (/\b(?:contract price|apy|guaranteed share|salary[- ]cap price)\b/i.test(clause)) return trend.contract_price;
-  if (/\b(?:move share|share of (?:league )?material moves)\b/i.test(clause)) return trend.transaction_share;
-  if (/\b(?:mobility|material[- ]move rate|events? per 100)\b/i.test(clause)) return trend.mobility;
+  if (/\b(?:move share|share of (?:league(?:wide|-wide)? )?(?:material moves|trades))\b/i.test(clause)) return trend.transaction_share;
+  if (/\b(?:mobility|player movement|trade activity|market volume|material[- ]move rate|(?:events?|moves?|trades?) per 100)\b/i.test(clause)) return trend.mobility;
   if (/\b(?:material events?|event count|transactions? observed)\b/i.test(clause)) return trend.event_count;
   return null;
 }
@@ -417,19 +664,32 @@ function signalNumericVariants(
   clause: string,
 ): Set<string> {
   const values = new Set<string>();
-  for (const candidate of [
+  const candidates = [
     signal.overall_value,
     signal.baseline_value,
     signal.recent_value,
-    signal.relative_change_basis_points,
-  ]) {
-    for (const token of artifactNumericVariants(candidate)) values.add(token);
+  ];
+  const per100Rate = signal.unit === 'events_per_100_player_seasons' && /\bper 100\b/i.test(clause);
+  for (const candidate of per100Rate ? candidates : [...candidates, signal.relative_change_basis_points]) {
+    for (const token of per100Rate ? rateNumericVariants(candidate) : artifactNumericVariants(candidate)) values.add(token);
   }
   if (signal.baseline_value != null && signal.recent_value != null) {
-    for (const token of artifactNumericVariants(signal.recent_value - signal.baseline_value)) values.add(token);
+    const difference = signal.recent_value - signal.baseline_value;
+    for (const token of per100Rate ? rateNumericVariants(difference) : artifactNumericVariants(difference)) values.add(token);
   }
   if (/\b(?:sample(?: size)?|observations?|contracts? observed|trades? observed)\b/i.test(clause)) {
     values.add(normalizeNumber(String(signal.sample_size)));
+  }
+  return values;
+}
+
+function rateNumericVariants(value: unknown): Set<string> {
+  const values = new Set<string>();
+  if (typeof value !== 'number' || !Number.isFinite(value)) return values;
+  for (const candidate of new Set([value, Math.abs(value)])) {
+    for (const precision of [0, 1, 2, 3]) {
+      values.add(normalizeNumber((candidate / 100).toFixed(precision)));
+    }
   }
   return values;
 }
@@ -462,6 +722,10 @@ function normalizeNumber(value: string): string {
 function proseSentences(text: string): string[] {
   // Decimal points are part of governed numeric values, not sentence breaks.
   return text.split(/\n|(?<!\d)\.|\.(?!\d)/);
+}
+
+function interpretationClauses(sentence: string): string[] {
+  return sentence.split(/;|\b(?:but|while|whereas|yet|without)\b|,\s+(?=and\s)/i);
 }
 
 function sameSet(left: Set<string>, right: Set<string>): boolean {

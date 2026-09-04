@@ -5,7 +5,6 @@ import type {
   NflTransactionMarketSignal,
   NflTransactionMarketYearPoint,
 } from '@shared/types';
-import { nflTransactionMarketFootballRead } from '@shared/nflTransactionMarket';
 import { fire } from '../lib/events';
 import { useBriefs, useUi } from '../store';
 import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
@@ -13,11 +12,17 @@ import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
 interface Props {
   analysis: NflTransactionMarketAnalysis;
   interpretation?: string;
+  interpretationStatus?: 'pending' | 'ready' | 'unavailable';
   followups?: string[];
 }
 
-export function NflTransactionMarketAnalysisView({ analysis, interpretation = '', followups = [] }: Props) {
-  const footballRead = nflTransactionMarketFootballRead(analysis);
+export function NflTransactionMarketAnalysisView({
+  analysis,
+  interpretation = '',
+  interpretationStatus,
+  followups = [],
+}: Props) {
+  const resolvedInterpretationStatus = interpretationStatus ?? legacyInterpretationStatus(interpretation);
   const { activeBriefId, sourcesByBrief } = useBriefs();
   const { setSelectedSourceRef, setSourceFilterRefs, setHighlightedSourceRef, setRailCollapsed } = useUi();
   const eventSourceRefs = new Map(
@@ -44,33 +49,10 @@ export function NflTransactionMarketAnalysisView({ analysis, interpretation = ''
       ? analysis.influential_transactions
       : analysis.comparables
   ).slice(0, 4);
-  const supplemental = supplementalInterpretation(interpretationForDisplay(interpretation), footballRead);
 
   return (
     <div style={{ display: 'grid', gap: SPACE.xl }} data-testid="nfl-transaction-market-analysis">
-      <section style={{
-        display: 'grid', gap: SPACE.md, padding: `${SPACE.xl}px ${SPACE['2xl']}px`,
-        border: `1px solid ${F.fenway}`, borderLeft: `4px solid ${F.fenway}`,
-        borderRadius: RADIUS.md, background: F.fenwaySoft,
-      }}>
-        <div>
-          <SectionLabel>Bottom line</SectionLabel>
-          <h3 style={{
-            margin: 0, color: F.ink, fontFamily: 'var(--font-display)',
-            fontSize: TYPE.display.md, lineHeight: 1.35, letterSpacing: TRACKING.tight,
-          }}>{footballRead.conclusion}</h3>
-        </div>
-        <div style={{ borderTop: `1px solid ${F.borderStrong}`, paddingTop: SPACE.md }}>
-          <span style={{
-            display: 'block', marginBottom: 4, color: F.fenway,
-            fontFamily: 'var(--font-sans)', fontSize: TYPE.meta.md,
-            fontWeight: 700, letterSpacing: TRACKING.micro, textTransform: 'uppercase',
-          }}>What this means for New York</span>
-          <p style={{ margin: 0, color: F.ink, fontSize: TYPE.body.lg, lineHeight: 1.5, fontWeight: 600 }}>
-            {newYorkImplication(footballRead.implication)}
-          </p>
-        </div>
-      </section>
+      <NflAnalysisInterpretation interpretation={interpretation} status={resolvedInterpretationStatus} />
 
       <section>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: SPACE.sm, flexWrap: 'wrap' }}>
@@ -133,13 +115,6 @@ export function NflTransactionMarketAnalysisView({ analysis, interpretation = ''
         </section>
       )}
 
-      {supplemental && (
-        <section style={{ padding: SPACE.md, borderLeft: `3px solid ${F.borderStrong}`, background: F.cream50 }}>
-          <SectionLabel>Analyst interpretation</SectionLabel>
-          <p style={{ margin: 0, color: F.inkSoft, fontSize: TYPE.body.md, lineHeight: 1.6 }}>{supplemental}</p>
-        </section>
-      )}
-
       {followups.length > 0 && (
         <section>
           <SectionLabel>Next questions</SectionLabel>
@@ -176,6 +151,47 @@ export function NflTransactionMarketAnalysisView({ analysis, interpretation = ''
       </details>
     </div>
   );
+}
+
+export function NflAnalysisInterpretation({
+  interpretation,
+  status,
+}: {
+  interpretation: string;
+  status: 'pending' | 'ready' | 'unavailable' | undefined;
+}) {
+  if (status === 'ready' && interpretation.trim()) {
+    return <section data-testid="nfl-ai-football-read" style={{
+      display: 'grid', gap: SPACE.sm, padding: `${SPACE.xl}px ${SPACE['2xl']}px`,
+      border: `1px solid ${F.fenway}`, borderLeft: `4px solid ${F.fenway}`,
+      borderRadius: RADIUS.md, background: F.fenwaySoft,
+    }}>
+      <SectionLabel>Football read</SectionLabel>
+      <p style={{
+        margin: 0, color: F.ink, fontFamily: 'var(--font-display)',
+        fontSize: TYPE.display.sm, lineHeight: 1.5, letterSpacing: TRACKING.tight,
+        whiteSpace: 'pre-line',
+      }}>{interpretation}</p>
+    </section>;
+  }
+  if (status === 'unavailable') {
+    return <div role="status" data-testid="nfl-ai-football-read-unavailable" style={{
+      padding: `${SPACE.sm}px ${SPACE.md}px`, color: F.fgMuted,
+      borderLeft: `3px solid ${F.borderStrong}`, background: F.cream50,
+      fontSize: TYPE.body.sm, lineHeight: 1.45,
+    }}>
+      The live calculation is ready below. The football interpretation did not finish; retry to generate it.
+    </div>;
+  }
+  return null;
+}
+
+function legacyInterpretationStatus(value: string): 'pending' | 'ready' {
+  if (!value.trim()) return 'pending';
+  if (/posted the highest observed shares|clear the supported multi-signal (?:growth|shrinkage) gate|use those league rates to set opening price expectations/i.test(value)) {
+    return 'pending';
+  }
+  return 'ready';
 }
 
 function primaryTrendRows(analysis: NflTransactionMarketAnalysis): NflPositionMarketTrend[] {
@@ -467,39 +483,6 @@ function technicalSignalCell(signal: NflTransactionMarketSignal): string {
     ? `${formatRateDetailed(signal.baseline_value)} → ${formatRateDetailed(signal.recent_value)} · ${formatSigned(delta / 100, 2)} per 100`
     : `${formatPercentDetailed(signal.baseline_value)} → ${formatPercentDetailed(signal.recent_value)} · ${formatSigned(delta, 0)} bp`;
   return `${values} (${directionLabel(signal.direction).toLowerCase()})`;
-}
-
-function interpretationForDisplay(value: string): string {
-  return value
-    .replace(/clear the supported multi-signal growth gate/gi, 'show a clear growth trend')
-    .replace(/clear the supported multi-signal shrinkage gate/gi, 'show a clear decline')
-    .replace(/classification rules and evidence gates/gi, 'calculation rules and source limits')
-    .replace(/\bmaterial events\b/gi, 'player moves analyzed')
-    .replace(/\bmobility\b/gi, 'player movement')
-    .replace(/\bmove share\b/gi, 'share of league player movement')
-    .replace(/\bcontract price\b/gi, 'contract cost versus the cap')
-    .replace(/\btrade price\b/gi, 'premium-pick trade return')
-    .replace(/\bidentity coverage\b/gi, 'player records matched')
-    .replace(/\bcohort\b/gi, 'comparison period')
-    .trim();
-}
-
-function supplementalInterpretation(value: string, read: { conclusion: string; implication: string }): string | null {
-  if (!value) return null;
-  const cleanedConclusion = interpretationForDisplay(read.conclusion);
-  const cleanedImplication = interpretationForDisplay(read.implication);
-  const remainder = value
-    .replace(cleanedConclusion, '')
-    .replace(cleanedImplication, '')
-    .replace(/The calculation rules and source limits remain visible below\.?/gi, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-  return remainder.length >= 24 ? remainder : null;
-}
-
-function newYorkImplication(value: string): string {
-  const stripped = value.replace(/^For New York:\s*/i, '');
-  return stripped.replace(/^./, (letter) => letter.toUpperCase());
 }
 
 function moveLabel(value: string): string {

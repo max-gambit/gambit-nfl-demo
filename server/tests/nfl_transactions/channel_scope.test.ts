@@ -55,7 +55,7 @@ test('primary composer sends only the current question and leaves context routin
   assert.match(source, /question:\s*q/);
 });
 
-test('deterministic market artifact is a complete answer without waiting for interpretation', () => {
+test('market calculation is renderable while the football interpretation is pending', () => {
   const analysis = marketAnalysis('analysis-live', ['EDGE']);
   const body = transactionMarketArtifactBody(analysis);
   const progress = {
@@ -67,9 +67,10 @@ test('deterministic market artifact is a complete answer without waiting for int
     events: [],
   };
 
-  assert.match(body.answer, /For New York:/);
+  assert.equal(body.answer, '');
   assert.deepEqual(body.key_findings, []);
   assert.strictEqual(body.market_analysis, analysis);
+  assert.equal(body.analysis_interpretation_status, 'pending');
   assert.deepEqual(briefProgressStreamPayload({
     id: 'brief-live',
     status: 'generating',
@@ -123,11 +124,11 @@ test('seller proposal state remains inside its channel and is absent in a fresh 
   assert.equal(latestSellerMoveScenarioForSession([], 'fresh-channel'), null);
 });
 
-test('initial market response progress is complete immediately', () => {
+test('initial market response exposes the live result while AI reasoning continues', () => {
   const progress = marketArtifactBriefProgress();
-  assert.equal(progress.phase, 'ready');
-  assert.equal(progress.pct, 100);
-  assert.equal(progress.label, 'Market answer ready');
+  assert.equal(progress.phase, 'drafting');
+  assert.equal(progress.pct, 60);
+  assert.equal(progress.label, 'Live analysis ready');
 });
 
 test('EDGE and IOL comparison leads with a football conclusion while preserving signal boundaries', () => {

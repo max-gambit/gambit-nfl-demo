@@ -1,7 +1,7 @@
 import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
 import { Cite } from '../ds/Cite';
 import type { DataAnalysisBriefBody } from '@shared/types';
-import { NflTransactionMarketAnalysisView } from './NflTransactionMarketAnalysis';
+import { NflAnalysisInterpretation, NflTransactionMarketAnalysisView } from './NflTransactionMarketAnalysis';
 import { NflSellerMoveAnalysis } from './NflSellerMoveAnalysis';
 import { fire } from '../lib/events';
 
@@ -12,20 +12,25 @@ interface Props {
 export function DataAnalysisCardBody({ body }: Props) {
   if (body.combined_market_seller_analysis && body.market_analysis && body.seller_move_analysis) {
     return <div style={{ display: 'grid', gap: SPACE['2xl'] }}>
-      <NflTransactionMarketAnalysisView analysis={body.market_analysis} />
+      <NflAnalysisInterpretation interpretation={body.answer} status={body.analysis_interpretation_status} />
+      <NflSellerMoveAnalysis artifact={body.seller_move_analysis} followups={body.followups} />
       <div style={{ borderTop: `1px solid ${F.borderStrong}`, paddingTop: SPACE['2xl'] }}>
-        <NflSellerMoveAnalysis artifact={body.seller_move_analysis} followups={body.followups} />
+        <NflTransactionMarketAnalysisView analysis={body.market_analysis} />
       </div>
     </div>;
   }
   if (body.seller_move_analysis) {
-    return <NflSellerMoveAnalysis artifact={body.seller_move_analysis} followups={body.followups} />;
+    return <div style={{ display: 'grid', gap: SPACE['2xl'] }}>
+      <NflAnalysisInterpretation interpretation={body.answer} status={body.analysis_interpretation_status} />
+      <NflSellerMoveAnalysis artifact={body.seller_move_analysis} followups={body.followups} />
+    </div>;
   }
   if (body.market_analysis) {
     return (
       <NflTransactionMarketAnalysisView
         analysis={body.market_analysis}
         interpretation={body.answer}
+        interpretationStatus={body.analysis_interpretation_status}
         followups={body.followups}
       />
     );

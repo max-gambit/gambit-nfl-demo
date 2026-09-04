@@ -4,10 +4,13 @@ import {
   buildDeterministicNflTransactionMarketFallback,
   deterministicMarketEventSourceRows,
   deterministicMarketChatAnswer,
+  evaluateNflArtifactInterpretation,
   evaluateNflTransactionMarketDraft,
 } from '../../src/claude/nfl_transaction_market_guardrails.js';
+import { composeNflArtifactInterpretation } from '../../src/routes/briefs.js';
 import { analyzeNflTransactionMarketSnapshot, type NflTransactionMarketSnapshot } from '../../src/nfl_transactions/analyze.js';
 import type { SubmitDataAnalysisInput } from '@shared/types';
+import type Anthropic from '@anthropic-ai/sdk';
 
 test('guardrail rejects a number absent from the deterministic artifact', () => {
   const analysis = analysisFixture();
@@ -122,6 +125,55 @@ test('guardrail rejects a declared team scope that differs from the executed fil
   const result = evaluateNflTransactionMarketDraft(draft, analysis);
   assert.equal(result.ok, false);
   assert.ok(result.issues.some((issue) => /team scope/i.test(issue)));
+});
+
+test('market answer uses model-written football reasoning grounded in the live result', async () => {
+  const analysis = analysisFixture();
+  let captured: Anthropic.MessageCreateParamsNonStreaming | null = null;
+  const answer = await composeNflArtifactInterpretation({
+    question: 'How has the EDGE trade market changed, and what should New York do with that information?',
+    market: analysis,
+    seller_move: null,
+  }, async (params) => {
+    captured = params;
+    return {
+      content: [{
+        type: 'text',
+        text: 'EDGE activity should be read from the movement trend without collapsing every market signal into one label. For New York, the useful posture is to test availability against the closest returned trades before setting a negotiating position.',
+      }],
+    } as unknown as Anthropic.Message;
+  });
+
+  assert.match(answer, /For New York/);
+  assert(captured);
+  assert.match(JSON.stringify(captured), /Write the football judgment/);
+  assert.match(JSON.stringify(captured), new RegExp(analysis.analysis_id));
+  assert.deepEqual(evaluateNflArtifactInterpretation(answer, analysis), { ok: true, issues: [] });
+});
+
+test('AI interpretation rejects a qualitative direction opposite the calculated signal', () => {
+  const analysis = analysisFixture();
+  const expected = analysis.position_trends[0].mobility.direction;
+  const wrong = expected === 'growing' ? 'shrinking' : 'growing';
+  const result = evaluateNflArtifactInterpretation(
+    `EDGE player movement is ${wrong}. For New York, that changes the negotiating posture.`,
+    analysis,
+  );
+
+  assert.equal(result.ok, false);
+  assert(result.issues.some((issue) => /calculation says/i.test(issue)));
+});
+
+test('AI interpretation rejects every raw basis-point value labeled as a per-100 rate', () => {
+  const analysis = analysisFixture();
+  const raw = analysis.position_trends[0].mobility.recent_value!;
+  const result = evaluateNflArtifactInterpretation(
+    `EDGE player movement reached ${raw} trades per 100 player-seasons.`,
+    analysis,
+  );
+
+  assert.equal(result.ok, false);
+  assert(result.issues.some((issue) => /not attached to the claimed EDGE signal/i.test(issue)));
 });
 
 function analysisFixture() {
