@@ -17,7 +17,7 @@ export function NflSourceDetail({ source, onBack }: { source: BriefSource; onBac
       <button type="button" onClick={onBack} style={{
         border: 'none', background: 'transparent', color: F.fenway,
         padding: 0, cursor: 'pointer', fontWeight: 700, fontSize: TYPE.body.sm,
-      }}>← Evidence for this answer</button>
+      }}>← Sources for this answer</button>
       <div style={{ marginTop: SPACE['2xl'] }}>
         <span style={{
           fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.xs, fontWeight: 700,
@@ -28,7 +28,7 @@ export function NflSourceDetail({ source, onBack }: { source: BriefSource; onBac
       </div>
       <dl style={{ margin: `${SPACE['2xl']}px 0`, borderTop: `1px solid ${F.border}` }}>
         <Fact label="As of" value={asOf ?? 'Not supplied'} />
-        <Fact label="Authority" value={boundary} />
+        <Fact label="Source type" value={boundary} />
       </dl>
 
       {contribution && <section style={{ marginBottom: SPACE.xl }}>
@@ -109,6 +109,20 @@ function displayValue(value: unknown): string {
 }
 
 function label(value: string): string {
+  const labels: Record<string, string> = {
+    'overall status': 'Overall coverage',
+    readiness: 'Questions this data can answer',
+    coverage: 'Data coverage',
+    'position groups': 'By position',
+    'player signals': 'Relevant players',
+    'top gaps': 'What public data cannot confirm',
+    'what still needs checking': 'What public data cannot confirm',
+    'current roster': 'Giants contracts that could be moved',
+    'depth consequence': 'Roster impact',
+    'source as of': 'Source date',
+  };
+  const normalized = value.trim().toLowerCase();
+  if (labels[normalized]) return labels[normalized];
   return value.replace(/_/g, ' ').replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
@@ -143,6 +157,7 @@ function detailRows(source: BriefSource, data: Record<string, unknown>): Array<{
 
 function allowedDetailLabel(source: BriefSource, value: string): boolean {
   const label = value.trim();
+  if (source.data?.current_nfl_evidence && /^(?:dataset|contract field coverage|top cap contracts|position-group cap rollups|seller thesis|counterparty seller|required answer)/i.test(label)) return false;
   if (/^(?:player record|position mapping|identity match|raw position|normalization|source status|rows?|pff position|provider)/i.test(label)) return false;
   const common = /^(?:as of|date|retrieved|source as of|source updated|season|player|position|position groups|team|teams|from|to|move|transaction|compensation|contract terms|relevance|role|depth consequence|current 2026 cap space|2026 cap hit|top 51 active spending|top cap contracts|dead money|applied team cap|accounting|carryover and adjustments|2026 league salary cap|cap space created|next-year cap effect|guaranteed remaining|contract confidence|contract field coverage|attribution|coverage|coverage range|records in this snapshot|current roster|roster players|active cornerbacks considered|explicit first-at-position cornerbacks|player signals|summary|posture|subject team|readiness|overall status|top gaps)$/i;
   const cba = /^(?:article|section|locator|exact location|rule|effective date|authority|citation|what it says|what still needs checking)$/i;
@@ -166,6 +181,7 @@ function humanDate(value: string | null): string {
 
 function sourceName(value: string | null): string {
   if (!value) return 'Public NFL source';
+  if (value === 'GAMBIT_APP_DATA') return 'Public NFL data';
   return value.replace(/_/g, ' ');
 }
 

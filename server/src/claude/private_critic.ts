@@ -230,7 +230,7 @@ export function evaluateNflDraftForPrivateCritic(args: RunNflPrivateCriticArgs):
       severity: 'medium',
       claim: 'The draft leads with product/schema language.',
       evidence_boundary: 'Visible prose should translate data quality into front-office language.',
-      fix: 'Use high confidence, directional, priced in the current cap file, or needs source review only where it changes the recommendation.',
+      fix: 'Rewrite in plain football language. State the practical fact, uncertainty, or next action without exposing internal labels or workflow terms.',
     });
   }
 

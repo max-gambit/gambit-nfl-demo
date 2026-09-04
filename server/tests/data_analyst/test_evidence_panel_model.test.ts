@@ -46,6 +46,24 @@ test('current cap evidence uses a plain contribution and no default source dump'
   assert.deepEqual(model.backgroundItems, []);
 });
 
+test('current NFL evidence keeps football labels instead of NBA or implementation language', () => {
+  const source = sourceRow(1, 'ANALYST_DATA', 'New York Giants contracts and cap', {
+    current_nfl_evidence: { dataset_id: 'nfl_cap_sheets_current', team_id: 'NYG' },
+    rows: [{ k: 'Team', v: 'NYG - New York Giants' }],
+  });
+  const body: DataAnalysisBriefBody = {
+    kind: 'data_analysis', answer: 'Answer.', key_findings: [], tables: [], calculations: [], caveats: [], followups: [],
+  };
+  const model = buildEvidencePackModel(brief(body), [source], [], null, null);
+  const visible = [...model.checkedItems, ...model.backgroundItems]
+    .flatMap((item) => [item.title, item.proof, ...item.rows.flatMap((row) => [row.title, row.proof])])
+    .join(' ');
+
+  assert.match(visible, /New York Giants contracts and cap/);
+  assert.match(visible, /contract and salary-cap figures/);
+  assert.doesNotMatch(visible, /apron|current team data|coverage matrix|dataset/i);
+});
+
 test('historical market evidence shows the market definition and four best transactions, with every other citation retained', async () => {
   const reviewed = await loadReviewedNflTransactionSnapshot();
   const analysis = analyzeNflTransactionMarketSnapshot({

@@ -46,7 +46,9 @@ import {
   currentNflEvidenceScopeForQuestion,
   currentNflEvidenceTeamIds as resolveCurrentNflEvidenceTeamIds,
   defaultNflEvidenceTeamId,
+  humanizeNflVisibleText,
   isNflTradeGoalQuestion,
+  type CurrentNflEvidencePack,
 } from '../claude/nfl_evidence.js';
 import {
   buildNflContextComposerForDataAnalyst,
@@ -55,6 +57,7 @@ import {
 } from '../claude/nfl_context_composer.js';
 import {
   buildNflPrivateCriticRevisionBlock,
+  evaluateNflDraftForPrivateCritic,
   runNflPrivateCritic,
 } from '../claude/private_critic.js';
 import {
@@ -98,6 +101,7 @@ export const briefRoutes = new Hono();
 const DEFAULT_SHARE_TEAM_ID = 'GSW';
 const BRIEF_GENERATION_HEARTBEAT_MS = 60_000;
 export const BRIEF_GENERATION_DEADLINE_MS = 14_000;
+export const NFL_BRIEF_GENERATION_DEADLINE_MS = 45_000;
 export const NFL_ARTIFACT_INTERPRETATION_DEADLINE_MS = 30_000;
 const MAX_BRIEF_PROGRESS_EVENTS = 12;
 type DataAnalysisLookup = { messages: Anthropic.MessageParam[]; traces: DataAnalystTrace[] };
@@ -926,6 +930,7 @@ async function generateBriefWithDeadline(
 ): Promise<void> {
   let timer: NodeJS.Timeout | null = null;
   const generation = beginBriefGeneration(brief.id);
+  const deadlineMs = briefGenerationDeadlineMs(brief);
   try {
     await Promise.race([
       generateBriefForMode(brief, inheritedMarketQuery, preparedMarketLookup, generation),
@@ -935,7 +940,7 @@ async function generateBriefWithDeadline(
             generation.stop();
             reject(new Error('brief_generation_deadline_exceeded'));
           },
-          BRIEF_GENERATION_DEADLINE_MS,
+          deadlineMs,
         );
       }),
     ]);
@@ -943,6 +948,12 @@ async function generateBriefWithDeadline(
     if (timer) clearTimeout(timer);
     generation.stop();
   }
+}
+
+export function briefGenerationDeadlineMs(brief: Pick<Brief, 'question'>): number {
+  return currentNflEvidenceTeamIds(brief.question).length > 0
+    ? NFL_BRIEF_GENERATION_DEADLINE_MS
+    : BRIEF_GENERATION_DEADLINE_MS;
 }
 
 export async function generateBrief(
@@ -993,6 +1004,20 @@ export async function generateBrief(
     const composedNflContext = currentNflEvidence
       ? buildNflContextComposerForEvidence(brief.question, currentNflEvidence)
       : null;
+
+    if (shouldUseCurrentNflReasonedAnswer(currentNflEvidence, templateSelection) && composedNflContext) {
+      await generateCurrentNflReasonedAnswer({
+        brief,
+        currentNflEvidence,
+        composedNflContext,
+        heartbeat,
+        generation,
+        progress,
+        startedAt,
+      });
+      return;
+    }
+
     const runContextGraphLookup = shouldRunContextGraphLookup(brief.question, !!currentAppEvidence);
     const currentEvidenceSourceCount = currentAppEvidence?.sources.length ?? 0;
     await progress.mark(
@@ -1362,6 +1387,293 @@ export async function generateBrief(
   } finally {
     heartbeat.stop();
   }
+}
+
+export function shouldUseCurrentNflReasonedAnswer(
+  currentNflEvidence: CurrentNflEvidencePack | null,
+  templateSelection: ReturnType<typeof templateSelectionForBrief>,
+): currentNflEvidence is CurrentNflEvidencePack {
+  return Boolean(currentNflEvidence)
+    && effectiveBriefTemplateId(templateSelection) === 'decision_brief';
+}
+
+async function generateCurrentNflReasonedAnswer(args: {
+  brief: Brief;
+  currentNflEvidence: CurrentNflEvidencePack;
+  composedNflContext: ComposedNflContext;
+  heartbeat: BriefGenerationHeartbeat;
+  generation: BriefGenerationGuard;
+  progress: ReturnType<typeof createBriefProgressTracker>;
+  startedAt: number;
+}): Promise<void> {
+  await args.progress.mark(
+    'drafting',
+    40,
+    'Reviewing roster and trade options',
+    'Comparing football fit, contracts, and each team’s situation using current public information.',
+    'model',
+  );
+
+  const response = await createClaudeMessage({
+    model: BRIEF_MODEL,
+    max_tokens: 4096,
+    system: buildCurrentNflReasoningSystem(args.currentNflEvidence, args.composedNflContext),
+    tools: [submitDataAnalysisTool],
+    tool_choice: { type: 'tool', name: 'submit_data_analysis', disable_parallel_tool_use: true },
+    messages: [{ role: 'user', content: args.brief.question }],
+  });
+  const toolUse = response.content.find(
+    (block) => block.type === 'tool_use' && block.name === 'submit_data_analysis',
+  );
+  let normalizedInput = toolUse?.type === 'tool_use'
+    ? normalizeSubmitDataAnalysisInput(toolUse.input)
+    : null;
+  if (normalizedInput && hasCurrentNflAnalysisMarkupLeak(normalizedInput)) {
+    await args.progress.mark(
+      'repairing',
+      72,
+      'Finishing the answer',
+      'Checking the supporting details before they appear.',
+      'model',
+    );
+    normalizedInput = await repairCurrentNflAnalysisMarkup({
+      question: args.brief.question,
+      currentNflEvidence: args.currentNflEvidence,
+      composedNflContext: args.composedNflContext,
+    }) ?? normalizedInput;
+  }
+  const input = normalizedInput ? humanizeCurrentNflAnalysisInput(normalizedInput) : null;
+
+  if (!input) {
+    await persistEvidenceBoundGenerationFallback({
+      brief: args.brief,
+      heartbeat: args.heartbeat,
+      generation: args.generation,
+      progress: args.progress,
+      sources: args.currentNflEvidence.sources,
+      startedAt: args.startedAt,
+    });
+    return;
+  }
+
+  const critique = evaluateNflDraftForPrivateCritic({
+    question: args.brief.question,
+    composedContext: args.composedNflContext,
+    draftKind: 'data_analysis',
+    draft: input,
+  });
+  if (critique.verdict === 'revise') {
+    await persistEvidenceBoundGenerationFallback({
+      brief: args.brief,
+      heartbeat: args.heartbeat,
+      generation: args.generation,
+      progress: args.progress,
+      sources: args.currentNflEvidence.sources,
+      startedAt: args.startedAt,
+    });
+    return;
+  }
+
+  if (!(await args.heartbeat.isCurrent()) || !args.generation.isActive()) return;
+  const sourceRows = args.currentNflEvidence.sources.map((source) => ({
+    ...source,
+    brief_id: args.brief.id,
+  }));
+  const insertedSourceIds = sourceRows.length > 0
+    ? await insertMissingBriefSources(args.brief.id, sourceRows, args.generation)
+    : [];
+  if (!insertedSourceIds) return;
+  if (!args.generation.isActive()) {
+    await removeInsertedBriefRows('brief_sources', insertedSourceIds);
+    return;
+  }
+
+  const body: DataAnalysisBriefBody = {
+    kind: 'data_analysis',
+    answer: input.answer,
+    key_findings: input.key_findings,
+    tables: input.tables,
+    calculations: input.calculations,
+    caveats: input.caveats,
+    followups: input.followups,
+  };
+  const readyProgress = args.progress.complete(
+    'Answer ready',
+    'The football conclusion and its public sources are ready.',
+  );
+  const updated = await db
+    .from('briefs')
+    .update({
+      mode: 'data_analyst',
+      thesis: input.answer,
+      body,
+      status: 'ready',
+      error: null,
+      progress: readyProgress,
+      duration_ms: Date.now() - args.startedAt,
+      updated_at: readyProgress.updated_at,
+    })
+    .eq('id', args.brief.id)
+    .eq('status', 'generating')
+    .eq('updated_at', args.heartbeat.currentUpdatedAt())
+    .select('updated_at')
+    .maybeSingle();
+  if (updated.error) {
+    await removeInsertedBriefRows('brief_sources', insertedSourceIds);
+    throw new Error(`current NFL answer update failed: ${updated.error.message}`);
+  }
+  if (!updated.data) {
+    await removeInsertedBriefRows('brief_sources', insertedSourceIds);
+    return;
+  }
+  publishBriefProgress(briefProgressStreamPayload({
+    id: args.brief.id,
+    status: 'ready',
+    error: null,
+    progress: readyProgress,
+    updated_at: (updated.data as Pick<Brief, 'updated_at'>).updated_at,
+    body,
+  }));
+}
+
+export function buildCurrentNflReasoningSystem(
+  currentNflEvidence: CurrentNflEvidencePack,
+  composedNflContext: ComposedNflContext,
+): Anthropic.TextBlockParam[] {
+  return [
+    { type: 'text', text: buildDemoTeamPerspectiveBlock(defaultBriefTeamId() ?? 'NYG') },
+    { type: 'text', text: DATA_ANALYST_SYSTEM, cache_control: { type: 'ephemeral' } },
+    {
+      type: 'text',
+      text: [
+        'You are Gambit’s NFL front-office analyst. The user wants a live football judgment, not a canned response.',
+        'Reason from the current NFL evidence below. Lead with the practical football conclusion and then explain why.',
+        'Treat injuries, proposed moves, and other assumptions stated by the user as user-entered scenarios, not sourced facts.',
+        'Name a player or counterparty only when it appears in the supplied evidence. A plausible target is an exploratory candidate, not a claim that the player is available.',
+        'When the user asks for trade targets, put the best 3-5 plausible candidates from the supplied target rows in the first sentence. Prefer priority-call or exploratory-call candidates; if there are too few, include monitor candidates and say they are names to scout rather than players known to be available. Never lead with a player marked not a priority or unlikely unless the team changes direction. Explain football fit, contract shape, likely resistance from the other team, and what must be confirmed. Do not refuse to name candidates solely because availability is unconfirmed.',
+        'NFL trades do not require salary matching. Do not propose trading a Giants player merely to fund an acquisition unless the supplied cap facts show that clearing room is necessary.',
+        'Use direct football language throughout. Avoid internal product jargon such as seller thesis, seller cards, lane, screen, call-now, check-call, directional, source-needed, evidence boundary, preflight, model, runtime, artifact, deterministic, posture, gating issue, salary-out, pick-led, construction, or current file. Never mention an internal confidence label, row, gate, grade, or workflow. Use football terms, not baseball metaphors such as premium bat.',
+        'Use only figures and source references present below. Preserve material freshness, coverage, and uncertainty caveats.',
+        'Keep the lead answer under 90 words. Put supporting detail in 3-5 concise key findings. Keep tables and calculations empty unless they materially clarify the answer.',
+        'Return exactly one complete submit_data_analysis call. Server-provided source cards are already reserved, so return sources: [].',
+      ].join('\n'),
+    },
+    { type: 'text', text: currentNflEvidence.systemBlock },
+    { type: 'text', text: composedNflContext.system_block },
+  ];
+}
+
+export function humanizeCurrentNflAnalysisInput(input: SubmitDataAnalysisInput): SubmitDataAnalysisInput {
+  const text = (value: string | null | undefined): string | null | undefined => {
+    if (value == null) return value;
+    return humanizeNflVisibleText(value);
+  };
+  const safe = (value: string | null | undefined): boolean => !value || !CURRENT_NFL_MARKUP_LEAK_RE.test(value);
+  const safeCell = (value: string | number | null): boolean => typeof value !== 'string' || safe(value);
+
+  return {
+    ...input,
+    answer: conciseCurrentNflLead(text(input.answer) ?? input.answer),
+    key_findings: input.key_findings
+      .filter((finding) => safe(finding.label) && safe(finding.body))
+      .map((finding) => ({
+        ...finding,
+        label: text(finding.label) ?? finding.label,
+        body: text(finding.body) ?? finding.body,
+      })),
+    tables: input.tables
+      .filter((table) => safe(table.title)
+        && table.columns.every(safe)
+        && table.rows.every((row) => row.every(safeCell)))
+      .map((table) => ({
+        ...table,
+        title: text(table.title) ?? table.title,
+        columns: table.columns.map((column) => text(column) ?? column),
+        rows: table.rows.map((row) => row.map((cell) => typeof cell === 'string' ? text(cell) ?? cell : cell)),
+      })),
+    calculations: input.calculations
+      .filter((calculation) => safe(calculation.label) && safe(calculation.formula) && safe(calculation.value))
+      .map((calculation) => ({
+        ...calculation,
+        label: text(calculation.label) ?? calculation.label,
+        formula: text(calculation.formula) ?? undefined,
+        value: text(calculation.value) ?? calculation.value,
+      })),
+    caveats: input.caveats.filter(safe).map((caveat) => text(caveat) ?? caveat),
+    followups: input.followups.filter(safe).map((followup) => text(followup) ?? followup),
+  };
+}
+
+const CURRENT_NFL_MARKUP_LEAK_RE = /<\/?(?:answer|key_findings?|item|label|body|source_refs?|tables?|columns?|rows?|calculations?|sources?|caveats?|followups?)\b/i;
+
+export function hasCurrentNflAnalysisMarkupLeak(input: SubmitDataAnalysisInput): boolean {
+  const values: Array<string | null | undefined> = [
+    input.answer,
+    ...input.key_findings.flatMap((finding) => [finding.label, finding.body]),
+    ...input.tables.flatMap((table) => [
+      table.title,
+      ...table.columns,
+      ...table.rows.flatMap((row) => row.filter((cell): cell is string => typeof cell === 'string')),
+    ]),
+    ...input.calculations.flatMap((calculation) => [calculation.label, calculation.formula, calculation.value]),
+    ...input.caveats,
+    ...input.followups,
+  ];
+  return values.some((value) => Boolean(value && CURRENT_NFL_MARKUP_LEAK_RE.test(value)));
+}
+
+async function repairCurrentNflAnalysisMarkup(args: {
+  question: string;
+  currentNflEvidence: CurrentNflEvidencePack;
+  composedNflContext: ComposedNflContext;
+}): Promise<SubmitDataAnalysisInput | null> {
+  try {
+    const response = await createClaudeMessage({
+      model: BRIEF_MODEL,
+      max_tokens: 2048,
+      system: [
+        ...buildCurrentNflReasoningSystem(args.currentNflEvidence, args.composedNflContext),
+        {
+          type: 'text',
+          text: [
+            'The prior response put response-format tags inside a text field and cannot be shown.',
+            'Write the football answer again from the supplied evidence.',
+            'Return clean values in exactly one submit_data_analysis call. Do not put XML, JSON, field names, or response tags inside any text value.',
+            'Include 3-5 concise key findings unless the evidence genuinely supports only the lead answer.',
+          ].join('\n'),
+        },
+      ],
+      tools: [submitDataAnalysisTool],
+      tool_choice: { type: 'tool', name: 'submit_data_analysis', disable_parallel_tool_use: true },
+      messages: [{ role: 'user', content: args.question }],
+    });
+    const toolUse = response.content.find(
+      (block) => block.type === 'tool_use' && block.name === 'submit_data_analysis',
+    );
+    const normalized = toolUse?.type === 'tool_use'
+      ? normalizeSubmitDataAnalysisInput(toolUse.input)
+      : null;
+    return normalized && !hasCurrentNflAnalysisMarkupLeak(normalized) ? normalized : null;
+  } catch {
+    return null;
+  }
+}
+
+function conciseCurrentNflLead(value: string, maxWords = 90): string {
+  const sentences = value.trim().split(/(?<=[.!?])\s+/).filter(Boolean);
+  const selected: string[] = [];
+  let wordCount = 0;
+  for (const sentence of sentences) {
+    const sentenceWords = sentence.trim().split(/\s+/).filter(Boolean).length;
+    if (selected.length > 0 && wordCount + sentenceWords > maxWords) break;
+    selected.push(sentence.trim());
+    wordCount += sentenceWords;
+    if (wordCount >= maxWords) break;
+  }
+  const lead = selected.join(' ').trim();
+  if (wordCount <= maxWords) return lead || value;
+  const words = lead.split(/\s+/).slice(0, maxWords);
+  return `${words.join(' ').replace(/[,:;\s]+$/g, '')}.`;
 }
 
 async function repairSubmitBriefTemplate(args: {

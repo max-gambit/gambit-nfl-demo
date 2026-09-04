@@ -2,10 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   BRIEF_GENERATION_DEADLINE_MS,
+  NFL_BRIEF_GENERATION_DEADLINE_MS,
+  briefGenerationDeadlineMs,
   beginBriefGeneration,
   briefGenerationErrorMessage,
   briefProgressStreamPayload,
   buildBriefUserPrompt,
+  buildCurrentNflReasoningSystem,
   currentNbaEvidenceTeamIds,
   currentNflEvidenceTeamIds,
   hasNflCounterpartyIntelTrace,
@@ -13,12 +16,14 @@ import {
   hasNflCoverageTrace,
   hasNflTradeScreenTrace,
   hasRequiredNflRosterCapTrace,
+  humanizeCurrentNflAnalysisInput,
   missingSubmitBriefFields,
   normalizeSubmitDataAnalysisInput,
   normalizeSubmitBriefInput,
   requiresNflRosterCapDataLookup,
   shouldRunContextGraphLookup,
   shouldRepairMissingSubmitBriefFields,
+  shouldUseCurrentNflReasonedAnswer,
 } from '../../src/routes/briefs.js';
 import {
   mergeMoveCandidateEnrichment,
@@ -671,6 +676,86 @@ test('open-ended generation has a sub-15-second terminal-state deadline', () => 
     briefGenerationErrorMessage(new Error('brief_generation_deadline_exceeded')),
     'This answer took too long to finish. Your question is saved; try again or ask it more narrowly.',
   );
+});
+
+test('current NFL briefs get enough time for source-backed model reasoning', () => {
+  const currentNflQuestion = {
+    question: "If we're concerned about Malik Nabers' knee week 1, what are potential trade targets for us?",
+  };
+  const unrelatedQuestion = { question: 'Summarize the decision.' };
+
+  assert.equal(briefGenerationDeadlineMs(currentNflQuestion), NFL_BRIEF_GENERATION_DEADLINE_MS);
+  assert.ok(NFL_BRIEF_GENERATION_DEADLINE_MS >= 30_000);
+  assert.ok(NFL_BRIEF_GENERATION_DEADLINE_MS <= 45_000);
+  assert.equal(briefGenerationDeadlineMs(unrelatedQuestion), BRIEF_GENERATION_DEADLINE_MS);
+});
+
+test('current NFL reasoning treats injury language as a user scenario and constrains named targets', () => {
+  const question = "If we're concerned about Malik Nabers' knee week 1, what are potential trade targets for us?";
+  const system = buildCurrentNflReasoningSystem(
+    { systemBlock: 'CURRENT NFL EVIDENCE: named targets and source refs.' } as Parameters<typeof buildCurrentNflReasoningSystem>[0],
+    { system_block: 'COMPOSED NFL CONTEXT: governed rows only.' } as Parameters<typeof buildCurrentNflReasoningSystem>[1],
+  ).map((block) => block.text).join('\n');
+
+  assert.match(system, /user-entered scenarios, not sourced facts/i);
+  assert.match(system, /Name a player or counterparty only when it appears in the supplied evidence/i);
+  assert.match(system, /The user wants a live football judgment, not a canned response/i);
+  assert.doesNotMatch(system, new RegExp(question.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+});
+
+test('current NFL compact reasoning preserves explicitly selected answer templates', () => {
+  const evidence = { systemBlock: 'current NFL evidence' } as Parameters<typeof shouldUseCurrentNflReasonedAnswer>[0];
+
+  assert.equal(shouldUseCurrentNflReasonedAnswer(evidence, { template_id: 'decision_brief' }), true);
+  assert.equal(shouldUseCurrentNflReasonedAnswer(evidence, { template_id: 'comparison_matrix' }), false);
+  assert.equal(shouldUseCurrentNflReasonedAnswer(null, { template_id: 'decision_brief' }), false);
+});
+
+test('current NFL answers cannot leak internal workflow jargon', () => {
+  const input = humanizeCurrentNflAnalysisInput({
+    answer: `${'No receiver lane clears our cap-file and counterparty screens. Use a lower-pain salary-out lever before a check-call. '.repeat(8)}This should not appear.`,
+    key_findings: [{
+      label: 'Seller thesis',
+      body: 'WR readiness is directional; re-run the seller screen instead of a call_now lane.',
+      source_refs: [1],
+    }],
+    tables: [],
+    calculations: [],
+    sources: [],
+    caveats: ['This is the evidence boundary, not a runtime guarantee. Seller receiver values are directional captured-season reads with high confidence. Availability is the gating question.'],
+    followups: ['Should we model the next target lane with enough trade room, according to the seller cards?'],
+  });
+  const visible = JSON.stringify(input);
+
+  assert.doesNotMatch(visible, /seller thesis|seller cards|seller (?:screen|readiness|signal|intent|posture)|receiver lane|target lane|counterparty|screen|call_now|check-call|directional|trade room|trade impact|salary-out|pick-led|constructions|cap-file|evidence boundary|runtime|captured-season|high confidence|low-pain|cap lever|gating (?:issue|question)|current file|current evidence|contract fit|source check|discipline path|posture|should we model/i);
+  assert.match(input.answer, /current public roster and contract data/i);
+  assert.match(input.answer, /contract New York could move/i);
+  assert.ok(input.answer.split(/\s+/).length <= 90);
+});
+
+test('current NFL answers drop malformed model markup instead of rendering it', () => {
+  const input = humanizeCurrentNflAnalysisInput({
+    answer: 'Scout Marvin Mims Jr. and Tre Tucker first; neither is confirmed available.',
+    key_findings: [
+      { label: 'Valid finding', body: 'Denver may resist because it expects to contend.', source_refs: [5] },
+      { label: 'Broken finding', body: '<answer>Do not render this</answer><key_findings>', source_refs: [5] },
+    ],
+    tables: [{
+      title: 'Broken table',
+      columns: ['Player'],
+      rows: [['<rows>["Marvin Mims Jr."]</rows>']],
+      source_refs: [5],
+    }],
+    calculations: [],
+    sources: [],
+    caveats: ['Availability must be confirmed.', '<caveats><item>Do not render</item>'],
+    followups: [],
+  });
+
+  assert.equal(input.key_findings.length, 1);
+  assert.equal(input.tables.length, 0);
+  assert.deepEqual(input.caveats, ['Availability must be confirmed.']);
+  assert.doesNotMatch(JSON.stringify(input), /<\/?(?:answer|key_findings?|rows?|caveats?|item)\b/i);
 });
 
 test('a retry invalidates the older in-process generation lease', () => {

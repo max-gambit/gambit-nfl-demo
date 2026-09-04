@@ -221,6 +221,29 @@ export function classifyEvidenceSource(source: BriefSource): EvidenceSourceClass
   const rows = dataRows(source);
   const text = `${source.kind} ${source.source ?? ''} ${source.title} ${rows.map((row) => `${row.k} ${row.v}`).join(' ')}`.toLowerCase();
   const teamLabel = teamLabelForSource(source, rows);
+  const nflEvidence = currentNflEvidence(source);
+
+  if (nflEvidence) {
+    const dataset = typeof nflEvidence.dataset_id === 'string' ? nflEvidence.dataset_id : '';
+    if (dataset === 'nfl_rosters_current') {
+      return classification(source, 'roster', 'roster', cleanTitle(source.title), 'Confirms the loaded players and positions.', 'clipboard', teamLabel);
+    }
+    if (dataset === 'nfl_cap_sheets_current') {
+      return classification(source, 'contract', 'cap', cleanTitle(source.title), 'Shows the public contract and salary-cap figures.', 'doc', teamLabel);
+    }
+    if (dataset === 'nfl_player_metrics_current') {
+      return classification(source, 'stats', 'roster', cleanTitle(source.title), 'Shows the public performance information used in the football comparison.', 'pulse', teamLabel);
+    }
+    if (dataset === 'nfl_coverage_current') {
+      return classification(source, 'supporting', 'supporting', cleanTitle(source.title), 'Shows where the public data is complete and where the answer needs caution.', 'shield', teamLabel);
+    }
+    if (dataset === 'nfl_trade_screen_current') {
+      return classification(source, 'supporting', 'supporting', cleanTitle(source.title), 'Shows the players considered, roster impact, and cap consequences.', 'search', teamLabel);
+    }
+    if (dataset === 'nfl_context_graph') {
+      return classification(source, 'context', 'context', cleanTitle(source.title), 'Shows public clues about why another team might or might not listen.', 'link', teamLabel);
+    }
+  }
 
   if (source.data?.current_team_cap_summary === true) {
     return classification(source, 'cap', 'cap', cleanTitle(source.title), sourceContribution(source, 'Establishes the current cap figures used in this answer.'), 'clipboard', teamLabel);
@@ -725,13 +748,13 @@ function sourceMeta(source: BriefSource): string {
 function humanSource(value: string | null | undefined): string | null {
   const raw = meaningful(value);
   if (!raw) return null;
-  if (raw === 'GAMBIT_APP_DATA') return 'Gambit app data';
+  if (raw === 'GAMBIT_APP_DATA') return 'Public NFL data';
   if (raw === 'CBA REFERENCE') return 'CBA reference';
   return raw.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 function teamLabelForSource(source: BriefSource, rows: { k: string; v: string }[]): string | null {
-  const evidence = currentNbaEvidence(source);
+  const evidence = currentNflEvidence(source) ?? currentNbaEvidence(source);
   if (typeof evidence?.team_id === 'string') return evidence.team_id;
 
   const teamValue = rowValue(rows, 'Team') ?? rowValue(rows, 'Teams');
@@ -740,6 +763,13 @@ function teamLabelForSource(source: BriefSource, rows: { k: string; v: string }[
 
   const titleMatch = source.title.match(/\b[A-Z]{3}\b/);
   return titleMatch?.[0] ?? null;
+}
+
+function currentNflEvidence(source: BriefSource): Record<string, unknown> | null {
+  const data = source.data;
+  if (!data || typeof data !== 'object') return null;
+  const evidence = data.current_nfl_evidence;
+  return evidence && typeof evidence === 'object' ? evidence as Record<string, unknown> : null;
 }
 
 function currentNbaEvidence(source: BriefSource): Record<string, unknown> | null {
