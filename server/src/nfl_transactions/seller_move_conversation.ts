@@ -11,6 +11,10 @@ import {
   type NflTransactionMarketSnapshot,
 } from './analyze.js';
 import {
+  isNflTransactionMarketQuestion,
+  transactionMarketRequestFromQuestion,
+} from './question.js';
+import {
   buildNflSellerMoveOptions,
   calculateNflSellerMove,
 } from './model_move.js';
@@ -30,11 +34,13 @@ type SellerMovePatch = {
 export interface ParsedSellerMoveTurn {
   kind: 'scenario';
   patch: SellerMovePatch;
+  market_question?: string;
 }
 
 export interface PreparedNflSellerMoveTurn {
   artifact: NflSellerMoveConversationArtifact;
   market: NflTransactionMarketAnalysis;
+  show_market_analysis: boolean;
 }
 
 /**
@@ -81,19 +87,38 @@ export function parseNflSellerMoveTurn(
     }
   }
 
-  const scenarioCue = /\b(?:what if|suppose|if)\s+(?:the giants|new york|we)\s+(?:(?:were to|could|should)\s+)?(?:move|moved|trade|traded|trading)(?!\s+for\b)\b/i.test(value)
-    || /^\s*(?:move|trade)\s+.+?\s+(?:for|in exchange for|in return for)\b/i.test(value);
+  const contextualCue = /\b(?:what if|suppose|if)\s+(?:the giants|new york|we)\s+(?:(?:were to|could|should)\s+)?(?:move|moved|trade|traded|trading)(?!\s+for\b)\b/i.exec(value);
+  const imperativeCue = /^\s*(?:move|trade)\s+.+?\s+(?:for|in exchange for|in return for)\b/i.exec(value);
+  const scenarioCue = contextualCue ?? imperativeCue;
   if (!scenarioCue) return null;
 
-  const playerMatch = value.match(/\b(?:move|moved|trade|traded|trading)\s+(.+?)(?:\s+away)?\s+(?:for|in exchange for|in return for)\b/i)
-    ?? value.match(/\b(?:move|moved|trade|traded|trading)\s+(.+?)(?:\?|$)/i);
-  const years = uniqueMatches(value, /\b(20\d{2})\b/g).map(Number);
-  const rounds = roundValues(value);
+  // Parse only the explicit seller clause. A compound question can contain
+  // earlier phrases such as "the trade market for EDGE players"; matching
+  // from the start of the sentence would incorrectly treat "market" as the
+  // player and the historical start year as part of the proposed return.
+  const sellerClause = value.slice(scenarioCue.index);
+  const playerMatch = sellerClause.match(/\b(?:move|moved|trade|traded|trading)\s+(.+?)(?:\s+away)?\s+(?:for|in exchange for|in return for)\b/i)
+    ?? sellerClause.match(/\b(?:move|moved|trade|traded|trading)\s+(.+?)(?:\?|$)/i);
+  const compensationMatch = sellerClause.match(/\b(?:for|in exchange for|in return for)\s+(.+)$/i);
+  const compensationClause = compensationMatch?.[1] ?? sellerClause;
+  const years = uniqueMatches(compensationClause, /\b(20\d{2})\b/g).map(Number);
+  const rounds = roundValues(compensationClause);
   const patch: SellerMovePatch = {};
   if (playerMatch?.[1]) patch.player_query = cleanPlayerQuery(playerMatch[1]);
   if (years.length === 1) patch.pick_year = years[0];
   if (rounds.length === 1) patch.pick_round = rounds[0];
-  return { kind: 'scenario', patch };
+  const marketQuestion = contextualCue && contextualCue.index > 0
+    ? value.slice(0, contextualCue.index)
+      .trim()
+      .replace(/(?:\s*[-–—]\s*|\s+)and$/iu, '')
+      .replace(/[\s,;:\-–—]+$/u, '')
+      .trim()
+    : '';
+  return {
+    kind: 'scenario',
+    patch,
+    ...(isNflTransactionMarketQuestion(marketQuestion) ? { market_question: marketQuestion } : {}),
+  };
 }
 
 export async function runNflSellerMoveConversationTurn(
@@ -115,19 +140,39 @@ export async function runNflSellerMoveConversationTurn(
     return {
       artifact: unavailableArtifact(baseScenario(market, previous), 'The current public contract or transaction data is unavailable right now.'),
       market,
+      show_market_analysis: Boolean(parsed.market_question),
     };
   }
-  const effectiveMarket = market ?? defaultSellerMarketFromSnapshot(teamData.seed, snapshot);
+  const effectiveMarket = sellerMarketForTurn(parsed, market, teamData.seed, snapshot);
   if (teamData.source_mode !== 'supabase_current_views') {
     return {
       artifact: unavailableArtifact(baseScenario(effectiveMarket, previous), 'Current Giants contract data is not available from the local database.'),
       market: effectiveMarket,
+      show_market_analysis: Boolean(parsed.market_question),
     };
   }
   return {
     artifact: resolveNflSellerMoveConversationTurn(parsed, effectiveMarket, previous, teamData.seed, snapshot),
     market: effectiveMarket,
+    show_market_analysis: Boolean(parsed.market_question),
   };
+}
+
+export function sellerMarketForTurn(
+  parsed: ParsedSellerMoveTurn,
+  inherited: NflTransactionMarketAnalysis | null,
+  seed: NflDemoSeed,
+  snapshot: NflTransactionMarketSnapshot,
+): NflTransactionMarketAnalysis {
+  if (parsed.market_question) {
+    // The extracted prefix is a complete market question. Do not carry an old
+    // channel's omitted filters into a new explicit scope.
+    return analyzeNflTransactionMarketSnapshot(
+      transactionMarketRequestFromQuestion(parsed.market_question),
+      snapshot,
+    );
+  }
+  return inherited ?? defaultSellerMarketFromSnapshot(seed, snapshot);
 }
 
 export function defaultSellerMarketFromSnapshot(seed: NflDemoSeed, snapshot: NflTransactionMarketSnapshot): NflTransactionMarketAnalysis {

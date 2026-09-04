@@ -54,6 +54,11 @@ test('parses unplanned trade and position variations', () => {
   assert.deepEqual(beforeAfter.position_groups, ['RB', 'S']);
   assert.equal(beforeAfter.comparison_year, 2020);
   assert.equal(beforeAfter.analysis_mode, 'period_comparison');
+
+  const edgeTradeMarket = transactionMarketRequestFromQuestion('Since 2018, how has the trade market for EDGE players changed?');
+  assert.equal(edgeTradeMarket.start_year, 2018);
+  assert.deepEqual(edgeTradeMarket.position_groups, ['EDGE']);
+  assert.deepEqual(edgeTradeMarket.transaction_types, ['trade']);
 });
 
 test('recognizes hyphenated material-move acceptance wording', () => {

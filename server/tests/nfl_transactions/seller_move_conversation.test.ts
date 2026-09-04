@@ -9,9 +9,10 @@ import {
   defaultSellerMarketFromSnapshot,
   parseNflSellerMoveTurn,
   resolveNflSellerMoveConversationTurn,
+  sellerMarketForTurn,
 } from '../../src/nfl_transactions/seller_move_conversation.js';
 import { loadReviewedNflTransactionSnapshot } from '../../src/nfl_transactions/seed.js';
-import { deterministicSellerMoveEvidenceRows } from '../../src/routes/briefs.js';
+import { deterministicSellerMoveEvidenceRows, sellerMoveArtifactBody } from '../../src/routes/briefs.js';
 
 const GENERATED_AT = '2026-09-03T16:00:00.000Z';
 
@@ -36,6 +37,52 @@ test('a market-analysis continuation resolves a full Giants seller proposal', as
   assert.equal(artifact.result?.proposal.pick_year, 2027);
   assert.equal(artifact.result?.proposal.pick_round, 2);
   assert(artifact.result?.comparables.length);
+});
+
+test('a compound market and seller question isolates the player and proposed return', () => {
+  const question = 'Since 2018, how has the trade market for EDGE players changed—and if the Giants moved Brian Burns for a 2027 second-round pick, would that return be above, within, or below the historical range?';
+  const turn = parseNflSellerMoveTurn(question, null);
+
+  assert(turn);
+  assert.equal(turn.patch.player_query, 'Brian Burns');
+  assert.equal(turn.patch.pick_year, 2027);
+  assert.equal(turn.patch.pick_round, 2);
+  assert.equal(turn.market_question, 'Since 2018, how has the trade market for EDGE players changed');
+});
+
+test('a compound question uses its explicit market scope instead of stale channel filters', async () => {
+  const fixture = await liveFixture();
+  const turn = parseNflSellerMoveTurn(
+    'Since 2018, how has the trade market for EDGE players changed—and if the Giants moved Brian Burns for a 2027 second, where would that land?',
+    null,
+  )!;
+  const staleMarket = analyzeNflTransactionMarketSnapshot({
+    analysis_mode: 'ten_year_trend',
+    start_year: 2016,
+    end_year: 2020,
+    team_ids: ['NYG'],
+    position_groups: ['WR'],
+    transaction_types: ['extension'],
+    include_ytd: false,
+    max_comparables: 12,
+  }, fixture.snapshot, { generatedAt: GENERATED_AT });
+  const market = sellerMarketForTurn(turn, staleMarket, fixture.seed, fixture.snapshot);
+
+  assert.equal(market.query.start_year, 2018);
+  assert.equal(market.query.end_year, 2025);
+  assert.deepEqual(market.query.team_ids, []);
+  assert.deepEqual(market.query.position_groups, ['EDGE']);
+  assert.deepEqual(market.query.transaction_types, ['trade']);
+});
+
+test('compound seller bodies request both live result surfaces', async () => {
+  const fixture = await liveFixture();
+  const artifact = answer(fixture, 'What if we moved Brian Burns for a 2027 second?', null);
+  const body = sellerMoveArtifactBody(fixture.market, artifact, true);
+
+  assert.equal(body.combined_market_seller_analysis, true);
+  assert.equal(body.market_analysis, fixture.market);
+  assert.equal(body.seller_move_analysis, artifact);
 });
 
 test('seller answers cite contract, role, the trade rule, and historical comparables', async () => {
@@ -196,6 +243,7 @@ test('the active Analysis path contains no embedded form or retired cap room', a
 
   assert.doesNotMatch(marketView, /NflModelMove|Model a move|Seller-side check/);
   assert.doesNotMatch(dataBody, /NflModelMove|Model a move|Seller-side check/);
+  assert.match(dataBody, /combined_market_seller_analysis[\s\S]+NflTransactionMarketAnalysisView[\s\S]+NflSellerMoveAnalysis/);
 });
 
 let fixturePromise: Promise<Awaited<ReturnType<typeof buildLiveFixture>>> | null = null;

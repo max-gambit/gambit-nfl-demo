@@ -10,6 +10,14 @@ interface Props {
 }
 
 export function DataAnalysisCardBody({ body }: Props) {
+  if (body.combined_market_seller_analysis && body.market_analysis && body.seller_move_analysis) {
+    return <div style={{ display: 'grid', gap: SPACE['2xl'] }}>
+      <NflTransactionMarketAnalysisView analysis={body.market_analysis} />
+      <div style={{ borderTop: `1px solid ${F.borderStrong}`, paddingTop: SPACE['2xl'] }}>
+        <NflSellerMoveAnalysis artifact={body.seller_move_analysis} followups={body.followups} />
+      </div>
+    </div>;
+  }
   if (body.seller_move_analysis) {
     return <NflSellerMoveAnalysis artifact={body.seller_move_analysis} followups={body.followups} />;
   }

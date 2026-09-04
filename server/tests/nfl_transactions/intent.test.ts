@@ -42,6 +42,7 @@ test('server intent matrix keeps prior context bounded to recognizable continuat
   const cases = [
     ['Which position markets have grown or shrunk over the last 10 years?', fresh, 'transaction_market', false],
     ['What if we moved Brian Burns for a 2027 second?', fresh, 'seller_move', false],
+    ['Since 2018, how has the trade market for EDGE players changed—and if the Giants moved Brian Burns for a 2027 second-round pick, would that return be above, within, or below the historical range?', fresh, 'seller_move', false],
     ['Make it a first.', fresh, 'seller_modifier_without_context', false],
     ['Show me trades only.', marketChannel, 'transaction_market', true],
     ['Compare edge rushers with interior offensive linemen.', marketChannel, 'transaction_market', true],

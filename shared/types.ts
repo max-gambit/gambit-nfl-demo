@@ -199,6 +199,8 @@ export interface DataAnalysisBriefBody {
   market_analysis?: NflTransactionMarketAnalysis;
   /** Server-attached deterministic seller-side trade continuation. */
   seller_move_analysis?: NflSellerMoveConversationArtifact;
+  /** The user asked for a market read and a seller check in the same turn. */
+  combined_market_seller_analysis?: boolean;
 }
 
 export type BriefBody = RecommendationBriefBody | DataAnalysisBriefBody;

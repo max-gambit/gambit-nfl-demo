@@ -227,9 +227,19 @@ briefRoutes.post('/', async (c) => {
     preparedMarketBody = unavailableSellerAnswerBody();
     preparedProgress = readyBriefProgress('Trade check unavailable', 'The public contract or transaction source could not be loaded.');
   } else if (preparedSellerMove && preparedSellerTurn) {
-    preparedMarketBody = sellerMoveArtifactBody(preparedSellerTurn.market, preparedSellerMove);
+    preparedMarketBody = sellerMoveArtifactBody(
+      preparedSellerTurn.market,
+      preparedSellerMove,
+      preparedSellerTurn.show_market_analysis,
+    );
     preparedProgress = sellerMoveBriefProgress(preparedSellerMove);
-    preparedSources = await deterministicSellerMoveEvidenceRows(preparedSellerMove);
+    const sellerSources = await deterministicSellerMoveEvidenceRows(preparedSellerMove);
+    preparedSources = preparedSellerTurn.show_market_analysis
+      ? [
+        ...sellerSources,
+        ...deterministicMarketEvidenceRows(preparedSellerTurn.market, sellerSources.length + 1),
+      ]
+      : sellerSources;
   } else if (immediateClarification) {
     preparedMarketBody = sellerModifierClarificationBody();
     preparedProgress = readyBriefProgress('Clarification ready', 'The proposed trade needs a player, draft year, and round.');
@@ -1925,6 +1935,7 @@ function unavailableSellerAnswerBody(): DataAnalysisBriefBody {
 export function sellerMoveArtifactBody(
   market: NflTransactionMarketAnalysis,
   artifact: NflSellerMoveConversationArtifact,
+  showMarketAnalysis = false,
 ): DataAnalysisBriefBody {
   const result = artifact.result;
   const comparableRefs = result?.comparables.map((_, index) => index + 4) ?? [];
@@ -1971,6 +1982,7 @@ export function sellerMoveArtifactBody(
     ] : [],
     market_analysis: market,
     seller_move_analysis: artifact,
+    ...(showMarketAnalysis ? { combined_market_seller_analysis: true } : {}),
   };
 }
 

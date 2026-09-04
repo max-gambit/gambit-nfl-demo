@@ -93,7 +93,7 @@ export function teamIdsFromQuestion(question: string): string[] {
 }
 
 function transactionTypesFromQuestion(question: string): NflTransactionType[] | null {
-  if (/\btrades? only\b|\btrade(?:s|d)? since\b|\bamong trades\b/i.test(question)) return ['trade'];
+  if (/\btrades? only\b|\btrade(?:s|d)? since\b|\bamong trades\b|\btrade market\b/i.test(question)) return ['trade'];
   if (/\bcontracts? only\b/i.test(question)) return ['free_agent_signing', 're_signing', 'extension', 'tag'];
   if (/\bfree agen(?:t|cy|ts) only\b/i.test(question)) return ['free_agent_signing'];
   if (/\breleases? only\b|\bcuts? only\b/i.test(question)) return ['release'];
