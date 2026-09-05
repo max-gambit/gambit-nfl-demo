@@ -32,7 +32,7 @@ test('NFL context composer orients trade answers without writing an answer plan'
   assert.equal(context.decision_primitives.some((primitive) => primitive.key === 'playable_depth'), true);
   assert.equal(context.decision_primitives.some((primitive) => primitive.key === 'decision_confidence'), true);
   assert.match(context.system_block, /Seller thesis cards/i);
-  assert.match(context.system_block, /conditional\/day-three/i);
+  assert.match(context.system_block, /working negotiation hypothesis/i);
   assert.match(context.system_block, /Raw row counts are inventory/i);
   assert.match(context.system_block, /Do not headline Vita Vea/i);
   assert.match(context.system_block, /new extension, restructure, or new-money/i);
@@ -418,6 +418,81 @@ test('private critic flags missing trade price, unsupported role fit, and unsupp
   });
   assert.equal(dbCritique.verdict, 'revise');
   assert.equal(dbCritique.issues.some((issue) => issue.category === 'unsupported_benchmark_claim'), true);
+});
+
+test('private critic allows historical trade-price reasoning but rejects invented seller acceptance', async () => {
+  const question = 'If the Giants wanted to add a veteran interior offensive lineman without giving up a Day 1 or Day 2 pick, which realistic trade targets fit their 2026 cap?';
+  const evidence = await buildCurrentNflEvidence(question);
+  const context = buildNflContextComposerForEvidence(question, evidence);
+  assert.ok(context);
+  assert.match(context.system_block, /Trade sample: \d+ trades/i);
+  assert.match(context.system_block, /Observed returns:/i);
+
+  const overclaim: SubmitDataAnalysisInput = {
+    answer: 'Chicago would accept a Day 3 pick for Garrett Bradbury. Compensation elsewhere still needs confirmation.',
+    key_findings: [], tables: [], calculations: [], sources: [], caveats: [], followups: [],
+  };
+  const historicalJudgment: SubmitDataAnalysisInput = {
+    answer: 'Day 3 falls within the historical IOL range: Joe Thuney moved for a fourth and Ed Ingram for a sixth. That makes it a defensible opening limit, but each current asking price and player’s availability remain unconfirmed.',
+    key_findings: [], tables: [], calculations: [], sources: [], caveats: [], followups: [],
+  };
+  const ungroundedPlayerPrice: SubmitDataAnalysisInput = {
+    answer: 'Damien Lewis likely costs more than Day 3. His asking price and availability remain unconfirmed.',
+    key_findings: [], tables: [], calculations: [], sources: [], caveats: [], followups: [],
+  };
+  const reasonedPlayerPrice: SubmitDataAnalysisInput = {
+    answer: 'Against the historical IOL sample, Damien Lewis likely costs more than the typical Day 3 return because his current contract and role make him a weaker match for the rental comparables. That is an inference; the current asking price and availability remain unconfirmed.',
+    key_findings: [], tables: [], calculations: [], sources: [], caveats: [], followups: [],
+  };
+  const liveOpeningRange: SubmitDataAnalysisInput = {
+    answer: 'Across 2016–2025, 31 of 32 allocable interior-line trades returned Round 4–7 picks. A fourth-to-sixth is a fair opening range, while availability remains unconfirmed for the current candidates.',
+    key_findings: [], tables: [], calculations: [], sources: [], caveats: [], followups: [],
+  };
+  const explicitHistoricalBoundary: SubmitDataAnalysisInput = {
+    answer: 'History supports the pick constraint: 31 of 32 allocable interior-line trades since 2016 returned only Day 3 picks.',
+    key_findings: [], tables: [], calculations: [], sources: [],
+    caveats: ["No target's availability is confirmed, and the historical Day 3 range is not any club's current asking price."],
+    followups: [],
+  };
+  const fourthRoundOverclaim: SubmitDataAnalysisInput = {
+    answer: 'Chicago would move Garrett Bradbury for a fourth-round pick.',
+    key_findings: [], tables: [], calculations: [], sources: [], caveats: [], followups: [],
+  };
+  const wrongFullPeriodClaim: SubmitDataAnalysisInput = {
+    answer: 'Every single-player IOL trade from 2016–2025 returned a Day 3 pick, so a Day 3 opening offer matches history. Current asking prices and availability remain unconfirmed.',
+    key_findings: [], tables: [], calculations: [], sources: [], caveats: [], followups: [],
+  };
+
+  const overclaimCritique = evaluateNflDraftForPrivateCritic({ question, composedContext: context, draftKind: 'data_analysis', draft: overclaim });
+  const historicalCritique = evaluateNflDraftForPrivateCritic({ question, composedContext: context, draftKind: 'data_analysis', draft: historicalJudgment });
+  const ungroundedCritique = evaluateNflDraftForPrivateCritic({ question, composedContext: context, draftKind: 'data_analysis', draft: ungroundedPlayerPrice });
+  const reasonedCritique = evaluateNflDraftForPrivateCritic({ question, composedContext: context, draftKind: 'data_analysis', draft: reasonedPlayerPrice });
+  const liveOpeningRangeCritique = evaluateNflDraftForPrivateCritic({ question, composedContext: context, draftKind: 'data_analysis', draft: liveOpeningRange });
+  const explicitHistoricalBoundaryCritique = evaluateNflDraftForPrivateCritic({ question, composedContext: context, draftKind: 'data_analysis', draft: explicitHistoricalBoundary });
+  const fourthRoundOverclaimCritique = evaluateNflDraftForPrivateCritic({ question: 'Would Chicago move Garrett Bradbury for a fourth-round pick?', composedContext: context, draftKind: 'data_analysis', draft: fourthRoundOverclaim });
+  const wrongFullPeriodCritique = evaluateNflDraftForPrivateCritic({ question, composedContext: context, draftKind: 'data_analysis', draft: wrongFullPeriodClaim });
+  assert.equal(overclaimCritique.issues.some((issue) => issue.category === 'missing_trade_price' && issue.severity === 'high'), true);
+  assert.equal(historicalCritique.issues.some((issue) => issue.category === 'missing_trade_price' && issue.severity === 'high'), false);
+  assert.equal(ungroundedCritique.issues.some((issue) => issue.category === 'missing_trade_price' && issue.severity === 'high'), true);
+  assert.equal(reasonedCritique.issues.some((issue) => issue.category === 'missing_trade_price' && issue.severity === 'high'), false);
+  assert.equal(liveOpeningRangeCritique.issues.some((issue) => issue.category === 'missing_trade_price' && issue.severity === 'high'), false);
+  assert.equal(explicitHistoricalBoundaryCritique.issues.some((issue) => issue.category === 'missing_trade_price' && issue.severity === 'high'), false);
+  assert.equal(fourthRoundOverclaimCritique.issues.some((issue) => issue.category === 'missing_trade_price' && issue.severity === 'high'), true);
+  assert.equal(wrongFullPeriodCritique.issues.some((issue) => issue.category === 'missing_trade_price' && issue.severity === 'high'), true);
+});
+
+test('private critic does not price a current player from an insufficient historical sample', async () => {
+  const question = 'Which veteran safety can the Giants acquire for a fourth-round pick?';
+  const evidence = await buildCurrentNflEvidence(question);
+  const context = buildNflContextComposerForEvidence(question, evidence);
+  assert.ok(context);
+  assert.match(context.system_block, /Price conclusion: Too few/i);
+  const draft: SubmitDataAnalysisInput = {
+    answer: 'The historical safety market says a fourth-round pick falls within the expected range. Current asking prices and availability remain unconfirmed.',
+    key_findings: [], tables: [], calculations: [], sources: [], caveats: [], followups: [],
+  };
+  const critique = evaluateNflDraftForPrivateCritic({ question, composedContext: context, draftKind: 'data_analysis', draft });
+  assert.equal(critique.issues.some((issue) => issue.category === 'missing_trade_price' && issue.severity === 'high'), true);
 });
 
 test('private critic scans primary presentation bodies for unsupported visible claims', async () => {

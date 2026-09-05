@@ -1435,6 +1435,7 @@ async function generateCurrentNflReasonedAnswer(args: {
     // ever exposing a partial response.
   }
   let input: SubmitDataAnalysisInput | null;
+  let usedRevision = !response;
   if (!response) {
     await args.progress.mark(
       'repairing',
@@ -1463,6 +1464,7 @@ async function generateCurrentNflReasonedAnswer(args: {
     input = normalizedInput ? humanizeCurrentNflAnalysisInput(normalizedInput) : null;
   }
   if (input && hasCurrentNflAnalysisDisplayViolation(input)) {
+    usedRevision = true;
     await args.progress.mark(
       'repairing',
       72,
@@ -1494,13 +1496,41 @@ async function generateCurrentNflReasonedAnswer(args: {
     return;
   }
 
-  const critique = evaluateNflDraftForPrivateCritic({
+  let critique = evaluateNflDraftForPrivateCritic({
     question: args.brief.question,
     composedContext: args.composedNflContext,
     draftKind: 'data_analysis',
     draft: input,
   });
-  if (critique.verdict === 'revise') {
+  if (critique.verdict === 'revise' && !usedRevision) {
+    await args.progress.mark(
+      'repairing',
+      72,
+      'Checking the football answer',
+      'One unsupported claim needs a cleaner answer before it appears.',
+      'model',
+    );
+    const repairTimeoutMs = currentNflRepairTimeoutMs(args.startedAt);
+    const repairedInput = repairTimeoutMs > 0
+      ? await repairCurrentNflAnalysisMarkup({
+        question: args.brief.question,
+        currentNflEvidence: args.currentNflEvidence,
+        composedNflContext: args.composedNflContext,
+        timeoutMs: repairTimeoutMs,
+        revisionInstruction: critique.revision_instructions.join(' '),
+      })
+      : null;
+    input = repairedInput ? humanizeCurrentNflAnalysisInput(repairedInput) : null;
+    critique = input
+      ? evaluateNflDraftForPrivateCritic({
+        question: args.brief.question,
+        composedContext: args.composedNflContext,
+        draftKind: 'data_analysis',
+        draft: input,
+      })
+      : critique;
+  }
+  if (!input || critique.verdict === 'revise') {
     await persistEvidenceBoundGenerationFallback({
       brief: args.brief,
       heartbeat: args.heartbeat,
@@ -1590,7 +1620,9 @@ export function buildCurrentNflReasoningSystem(
         'In the visible answer, refer to those assumptions naturally: say “if the knee concern proves real,” not “user-entered scenario,” “sourced injury,” or “current data.”',
         'Name a player or counterparty only when it appears in the supplied evidence. A plausible target is an exploratory candidate, not a claim that the player is available.',
         'When the user asks for trade targets, put the best 3-5 plausible candidates from the supplied target rows in the first sentence. Prefer priority-call or exploratory-call candidates; if there are too few, include monitor candidates and say they are names to scout rather than players known to be available. Never lead with a player marked not a priority or unlikely unless the team changes direction. Explain football fit, contract shape, likely resistance from the other team, and what must be confirmed. Do not refuse to name candidates solely because availability is unconfirmed.',
-        'NFL trades do not require salary matching. If the evidence says New York can absorb the target, do not name a Giant to trade, discuss clearing salary, or add an outgoing-player alternative.',
+        'NFL trades do not require matching contracts. If the evidence says New York can absorb the target, do not propose trading a Giant merely to make the target’s contract fit.',
+        'A user-stated pick ceiling is a proposed limit, not evidence that another team would accept it. When same-position historical trades are supplied, use them to judge whether that limit resembles prior returns, identify the closest deals, and reason about which current candidates are stronger or weaker comparables. Make the football judgment; do not merely recite the sample. Clearly separate that market-based inference from an actual current asking price or willingness to trade, which remains unconfirmed unless a source says otherwise.',
+        'Keep the full-period pick mix separate from the baseline and recent comparison windows. Never describe a window-only result as true of every trade across the full period.',
         'Use direct football language throughout. Avoid internal product jargon such as seller thesis, seller cards, seller signal, lane, screen, call-now, check-call, directional, source-needed, evidence boundary, preflight, model, runtime, artifact, deterministic, posture, gating issue, lever, salary-out, pick-led, construction, contract fit, current file, reject-unless, or contend-mode. Never mention an internal confidence label, row, gate, grade, or workflow. Use football terms, not baseball metaphors such as premium bat.',
         'Use only figures and source references present below. Preserve material freshness, coverage, and uncertainty caveats.',
         'Keep the lead answer under 75 words. Return exactly 3 key findings; keep each label under 7 words and each body under 45 words. Return no tables or calculations for this answer. Include at most 2 caveats and 3 short follow-up questions.',
@@ -1608,6 +1640,7 @@ export function humanizeCurrentNflAnalysisInput(input: SubmitDataAnalysisInput):
     return value
       .replace(/\$-([0-9.]+[KMB]?)/g, (_match, amount: string) => `-$${amount}`)
       .replace(/~([−-])\$/g, '$1$')
+      .replace(/\bwithout moving salary out\b/gi, 'without trading away a Giant to make the money work')
       .trim();
   };
   const safe = (value: string | null | undefined): boolean => !value
@@ -1688,6 +1721,7 @@ async function repairCurrentNflAnalysisMarkup(args: {
   currentNflEvidence: CurrentNflEvidencePack;
   composedNflContext: ComposedNflContext;
   timeoutMs: number;
+  revisionInstruction?: string;
 }): Promise<SubmitDataAnalysisInput | null> {
   try {
     const response = await createClaudeMessage({
@@ -1700,6 +1734,7 @@ async function repairCurrentNflAnalysisMarkup(args: {
           text: [
             'The prior response cannot be shown because it contains formatting debris or internal product language.',
             'Write the football answer again from the supplied evidence.',
+            ...(args.revisionInstruction ? [`Specific correction required: ${args.revisionInstruction}`] : []),
             'Return clean values in exactly one submit_data_analysis call. Do not put XML, JSON, field names, response tags, or internal workflow terms inside any text value.',
             'Include exactly 3 concise key findings. Keep each body under 45 words, with no tables or calculations.',
           ].join('\n'),

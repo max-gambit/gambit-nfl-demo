@@ -168,6 +168,7 @@ test('Analysis evidence surfaces use plain user-facing labels', async () => {
   assert.match(detail, /directFact\(data, 'excerpt', 'What it says'\)/);
   assert.match(detail, /top cap contracts|contract field coverage|roster players|exact location/i);
   assert.match(detail, /2026 cap number|contract terms\?|why the team might listen|why it might not|what to confirm/i);
+  assert.match(detail, /trade sample|full-period pick bands|premium-pick share|price conclusion|comparison windows|observed returns|what this does not show/i);
   assert.match(cite, /setSourceFilterRef\(refIndex\);[\s\S]*setHighlightedSourceRef\(refIndex\)/);
 });
 

@@ -264,6 +264,82 @@ test('NFL trade target lanes honor requested position instead of defaulting to p
   assert.match(genericScreen.named_target_lanes[0] ?? '', /No named target lane passed/);
 });
 
+test('interior offensive-line questions never resolve to defensive-interior targets', async () => {
+  const seed = await loadCurrentNflData();
+  const question = 'If the Giants wanted to add a veteran interior offensive lineman without giving up a Day 1 or Day 2 pick, which realistic trade targets fit their 2026 cap, and how would each acquisition change the starting five?';
+  const screen = await buildNflTradeGoalScreen(
+    seed,
+    'NYG',
+    question,
+  );
+
+  assert.ok(screen);
+  assert.match(screen.objective, /offensive-line help/i);
+  assert.ok(screen.target_lanes.length >= 3);
+  assert.equal(screen.target_lanes.every((lane) => ['OL', 'G', 'C'].includes(lane.position ?? '')), true);
+  assert.equal(screen.target_lanes.some((lane) => ['Harrison Phillips', 'Thomas Booker', 'Adam Butler'].includes(lane.target_player_name)), false);
+  assert.ok(screen.historical_trade_price);
+  assert.deepEqual(screen.historical_trade_price.position_groups, ['IOL']);
+  assert.ok(screen.historical_trade_price.trade_count >= 20);
+  assert.ok(screen.historical_trade_price.allocable_trade_count >= 10);
+  assert.equal(
+    Object.values(screen.historical_trade_price.full_period_compensation_mix).reduce((sum, count) => sum + count, 0),
+    screen.historical_trade_price.allocable_trade_count,
+  );
+  assert.ok((screen.historical_trade_price.full_period_premium_share_basis_points ?? 0) > 0);
+  assert.match(screen.historical_trade_price.compensation_explanation, /rounds 4–7=/i);
+  assert.ok(screen.historical_trade_price.comparables.length >= 4);
+  assert.equal(screen.historical_trade_price.comparables.every((row) => ['G', 'C', 'OG', 'OL', 'IOL'].includes((row.raw_position ?? '').toUpperCase())), true);
+  assert.match(screen.historical_trade_price.trade_source?.url ?? '', /releases\/download\/trades\/trades\.csv$/);
+
+  const evidence = await buildCurrentNflEvidence(question);
+  assert.ok(evidence);
+  assert.match(evidence.systemBlock, /Historical IOL trade sample:/);
+  assert.match(evidence.systemBlock, /Historical comparables:/);
+  const historySource = evidence.sources.find((source) => source.data?.internal_dataset_id === 'nfl_transaction_market_history');
+  const comparableSources = evidence.sources.filter((source) => source.data?.internal_dataset_id === 'nfl_transaction_market_comparable');
+  assert.ok(historySource);
+  assert.match(String(historySource.data?.source_url ?? ''), /releases\/download\/trades\/trades\.csv$/);
+  assert.ok(comparableSources.length >= 4);
+  assert.equal(comparableSources.every((source) => /releases\/download\/trades\/trades\.csv$/.test(String(source.data?.source_url ?? ''))), true);
+});
+
+test('bare tackle questions resolve to offensive tackles after defensive-tackle disambiguation', async () => {
+  const seed = await loadCurrentNflData();
+  const screen = await buildNflTradeGoalScreen(
+    seed,
+    'NYG',
+    'Which veteran tackle can the Giants acquire without a first-round pick?',
+  );
+
+  assert.ok(screen);
+  assert.match(screen.objective, /offensive-tackle help/i);
+  assert.ok(screen.target_lanes.length > 0);
+  assert.equal(screen.target_lanes.every((lane) => ['OT', 'T'].includes(lane.position ?? '')), true);
+  assert.deepEqual(screen.historical_trade_price?.position_groups, ['OT']);
+
+  const defensive = await buildNflTradeGoalScreen(
+    seed,
+    'NYG',
+    'Which veteran defensive tackle can the Giants acquire without a first-round pick?',
+  );
+  assert.ok(defensive);
+  assert.equal(defensive.target_lanes.every((lane) => ['DT', 'NT', 'DL'].includes(lane.position ?? '')), true);
+  assert.deepEqual(defensive.historical_trade_price?.position_groups, ['IDL']);
+});
+
+test('sparse historical price samples remain examples rather than market ranges', async () => {
+  const question = 'Which veteran safety can the Giants acquire for a fourth-round pick?';
+  const evidence = await buildCurrentNflEvidence(question);
+  assert.ok(evidence);
+  const history = evidence.sources.find((source) => source.data?.internal_dataset_id === 'nfl_transaction_market_history');
+  assert.ok(history);
+  const rows = Array.isArray(history.data?.rows) ? history.data.rows : [];
+  assert.match(String(rows.find((row) => row && typeof row === 'object' && 'k' in row && row.k === 'Price conclusion' && 'v' in row)?.v ?? ''), /too few/i);
+  assert.match(evidence.systemBlock, /too few allocable trades/i);
+  assert.match(evidence.systemBlock, /do not use this sample to price a current player/i);
+});
+
 test('a named Giants player resolves the position needed for replacement targets', async () => {
   const seed = await loadCurrentNflData();
   const screen = await buildNflTradeGoalScreen(

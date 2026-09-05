@@ -297,7 +297,13 @@ function sourceRowsByRef(sources: Omit<BriefSource, 'id' | 'brief_id'>[]): Map<n
   const rowsByRef = new Map<number, SourceRow[]>();
   for (const source of sources) {
     const rows = source.data?.rows;
-    rowsByRef.set(source.ref_index, Array.isArray(rows) ? rows.filter(isSourceRow) : []);
+    const internalDatasetId = typeof source.data?.internal_dataset_id === 'string'
+      ? source.data.internal_dataset_id
+      : null;
+    rowsByRef.set(source.ref_index, [
+      ...(internalDatasetId ? [{ k: 'Dataset', v: internalDatasetId }] : []),
+      ...(Array.isArray(rows) ? rows.filter(isSourceRow) : []),
+    ]);
   }
   return rowsByRef;
 }
@@ -458,6 +464,7 @@ function compactFacts(
     if (dataset === 'nfl_coverage_current') pushFact(facts, ref, refsAreReserved, rows, ['Team', 'Overall status', 'Readiness', 'Position groups', 'Top gaps']);
     if (dataset === 'nfl_trade_screen_current') pushFact(facts, ref, refsAreReserved, rows, ['Objective', 'Lower-pain outgoing hierarchy', 'Depth-after-trade checks', 'Seller thesis cards', 'Counterparty seller summaries', 'Bad cap-relief trades', 'Required answer checks']);
     if (dataset === 'nfl_context_graph' && tags.includes('seller_thesis')) pushFact(facts, ref, refsAreReserved, rows, ['Counterparty Intel teams', 'Seller thesis summaries', 'Intel precedence']);
+    if (dataset === 'nfl_transaction_market_history' && tags.includes('trade')) pushFact(facts, ref, refsAreReserved, rows, ['Position', 'Period', 'Trade sample', 'Full-period pick bands', 'Premium-pick share', 'Price conclusion', 'Comparison windows', 'Observed returns', 'Method', 'Player matching', 'What this supports', 'What it does not show']);
     if (facts.length >= 12) break;
   }
   return facts.length ? facts : ['Use the loaded NFL app-data traces as the evidence boundary before making a strong claim.'];

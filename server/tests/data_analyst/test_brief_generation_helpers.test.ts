@@ -803,6 +803,16 @@ test('current NFL answers drop isolated internal language without discarding cle
   assert.equal(hasCurrentNflAnalysisDisplayViolation(input), false);
 });
 
+test('current NFL answers translate a salary-fit phrase without triggering a full regeneration', () => {
+  const input = humanizeCurrentNflAnalysisInput({
+    answer: 'New York can absorb the contract without moving salary out.',
+    key_findings: [], tables: [], calculations: [], sources: [], caveats: [], followups: [],
+  });
+
+  assert.equal(input.answer, 'New York can absorb the contract without trading away a Giant to make the money work.');
+  assert.equal(hasCurrentNflAnalysisDisplayViolation(input), false);
+});
+
 test('current NFL answers detect provider tool markup that escaped into a text field', () => {
   const input = humanizeCurrentNflAnalysisInput({
     answer: 'Tre Tucker is worth an exploratory call. <parameter name="answer">broken</parameter>',

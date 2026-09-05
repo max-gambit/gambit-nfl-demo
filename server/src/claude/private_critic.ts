@@ -282,6 +282,47 @@ export function evaluateNflDraftForPrivateCritic(args: RunNflPrivateCriticArgs):
     });
   }
 
+  const userRequestsTradePrice = /\b(?:day[-\s]?[123]|first[-\s]?round|second[-\s]?round|third[-\s]?round|fourth[-\s]?round|fifth[-\s]?round|sixth[-\s]?round|seventh[-\s]?round|round\s*[1-7]|r[1-7]|draft[-\s]?(?:pick|capital)|compensation|asking price|trade price)\b/i.test(question);
+  const draftAcknowledgesUnknownPrice = /\b(?:asking price|trade price|compensation|return|day[-\s]?3 (?:price|pick|capital))\b.{0,120}\b(?:unknown|unconfirmed|not (?:known|established|supported)|must be confirmed|needs? confirmation|confirm(?:ed|ation)?)\b|\b(?:unknown|unconfirmed|not (?:known|established|supported)|must be confirmed|needs? confirmation)\b.{0,120}\b(?:asking price|trade price|compensation|return|day[-\s]?3 (?:price|pick|capital))\b/is.test(draftText)
+    || (/\b(?:opening|starting) (?:offer|range)\b/i.test(draftText)
+      && /\b(?:availability|seller|team)\b.{0,100}\b(?:unconfirmed|not confirmed|must be confirmed|needs? confirmation)\b|\b(?:unconfirmed|not confirmed)\b.{0,100}\bsellers?\b/is.test(draftText))
+    || /\b(?:historical|market)\b.{0,140}\b(?:range|sample|returns?)\b.{0,80}\b(?:is not|isn't|does not establish|cannot establish|does not show|cannot show)\b.{0,80}\b(?:current )?(?:asking price|ask|willingness)\b/is.test(draftText);
+  const hasHistoricalTradePriceEvidence = /\bTrade sample:\s*\d+ trades\b|\bObserved returns:\s*.+\bTrade compensation uses\b/is.test(contextText);
+  const historicalPriceEvidenceIsInsufficient = /\b(?:Historical price comparison|Price conclusion):\s*Too few\b/i.test(contextText);
+  const draftUsesHistoricalPriceFrame = /\b(?:historical(?:ly)?|prior trades?|observed returns?|trade sample|comparables?|market range|full[-\s]?period|since\s+20\d{2})\b|\b20\d{2}[–-]20\d{2}\b/i.test(draftText);
+  const draftMakesPriceJudgment = /\b(?:day[-\s]?[123]|(?:first|second|third|fourth|fifth|sixth|seventh)[-\s]?round|round\s*[1-7]|r[1-7])\b.{0,80}\b(?:is enough|would be enough|gets|lands|fits|matches|falls within|is above|is below|market|range|price|ask|return|cost)\b|\b(?:not realistic|realistic|obtainable|available|price|ask|return|cost|market|range)\b.{0,80}\b(?:day[-\s]?[123]|(?:first|second|third|fourth|fifth|sixth|seventh)[-\s]?round|round\s*[1-7]|r[1-7])\b/is.test(draftText);
+  const draftClaimsCurrentSellerPrice = draftText
+    .split(/(?<=[.!?])\s+|\n+/)
+    .some((sentence) => {
+      const sellerAcceptanceClaim = /\b(?:would|could|can)\s+(?:accept|take|move|trade|deal).{0,100}\b(?:day[-\s]?[123]|(?:first|second|third|fourth|fifth|sixth|seventh)[-\s]?round|round\s*[1-7]|r[1-7])\b/is.test(sentence);
+      const statedAsk = /\b(?:asking price|trade price|price|ask)\s+(?:is|equals?|will be|would be)\s+(?:a )?(?:day[-\s]?[123]|(?:first|second|third|fourth|fifth|sixth|seventh)[-\s]?round|round\s*[1-7]|r[1-7])\b|\b(?:team|club|front office|[A-Z][a-z]+)\b.{0,50}\b(?:wants?|demands?|is asking for)\b.{0,50}\b(?:day[-\s]?[123]|(?:first|second|third|fourth|fifth|sixth|seventh)[-\s]?round|round\s*[1-7]|r[1-7])\b/s.test(sentence);
+      const negatedOrQualified = /\b(?:does not|do not|cannot|can't|unknown|unconfirmed|not (?:known|established|supported)|no (?:public )?(?:evidence|source)|must be confirmed|needs? confirmation)\b/i.test(sentence);
+      return (sellerAcceptanceClaim || statedAsk) && !negatedOrQualified;
+    });
+  const historicalSampleContainsPremiumReturns = /\bFull-period pick bands:\s*Round 1:\s*(?:[1-9]\d*)\b|\bFull-period pick bands:[^\n]*Rounds 2–3:\s*(?:[1-9]\d*)\b/i.test(contextText);
+  const draftErasesFullPeriodPremiumReturns = /\b(?:every|all)\b.{0,160}\b(?:2016[–-]2025|ten[-\s]?year|full[-\s]?decade)\b.{0,180}\b(?:rounds? 4[–-]7|day[-\s]?3)\b|\b(?:2016[–-]2025|ten[-\s]?year|full[-\s]?decade)\b.{0,160}\b(?:every|all)\b.{0,120}\b(?:rounds? 4[–-]7|day[-\s]?3)\b/is.test(draftText);
+  if (userRequestsTradePrice
+    && hasPrimitive(args.composedContext, 'trade_price_discipline')
+    && (
+      draftClaimsCurrentSellerPrice
+      || (historicalSampleContainsPremiumReturns && draftErasesFullPeriodPremiumReturns)
+      || (!hasHistoricalTradePriceEvidence && !draftAcknowledgesUnknownPrice)
+      || (historicalPriceEvidenceIsInsufficient && (draftMakesPriceJudgment || !draftAcknowledgesUnknownPrice))
+      || (draftMakesPriceJudgment && !draftUsesHistoricalPriceFrame)
+    )) {
+    issues.push({
+      category: 'missing_trade_price',
+      severity: 'high',
+      claim: 'The draft does not cleanly separate the historical trade range from a current seller\'s unconfirmed price.',
+      evidence_boundary: hasHistoricalTradePriceEvidence
+        ? 'The attached trade history supports a market-based comparison, but it does not reveal a current team\'s asking price or willingness to trade.'
+        : 'No same-position historical trade sample or current asking price is attached.',
+      fix: hasHistoricalTradePriceEvidence
+        ? 'Make the football judgment from the historical same-position trades, name the closest comparables, label player-specific pricing as an inference, and state that the current ask and availability still need confirmation.'
+        : 'Do not classify the proposed pick as enough or too little; state that compensation and availability need confirmation.',
+    });
+  }
+
   if (hasPrimitive(args.composedContext, 'role_fit')
     && /\b(solves?|answer|difference[-\s]?maker|disruptive|coverage liability|replaceable|trust it|upgrade|juice)\b/i.test(draftText)
     && /directional|public evidence is directional|OL is continuity\/availability|role-fit not proven/i.test(contextText)
