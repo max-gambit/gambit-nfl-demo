@@ -8,7 +8,7 @@ import {
   type NflRosterEntry,
 } from '../nfl_data/seed.js';
 
-export type NflCurrentQuestionKind = 'cap_space' | 'starting_cornerbacks' | 'largest_cap_hits';
+export type NflCurrentQuestionKind = 'cap_space' | 'starting_cornerbacks' | 'largest_cap_hits' | 'wide_receiver_contracts';
 
 export interface PreparedNflCurrentAnswer {
   body: DataAnalysisBriefBody;
@@ -29,7 +29,24 @@ export function classifyNflCurrentQuestion(question: string): NflCurrentQuestion
   if (/\b(?:largest|highest|biggest|top)\b.*\b(?:2026\s+)?cap hits?\b|\bcap hits?\b.*\b(?:largest|highest|biggest|top)\b/i.test(value)) {
     return 'largest_cap_hits';
   }
+  if (
+    /\b(?:show|list|display|give me)\b/i.test(value)
+    && /\b(?:wide receivers?|receivers?|wrs?)\b/i.test(value)
+    && /\b(?:contracts?|cap hits?|cap numbers?|salar(?:y|ies))\b/i.test(value)
+    && !isHistoricalQuestion(value)
+  ) {
+    return 'wide_receiver_contracts';
+  }
   return null;
+}
+
+function isHistoricalQuestion(value: string): boolean {
+  return /\b(?:historical|history|trend|trends)\b/i.test(value)
+    || /\b(?:over|across|during)\s+(?:the\s+)?(?:last|past)\s+(?:\d+\s+years?|decade)\b/i.test(value)
+    || /\b(?:since|before|after|from)\s+20\d{2}\b/i.test(value)
+    || /\bbetween\s+20\d{2}\s+and\s+20\d{2}\b/i.test(value)
+    || /\b(?:compare|compared|versus|vs\.?)\b.*\b20\d{2}\b/i.test(value)
+    || /\b20\d{2}\s*(?:-|–|—|to|through)\s*20\d{2}\b/i.test(value);
 }
 
 export async function buildNflCurrentAnswer(
@@ -52,6 +69,7 @@ export async function buildNflCurrentAnswer(
     case 'cap_space': return capSpaceAnswer(loaded.seed);
     case 'starting_cornerbacks': return startingCornerbacksAnswer(loaded.seed);
     case 'largest_cap_hits': return largestCapHitsAnswer(loaded.seed);
+    case 'wide_receiver_contracts': return wideReceiverContractsAnswer(loaded.seed);
   }
 }
 
@@ -175,6 +193,54 @@ function largestCapHitsAnswer(seed: NflDemoSeed): PreparedNflCurrentAnswer {
       followups: [],
     },
     sources: rows.map((row, index) => contractSource(row, seed.as_of_date, index + 1)),
+  };
+}
+
+function wideReceiverContractsAnswer(seed: NflDemoSeed): PreparedNflCurrentAnswer {
+  const activeIds = new Set(seed.roster_entries
+    .filter((row) => row.team_id === 'NYG' && row.roster_status === 'active' && row.position === 'WR')
+    .map((row) => row.player_id));
+  const rows = seed.cap_rows
+    .filter((row) => (
+      row.team_id === 'NYG'
+      && row.player_id
+      && activeIds.has(row.player_id)
+      && row.position === 'WR'
+      && row.cap_number_2026 != null
+      && row.source_url
+      && supportedCapRow(row)
+    ))
+    .sort((left, right) => right.cap_number_2026! - left.cap_number_2026! || left.player_name.localeCompare(right.player_name));
+  if (rows.length === 0) return unavailableCurrentAnswer('wide_receiver_contracts');
+
+  const asOf = readableDate(seed.as_of_date);
+  const totalCapHit = rows.reduce((sum, row) => sum + row.cap_number_2026!, 0);
+  return {
+    body: {
+      kind: 'data_analysis',
+      answer: `The loaded Giants roster has ${rows.length} active wide receivers with supported contract rows. Their combined 2026 cap hit is ${money(totalCapHit)} as of ${asOf}.`,
+      key_findings: [],
+      tables: [{
+        title: 'Current Giants wide receiver contracts',
+        columns: ['Player', '2026 cap hit', 'Years remaining', 'Guaranteed remaining'],
+        rows: rows.map((row) => [
+          row.player_name,
+          money(row.cap_number_2026!),
+          row.contract_years_remaining == null ? 'Not available' : row.contract_years_remaining,
+          moneyOrUnavailable(row.guaranteed_remaining),
+        ]),
+        source_refs: rows.map((_, index) => index + 1),
+      }],
+      calculations: [{
+        label: 'Combined 2026 cap hit',
+        formula: rows.map((row) => money(row.cap_number_2026!)).join(' + '),
+        value: money(totalCapHit),
+        source_refs: rows.map((_, index) => index + 1),
+      }],
+      caveats: [`This includes active Giants wide receivers with supported rows in the current public cap sheet as of ${asOf}. Unpublished contract fields are shown as unavailable rather than estimated.`],
+      followups: [],
+    },
+    sources: rows.map((row, index) => positionContractSource(row, seed.as_of_date, index + 1)),
   };
 }
 
@@ -311,6 +377,32 @@ function contractSource(row: NflCapRow, asOfDate: string, refIndex: number): Omi
   };
 }
 
+function positionContractSource(row: NflCapRow, asOfDate: string, refIndex: number): Omit<BriefSource, 'id' | 'brief_id'> {
+  return {
+    ref_index: refIndex,
+    kind: 'CONTRACT',
+    source: 'OverTheCap',
+    title: `${row.player_name} — current contract`,
+    updated_at: asOfDate,
+    data: {
+      source_url: row.source_url,
+      authority_label: 'Public player contract source',
+      contribution: `Establishes the contract figures shown for ${row.player_name}.`,
+      current_team_contract: true,
+      current_position_contract_group: 'WR',
+      rows: [
+        { k: 'As of', v: readableDate(asOfDate) },
+        { k: 'Player', v: row.player_name },
+        { k: 'Position', v: row.position ?? 'WR' },
+        { k: '2026 cap hit', v: money(row.cap_number_2026!) },
+        { k: 'Contract terms', v: row.contract_years_remaining == null ? 'Not available' : `${row.contract_years_remaining} year${row.contract_years_remaining === 1 ? '' : 's'} remaining` },
+        { k: 'Guaranteed remaining', v: moneyOrUnavailable(row.guaranteed_remaining) },
+        { k: 'Contract confidence', v: confidenceLabel(row.contract_ledger_confidence) },
+      ],
+    },
+  };
+}
+
 function supportedCapRow(row: NflCapRow): boolean {
   return row.source_status === 'captured'
     && (row.contract_ledger_confidence === 'captured' || row.contract_ledger_confidence === 'derived');
@@ -400,6 +492,10 @@ function money(value: number): string {
     currency: 'USD',
     maximumFractionDigits: 0,
   }).format(value);
+}
+
+function moneyOrUnavailable(value: number | null): string {
+  return value == null ? 'Not available' : money(value);
 }
 
 function readableDate(value: string): string {

@@ -1071,6 +1071,9 @@ function compactAuditTitle(spec: AuditClaimSpec, rows: EvidenceCheckRow[]): stri
   if (rows.some((row) => row.source.data?.current_team_cap_summary === true)) return 'Giants 2026 cap position';
   if (rows.some((row) => row.source.data?.current_team_cap_calculation === true)) return 'Giants 2026 cap accounting';
   if (rows.some((row) => row.source.data?.current_league_cap === true)) return 'Official 2026 league salary cap';
+  const positionContractGroup = rows.find((row) => typeof row.source.data?.current_position_contract_group === 'string')
+    ?.source.data?.current_position_contract_group;
+  if (typeof positionContractGroup === 'string') return `Current Giants ${positionContractGroup} contracts`;
   if (rows.some((row) => row.source.data?.current_team_contract === true)) return 'Largest Giants 2026 cap hits';
   if (rows.some((row) => row.source.data?.current_team_roster === true || row.source.data?.current_team_depth === true)) return 'Current Giants cornerback roles';
   if (rows.some((row) => row.source.data?.seller_move_contract === true)) return 'Contract and cap calculation';

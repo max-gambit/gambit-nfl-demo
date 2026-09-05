@@ -101,8 +101,9 @@ const DEFAULT_SHARE_TEAM_ID = 'GSW';
 const BRIEF_GENERATION_HEARTBEAT_MS = 60_000;
 export const BRIEF_GENERATION_DEADLINE_MS = 14_000;
 export const NFL_BRIEF_GENERATION_DEADLINE_MS = 45_000;
-export const CURRENT_NFL_PRIMARY_REQUEST_TIMEOUT_MS = 28_000;
-export const CURRENT_NFL_REPAIR_REQUEST_TIMEOUT_MS = 8_000;
+export const CURRENT_NFL_PRIMARY_REQUEST_TIMEOUT_MS = 24_000;
+export const CURRENT_NFL_REPAIR_REQUEST_TIMEOUT_MS = 18_000;
+export const CURRENT_NFL_PERSISTENCE_MARGIN_MS = 5_000;
 export const CURRENT_NFL_REASONING_MODEL = process.env.ANTHROPIC_CURRENT_NFL_MODEL?.trim() || 'claude-fable-5';
 export const NFL_ARTIFACT_INTERPRETATION_DEADLINE_MS = 30_000;
 const MAX_BRIEF_PROGRESS_EVENTS = 12;
@@ -1416,7 +1417,7 @@ async function generateCurrentNflReasonedAnswer(args: {
     'model',
   );
 
-  let response: Awaited<ReturnType<typeof createClaudeMessage>>;
+  let response: Awaited<ReturnType<typeof createClaudeMessage>> | null = null;
   try {
     response = await createClaudeMessage({
       model: CURRENT_NFL_REASONING_MODEL,
@@ -1430,23 +1431,37 @@ async function generateCurrentNflReasonedAnswer(args: {
       maxRetries: 0,
     });
   } catch {
-    await persistEvidenceBoundGenerationFallback({
-      brief: args.brief,
-      heartbeat: args.heartbeat,
-      generation: args.generation,
-      progress: args.progress,
-      sources: args.currentNflEvidence.sources,
-      startedAt: args.startedAt,
-    });
-    return;
+    // A single bounded retry below handles transient provider failures without
+    // ever exposing a partial response.
   }
-  const toolUse = response.content.find(
-    (block) => block.type === 'tool_use' && block.name === 'submit_data_analysis',
-  );
-  const normalizedInput = toolUse?.type === 'tool_use'
-    ? normalizeSubmitDataAnalysisInput(toolUse.input)
-    : null;
-  let input = normalizedInput ? humanizeCurrentNflAnalysisInput(normalizedInput) : null;
+  let input: SubmitDataAnalysisInput | null;
+  if (!response) {
+    await args.progress.mark(
+      'repairing',
+      72,
+      'Trying the answer again',
+      'The first draft did not finish cleanly. Running one final attempt.',
+      'model',
+    );
+    const retryTimeoutMs = currentNflRepairTimeoutMs(args.startedAt);
+    const retryInput = retryTimeoutMs > 0
+      ? await repairCurrentNflAnalysisMarkup({
+        question: args.brief.question,
+        currentNflEvidence: args.currentNflEvidence,
+        composedNflContext: args.composedNflContext,
+        timeoutMs: retryTimeoutMs,
+      })
+      : null;
+    input = retryInput ? humanizeCurrentNflAnalysisInput(retryInput) : null;
+  } else {
+    const toolUse = response.content.find(
+      (block) => block.type === 'tool_use' && block.name === 'submit_data_analysis',
+    );
+    const normalizedInput = toolUse?.type === 'tool_use'
+      ? normalizeSubmitDataAnalysisInput(toolUse.input)
+      : null;
+    input = normalizedInput ? humanizeCurrentNflAnalysisInput(normalizedInput) : null;
+  }
   if (input && hasCurrentNflAnalysisDisplayViolation(input)) {
     await args.progress.mark(
       'repairing',
@@ -1455,11 +1470,15 @@ async function generateCurrentNflReasonedAnswer(args: {
       'Checking the supporting details before they appear.',
       'model',
     );
-    const repairedInput = await repairCurrentNflAnalysisMarkup({
-      question: args.brief.question,
-      currentNflEvidence: args.currentNflEvidence,
-      composedNflContext: args.composedNflContext,
-    });
+    const repairTimeoutMs = currentNflRepairTimeoutMs(args.startedAt);
+    const repairedInput = repairTimeoutMs > 0
+      ? await repairCurrentNflAnalysisMarkup({
+        question: args.brief.question,
+        currentNflEvidence: args.currentNflEvidence,
+        composedNflContext: args.composedNflContext,
+        timeoutMs: repairTimeoutMs,
+      })
+      : null;
     input = repairedInput ? humanizeCurrentNflAnalysisInput(repairedInput) : null;
   }
 
@@ -1591,7 +1610,8 @@ export function humanizeCurrentNflAnalysisInput(input: SubmitDataAnalysisInput):
       .replace(/~([−-])\$/g, '$1$')
       .trim();
   };
-  const safe = (value: string | null | undefined): boolean => !value || !CURRENT_NFL_MARKUP_LEAK_RE.test(value);
+  const safe = (value: string | null | undefined): boolean => !value
+    || (!CURRENT_NFL_MARKUP_LEAK_RE.test(value) && !CURRENT_NFL_INTERNAL_LANGUAGE_RE.test(value));
   const safeCell = (value: string | number | null): boolean => typeof value !== 'string' || safe(value);
 
   return {
@@ -1628,7 +1648,7 @@ export function humanizeCurrentNflAnalysisInput(input: SubmitDataAnalysisInput):
 }
 
 const CURRENT_NFL_MARKUP_LEAK_RE = /<\/?[a-z][^>]*>|\b(?:tool_use|tool_result|function_call)\b|["']?(?:source_refs?|key_findings|calculations|followups)["']?\s*[:=]/i;
-const CURRENT_NFL_INTERNAL_LANGUAGE_RE = /\b(?:seller[-\s]?thesis|seller cards?|seller signals?|(?:seller|target|trade|receiver) lanes?|call[_\s-]?now|check[_\s-]?call|posture[_\s-]?change[_\s-]?only|do[_\s-]?not[_\s-]?lead|source[-\s]?needed|evidence boundar(?:y|ies)|preflight|runtime|deterministic|gating (?:issue|question)|salary[-\s]?out|pick[-\s]?led|cap[-\s]?file|row parity|app rows?|contract ledger v1|captured[-\s]?confidence|trade[-\s]?goal screen|counterparty screen|cap levers?|cleaner levers?|contract fit|contend[-\s]?mode|reject[-\s]?unless|user[-\s]?entered scenario|sourced (?:fact|injury))\b/i;
+const CURRENT_NFL_INTERNAL_LANGUAGE_RE = /\b(?:seller[-\s]?thesis|seller cards?|seller signals?|(?:seller|target|trade|receiver) lanes?|call[_\s-]?now|check[_\s-]?call|posture[_\s-]?change[_\s-]?only|do[_\s-]?not[_\s-]?lead|directional(?: rows?)?|source[-\s]?needed|evidence boundar(?:y|ies)|preflight|runtime|deterministic|gating (?:issue|question)|salary[-\s]?out|pick[-\s]?led|cap[-\s]?file|row parity|app rows?|contract ledger v1|captured[-\s]?confidence|trade[-\s]?goal screen|counterparty screen|cap levers?|cleaner levers?|contract fit|contend[-\s]?mode|reject[-\s]?unless|user[-\s]?entered scenario|sourced (?:fact|injury))\b/i;
 
 export function hasCurrentNflAnalysisMarkupLeak(input: SubmitDataAnalysisInput): boolean {
   const values: Array<string | null | undefined> = [
@@ -1667,11 +1687,12 @@ async function repairCurrentNflAnalysisMarkup(args: {
   question: string;
   currentNflEvidence: CurrentNflEvidencePack;
   composedNflContext: ComposedNflContext;
+  timeoutMs: number;
 }): Promise<SubmitDataAnalysisInput | null> {
   try {
     const response = await createClaudeMessage({
       model: CURRENT_NFL_REASONING_MODEL,
-      max_tokens: 900,
+      max_tokens: 1200,
       system: [
         ...buildCurrentNflReasoningSystem(args.currentNflEvidence, args.composedNflContext),
         {
@@ -1688,7 +1709,7 @@ async function repairCurrentNflAnalysisMarkup(args: {
       tool_choice: { type: 'tool', name: 'submit_data_analysis', disable_parallel_tool_use: true },
       messages: [{ role: 'user', content: args.question }],
     }, {
-      timeout: CURRENT_NFL_REPAIR_REQUEST_TIMEOUT_MS,
+      timeout: args.timeoutMs,
       maxRetries: 0,
     });
     const toolUse = response.content.find(
@@ -1701,6 +1722,13 @@ async function repairCurrentNflAnalysisMarkup(args: {
   } catch {
     return null;
   }
+}
+
+export function currentNflRepairTimeoutMs(startedAt: number, now = Date.now()): number {
+  const remainingBeforePersistence = NFL_BRIEF_GENERATION_DEADLINE_MS
+    - Math.max(0, now - startedAt)
+    - CURRENT_NFL_PERSISTENCE_MARGIN_MS;
+  return Math.max(0, Math.min(CURRENT_NFL_REPAIR_REQUEST_TIMEOUT_MS, remainingBeforePersistence));
 }
 
 function conciseCurrentNflLead(value: string, maxWords = 90): string {

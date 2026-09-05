@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   BRIEF_GENERATION_DEADLINE_MS,
   CURRENT_NFL_PRIMARY_REQUEST_TIMEOUT_MS,
+  CURRENT_NFL_PERSISTENCE_MARGIN_MS,
   CURRENT_NFL_REPAIR_REQUEST_TIMEOUT_MS,
   NFL_BRIEF_GENERATION_DEADLINE_MS,
   briefGenerationDeadlineMs,
@@ -11,6 +12,7 @@ import {
   briefProgressStreamPayload,
   buildBriefUserPrompt,
   buildCurrentNflReasoningSystem,
+  currentNflRepairTimeoutMs,
   currentNbaEvidenceTeamIds,
   currentNflEvidenceTeamIds,
   hasNflCounterpartyIntelTrace,
@@ -693,7 +695,13 @@ test('current NFL briefs get enough time for source-backed model reasoning', () 
   assert.ok(NFL_BRIEF_GENERATION_DEADLINE_MS <= 45_000);
   assert.equal(briefGenerationDeadlineMs(unrelatedQuestion), BRIEF_GENERATION_DEADLINE_MS);
   assert.ok(CURRENT_NFL_PRIMARY_REQUEST_TIMEOUT_MS < NFL_BRIEF_GENERATION_DEADLINE_MS);
-  assert.ok(CURRENT_NFL_PRIMARY_REQUEST_TIMEOUT_MS + CURRENT_NFL_REPAIR_REQUEST_TIMEOUT_MS < NFL_BRIEF_GENERATION_DEADLINE_MS);
+  assert.ok(CURRENT_NFL_PERSISTENCE_MARGIN_MS > 0);
+  assert.equal(currentNflRepairTimeoutMs(10_000, 10_000), CURRENT_NFL_REPAIR_REQUEST_TIMEOUT_MS);
+  assert.equal(
+    currentNflRepairTimeoutMs(10_000, 10_000 + CURRENT_NFL_PRIMARY_REQUEST_TIMEOUT_MS),
+    NFL_BRIEF_GENERATION_DEADLINE_MS - CURRENT_NFL_PRIMARY_REQUEST_TIMEOUT_MS - CURRENT_NFL_PERSISTENCE_MARGIN_MS,
+  );
+  assert.equal(currentNflRepairTimeoutMs(10_000, 10_000 + NFL_BRIEF_GENERATION_DEADLINE_MS), 0);
 });
 
 test('current NFL reasoning treats injury language as a user scenario and constrains named targets', () => {
@@ -722,6 +730,15 @@ test('current NFL compact reasoning yields to explicit tables and calculations',
   assert.equal(requestsStructuredCurrentNflAnswer('Show our current WR contracts in a table.'), true);
   assert.equal(requestsStructuredCurrentNflAnswer('Calculate the cap room created by cutting this player.'), true);
   assert.equal(requestsStructuredCurrentNflAnswer('What is the dead money if we trade Brian Burns?'), true);
+});
+
+test('current NFL routing recognizes natural trading and acquisition phrasing', () => {
+  const tradingQuestion = 'If Malik Nabers is limited, which receivers should the Giants explore trading for?';
+  const acquisitionQuestion = 'Which receiver should the Giants acquire?';
+
+  assert.deepEqual(currentNflEvidenceTeamIds(tradingQuestion), ['NYG']);
+  assert.equal(briefGenerationDeadlineMs({ question: tradingQuestion }), NFL_BRIEF_GENERATION_DEADLINE_MS);
+  assert.deepEqual(currentNflEvidenceTeamIds(acquisitionQuestion), ['NYG']);
 });
 
 test('current NFL answers reject internal workflow jargon instead of mechanically rewriting prose', () => {
@@ -766,6 +783,24 @@ test('current NFL answers drop malformed model markup instead of rendering it', 
   assert.equal(input.tables.length, 0);
   assert.deepEqual(input.caveats, ['Availability must be confirmed.']);
   assert.doesNotMatch(JSON.stringify(input), /<\/?(?:answer|key_findings?|rows?|caveats?|item)\b/i);
+});
+
+test('current NFL answers drop isolated internal language without discarding clean prose', () => {
+  const input = humanizeCurrentNflAnalysisInput({
+    answer: 'Tre Tucker is worth exploring if Malik Nabers is unavailable.',
+    key_findings: [
+      { label: 'Clean finding', body: 'Las Vegas has enough depth to take the call.', source_refs: [7] },
+      { label: 'Bad finding', body: 'This target lane clears the seller screen.', source_refs: [7] },
+    ],
+    tables: [], calculations: [], sources: [],
+    caveats: ['Availability must be confirmed.', 'This is only a directional row.'],
+    followups: ['What would Las Vegas ask for?', 'Run the next seller-thesis card.'],
+  });
+
+  assert.equal(input.key_findings.length, 1);
+  assert.deepEqual(input.caveats, ['Availability must be confirmed.']);
+  assert.deepEqual(input.followups, ['What would Las Vegas ask for?']);
+  assert.equal(hasCurrentNflAnalysisDisplayViolation(input), false);
 });
 
 test('current NFL answers detect provider tool markup that escaped into a text field', () => {

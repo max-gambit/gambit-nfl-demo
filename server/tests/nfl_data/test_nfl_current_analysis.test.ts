@@ -15,6 +15,10 @@ test('basic Giants cap and roster questions have a bounded deterministic route',
   assert.equal(classifyNflCurrentQuestion('How much 2026 cap space do the Giants currently have?'), 'cap_space');
   assert.equal(classifyNflCurrentQuestion('Who are the Giants starting cornerbacks right now?'), 'starting_cornerbacks');
   assert.equal(classifyNflCurrentQuestion('Which Giants contracts have the largest 2026 cap hits?'), 'largest_cap_hits');
+  assert.equal(classifyNflCurrentQuestion('Show our current Giants wide receiver contracts in a table.'), 'wide_receiver_contracts');
+  assert.equal(classifyNflCurrentQuestion('List Giants wide receiver contracts over the last 10 years.'), null);
+  assert.equal(classifyNflCurrentQuestion('List Giants wide receiver contracts over the last decade.'), null);
+  assert.equal(classifyNflCurrentQuestion('Show Giants WR contract trends since 2018.'), null);
   assert.equal(classifyNflCurrentQuestion('How much cap space do the New York Jets have?'), null);
   assert.equal(classifyNflCurrentQuestion('How does that affect our draft strategy?'), null);
   assert.equal(classifyNflCurrentQuestion('Which position markets have grown?'), null);
@@ -64,13 +68,28 @@ test('cornerback answer distinguishes explicit depth-chart evidence from inferen
   assert.equal(result.sources[2]?.data?.current_team_role_history, true);
 });
 
-test('all three current answers complete well inside the model deadline and never need a model', async () => {
+test('wide receiver contract table is built from current active-roster contract rows', async () => {
+  const result = await buildNflCurrentAnswer('wide_receiver_contracts', { loadTeam: currentLoader(await nygSeed()) });
+  const table = result.body.tables[0];
+
+  assert.equal(table?.title, 'Current Giants wide receiver contracts');
+  assert.ok(table && table.rows.length > 0);
+  assert.ok(table.rows.some((row) => row[0] === 'Darius Slayton'));
+  assert.ok(table.rows.some((row) => row[0] === 'Malik Nabers'));
+  assert.equal(result.sources.length, table.rows.length);
+  assert.ok(result.sources.every((source) => source.data?.current_team_contract === true));
+  assert.ok(result.sources.every((source) => source.data?.current_position_contract_group === 'WR'));
+  assert.ok(result.sources.every((source) => /^https:\/\/overthecap\.com\/player\//.test(String(source.data?.source_url))));
+});
+
+test('all current answers complete well inside the model deadline and never need a model', async () => {
   const seed = await nygSeed();
   const started = performance.now();
   const answers = await Promise.all([
     buildNflCurrentAnswer('cap_space', { loadTeam: currentLoader(seed) }),
     buildNflCurrentAnswer('starting_cornerbacks', { loadTeam: currentLoader(seed) }),
     buildNflCurrentAnswer('largest_cap_hits', { loadTeam: currentLoader(seed) }),
+    buildNflCurrentAnswer('wide_receiver_contracts', { loadTeam: currentLoader(seed) }),
   ]);
 
   assert.ok(performance.now() - started < 2_000);
