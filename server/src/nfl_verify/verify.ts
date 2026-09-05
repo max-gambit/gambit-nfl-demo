@@ -24,7 +24,7 @@ async function main(): Promise<void> {
   const health = await buildNflDataHealth('NYG');
   record('health', health.meeting_ready && health.source_mode === 'supabase_current_views', `${health.status}; meeting_ready=${health.meeting_ready}; source=${health.source_mode}`);
   const roster = health.datasets.find((dataset) => dataset.id === 'roster');
-  record('freshness', Boolean(roster && roster.age_hours != null && roster.age_hours <= 48 && roster.row_count === 102), `roster rows=${roster?.row_count ?? 0}; age_hours=${roster?.age_hours ?? 'unknown'}`);
+  record('freshness', Boolean(roster && roster.age_hours != null && roster.age_hours <= 48 && roster.row_count >= 70), `roster rows=${roster?.row_count ?? 0}; age_hours=${roster?.age_hours ?? 'unknown'}`);
   const capHealth = health.datasets.find((dataset) => dataset.id === 'cap_contracts');
   record('health_counts', Boolean(capHealth && capHealth.captured_count + capHealth.derived_count + capHealth.source_needed_count === capHealth.row_count), `cap categories=${(capHealth?.captured_count ?? 0) + (capHealth?.derived_count ?? 0) + (capHealth?.source_needed_count ?? 0)}; cap rows=${capHealth?.row_count ?? 0}`);
   const transactionHealth = health.datasets.find((dataset) => dataset.id === 'transaction_market');

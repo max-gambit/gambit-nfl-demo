@@ -41,7 +41,7 @@ export async function buildNflDataHealth(
   const roster = seed.roster_entries.filter((row) => row.team_id === normalizedTeamId);
   const cap = seed.cap_rows.filter((row) => row.team_id === normalizedTeamId && row.player_id);
   const metrics = seed.player_metrics.filter((row) => row.team_id === normalizedTeamId);
-  const ageHours = dateAgeHours(seed.as_of_date, generatedAt);
+  const ageHours = dateAgeHours(seed.retrieved_at, generatedAt);
   const dbBacked = source_mode === 'supabase_current_views';
   const coreIncomplete = cap.filter((row) => isDecisionCritical(row) && !hasDecisionFields(row));
   const arithmeticFailures = cap.filter((row) => row.source_status === 'captured' && row.cap_number_2026 != null && !rowArithmeticReconciles(row));

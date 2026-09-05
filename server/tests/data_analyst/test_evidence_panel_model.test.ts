@@ -64,6 +64,44 @@ test('current NFL evidence keeps football labels instead of NBA or implementatio
   assert.doesNotMatch(visible, /apron|current team data|coverage matrix|dataset/i);
 });
 
+test('AI target evidence keeps the named player and exact sources instead of a generic salary label', () => {
+  const source = sourceRow(7, 'CONTRACT', 'Tre Tucker — LV contract and team context', {
+    source_url: 'https://overthecap.com/player/tre-tucker/10964',
+    roster_source_url: 'https://www.raiders.com/team/players-roster/',
+    contribution: 'Supports the contract and team context used when discussing Tre Tucker.',
+    current_nfl_evidence: { dataset_id: 'nfl_trade_target_current', team_id: 'LV', player_name: 'Tre Tucker' },
+    rows: [{ k: 'Player', v: 'Tre Tucker' }, { k: 'Team', v: 'LV' }],
+  });
+  const body: DataAnalysisBriefBody = {
+    kind: 'data_analysis',
+    answer: 'Call Las Vegas about Tre Tucker.',
+    key_findings: [{ label: 'Tre Tucker', body: 'A useful speed option.', source_refs: [7] }],
+    tables: [], calculations: [], caveats: [], followups: [],
+  };
+
+  const model = buildEvidencePackModel(brief(body), [source], [], null, null);
+  assert.equal(model.checkedItems[0]?.title, 'Tre Tucker — LV contract and team context');
+  assert.match(model.checkedItems[0]?.proof ?? '', /Tre Tucker/);
+  assert.doesNotMatch(JSON.stringify(model), /salary stack/i);
+});
+
+test('uncited current NFL fallback sources stay in the background', () => {
+  const source = sourceRow(1, 'CONTRACT', 'Tre Tucker — LV contract and team context', {
+    current_nfl_evidence: { dataset_id: 'nfl_trade_target_current', team_id: 'LV', player_name: 'Tre Tucker' },
+    rows: [{ k: 'Player', v: 'Tre Tucker' }],
+  });
+  const body: DataAnalysisBriefBody = {
+    kind: 'data_analysis',
+    answer: 'I could not complete a reliable football answer in time.',
+    key_findings: [], tables: [], calculations: [], caveats: [], followups: [],
+  };
+
+  const model = buildEvidencePackModel(brief(body), [source], [], null, null);
+  assert.deepEqual(model.checkedItems, []);
+  assert.equal(model.usedRefs, 0);
+  assert.ok(model.backgroundItems.some((item) => item.refs.includes(1)));
+});
+
 test('historical market evidence shows the market definition and four best transactions, with every other citation retained', async () => {
   const reviewed = await loadReviewedNflTransactionSnapshot();
   const analysis = analyzeNflTransactionMarketSnapshot({
@@ -129,6 +167,7 @@ test('Analysis evidence surfaces use plain user-facing labels', async () => {
   assert.match(detail, /directFact\(data, 'article', 'Article'\)/);
   assert.match(detail, /directFact\(data, 'excerpt', 'What it says'\)/);
   assert.match(detail, /top cap contracts|contract field coverage|roster players|exact location/i);
+  assert.match(detail, /2026 cap number|contract terms\?|why the team might listen|why it might not|what to confirm/i);
   assert.match(cite, /setSourceFilterRef\(refIndex\);[\s\S]*setHighlightedSourceRef\(refIndex\)/);
 });
 

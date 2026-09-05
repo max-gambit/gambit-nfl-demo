@@ -229,7 +229,13 @@ export function deterministicMarketEventSourceRows(
   const rows = [...analysis.comparables, ...analysis.influential_transactions]
     .filter((row, index, all) => all.findIndex((candidate) => candidate.event_id === row.event_id) === index);
   return rows.map((row, index) => {
-    const upstream = analysis.source_refs.find((source) => row.source_ref_ids.includes(source.id));
+    const preferredSourceId = row.transaction_type === 'trade' ? 'trades'
+      : ['free_agent_signing', 're_signing', 'extension', 'tag'].includes(row.transaction_type) ? 'contracts'
+        : null;
+    const upstream = (preferredSourceId
+      ? analysis.source_refs.find((source) => source.id === preferredSourceId && row.source_ref_ids.includes(source.id))
+      : null)
+      ?? analysis.source_refs.find((source) => row.source_ref_ids.includes(source.id));
     return {
       ref_index: startRefIndex + index,
       kind: 'ANALYST_DATA' as const,

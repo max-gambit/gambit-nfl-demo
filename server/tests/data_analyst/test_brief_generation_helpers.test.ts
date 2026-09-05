@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   BRIEF_GENERATION_DEADLINE_MS,
+  CURRENT_NFL_PRIMARY_REQUEST_TIMEOUT_MS,
+  CURRENT_NFL_REPAIR_REQUEST_TIMEOUT_MS,
   NFL_BRIEF_GENERATION_DEADLINE_MS,
   briefGenerationDeadlineMs,
   beginBriefGeneration,
@@ -14,12 +16,14 @@ import {
   hasNflCounterpartyIntelTrace,
   hasNflTradeIntelTrace,
   hasNflCoverageTrace,
+  hasCurrentNflAnalysisDisplayViolation,
   hasNflTradeScreenTrace,
   hasRequiredNflRosterCapTrace,
   humanizeCurrentNflAnalysisInput,
   missingSubmitBriefFields,
   normalizeSubmitDataAnalysisInput,
   normalizeSubmitBriefInput,
+  requestsStructuredCurrentNflAnswer,
   requiresNflRosterCapDataLookup,
   shouldRunContextGraphLookup,
   shouldRepairMissingSubmitBriefFields,
@@ -688,6 +692,8 @@ test('current NFL briefs get enough time for source-backed model reasoning', () 
   assert.ok(NFL_BRIEF_GENERATION_DEADLINE_MS >= 30_000);
   assert.ok(NFL_BRIEF_GENERATION_DEADLINE_MS <= 45_000);
   assert.equal(briefGenerationDeadlineMs(unrelatedQuestion), BRIEF_GENERATION_DEADLINE_MS);
+  assert.ok(CURRENT_NFL_PRIMARY_REQUEST_TIMEOUT_MS < NFL_BRIEF_GENERATION_DEADLINE_MS);
+  assert.ok(CURRENT_NFL_PRIMARY_REQUEST_TIMEOUT_MS + CURRENT_NFL_REPAIR_REQUEST_TIMEOUT_MS < NFL_BRIEF_GENERATION_DEADLINE_MS);
 });
 
 test('current NFL reasoning treats injury language as a user scenario and constrains named targets', () => {
@@ -711,7 +717,14 @@ test('current NFL compact reasoning preserves explicitly selected answer templat
   assert.equal(shouldUseCurrentNflReasonedAnswer(null, { template_id: 'decision_brief' }), false);
 });
 
-test('current NFL answers cannot leak internal workflow jargon', () => {
+test('current NFL compact reasoning yields to explicit tables and calculations', () => {
+  assert.equal(requestsStructuredCurrentNflAnswer('Which receivers should we call about if Malik Nabers is limited?'), false);
+  assert.equal(requestsStructuredCurrentNflAnswer('Show our current WR contracts in a table.'), true);
+  assert.equal(requestsStructuredCurrentNflAnswer('Calculate the cap room created by cutting this player.'), true);
+  assert.equal(requestsStructuredCurrentNflAnswer('What is the dead money if we trade Brian Burns?'), true);
+});
+
+test('current NFL answers reject internal workflow jargon instead of mechanically rewriting prose', () => {
   const input = humanizeCurrentNflAnalysisInput({
     answer: `${'No receiver lane clears our cap-file and counterparty screens. Use a lower-pain salary-out lever before a check-call. '.repeat(8)}This should not appear.`,
     key_findings: [{
@@ -725,11 +738,8 @@ test('current NFL answers cannot leak internal workflow jargon', () => {
     caveats: ['This is the evidence boundary, not a runtime guarantee. Seller receiver values are directional captured-season reads with high confidence. Availability is the gating question.'],
     followups: ['Should we model the next target lane with enough trade room, according to the seller cards?'],
   });
-  const visible = JSON.stringify(input);
-
-  assert.doesNotMatch(visible, /seller thesis|seller cards|seller (?:screen|readiness|signal|intent|posture)|receiver lane|target lane|counterparty|screen|call_now|check-call|directional|trade room|trade impact|salary-out|pick-led|constructions|cap-file|evidence boundary|runtime|captured-season|high confidence|low-pain|cap lever|gating (?:issue|question)|current file|current evidence|contract fit|source check|discipline path|posture|should we model/i);
-  assert.match(input.answer, /current public roster and contract data/i);
-  assert.match(input.answer, /contract New York could move/i);
+  assert.equal(hasCurrentNflAnalysisDisplayViolation(input), true);
+  assert.match(input.answer, /receiver lane clears our cap-file/i);
   assert.ok(input.answer.split(/\s+/).length <= 90);
 });
 
@@ -756,6 +766,15 @@ test('current NFL answers drop malformed model markup instead of rendering it', 
   assert.equal(input.tables.length, 0);
   assert.deepEqual(input.caveats, ['Availability must be confirmed.']);
   assert.doesNotMatch(JSON.stringify(input), /<\/?(?:answer|key_findings?|rows?|caveats?|item)\b/i);
+});
+
+test('current NFL answers detect provider tool markup that escaped into a text field', () => {
+  const input = humanizeCurrentNflAnalysisInput({
+    answer: 'Tre Tucker is worth an exploratory call. <parameter name="answer">broken</parameter>',
+    key_findings: [], tables: [], calculations: [], sources: [], caveats: [], followups: [],
+  });
+
+  assert.equal(hasCurrentNflAnalysisDisplayViolation(input), true);
 });
 
 test('a retry invalidates the older in-process generation lease', () => {

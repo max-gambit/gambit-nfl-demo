@@ -185,7 +185,10 @@ test('Dexter Lawrence follows the loaded current roster truth and suggests sourc
 
   assert.equal(fixture.seed.roster_entries.some((row) => row.team_id === 'NYG' && row.player_name === 'Dexter Lawrence'), false);
   assert.equal(dexter.status, 'clarification');
-  assert.match(dexter.message ?? '', /could not find Dexter Lawrence in the current Giants roster or cap sheet as of 2026-09-02/i);
+  assert.match(
+    dexter.message ?? '',
+    new RegExp(`could not find Dexter Lawrence in the current Giants roster or cap sheet as of ${fixture.seed.as_of_date}`, 'i'),
+  );
   assert.match(dexter.message ?? '', /same position with usable contract data include/i);
   assert.match(dexter.message ?? '', /DJ Reader|Darius Alexander|Bobby Jamison-Travis/i);
 });

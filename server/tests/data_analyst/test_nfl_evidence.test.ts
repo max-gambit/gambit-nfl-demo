@@ -117,7 +117,11 @@ test('NFL trade-goal evidence adds depth hierarchy target lanes and caveat clean
 
   assert.ok(evidence);
   assert.equal(evidence.team_ids[0], 'NYG');
-  assert.equal(evidence.reserved_max_ref_index, 6);
+  assert.equal(evidence.reserved_max_ref_index, 6 + evidence.sources.filter((source) => {
+    const metadata = source.data?.current_nfl_evidence;
+    return metadata && typeof metadata === 'object' && 'dataset_id' in metadata
+      && metadata.dataset_id === 'nfl_trade_target_current';
+  }).length);
   assert.match(evidence.systemBlock, /trade-goal checks/i);
   assert.match(evidence.systemBlock, /Depth-after-trade checks:/);
   assert.match(evidence.systemBlock, /Lower-pain outgoing hierarchy:/);
@@ -148,7 +152,17 @@ test('NFL trade-goal evidence adds depth hierarchy target lanes and caveat clean
       ? String(metadata.dataset_id)
       : null;
   });
-  assert.deepEqual(datasets, ['nfl_rosters_current', 'nfl_cap_sheets_current', 'nfl_player_metrics_current', 'nfl_coverage_current', 'nfl_trade_screen_current', 'nfl_context_graph']);
+  assert.deepEqual(datasets.slice(0, 6), ['nfl_rosters_current', 'nfl_cap_sheets_current', 'nfl_player_metrics_current', 'nfl_coverage_current', 'nfl_trade_screen_current', 'nfl_context_graph']);
+  assert.equal(datasets.slice(6).every((dataset) => dataset === 'nfl_trade_target_current'), true);
+  const targetSources = evidence.sources.filter((source) => {
+    const metadata = source.data?.current_nfl_evidence;
+    return metadata && typeof metadata === 'object' && 'dataset_id' in metadata
+      && metadata.dataset_id === 'nfl_trade_target_current';
+  });
+  assert.ok(targetSources.length > 0);
+  assert.equal(targetSources.every((source) => /^https:\/\//.test(String(source.data?.source_url ?? ''))), true);
+  assert.equal(targetSources.every((source) => /^https:\/\//.test(String(source.data?.roster_source_url ?? ''))), true);
+  assert.match(evidence.systemBlock, /Player-specific source refs:/);
   assert.equal(evidence.trace_datasets.some((dataset) => dataset.dataset_id === 'nfl_coverage_current' && dataset.team_ids.includes('NYG')), true);
   assert.equal(evidence.trace_datasets.some((dataset) => dataset.dataset_id === 'nfl_trade_screen_current' && dataset.team_ids.includes('NYG')), true);
   assert.equal(evidence.trace_datasets.some((dataset) => dataset.dataset_id === 'nfl_context_graph' && dataset.team_ids.includes('NYG') && dataset.team_ids.includes('TB')), true);

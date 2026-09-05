@@ -46,7 +46,6 @@ import {
   currentNflEvidenceScopeForQuestion,
   currentNflEvidenceTeamIds as resolveCurrentNflEvidenceTeamIds,
   defaultNflEvidenceTeamId,
-  humanizeNflVisibleText,
   isNflTradeGoalQuestion,
   type CurrentNflEvidencePack,
 } from '../claude/nfl_evidence.js';
@@ -102,6 +101,9 @@ const DEFAULT_SHARE_TEAM_ID = 'GSW';
 const BRIEF_GENERATION_HEARTBEAT_MS = 60_000;
 export const BRIEF_GENERATION_DEADLINE_MS = 14_000;
 export const NFL_BRIEF_GENERATION_DEADLINE_MS = 45_000;
+export const CURRENT_NFL_PRIMARY_REQUEST_TIMEOUT_MS = 28_000;
+export const CURRENT_NFL_REPAIR_REQUEST_TIMEOUT_MS = 8_000;
+export const CURRENT_NFL_REASONING_MODEL = process.env.ANTHROPIC_CURRENT_NFL_MODEL?.trim() || 'claude-fable-5';
 export const NFL_ARTIFACT_INTERPRETATION_DEADLINE_MS = 30_000;
 const MAX_BRIEF_PROGRESS_EVENTS = 12;
 type DataAnalysisLookup = { messages: Anthropic.MessageParam[]; traces: DataAnalystTrace[] };
@@ -1414,21 +1416,38 @@ async function generateCurrentNflReasonedAnswer(args: {
     'model',
   );
 
-  const response = await createClaudeMessage({
-    model: BRIEF_MODEL,
-    max_tokens: 4096,
-    system: buildCurrentNflReasoningSystem(args.currentNflEvidence, args.composedNflContext),
-    tools: [submitDataAnalysisTool],
-    tool_choice: { type: 'tool', name: 'submit_data_analysis', disable_parallel_tool_use: true },
-    messages: [{ role: 'user', content: args.brief.question }],
-  });
+  let response: Awaited<ReturnType<typeof createClaudeMessage>>;
+  try {
+    response = await createClaudeMessage({
+      model: CURRENT_NFL_REASONING_MODEL,
+      max_tokens: 1200,
+      system: buildCurrentNflReasoningSystem(args.currentNflEvidence, args.composedNflContext),
+      tools: [submitDataAnalysisTool],
+      tool_choice: { type: 'tool', name: 'submit_data_analysis', disable_parallel_tool_use: true },
+      messages: [{ role: 'user', content: args.brief.question }],
+    }, {
+      timeout: CURRENT_NFL_PRIMARY_REQUEST_TIMEOUT_MS,
+      maxRetries: 0,
+    });
+  } catch {
+    await persistEvidenceBoundGenerationFallback({
+      brief: args.brief,
+      heartbeat: args.heartbeat,
+      generation: args.generation,
+      progress: args.progress,
+      sources: args.currentNflEvidence.sources,
+      startedAt: args.startedAt,
+    });
+    return;
+  }
   const toolUse = response.content.find(
     (block) => block.type === 'tool_use' && block.name === 'submit_data_analysis',
   );
-  let normalizedInput = toolUse?.type === 'tool_use'
+  const normalizedInput = toolUse?.type === 'tool_use'
     ? normalizeSubmitDataAnalysisInput(toolUse.input)
     : null;
-  if (normalizedInput && hasCurrentNflAnalysisMarkupLeak(normalizedInput)) {
+  let input = normalizedInput ? humanizeCurrentNflAnalysisInput(normalizedInput) : null;
+  if (input && hasCurrentNflAnalysisDisplayViolation(input)) {
     await args.progress.mark(
       'repairing',
       72,
@@ -1436,15 +1455,15 @@ async function generateCurrentNflReasonedAnswer(args: {
       'Checking the supporting details before they appear.',
       'model',
     );
-    normalizedInput = await repairCurrentNflAnalysisMarkup({
+    const repairedInput = await repairCurrentNflAnalysisMarkup({
       question: args.brief.question,
       currentNflEvidence: args.currentNflEvidence,
       composedNflContext: args.composedNflContext,
-    }) ?? normalizedInput;
+    });
+    input = repairedInput ? humanizeCurrentNflAnalysisInput(repairedInput) : null;
   }
-  const input = normalizedInput ? humanizeCurrentNflAnalysisInput(normalizedInput) : null;
 
-  if (!input) {
+  if (!input || hasCurrentNflAnalysisDisplayViolation(input)) {
     await persistEvidenceBoundGenerationFallback({
       brief: args.brief,
       heartbeat: args.heartbeat,
@@ -1549,12 +1568,13 @@ export function buildCurrentNflReasoningSystem(
         'You are Gambit’s NFL front-office analyst. The user wants a live football judgment, not a canned response.',
         'Reason from the current NFL evidence below. Lead with the practical football conclusion and then explain why.',
         'Treat injuries, proposed moves, and other assumptions stated by the user as user-entered scenarios, not sourced facts.',
+        'In the visible answer, refer to those assumptions naturally: say “if the knee concern proves real,” not “user-entered scenario,” “sourced injury,” or “current data.”',
         'Name a player or counterparty only when it appears in the supplied evidence. A plausible target is an exploratory candidate, not a claim that the player is available.',
         'When the user asks for trade targets, put the best 3-5 plausible candidates from the supplied target rows in the first sentence. Prefer priority-call or exploratory-call candidates; if there are too few, include monitor candidates and say they are names to scout rather than players known to be available. Never lead with a player marked not a priority or unlikely unless the team changes direction. Explain football fit, contract shape, likely resistance from the other team, and what must be confirmed. Do not refuse to name candidates solely because availability is unconfirmed.',
-        'NFL trades do not require salary matching. Do not propose trading a Giants player merely to fund an acquisition unless the supplied cap facts show that clearing room is necessary.',
-        'Use direct football language throughout. Avoid internal product jargon such as seller thesis, seller cards, lane, screen, call-now, check-call, directional, source-needed, evidence boundary, preflight, model, runtime, artifact, deterministic, posture, gating issue, salary-out, pick-led, construction, or current file. Never mention an internal confidence label, row, gate, grade, or workflow. Use football terms, not baseball metaphors such as premium bat.',
+        'NFL trades do not require salary matching. If the evidence says New York can absorb the target, do not name a Giant to trade, discuss clearing salary, or add an outgoing-player alternative.',
+        'Use direct football language throughout. Avoid internal product jargon such as seller thesis, seller cards, seller signal, lane, screen, call-now, check-call, directional, source-needed, evidence boundary, preflight, model, runtime, artifact, deterministic, posture, gating issue, lever, salary-out, pick-led, construction, contract fit, current file, reject-unless, or contend-mode. Never mention an internal confidence label, row, gate, grade, or workflow. Use football terms, not baseball metaphors such as premium bat.',
         'Use only figures and source references present below. Preserve material freshness, coverage, and uncertainty caveats.',
-        'Keep the lead answer under 90 words. Put supporting detail in 3-5 concise key findings. Keep tables and calculations empty unless they materially clarify the answer.',
+        'Keep the lead answer under 75 words. Return exactly 3 key findings; keep each label under 7 words and each body under 45 words. Return no tables or calculations for this answer. Include at most 2 caveats and 3 short follow-up questions.',
         'Return exactly one complete submit_data_analysis call. Server-provided source cards are already reserved, so return sources: [].',
       ].join('\n'),
     },
@@ -1566,7 +1586,10 @@ export function buildCurrentNflReasoningSystem(
 export function humanizeCurrentNflAnalysisInput(input: SubmitDataAnalysisInput): SubmitDataAnalysisInput {
   const text = (value: string | null | undefined): string | null | undefined => {
     if (value == null) return value;
-    return humanizeNflVisibleText(value);
+    return value
+      .replace(/\$-([0-9.]+[KMB]?)/g, (_match, amount: string) => `-$${amount}`)
+      .replace(/~([−-])\$/g, '$1$')
+      .trim();
   };
   const safe = (value: string | null | undefined): boolean => !value || !CURRENT_NFL_MARKUP_LEAK_RE.test(value);
   const safeCell = (value: string | number | null): boolean => typeof value !== 'string' || safe(value);
@@ -1604,7 +1627,8 @@ export function humanizeCurrentNflAnalysisInput(input: SubmitDataAnalysisInput):
   };
 }
 
-const CURRENT_NFL_MARKUP_LEAK_RE = /<\/?(?:answer|key_findings?|item|label|body|source_refs?|tables?|columns?|rows?|calculations?|sources?|caveats?|followups?)\b/i;
+const CURRENT_NFL_MARKUP_LEAK_RE = /<\/?[a-z][^>]*>|\b(?:tool_use|tool_result|function_call)\b|["']?(?:source_refs?|key_findings|calculations|followups)["']?\s*[:=]/i;
+const CURRENT_NFL_INTERNAL_LANGUAGE_RE = /\b(?:seller[-\s]?thesis|seller cards?|seller signals?|(?:seller|target|trade|receiver) lanes?|call[_\s-]?now|check[_\s-]?call|posture[_\s-]?change[_\s-]?only|do[_\s-]?not[_\s-]?lead|source[-\s]?needed|evidence boundar(?:y|ies)|preflight|runtime|deterministic|gating (?:issue|question)|salary[-\s]?out|pick[-\s]?led|cap[-\s]?file|row parity|app rows?|contract ledger v1|captured[-\s]?confidence|trade[-\s]?goal screen|counterparty screen|cap levers?|cleaner levers?|contract fit|contend[-\s]?mode|reject[-\s]?unless|user[-\s]?entered scenario|sourced (?:fact|injury))\b/i;
 
 export function hasCurrentNflAnalysisMarkupLeak(input: SubmitDataAnalysisInput): boolean {
   const values: Array<string | null | undefined> = [
@@ -1622,6 +1646,23 @@ export function hasCurrentNflAnalysisMarkupLeak(input: SubmitDataAnalysisInput):
   return values.some((value) => Boolean(value && CURRENT_NFL_MARKUP_LEAK_RE.test(value)));
 }
 
+export function hasCurrentNflAnalysisDisplayViolation(input: SubmitDataAnalysisInput): boolean {
+  if (hasCurrentNflAnalysisMarkupLeak(input)) return true;
+  const values: Array<string | null | undefined> = [
+    input.answer,
+    ...input.key_findings.flatMap((finding) => [finding.label, finding.body]),
+    ...input.tables.flatMap((table) => [
+      table.title,
+      ...table.columns,
+      ...table.rows.flatMap((row) => row.filter((cell): cell is string => typeof cell === 'string')),
+    ]),
+    ...input.calculations.flatMap((calculation) => [calculation.label, calculation.formula, calculation.value]),
+    ...input.caveats,
+    ...input.followups,
+  ];
+  return values.some((value) => Boolean(value && CURRENT_NFL_INTERNAL_LANGUAGE_RE.test(value)));
+}
+
 async function repairCurrentNflAnalysisMarkup(args: {
   question: string;
   currentNflEvidence: CurrentNflEvidencePack;
@@ -1629,23 +1670,26 @@ async function repairCurrentNflAnalysisMarkup(args: {
 }): Promise<SubmitDataAnalysisInput | null> {
   try {
     const response = await createClaudeMessage({
-      model: BRIEF_MODEL,
-      max_tokens: 2048,
+      model: CURRENT_NFL_REASONING_MODEL,
+      max_tokens: 900,
       system: [
         ...buildCurrentNflReasoningSystem(args.currentNflEvidence, args.composedNflContext),
         {
           type: 'text',
           text: [
-            'The prior response put response-format tags inside a text field and cannot be shown.',
+            'The prior response cannot be shown because it contains formatting debris or internal product language.',
             'Write the football answer again from the supplied evidence.',
-            'Return clean values in exactly one submit_data_analysis call. Do not put XML, JSON, field names, or response tags inside any text value.',
-            'Include 3-5 concise key findings unless the evidence genuinely supports only the lead answer.',
+            'Return clean values in exactly one submit_data_analysis call. Do not put XML, JSON, field names, response tags, or internal workflow terms inside any text value.',
+            'Include exactly 3 concise key findings. Keep each body under 45 words, with no tables or calculations.',
           ].join('\n'),
         },
       ],
       tools: [submitDataAnalysisTool],
       tool_choice: { type: 'tool', name: 'submit_data_analysis', disable_parallel_tool_use: true },
       messages: [{ role: 'user', content: args.question }],
+    }, {
+      timeout: CURRENT_NFL_REPAIR_REQUEST_TIMEOUT_MS,
+      maxRetries: 0,
     });
     const toolUse = response.content.find(
       (block) => block.type === 'tool_use' && block.name === 'submit_data_analysis',
@@ -1653,7 +1697,7 @@ async function repairCurrentNflAnalysisMarkup(args: {
     const normalized = toolUse?.type === 'tool_use'
       ? normalizeSubmitDataAnalysisInput(toolUse.input)
       : null;
-    return normalized && !hasCurrentNflAnalysisMarkupLeak(normalized) ? normalized : null;
+    return normalized && !hasCurrentNflAnalysisDisplayViolation(normalized) ? normalized : null;
   } catch {
     return null;
   }
@@ -1763,20 +1807,20 @@ async function persistEvidenceBoundGenerationFallback(args: {
   }
   const body: DataAnalysisBriefBody = {
     kind: 'data_analysis',
-    answer: 'I could not complete a source-supported answer from the available public information.',
+    answer: 'I could not complete a reliable football answer in time, so I have left the conclusion blank rather than show an unsupported or broken response.',
     key_findings: [],
     tables: [],
     calculations: [],
     caveats: [
       args.sources.length > 0
-        ? 'The sources that were successfully checked remain attached. No unsupported conclusion has been filled in.'
+        ? 'The public roster, contract, and team sources that were successfully checked remain attached.'
         : 'No usable public source was returned, so no football conclusion is being inferred.',
     ],
     followups: [],
   };
   const readyProgress = args.progress.complete(
-    'Source-limited answer ready',
-    'The supported source material is preserved without filling in missing claims.',
+    'Could not complete the answer',
+    'The checked public sources are available, but no conclusion was added.',
   );
   if (!args.generation.isActive()) {
     await removeInsertedBriefRows('brief_sources', insertedSourceIds);
@@ -2156,6 +2200,41 @@ export async function generateDataAnalysisBrief(
   const progress = createBriefProgressTracker(brief, heartbeat);
   const templateSelection = templateSelectionForBrief(brief);
   try {
+    const currentNflTeamIds = currentNflEvidenceTeamIds(brief.question, defaultBriefTeamId());
+    if (
+      currentNflTeamIds.length > 0
+      && !isNflTransactionMarketQuestion(brief.question)
+      && !inheritedMarketQuery
+      && !requestsStructuredCurrentNflAnswer(brief.question)
+    ) {
+      await progress.mark(
+        'collecting_evidence',
+        12,
+        'Checking current football sources',
+        `Loading roster, contract, performance, and team information for ${currentNflTeamIds.join(', ')}.`,
+        'data',
+      );
+      const currentNflEvidence = await buildCurrentNflEvidence(brief.question, {
+        teamIds: currentNflTeamIds,
+        scope: currentNflEvidenceScopeForQuestion(brief.question) ?? 'transaction_full',
+      });
+      const composedNflContext = currentNflEvidence
+        ? buildNflContextComposerForEvidence(brief.question, currentNflEvidence)
+        : null;
+      if (currentNflEvidence && composedNflContext) {
+        await generateCurrentNflReasonedAnswer({
+          brief,
+          currentNflEvidence,
+          composedNflContext,
+          heartbeat,
+          generation,
+          progress,
+          startedAt,
+        });
+        return;
+      }
+    }
+
     const system: Anthropic.TextBlockParam[] = [
       { type: 'text', text: DATA_ANALYST_SYSTEM, cache_control: { type: 'ephemeral' } },
       { type: 'text', text: buildDataAnalysisTemplateSystemBlock(templateSelection), cache_control: { type: 'ephemeral' } },
@@ -2382,6 +2461,16 @@ export async function generateDataAnalysisBrief(
   } finally {
     heartbeat.stop();
   }
+}
+
+export function requestsStructuredCurrentNflAnswer(question: string): boolean {
+  const value = question.trim();
+  if (/\b(?:table|tabular|spreadsheet|chart|graph)\b/i.test(value)) return true;
+  if (/\b(?:calculate|compute|recalculate|show\s+(?:me\s+)?the\s+math|run\s+the\s+numbers)\b/i.test(value)) return true;
+
+  const rosterMove = '(?:cut|release|trade|move|restructure|extend(?:ed|ing|s)?)';
+  const capEffect = '(?:cap (?:space|room|hit|number)|savings|dead money|cash due)';
+  return new RegExp(`\\b${rosterMove}\\b[\\s\\S]{0,80}\\b${capEffect}\\b|\\b${capEffect}\\b[\\s\\S]{0,80}\\b${rosterMove}\\b`, 'i').test(value);
 }
 
 export async function ensureNflTransactionMarketLookup(

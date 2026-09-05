@@ -63,12 +63,14 @@ export function withClaudeServerSideFallback(
 
 export async function createClaudeMessage(
   params: Anthropic.MessageCreateParamsNonStreaming,
+  options?: Anthropic.RequestOptions,
 ): Promise<Anthropic.Message> {
   const request = withClaudeServerSideFallback(params);
   if (request.fallbacks?.length) {
     try {
       const response = await anthropic.beta.messages.create(
         request as unknown as BetaMessageCreateParamsNonStreaming,
+        options,
       );
       logFallbackServingModel(params.model, response);
       return response as unknown as Anthropic.Message;
@@ -80,13 +82,13 @@ export async function createClaudeMessage(
       const response = await anthropic.messages.create({
         ...params,
         model: fallbackModel,
-      });
+      }, options);
       logFallbackServingModel(params.model, response);
       return response;
     }
   }
 
-  return anthropic.messages.create(params);
+  return anthropic.messages.create(params, options);
 }
 
 export function streamClaudeMessage(

@@ -36654,7 +36654,7 @@
       ],
       "position_metrics": {
         "depth_chart_pos_slot": 7,
-        "depth_chart_pos_rank": 4,
+        "depth_chart_pos_rank": 3,
         "depth_chart_group_id": 21
       },
       "quality_flags": [
@@ -58987,7 +58987,7 @@
         "injury_questionable_weeks_2025": 2,
         "injury_limited_practice_weeks_2025": 2,
         "depth_chart_pos_slot": 4,
-        "depth_chart_pos_rank": 2,
+        "depth_chart_pos_rank": 1,
         "depth_chart_group_id": 21
       },
       "quality_flags": [
@@ -59182,13 +59182,13 @@
         "injury_questionable_weeks_2025": 2,
         "injury_limited_practice_weeks_2025": 1,
         "injury_dnp_practice_weeks_2025": 1,
-        "depth_chart_pos_slot": 8,
+        "depth_chart_pos_slot": 11,
         "depth_chart_pos_rank": 1,
         "depth_chart_group_id": 15
       },
       "quality_flags": [
         "depth_chart_group_base_3_4_d",
-        "depth_chart_position_lcb"
+        "depth_chart_position_rcb"
       ]
     },
     {
@@ -59236,13 +59236,13 @@
         "injury_dnp_practice_weeks_2025": 1,
         "injury_limited_practice_weeks_2025": 3,
         "injury_out_weeks_2025": 2,
-        "depth_chart_pos_slot": 11,
+        "depth_chart_pos_slot": 8,
         "depth_chart_pos_rank": 1,
         "depth_chart_group_id": 15
       },
       "quality_flags": [
         "depth_chart_group_base_3_4_d",
-        "depth_chart_position_rcb"
+        "depth_chart_position_lcb"
       ]
     },
     {
@@ -59392,7 +59392,7 @@
         "injury_out_weeks_2025": 1,
         "injury_dnp_practice_weeks_2025": 1,
         "depth_chart_pos_slot": 7,
-        "depth_chart_pos_rank": 2,
+        "depth_chart_pos_rank": 3,
         "depth_chart_group_id": 15
       },
       "quality_flags": [
@@ -59732,13 +59732,13 @@
         "injury_limited_practice_weeks_2025": 1,
         "injury_out_weeks_2025": 2,
         "injury_dnp_practice_weeks_2025": 2,
-        "depth_chart_pos_slot": 4,
+        "depth_chart_pos_slot": 7,
         "depth_chart_pos_rank": 2,
         "depth_chart_group_id": 15
       },
       "quality_flags": [
         "depth_chart_group_base_3_4_d",
-        "depth_chart_position_wlb"
+        "depth_chart_position_slb"
       ]
     },
     {
@@ -59941,13 +59941,13 @@
         "missed_tackles": 5,
         "missed_tackle_pct": 0.062,
         "passes_batted": 0,
-        "depth_chart_pos_slot": 9,
+        "depth_chart_pos_slot": 10,
         "depth_chart_pos_rank": 1,
         "depth_chart_group_id": 15
       },
       "quality_flags": [
         "depth_chart_group_base_3_4_d",
-        "depth_chart_position_ss"
+        "depth_chart_position_fs"
       ]
     },
     {
@@ -59973,13 +59973,13 @@
       ],
       "position_metrics": {
         "injury_report_weeks_2025": 1,
-        "depth_chart_pos_slot": 12,
+        "depth_chart_pos_slot": 10,
         "depth_chart_pos_rank": 2,
         "depth_chart_group_id": 15
       },
       "quality_flags": [
         "depth_chart_group_base_3_4_d",
-        "depth_chart_position_nb"
+        "depth_chart_position_fs"
       ]
     },
     {
@@ -64682,8 +64682,8 @@
         "ngs_avg_yac": 3.24,
         "ngs_expected_yac": 3.097,
         "ngs_yac_above_expectation": 0.143,
-        "depth_chart_pos_slot": 1,
-        "depth_chart_pos_rank": 1,
+        "depth_chart_pos_slot": 2,
+        "depth_chart_pos_rank": 2,
         "depth_chart_group_id": 21
       },
       "quality_flags": [
@@ -73897,7 +73897,7 @@
       ],
       "position_metrics": {
         "depth_chart_pos_slot": 3,
-        "depth_chart_pos_rank": 3,
+        "depth_chart_pos_rank": 4,
         "depth_chart_group_id": 21
       },
       "quality_flags": [
@@ -76090,7 +76090,7 @@
         "injury_out_weeks_2025": 3,
         "injury_limited_practice_weeks_2025": 2,
         "depth_chart_pos_slot": 9,
-        "depth_chart_pos_rank": 3,
+        "depth_chart_pos_rank": 2,
         "depth_chart_group_id": 21
       },
       "quality_flags": [
@@ -84504,13 +84504,13 @@
         "passes_batted": 0,
         "injury_report_weeks_2025": 1,
         "injury_questionable_weeks_2025": 1,
-        "depth_chart_pos_slot": 10,
+        "depth_chart_pos_slot": 9,
         "depth_chart_pos_rank": 1,
         "depth_chart_group_id": 15
       },
       "quality_flags": [
         "depth_chart_group_base_3_4_d",
-        "depth_chart_position_fs"
+        "depth_chart_position_ss"
       ]
     },
     {
@@ -84718,7 +84718,7 @@
         "injury_out_weeks_2025": 1,
         "injury_dnp_practice_weeks_2025": 2,
         "depth_chart_pos_slot": 5,
-        "depth_chart_pos_rank": 5,
+        "depth_chart_pos_rank": 4,
         "depth_chart_group_id": 15
       },
       "quality_flags": [
@@ -87810,7 +87810,7 @@
         "rushing_broken_tackles": 0,
         "injury_report_weeks_2025": 1,
         "depth_chart_pos_slot": 9,
-        "depth_chart_pos_rank": 2,
+        "depth_chart_pos_rank": 3,
         "depth_chart_group_id": 21
       },
       "quality_flags": [
@@ -90223,7 +90223,7 @@
       ],
       "position_metrics": {
         "depth_chart_pos_slot": 5,
-        "depth_chart_pos_rank": 4,
+        "depth_chart_pos_rank": 3,
         "depth_chart_group_id": 21
       },
       "quality_flags": [
@@ -97322,7 +97322,7 @@
         "missed_tackle_pct": 0,
         "passes_batted": 0,
         "depth_chart_pos_slot": 5,
-        "depth_chart_pos_rank": 4,
+        "depth_chart_pos_rank": 2,
         "depth_chart_group_id": 15
       },
       "quality_flags": [
@@ -107815,7 +107815,7 @@
       "team_ids": [
         "BUF"
       ],
-      "position": "NB",
+      "position": "PR",
       "offense_snaps_2025": 0,
       "defense_snaps_2025": 0,
       "special_teams_snaps_2025": 0,
@@ -107829,13 +107829,13 @@
         "nflverse_depth_charts"
       ],
       "position_metrics": {
-        "depth_chart_pos_slot": 12,
-        "depth_chart_pos_rank": 1,
-        "depth_chart_group_id": 15
+        "depth_chart_pos_slot": 4,
+        "depth_chart_pos_rank": 4,
+        "depth_chart_group_id": 18
       },
       "quality_flags": [
-        "depth_chart_group_base_3_4_d",
-        "depth_chart_position_nb"
+        "depth_chart_group_special_teams",
+        "depth_chart_position_pr"
       ]
     },
     {
@@ -108539,34 +108539,6 @@
       ]
     },
     {
-      "player_name": "Tyrek Funderburk",
-      "team_ids": [
-        "CAR"
-      ],
-      "position": "RCB",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 11,
-        "depth_chart_pos_rank": 3,
-        "depth_chart_group_id": 15
-      },
-      "quality_flags": [
-        "depth_chart_group_base_3_4_d",
-        "depth_chart_position_rcb"
-      ]
-    },
-    {
       "player_name": "John Metchie III",
       "team_ids": [
         "CAR"
@@ -108928,34 +108900,6 @@
       "quality_flags": [
         "depth_chart_group_3wr_1te",
         "depth_chart_position_rb"
-      ]
-    },
-    {
-      "player_name": "Ryan Hayes",
-      "team_ids": [
-        "CAR"
-      ],
-      "position": "LT",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 3,
-        "depth_chart_pos_rank": 5,
-        "depth_chart_group_id": 21
-      },
-      "quality_flags": [
-        "depth_chart_group_3wr_1te",
-        "depth_chart_position_lt"
       ]
     },
     {
@@ -109323,6 +109267,34 @@
       ]
     },
     {
+      "player_name": "Dontae Manning",
+      "team_ids": [
+        "CHI"
+      ],
+      "position": "LCB",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 8,
+        "depth_chart_pos_rank": 2,
+        "depth_chart_group_id": 16
+      },
+      "quality_flags": [
+        "depth_chart_group_base_4_3_d",
+        "depth_chart_position_lcb"
+      ]
+    },
+    {
       "player_name": "Skyler Thomas",
       "team_ids": [
         "CHI"
@@ -109432,34 +109404,6 @@
       "quality_flags": [
         "depth_chart_group_base_4_3_d",
         "depth_chart_position_wlb"
-      ]
-    },
-    {
-      "player_name": "Dontae Manning",
-      "team_ids": [
-        "CHI"
-      ],
-      "position": "LCB",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 8,
-        "depth_chart_pos_rank": 3,
-        "depth_chart_group_id": 16
-      },
-      "quality_flags": [
-        "depth_chart_group_base_4_3_d",
-        "depth_chart_position_lcb"
       ]
     },
     {
@@ -110863,6 +110807,34 @@
       ]
     },
     {
+      "player_name": "KC Concepcion",
+      "team_ids": [
+        "CLE"
+      ],
+      "position": "WR",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 2,
+        "depth_chart_pos_rank": 2,
+        "depth_chart_group_id": 21
+      },
+      "quality_flags": [
+        "depth_chart_group_3wr_1te",
+        "depth_chart_position_wr"
+      ]
+    },
+    {
       "player_name": "Spencer Fano",
       "team_ids": [
         "CLE"
@@ -111000,34 +110972,6 @@
       "quality_flags": [
         "depth_chart_group_3wr_1te",
         "depth_chart_position_fb"
-      ]
-    },
-    {
-      "player_name": "KC Concepcion",
-      "team_ids": [
-        "CLE"
-      ],
-      "position": "WR",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 2,
-        "depth_chart_pos_rank": 2,
-        "depth_chart_group_id": 21
-      },
-      "quality_flags": [
-        "depth_chart_group_3wr_1te",
-        "depth_chart_position_wr"
       ]
     },
     {
@@ -112001,8 +111945,8 @@
         "nflverse_depth_charts"
       ],
       "position_metrics": {
-        "depth_chart_pos_slot": 2,
-        "depth_chart_pos_rank": 2,
+        "depth_chart_pos_slot": 1,
+        "depth_chart_pos_rank": 1,
         "depth_chart_group_id": 21
       },
       "quality_flags": [
@@ -112711,7 +112655,7 @@
       ]
     },
     {
-      "player_name": "Seth McLaughlin",
+      "player_name": "Cade Mays",
       "team_ids": [
         "DET"
       ],
@@ -112736,6 +112680,34 @@
       "quality_flags": [
         "depth_chart_group_3wr_1te",
         "depth_chart_position_c"
+      ]
+    },
+    {
+      "player_name": "Ben Bartch",
+      "team_ids": [
+        "DET"
+      ],
+      "position": "RG",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 6,
+        "depth_chart_pos_rank": 2,
+        "depth_chart_group_id": 21
+      },
+      "quality_flags": [
+        "depth_chart_group_3wr_1te",
+        "depth_chart_position_rg"
       ]
     },
     {
@@ -112795,34 +112767,6 @@
       ]
     },
     {
-      "player_name": "Cade Mays",
-      "team_ids": [
-        "DET"
-      ],
-      "position": "C",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 5,
-        "depth_chart_pos_rank": 3,
-        "depth_chart_group_id": 21
-      },
-      "quality_flags": [
-        "depth_chart_group_3wr_1te",
-        "depth_chart_position_c"
-      ]
-    },
-    {
       "player_name": "Tyler Conklin",
       "team_ids": [
         "DET"
@@ -112851,35 +112795,7 @@
       ]
     },
     {
-      "player_name": "Ben Bartch",
-      "team_ids": [
-        "DET"
-      ],
-      "position": "LG",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 4,
-        "depth_chart_pos_rank": 4,
-        "depth_chart_group_id": 21
-      },
-      "quality_flags": [
-        "depth_chart_group_3wr_1te",
-        "depth_chart_position_lg"
-      ]
-    },
-    {
-      "player_name": "Jabari Small",
+      "player_name": "Isiah Pacheco",
       "team_ids": [
         "DET"
       ],
@@ -112932,34 +112848,6 @@
       "quality_flags": [
         "depth_chart_group_3wr_1te",
         "depth_chart_position_wr"
-      ]
-    },
-    {
-      "player_name": "Isiah Pacheco",
-      "team_ids": [
-        "DET"
-      ],
-      "position": "RB",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 11,
-        "depth_chart_pos_rank": 5,
-        "depth_chart_group_id": 21
-      },
-      "quality_flags": [
-        "depth_chart_group_3wr_1te",
-        "depth_chart_position_rb"
       ]
     },
     {
@@ -117555,34 +117443,6 @@
       ]
     },
     {
-      "player_name": "Sincere Brown",
-      "team_ids": [
-        "LAC"
-      ],
-      "position": "WR",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 2,
-        "depth_chart_pos_rank": 8,
-        "depth_chart_group_id": 21
-      },
-      "quality_flags": [
-        "depth_chart_group_3wr_1te",
-        "depth_chart_position_wr"
-      ]
-    },
-    {
       "player_name": "Nakobe Dean",
       "team_ids": [
         "LV"
@@ -119347,34 +119207,6 @@
       ]
     },
     {
-      "player_name": "Carter Warren",
-      "team_ids": [
-        "MIA"
-      ],
-      "position": "RT",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 7,
-        "depth_chart_pos_rank": 4,
-        "depth_chart_group_id": 21
-      },
-      "quality_flags": [
-        "depth_chart_group_3wr_1te",
-        "depth_chart_position_rt"
-      ]
-    },
-    {
       "player_name": "Justin Joly",
       "team_ids": [
         "MIA"
@@ -119711,7 +119543,35 @@
       ]
     },
     {
-      "player_name": "Scooby Williams",
+      "player_name": "Kenny Dyson Jr.",
+      "team_ids": [
+        "MIN"
+      ],
+      "position": "LILB",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 5,
+        "depth_chart_pos_rank": 3,
+        "depth_chart_group_id": 15
+      },
+      "quality_flags": [
+        "depth_chart_group_base_3_4_d",
+        "depth_chart_position_lilb"
+      ]
+    },
+    {
+      "player_name": "Jamal Adams",
       "team_ids": [
         "MIN"
       ],
@@ -119795,62 +119655,6 @@
       ]
     },
     {
-      "player_name": "Jamal Adams",
-      "team_ids": [
-        "MIN"
-      ],
-      "position": "RILB",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 6,
-        "depth_chart_pos_rank": 4,
-        "depth_chart_group_id": 15
-      },
-      "quality_flags": [
-        "depth_chart_group_base_3_4_d",
-        "depth_chart_position_rilb"
-      ]
-    },
-    {
-      "player_name": "Kenny Dyson Jr.",
-      "team_ids": [
-        "MIN"
-      ],
-      "position": "RILB",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 6,
-        "depth_chart_pos_rank": 5,
-        "depth_chart_group_id": 15
-      },
-      "quality_flags": [
-        "depth_chart_group_base_3_4_d",
-        "depth_chart_position_rilb"
-      ]
-    },
-    {
       "player_name": "Jacob Roberts",
       "team_ids": [
         "MIN"
@@ -119870,7 +119674,7 @@
       ],
       "position_metrics": {
         "depth_chart_pos_slot": 6,
-        "depth_chart_pos_rank": 6,
+        "depth_chart_pos_rank": 4,
         "depth_chart_group_id": 15
       },
       "quality_flags": [
@@ -120156,34 +119960,6 @@
       "quality_flags": [
         "depth_chart_group_3wr_1te",
         "depth_chart_position_rb"
-      ]
-    },
-    {
-      "player_name": "Dontae Fleming",
-      "team_ids": [
-        "MIN"
-      ],
-      "position": "WR",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 1,
-        "depth_chart_pos_rank": 7,
-        "depth_chart_group_id": 21
-      },
-      "quality_flags": [
-        "depth_chart_group_3wr_1te",
-        "depth_chart_position_wr"
       ]
     },
     {
@@ -120667,6 +120443,34 @@
       "team_ids": [
         "NE"
       ],
+      "position": "LG",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 4,
+        "depth_chart_pos_rank": 2,
+        "depth_chart_group_id": 21
+      },
+      "quality_flags": [
+        "depth_chart_group_3wr_1te",
+        "depth_chart_position_lg"
+      ]
+    },
+    {
+      "player_name": "Walter Rouse",
+      "team_ids": [
+        "NE"
+      ],
       "position": "RG",
       "offense_snaps_2025": 0,
       "defense_snaps_2025": 0,
@@ -120775,34 +120579,6 @@
       ]
     },
     {
-      "player_name": "Walter Rouse",
-      "team_ids": [
-        "NE"
-      ],
-      "position": "RT",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 7,
-        "depth_chart_pos_rank": 3,
-        "depth_chart_group_id": 21
-      },
-      "quality_flags": [
-        "depth_chart_group_3wr_1te",
-        "depth_chart_position_rt"
-      ]
-    },
-    {
       "player_name": "Behren Morton",
       "team_ids": [
         "NE"
@@ -120831,7 +120607,7 @@
       ]
     },
     {
-      "player_name": "Cameron Latu",
+      "player_name": "Tanner Arkin",
       "team_ids": [
         "NE"
       ],
@@ -120887,7 +120663,7 @@
       ]
     },
     {
-      "player_name": "Tanner Arkin",
+      "player_name": "Cameron Latu",
       "team_ids": [
         "NE"
       ],
@@ -120991,34 +120767,6 @@
       "position_metrics": {
         "depth_chart_pos_slot": 1,
         "depth_chart_pos_rank": 7,
-        "depth_chart_group_id": 21
-      },
-      "quality_flags": [
-        "depth_chart_group_3wr_1te",
-        "depth_chart_position_wr"
-      ]
-    },
-    {
-      "player_name": "Jimmy Kibble",
-      "team_ids": [
-        "NE"
-      ],
-      "position": "WR",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 2,
-        "depth_chart_pos_rank": 8,
         "depth_chart_group_id": 21
       },
       "quality_flags": [
@@ -121283,7 +121031,7 @@
       "team_ids": [
         "NO"
       ],
-      "position": "RCB",
+      "position": "PR",
       "offense_snaps_2025": 0,
       "defense_snaps_2025": 0,
       "special_teams_snaps_2025": 0,
@@ -121297,13 +121045,13 @@
         "nflverse_depth_charts"
       ],
       "position_metrics": {
-        "depth_chart_pos_slot": 11,
-        "depth_chart_pos_rank": 3,
-        "depth_chart_group_id": 15
+        "depth_chart_pos_slot": 4,
+        "depth_chart_pos_rank": 2,
+        "depth_chart_group_id": 18
       },
       "quality_flags": [
-        "depth_chart_group_base_3_4_d",
-        "depth_chart_position_rcb"
+        "depth_chart_group_special_teams",
+        "depth_chart_position_pr"
       ]
     },
     {
@@ -121332,34 +121080,6 @@
       "quality_flags": [
         "depth_chart_group_base_3_4_d",
         "depth_chart_position_nb"
-      ]
-    },
-    {
-      "player_name": "Michael Heldman",
-      "team_ids": [
-        "NO"
-      ],
-      "position": "RDE",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 3,
-        "depth_chart_pos_rank": 4,
-        "depth_chart_group_id": 15
-      },
-      "quality_flags": [
-        "depth_chart_group_base_3_4_d",
-        "depth_chart_position_rde"
       ]
     },
     {
@@ -121494,7 +121214,7 @@
       ],
       "position_metrics": {
         "depth_chart_pos_slot": 11,
-        "depth_chart_pos_rank": 6,
+        "depth_chart_pos_rank": 5,
         "depth_chart_group_id": 21
       },
       "quality_flags": [
@@ -123183,34 +122903,6 @@
       ]
     },
     {
-      "player_name": "Chase Curtis",
-      "team_ids": [
-        "NYJ"
-      ],
-      "position": "TE",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 10,
-        "depth_chart_pos_rank": 5,
-        "depth_chart_group_id": 21
-      },
-      "quality_flags": [
-        "depth_chart_group_3wr_1te",
-        "depth_chart_position_te"
-      ]
-    },
-    {
       "player_name": "Chip Trayanum",
       "team_ids": [
         "NYJ"
@@ -123231,34 +122923,6 @@
       "position_metrics": {
         "depth_chart_pos_slot": 11,
         "depth_chart_pos_rank": 5,
-        "depth_chart_group_id": 21
-      },
-      "quality_flags": [
-        "depth_chart_group_3wr_1te",
-        "depth_chart_position_rb"
-      ]
-    },
-    {
-      "player_name": "Dominic Richardson",
-      "team_ids": [
-        "NYJ"
-      ],
-      "position": "RB",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 11,
-        "depth_chart_pos_rank": 6,
         "depth_chart_group_id": 21
       },
       "quality_flags": [
@@ -123712,34 +123376,6 @@
       "quality_flags": [
         "depth_chart_group_3wr_1te",
         "depth_chart_position_qb"
-      ]
-    },
-    {
-      "player_name": "Ja'Quinden Jackson",
-      "team_ids": [
-        "PHI"
-      ],
-      "position": "RB",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 11,
-        "depth_chart_pos_rank": 4,
-        "depth_chart_group_id": 21
-      },
-      "quality_flags": [
-        "depth_chart_group_3wr_1te",
-        "depth_chart_position_rb"
       ]
     },
     {
@@ -124863,11 +124499,11 @@
       ]
     },
     {
-      "player_name": "Deion Jones",
+      "player_name": "Romello Height",
       "team_ids": [
         "SF"
       ],
-      "position": "LILB",
+      "position": "WLB",
       "offense_snaps_2025": 0,
       "defense_snaps_2025": 0,
       "special_teams_snaps_2025": 0,
@@ -124881,13 +124517,13 @@
         "nflverse_depth_charts"
       ],
       "position_metrics": {
-        "depth_chart_pos_slot": 5,
+        "depth_chart_pos_slot": 4,
         "depth_chart_pos_rank": 2,
         "depth_chart_group_id": 15
       },
       "quality_flags": [
         "depth_chart_group_base_3_4_d",
-        "depth_chart_position_lilb"
+        "depth_chart_position_wlb"
       ]
     },
     {
@@ -124919,35 +124555,7 @@
       ]
     },
     {
-      "player_name": "Ashtyn Davis",
-      "team_ids": [
-        "SF"
-      ],
-      "position": "FS",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 10,
-        "depth_chart_pos_rank": 2,
-        "depth_chart_group_id": 15
-      },
-      "quality_flags": [
-        "depth_chart_group_base_3_4_d",
-        "depth_chart_position_fs"
-      ]
-    },
-    {
-      "player_name": "Nate Hobbs",
+      "player_name": "Ephesians Prysock",
       "team_ids": [
         "SF"
       ],
@@ -124975,7 +124583,7 @@
       ]
     },
     {
-      "player_name": "Romello Height",
+      "player_name": "Andrew Farmer II",
       "team_ids": [
         "SF"
       ],
@@ -125031,6 +124639,34 @@
       ]
     },
     {
+      "player_name": "Ashtyn Davis",
+      "team_ids": [
+        "SF"
+      ],
+      "position": "SS",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 9,
+        "depth_chart_pos_rank": 3,
+        "depth_chart_group_id": 15
+      },
+      "quality_flags": [
+        "depth_chart_group_base_3_4_d",
+        "depth_chart_position_ss"
+      ]
+    },
+    {
       "player_name": "Darrick Forrest",
       "team_ids": [
         "SF"
@@ -125059,11 +124695,11 @@
       ]
     },
     {
-      "player_name": "Victor Dimukeje",
+      "player_name": "Nate Hobbs",
       "team_ids": [
         "SF"
       ],
-      "position": "WLB",
+      "position": "RCB",
       "offense_snaps_2025": 0,
       "defense_snaps_2025": 0,
       "special_teams_snaps_2025": 0,
@@ -125077,41 +124713,13 @@
         "nflverse_depth_charts"
       ],
       "position_metrics": {
-        "depth_chart_pos_slot": 4,
-        "depth_chart_pos_rank": 4,
+        "depth_chart_pos_slot": 11,
+        "depth_chart_pos_rank": 3,
         "depth_chart_group_id": 15
       },
       "quality_flags": [
         "depth_chart_group_base_3_4_d",
-        "depth_chart_position_wlb"
-      ]
-    },
-    {
-      "player_name": "Andrew Farmer II",
-      "team_ids": [
-        "SF"
-      ],
-      "position": "WLB",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 4,
-        "depth_chart_pos_rank": 5,
-        "depth_chart_group_id": 15
-      },
-      "quality_flags": [
-        "depth_chart_group_base_3_4_d",
-        "depth_chart_position_wlb"
+        "depth_chart_position_rcb"
       ]
     },
     {
@@ -125134,7 +124742,7 @@
       ],
       "position_metrics": {
         "depth_chart_pos_slot": 4,
-        "depth_chart_pos_rank": 6,
+        "depth_chart_pos_rank": 4,
         "depth_chart_group_id": 15
       },
       "quality_flags": [
@@ -125199,62 +124807,6 @@
       ]
     },
     {
-      "player_name": "Mike Evans",
-      "team_ids": [
-        "SF"
-      ],
-      "position": "WR",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 1,
-        "depth_chart_pos_rank": 1,
-        "depth_chart_group_id": 21
-      },
-      "quality_flags": [
-        "depth_chart_group_3wr_1te",
-        "depth_chart_position_wr"
-      ]
-    },
-    {
-      "player_name": "Carver Willis",
-      "team_ids": [
-        "SF"
-      ],
-      "position": "RG",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 6,
-        "depth_chart_pos_rank": 2,
-        "depth_chart_group_id": 21
-      },
-      "quality_flags": [
-        "depth_chart_group_3wr_1te",
-        "depth_chart_position_rg"
-      ]
-    },
-    {
       "player_name": "Deebo Samuel",
       "team_ids": [
         "SF"
@@ -125275,6 +124827,34 @@
       "position_metrics": {
         "depth_chart_pos_slot": 2,
         "depth_chart_pos_rank": 2,
+        "depth_chart_group_id": 21
+      },
+      "quality_flags": [
+        "depth_chart_group_3wr_1te",
+        "depth_chart_position_wr"
+      ]
+    },
+    {
+      "player_name": "Mike Evans",
+      "team_ids": [
+        "SF"
+      ],
+      "position": "WR",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 1,
+        "depth_chart_pos_rank": 1,
         "depth_chart_group_id": 21
       },
       "quality_flags": [
@@ -125311,11 +124891,11 @@
       ]
     },
     {
-      "player_name": "Jarrett Patterson",
+      "player_name": "Carver Willis",
       "team_ids": [
         "SF"
       ],
-      "position": "RG",
+      "position": "LG",
       "offense_snaps_2025": 0,
       "defense_snaps_2025": 0,
       "special_teams_snaps_2025": 0,
@@ -125329,41 +124909,41 @@
         "nflverse_depth_charts"
       ],
       "position_metrics": {
-        "depth_chart_pos_slot": 6,
-        "depth_chart_pos_rank": 3,
-        "depth_chart_group_id": 21
-      },
-      "quality_flags": [
-        "depth_chart_group_3wr_1te",
-        "depth_chart_position_rg"
-      ]
-    },
-    {
-      "player_name": "Enrique Cruz Jr.",
-      "team_ids": [
-        "SF"
-      ],
-      "position": "RT",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 7,
+        "depth_chart_pos_slot": 4,
         "depth_chart_pos_rank": 2,
         "depth_chart_group_id": 21
       },
       "quality_flags": [
         "depth_chart_group_3wr_1te",
-        "depth_chart_position_rt"
+        "depth_chart_position_lg"
+      ]
+    },
+    {
+      "player_name": "Jarrett Patterson",
+      "team_ids": [
+        "SF"
+      ],
+      "position": "C",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 5,
+        "depth_chart_pos_rank": 2,
+        "depth_chart_group_id": 21
+      },
+      "quality_flags": [
+        "depth_chart_group_3wr_1te",
+        "depth_chart_position_c"
       ]
     },
     {
@@ -125420,6 +125000,34 @@
       "quality_flags": [
         "depth_chart_group_3wr_1te",
         "depth_chart_position_wr"
+      ]
+    },
+    {
+      "player_name": "Enrique Cruz Jr.",
+      "team_ids": [
+        "SF"
+      ],
+      "position": "LT",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 3,
+        "depth_chart_pos_rank": 3,
+        "depth_chart_group_id": 21
+      },
+      "quality_flags": [
+        "depth_chart_group_3wr_1te",
+        "depth_chart_position_lt"
       ]
     },
     {
@@ -125700,34 +125308,6 @@
       "quality_flags": [
         "depth_chart_group_base_3_4_d",
         "depth_chart_position_slb"
-      ]
-    },
-    {
-      "player_name": "Damarion Williams",
-      "team_ids": [
-        "TB"
-      ],
-      "position": "LCB",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 8,
-        "depth_chart_pos_rank": 2,
-        "depth_chart_group_id": 15
-      },
-      "quality_flags": [
-        "depth_chart_group_base_3_4_d",
-        "depth_chart_position_lcb"
       ]
     },
     {
@@ -126543,34 +126123,6 @@
       ]
     },
     {
-      "player_name": "Dominique Hampton",
-      "team_ids": [
-        "TEN"
-      ],
-      "position": "SLB",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 7,
-        "depth_chart_pos_rank": 3,
-        "depth_chart_group_id": 16
-      },
-      "quality_flags": [
-        "depth_chart_group_base_4_3_d",
-        "depth_chart_position_slb"
-      ]
-    },
-    {
       "player_name": "Melvin Smith Jr.",
       "team_ids": [
         "TEN"
@@ -127355,34 +126907,6 @@
       ]
     },
     {
-      "player_name": "Malik Spencer",
-      "team_ids": [
-        "WAS"
-      ],
-      "position": "FS",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 10,
-        "depth_chart_pos_rank": 4,
-        "depth_chart_group_id": 15
-      },
-      "quality_flags": [
-        "depth_chart_group_base_3_4_d",
-        "depth_chart_position_fs"
-      ]
-    },
-    {
       "player_name": "Drew Stevens",
       "team_ids": [
         "WAS"
@@ -127716,6 +127240,510 @@
       "quality_flags": [
         "depth_chart_group_3wr_1te",
         "depth_chart_position_te"
+      ]
+    },
+    {
+      "player_name": "Ryan Hayes",
+      "team_ids": [
+        "CAR"
+      ],
+      "position": "LT",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 3,
+        "depth_chart_pos_rank": 5,
+        "depth_chart_group_id": 21
+      },
+      "quality_flags": [
+        "depth_chart_group_3wr_1te",
+        "depth_chart_position_lt"
+      ]
+    },
+    {
+      "player_name": "Sincere Brown",
+      "team_ids": [
+        "LAC"
+      ],
+      "position": "WR",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 2,
+        "depth_chart_pos_rank": 8,
+        "depth_chart_group_id": 21
+      },
+      "quality_flags": [
+        "depth_chart_group_3wr_1te",
+        "depth_chart_position_wr"
+      ]
+    },
+    {
+      "player_name": "Carter Warren",
+      "team_ids": [
+        "MIA"
+      ],
+      "position": "RT",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 7,
+        "depth_chart_pos_rank": 4,
+        "depth_chart_group_id": 21
+      },
+      "quality_flags": [
+        "depth_chart_group_3wr_1te",
+        "depth_chart_position_rt"
+      ]
+    },
+    {
+      "player_name": "Dontae Fleming",
+      "team_ids": [
+        "MIN"
+      ],
+      "position": "WR",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 1,
+        "depth_chart_pos_rank": 7,
+        "depth_chart_group_id": 21
+      },
+      "quality_flags": [
+        "depth_chart_group_3wr_1te",
+        "depth_chart_position_wr"
+      ]
+    },
+    {
+      "player_name": "Michael Heldman",
+      "team_ids": [
+        "NO"
+      ],
+      "position": "RDE",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 3,
+        "depth_chart_pos_rank": 4,
+        "depth_chart_group_id": 15
+      },
+      "quality_flags": [
+        "depth_chart_group_base_3_4_d",
+        "depth_chart_position_rde"
+      ]
+    },
+    {
+      "player_name": "Dominic Richardson",
+      "team_ids": [
+        "NYJ"
+      ],
+      "position": "RB",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 11,
+        "depth_chart_pos_rank": 6,
+        "depth_chart_group_id": 21
+      },
+      "quality_flags": [
+        "depth_chart_group_3wr_1te",
+        "depth_chart_position_rb"
+      ]
+    },
+    {
+      "player_name": "Victor Dimukeje",
+      "team_ids": [
+        "SF"
+      ],
+      "position": "WLB",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 4,
+        "depth_chart_pos_rank": 3,
+        "depth_chart_group_id": 15
+      },
+      "quality_flags": [
+        "depth_chart_group_base_3_4_d",
+        "depth_chart_position_wlb"
+      ]
+    },
+    {
+      "player_name": "Dominique Hampton",
+      "team_ids": [
+        "TEN"
+      ],
+      "position": "SLB",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 7,
+        "depth_chart_pos_rank": 3,
+        "depth_chart_group_id": 16
+      },
+      "quality_flags": [
+        "depth_chart_group_base_4_3_d",
+        "depth_chart_position_slb"
+      ]
+    },
+    {
+      "player_name": "Malik Spencer",
+      "team_ids": [
+        "WAS"
+      ],
+      "position": "FS",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 10,
+        "depth_chart_pos_rank": 4,
+        "depth_chart_group_id": 15
+      },
+      "quality_flags": [
+        "depth_chart_group_base_3_4_d",
+        "depth_chart_position_fs"
+      ]
+    },
+    {
+      "player_name": "Tyrek Funderburk",
+      "team_ids": [
+        "CAR"
+      ],
+      "position": "RCB",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 11,
+        "depth_chart_pos_rank": 3,
+        "depth_chart_group_id": 15
+      },
+      "quality_flags": [
+        "depth_chart_group_base_3_4_d",
+        "depth_chart_position_rcb"
+      ]
+    },
+    {
+      "player_name": "Seth McLaughlin",
+      "team_ids": [
+        "DET"
+      ],
+      "position": "C",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 5,
+        "depth_chart_pos_rank": 2,
+        "depth_chart_group_id": 21
+      },
+      "quality_flags": [
+        "depth_chart_group_3wr_1te",
+        "depth_chart_position_c"
+      ]
+    },
+    {
+      "player_name": "Jabari Small",
+      "team_ids": [
+        "DET"
+      ],
+      "position": "RB",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 11,
+        "depth_chart_pos_rank": 4,
+        "depth_chart_group_id": 21
+      },
+      "quality_flags": [
+        "depth_chart_group_3wr_1te",
+        "depth_chart_position_rb"
+      ]
+    },
+    {
+      "player_name": "Scooby Williams",
+      "team_ids": [
+        "MIN"
+      ],
+      "position": "RILB",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 6,
+        "depth_chart_pos_rank": 3,
+        "depth_chart_group_id": 15
+      },
+      "quality_flags": [
+        "depth_chart_group_base_3_4_d",
+        "depth_chart_position_rilb"
+      ]
+    },
+    {
+      "player_name": "Jimmy Kibble",
+      "team_ids": [
+        "NE"
+      ],
+      "position": "WR",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 2,
+        "depth_chart_pos_rank": 8,
+        "depth_chart_group_id": 21
+      },
+      "quality_flags": [
+        "depth_chart_group_3wr_1te",
+        "depth_chart_position_wr"
+      ]
+    },
+    {
+      "player_name": "Chase Curtis",
+      "team_ids": [
+        "NYJ"
+      ],
+      "position": "TE",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 10,
+        "depth_chart_pos_rank": 5,
+        "depth_chart_group_id": 21
+      },
+      "quality_flags": [
+        "depth_chart_group_3wr_1te",
+        "depth_chart_position_te"
+      ]
+    },
+    {
+      "player_name": "Ja'Quinden Jackson",
+      "team_ids": [
+        "PHI"
+      ],
+      "position": "RB",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 11,
+        "depth_chart_pos_rank": 4,
+        "depth_chart_group_id": 21
+      },
+      "quality_flags": [
+        "depth_chart_group_3wr_1te",
+        "depth_chart_position_rb"
+      ]
+    },
+    {
+      "player_name": "Deion Jones",
+      "team_ids": [
+        "SF"
+      ],
+      "position": "LILB",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 5,
+        "depth_chart_pos_rank": 2,
+        "depth_chart_group_id": 15
+      },
+      "quality_flags": [
+        "depth_chart_group_base_3_4_d",
+        "depth_chart_position_lilb"
+      ]
+    },
+    {
+      "player_name": "Damarion Williams",
+      "team_ids": [
+        "TB"
+      ],
+      "position": "LCB",
+      "offense_snaps_2025": 0,
+      "defense_snaps_2025": 0,
+      "special_teams_snaps_2025": 0,
+      "snap_game_count_2025": 0,
+      "offense_snap_game_count_2025": 0,
+      "defense_snap_game_count_2025": 0,
+      "special_teams_snap_game_count_2025": 0,
+      "near_full_snap_game_count_2025": 0,
+      "games_2025": null,
+      "source_families": [
+        "nflverse_depth_charts"
+      ],
+      "position_metrics": {
+        "depth_chart_pos_slot": 8,
+        "depth_chart_pos_rank": 2,
+        "depth_chart_group_id": 15
+      },
+      "quality_flags": [
+        "depth_chart_group_base_3_4_d",
+        "depth_chart_position_lcb"
       ]
     },
     {
@@ -137040,34 +137068,6 @@
       "quality_flags": [
         "depth_chart_group_base_3_4_d",
         "depth_chart_position_fs"
-      ]
-    },
-    {
-      "player_name": "Ephesians Prysock",
-      "team_ids": [
-        "SF"
-      ],
-      "position": "RCB",
-      "offense_snaps_2025": 0,
-      "defense_snaps_2025": 0,
-      "special_teams_snaps_2025": 0,
-      "snap_game_count_2025": 0,
-      "offense_snap_game_count_2025": 0,
-      "defense_snap_game_count_2025": 0,
-      "special_teams_snap_game_count_2025": 0,
-      "near_full_snap_game_count_2025": 0,
-      "games_2025": null,
-      "source_families": [
-        "nflverse_depth_charts"
-      ],
-      "position_metrics": {
-        "depth_chart_pos_slot": 11,
-        "depth_chart_pos_rank": 3,
-        "depth_chart_group_id": 15
-      },
-      "quality_flags": [
-        "depth_chart_group_base_3_4_d",
-        "depth_chart_position_rcb"
       ]
     },
     {

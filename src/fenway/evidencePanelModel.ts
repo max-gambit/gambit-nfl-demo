@@ -140,9 +140,10 @@ export function buildEvidencePackModel(
   const focusRefs = new Set((sourceFilterRefs ?? []).filter((ref) => Number.isInteger(ref) && ref > 0));
   const hasFocus = focusRefs.size > 0;
 
-  const claimSpecs = hasFocus
+  const sourceFirstSpecs = sourceFirstNflClaimSpecs(activeBrief, sources, hasFocus ? focusRefs : null);
+  const claimSpecs = sourceFirstSpecs ?? (hasFocus
     ? focusedClaimSpecs(activeBrief, options, focusRefs, selectedOptionRef)
-    : defaultClaimSpecs(activeBrief, options);
+    : defaultClaimSpecs(activeBrief, options));
   if (hasFocus) {
     const coveredFocusRefs = new Set(claimSpecs.flatMap((spec) => spec.refs));
     for (const ref of focusRefs) {
@@ -239,6 +240,9 @@ export function classifyEvidenceSource(source: BriefSource): EvidenceSourceClass
     }
     if (dataset === 'nfl_trade_screen_current') {
       return classification(source, 'supporting', 'supporting', cleanTitle(source.title), 'Shows the players considered, roster impact, and cap consequences.', 'search', teamLabel);
+    }
+    if (dataset === 'nfl_trade_target_current') {
+      return classification(source, 'contract', 'contract', cleanTitle(source.title), sourceContribution(source, 'Shows the public contract and team information used for this specific player.'), 'doc', teamLabel);
     }
     if (dataset === 'nfl_context_graph') {
       return classification(source, 'context', 'context', cleanTitle(source.title), 'Shows public clues about why another team might or might not listen.', 'link', teamLabel);
@@ -337,6 +341,47 @@ function defaultClaimSpecs(activeBrief: Brief | null, options: BriefOption[]): A
   const specs = briefClaimSpecs(activeBrief?.body ?? null);
   const optionSpecs = optionAuditSpecs(options, null).slice(0, specs.length > 0 ? 2 : 4);
   return uniqueSpecs([...specs, ...optionSpecs]);
+}
+
+function sourceFirstNflClaimSpecs(
+  activeBrief: Brief | null,
+  sources: BriefSource[],
+  focusRefs: Set<number> | null,
+): AuditClaimSpec[] | null {
+  const body = activeBrief?.body;
+  if (!body || body.kind !== 'data_analysis' || body.market_analysis || body.seller_move_analysis?.result) return null;
+  const hasCurrentNflSources = sources.some((source) => Boolean(currentNflEvidence(source)) || hasCurrentNflSourceFlag(source));
+  if (!hasCurrentNflSources) return null;
+
+  const citedRefs = extractBriefSourceRefs(body);
+  const eligibleRefs = focusRefs && focusRefs.size > 0
+    ? focusRefs
+    : citedRefs;
+  return sources.flatMap((source): AuditClaimSpec[] => {
+    if (!eligibleRefs.has(source.ref_index)) return [];
+    const sourceClass = classifyEvidenceSource(source);
+    return [{
+      key: `nfl-source:${source.ref_index}`,
+      type: 'claim',
+      title: sourceClass.title,
+      proof: sourceClass.proof,
+      refs: [source.ref_index],
+      icon: sourceClass.icon,
+    }];
+  });
+}
+
+function hasCurrentNflSourceFlag(source: BriefSource): boolean {
+  const data = source.data;
+  return Boolean(data && (
+    data.current_team_cap_summary === true
+    || data.current_team_cap_calculation === true
+    || data.current_league_cap === true
+    || data.current_team_contract === true
+    || data.current_team_roster === true
+    || data.current_team_depth === true
+    || data.current_team_role_history === true
+  ));
 }
 
 function focusedClaimSpecs(
@@ -1032,6 +1077,9 @@ function compactAuditTitle(spec: AuditClaimSpec, rows: EvidenceCheckRow[]): stri
   if (rows.some((row) => row.source.data?.seller_move_role === true)) return 'Current role and depth';
   if (rows.some((row) => row.source.data?.seller_move_rule === true)) return 'Trade cap accounting rule';
   if (rows.some((row) => row.source.data?.seller_move_comparable === true)) return 'Historical trade range';
+  const targetSource = rows.find((row) => currentNflEvidence(row.source)?.dataset_id === 'nfl_trade_target_current');
+  if (targetSource) return targetSource.title;
+  if (rows.some((row) => Boolean(currentNflEvidence(row.source)))) return clampHeadline(spec.title, 46);
   if (/^Historical market definition$/i.test(spec.title)) return spec.title;
   if (rows.some((row) => Boolean(row.source.data?.transaction))) return spec.title;
 

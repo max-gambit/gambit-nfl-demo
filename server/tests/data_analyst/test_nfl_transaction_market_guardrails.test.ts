@@ -52,6 +52,24 @@ test('transaction evidence rows include the exact returned transactions', () => 
   assert.doesNotMatch(JSON.stringify(rows), /NFL_TRANSACTION_MARKET|Player record|Position mapping|Raw position|Normalization/);
 });
 
+test('trade evidence prefers the trades source when player identity is also cited', () => {
+  const analysis = structuredClone(analysisFixture());
+  analysis.source_refs.unshift({
+    ...analysis.source_refs[0],
+    id: 'players',
+    name: 'nflverse players',
+    url: 'https://github.com/nflverse/nflverse-data/releases/download/players/players.csv',
+  });
+  for (const row of [...analysis.comparables, ...analysis.influential_transactions]) {
+    row.source_ref_ids = ['players', 'trades'];
+  }
+  analysis.source_refs.find((source) => source.id === 'trades')!.url = 'https://github.com/nflverse/nflverse-data/releases/download/trades/trades.csv';
+
+  const rows = deterministicMarketEventSourceRows(analysis, analysis.source_refs.length + 1);
+  assert.ok(rows.length > 0);
+  assert.equal(rows[0].data?.source_url, 'https://github.com/nflverse/nflverse-data/releases/download/trades/trades.csv');
+});
+
 test('artifact-grounded fallback itself passes deterministic checks', () => {
   const analysis = analysisFixture();
   const draft: SubmitDataAnalysisInput = buildDeterministicNflTransactionMarketFallback(analysis);

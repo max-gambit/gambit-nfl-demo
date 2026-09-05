@@ -64,6 +64,20 @@ test('NFL data health accepts a current DB-backed coherent snapshot', async () =
   assert.equal(health.rule_authority.rules_with_locators, health.rule_authority.total_rules);
 });
 
+test('NFL data health measures freshness from retrieval time, not date-only roster labeling', async () => {
+  const seed = structuredClone(await loadNflDemoSeed());
+  seed.as_of_date = '2026-09-02';
+  seed.retrieved_at = '2026-09-02T17:00:00.000Z';
+  const health = await buildNflDataHealth('NYG', {
+    data: { seed, source_mode: 'supabase_current_views', fallback_reason: null },
+    transactionMarket: transactionHealth,
+    generatedAt: new Date('2026-09-04T23:00:00.000Z'),
+  });
+
+  assert.equal(health.datasets.find((dataset) => dataset.id === 'roster')?.age_hours, 54);
+  assert.equal(health.datasets.find((dataset) => dataset.id === 'cap_contracts')?.age_hours, 54);
+});
+
 test('NFL data health blocks cap arithmetic mismatch', async () => {
   const seed = structuredClone(await loadNflDemoSeed());
   seed.as_of_date = '2026-09-02T12:00:00.000Z';

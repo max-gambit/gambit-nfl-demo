@@ -335,6 +335,8 @@ export interface NflTradeTargetLane {
   what_they_lose: string;
   availability_validation: string;
   source_refs: string[];
+  contract_source_url: string | null;
+  roster_source_url: string | null;
 }
 
 export interface NflTradeMotivationInput {
@@ -382,6 +384,7 @@ interface TeamEvidence {
   coverageRefIndex: number | null;
   tradeRefIndex: number | null;
   intelRefIndex: number | null;
+  targetRefIndexes: number[];
   seed: NflDemoSeed;
 }
 
@@ -561,6 +564,9 @@ export async function buildCurrentNflEvidence(
       : null;
     const tradeRefIndex = tradeGoalScreen ? nextRefIndex++ : null;
     const intelRefIndex = tradeGoalScreen ? nextRefIndex++ : null;
+    const targetRefIndexes = tradeGoalScreen
+      ? tradeGoalScreen.target_lanes.map(() => nextRefIndex++)
+      : [];
     return {
       team_id: teamId,
       scope,
@@ -578,6 +584,7 @@ export async function buildCurrentNflEvidence(
       coverageRefIndex,
       tradeRefIndex,
       intelRefIndex,
+      targetRefIndexes,
       seed,
     };
   }));
@@ -623,6 +630,7 @@ function renderCurrentNflEvidenceBlock(
       ...(team.coverageRefIndex ? [team.coverageRefIndex] : []),
       ...(team.tradeRefIndex ? [team.tradeRefIndex] : []),
       ...(team.intelRefIndex ? [team.intelRefIndex] : []),
+      ...team.targetRefIndexes,
     ]
   ));
   const scope = teamEvidence[0]?.scope ?? 'transaction_full';
@@ -635,7 +643,7 @@ function renderCurrentNflEvidenceBlock(
     'Rows needing source review are caveats inside the audit, not a reason to reject the whole audit when current roster/cap coverage matches.',
     'Player Quality Metrics v3 is position-specific evidence, not a universal grade. Cite scorecards before claims like disruptive, coverage liability, separation, run-stopping, or replaceable. Cap hit, roster membership, and snaps alone are not player quality. OL public evidence is continuity/availability only unless a reviewed OL quality source is present.',
     'Coverage matrix status is mandatory readiness context: strong means the current app can support the claim; directional means caveat it; weak/blocked means do not make a strong claim without explicitly limiting the answer.',
-    'Visible answer style: translate data-quality labels into front-office language. Say "high confidence", "directional", "needs source review", "one unpriced row", or "priced in the current cap file"; avoid leading with product/schema terms like "Contract Ledger v1", "captured", "derived", "estimated", "source-needed", "row parity", "app rows", or "source status".',
+    'Visible answer style: state the football fact or the specific missing information. Never repeat schema labels, confidence tiers, source-status labels, internal action codes, or workflow language.',
     'Trade-goal answers must run four checks before recommending a move: depth after trading the outgoing player; lower-pain outgoing hierarchy before premium starters; named target/counterparty lanes from the current cap file; and clean caveat logic for negative trade economics.',
     'Trade-goal target lanes must also pass seller-thesis cards from counterparty Intel. Lead only with call_now or check_call actions. Treat monitor as a watch/check lane, posture_change_only as high impact but low probability, and do_not_lead as a lane to reject unless a new seller signal appears. Do not recite internal motivation_tier labels in visible prose.',
     consumer === 'brief'
@@ -653,7 +661,7 @@ function renderCurrentNflEvidenceBlock(
     lines.push(renderTeamAppEvidence(team));
     lines.push('');
     if (team.tradeGoalScreen) {
-      lines.push(renderTradeGoalScreen(team.tradeGoalScreen, team.tradeRefIndex));
+      lines.push(renderTradeGoalScreen(team.tradeGoalScreen, team.tradeRefIndex, team.targetRefIndexes));
       lines.push('');
     }
   }
@@ -765,7 +773,47 @@ function evidenceSourcesForTeam(team: TeamEvidence): Omit<BriefSource, 'id' | 'b
     ...coverageSources,
     ...(team.tradeGoalScreen && team.tradeRefIndex ? [tradeGoalSourceForTeam(team, team.tradeGoalScreen, team.tradeRefIndex)] : []),
     ...(team.tradeGoalScreen && team.intelRefIndex ? [tradeGoalIntelSourceForTeam(team, team.tradeGoalScreen, team.intelRefIndex)] : []),
+    ...(team.tradeGoalScreen ? team.tradeGoalScreen.target_lanes.flatMap((lane, index) => {
+      const refIndex = team.targetRefIndexes[index];
+      return refIndex ? [tradeTargetSource(lane, refIndex, team.seed.as_of_date)] : [];
+    }) : []),
   ];
+}
+
+function tradeTargetSource(
+  lane: NflTradeTargetLane,
+  refIndex: number,
+  asOfDate: string,
+): Omit<BriefSource, 'id' | 'brief_id'> {
+  return {
+    ref_index: refIndex,
+    kind: 'CONTRACT',
+    source: 'OverTheCap and NFL.com',
+    title: `${lane.target_player_name} — ${lane.target_team_id} contract and team context`,
+    updated_at: asOfDate,
+    data: {
+      ...(lane.contract_source_url ? { source_url: lane.contract_source_url } : {}),
+      ...(lane.roster_source_url ? { roster_source_url: lane.roster_source_url } : {}),
+      rows: [
+        { k: 'Player', v: lane.target_player_name },
+        { k: 'Team', v: lane.target_team_id },
+        { k: 'Position', v: lane.position ?? 'Not listed' },
+        { k: '2026 cap number', v: formatMoney(lane.cap_number_2026) ?? 'Not available' },
+        { k: 'Contract term', v: lane.contract_years_remaining == null ? 'Not available' : `${lane.contract_years_remaining} year${lane.contract_years_remaining === 1 ? '' : 's'} remaining` },
+        { k: 'Why the team might listen', v: humanizeNflVisibleText(lane.seller_case) },
+        { k: 'Why it might not', v: humanizeNflVisibleText(lane.seller_objection) },
+        { k: 'What to confirm', v: humanizeNflVisibleText(lane.validation_trigger) },
+      ],
+      contribution: `Supports the contract and team context used when discussing ${lane.target_player_name}. It does not establish that the player is available.`,
+      current_nfl_evidence: {
+        dataset_id: 'nfl_trade_target_current',
+        team_id: lane.target_team_id,
+        player_name: lane.target_player_name,
+        as_of_date: asOfDate,
+        source_name: 'OverTheCap and NFL.com',
+      },
+    },
+  };
 }
 
 function metricSourceForTeam(
@@ -902,7 +950,11 @@ function tradeGoalIntelSourceForTeam(
   };
 }
 
-function renderTradeGoalScreen(screen: NflTradeGoalScreen, refIndex: number | null): string {
+function renderTradeGoalScreen(
+  screen: NflTradeGoalScreen,
+  refIndex: number | null,
+  targetRefIndexes: number[],
+): string {
   const ref = refIndex ? `[${refIndex}] ` : '';
   return [
     `${ref}ANALYST_DATA - ${screen.subject_team_id} trade-goal checks`,
@@ -911,6 +963,8 @@ function renderTradeGoalScreen(screen: NflTradeGoalScreen, refIndex: number | nu
     `Lower-pain outgoing hierarchy: ${screen.outgoing_hierarchy.join(' | ')}`,
     `Seller thesis cards: ${screen.named_target_lanes.join(' | ')}`,
     `Counterparty seller screen: ${screen.counterparty_intel_summary.join(' | ')}`,
+    `Player-specific source refs: ${screen.target_lanes.map((lane, index) => `[${targetRefIndexes[index]}] ${lane.target_player_name} (${lane.target_team_id})`).join(' | ') || 'none'}`,
+    'Cite the player-specific ref for every named target. Use the broader trade and team-context refs only for cross-player context.',
     `Bad cap-relief/non-core guardrails: ${screen.bad_cap_relief_trades.join(' | ')}`,
     `Required answer structure: ${screen.answer_requirements.join(' | ')}`,
   ].join('\n');
@@ -1429,6 +1483,8 @@ function buildNflTradeTargetLane(
     what_they_lose: whatSellerLoses(row, rank, sellerDepthConsequence),
     availability_validation: validationTrigger,
     source_refs: sourceRefs,
+    contract_source_url: row.source_url,
+    roster_source_url: seed.teams.find((team) => team.team_id === row.team_id)?.source_url ?? null,
   };
 }
 

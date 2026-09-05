@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import type { BriefSource } from '@shared/types';
 import { F, SPACE, TRACKING, TYPE } from '../theme/fenway';
 
-const URL_KEYS = new Set(['source_url', 'url', 'authoritative_url']);
+const URL_KEYS = new Set(['source_url', 'roster_source_url', 'contract_source_url', 'url', 'authoritative_url']);
 
 export function NflSourceDetail({ source, onBack }: { source: BriefSource; onBack: () => void }) {
   const data = isRecord(source.data) ? source.data : {};
@@ -159,7 +159,7 @@ function allowedDetailLabel(source: BriefSource, value: string): boolean {
   const label = value.trim();
   if (source.data?.current_nfl_evidence && /^(?:dataset|contract field coverage|top cap contracts|position-group cap rollups|seller thesis|counterparty seller|required answer)/i.test(label)) return false;
   if (/^(?:player record|position mapping|identity match|raw position|normalization|source status|rows?|pff position|provider)/i.test(label)) return false;
-  const common = /^(?:as of|date|retrieved|source as of|source updated|season|player|position|position groups|team|teams|from|to|move|transaction|compensation|contract terms|relevance|role|depth consequence|current 2026 cap space|2026 cap hit|top 51 active spending|top cap contracts|dead money|applied team cap|accounting|carryover and adjustments|2026 league salary cap|cap space created|next-year cap effect|guaranteed remaining|contract confidence|contract field coverage|attribution|coverage|coverage range|records in this snapshot|current roster|roster players|active cornerbacks considered|explicit first-at-position cornerbacks|player signals|summary|posture|subject team|readiness|overall status|top gaps)$/i;
+  const common = /^(?:as of|date|retrieved|source as of|source updated|season|player|position|position groups|team|teams|from|to|move|transaction|compensation|contract terms?|relevance|role|depth consequence|current 2026 cap space|2026 cap hit|2026 cap number|top 51 active spending|top cap contracts|dead money|applied team cap|accounting|carryover and adjustments|2026 league salary cap|cap space created|next-year cap effect|guaranteed remaining|contract confidence|contract field coverage|attribution|coverage|coverage range|records in this snapshot|current roster|roster players|active cornerbacks considered|explicit first-at-position cornerbacks|player signals|summary|posture|subject team|readiness|overall status|top gaps|why the team might listen|why it might not|what to confirm)$/i;
   const cba = /^(?:article|section|locator|exact location|rule|effective date|authority|citation|what it says|what still needs checking)$/i;
   return common.test(label) || (source.kind === 'CBA' && cba.test(label));
 }
