@@ -3,7 +3,13 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import type { Brief, BriefSource, DataAnalysisBriefBody } from '@shared/types';
+import type { Brief, BriefSource, DataAnalysisBriefBody, NflTransactionTradeAsset } from '@shared/types';
+import {
+  nflTransactionMarketCohortEvidence,
+  nflTransactionMarketCohortPage,
+  nflTransactionTradeAssetLabel,
+  nflTransactionTradePackageLines,
+} from '../../../shared/nflTransactionMarket.js';
 import { buildEvidencePackModel } from '../../../src/fenway/evidencePanelModel.js';
 import {
   deterministicMarketEventSourceRows,
@@ -204,6 +210,81 @@ test('only transaction-history sources enter the additional-market group', () =>
   const transactionGroup = model.backgroundItems.find((item) => item.title === 'Additional market transactions');
   assert.deepEqual(transactionGroup?.refs, [1]);
   assert.ok(model.backgroundItems.some((item) => item.refs.includes(2) && item.title !== 'Additional market transactions'));
+});
+
+test('saved full history is searchable across directed packages and pageable without dropping player events', async () => {
+  const { snapshot } = await loadReviewedNflTransactionSnapshot();
+  const analysis = analyzeNflTransactionMarketSnapshot({
+    analysis_mode: 'comparables', start_year: 2016, end_year: 2025,
+    position_groups: ['EDGE'], transaction_types: ['trade'], max_comparables: 12,
+  }, snapshot);
+  const saved = JSON.parse(JSON.stringify(analysis)) as typeof analysis;
+  const evidence = nflTransactionMarketCohortEvidence(saved);
+  const expected = snapshot.events.filter((event) => event.position_group === 'EDGE'
+    && event.transaction_type === 'trade' && event.event_year >= saved.query.start_year && event.event_year <= saved.query.end_year);
+  assert.equal(evidence.complete, true);
+  assert.equal(evidence.rows.length, expected.length);
+  assert.equal(evidence.distinctTradeCount, new Set(expected.map((row) => row.raw_source_record?.trade_id)).size);
+  assert.match(evidence.summary, /player events.*player trade events.*distinct trades/);
+  assert.doesNotMatch(evidence.summary, /Sampled-only/);
+
+  const pageSize = 11;
+  const firstPage = nflTransactionMarketCohortPage(evidence.rows, '', 0, pageSize);
+  const traversed = Array.from({ length: firstPage.pageCount }, (_, page) => (
+    nflTransactionMarketCohortPage(evidence.rows, '', page, pageSize).rows
+  )).flat();
+  assert.deepEqual(traversed.map((row) => row.event_id), evidence.rows.map((row) => row.event_id));
+  assert.equal(new Set(traversed.map((row) => row.event_id)).size, expected.length);
+  assert.equal(nflTransactionMarketCohortPage(evidence.rows, '', 999, pageSize).page, firstPage.pageCount - 1);
+
+  const burns = nflTransactionMarketCohortPage(evidence.rows, '  bRiAn BURNS CAR NYG 2024 166  ', 999);
+  assert.equal(burns.rows.length, 1);
+  assert.equal(burns.rows[0].player_name, 'Brian Burns');
+  assert.equal(burns.page, 0, 'a narrowed search must not strand the user on an empty later page');
+  const packageLines = nflTransactionTradePackageLines(burns.rows[0]);
+  assert.ok(packageLines.includes('CAR → NYG: 2024 R5 No. 166'));
+  assert.ok(packageLines.some((line) => /^NYG → CAR: 2025 R5.*conditional/.test(line)));
+  assert.equal(packageLines.length, burns.rows[0].trade_package!.assets.length);
+  const absent = nflTransactionMarketCohortPage(evidence.rows, 'nonexistent-player-and-asset');
+  assert.equal(absent.matchCount, 0);
+  assert.equal(absent.pageCount, 0);
+  assert.deepEqual(absent.rows, []);
+
+  const legacy = structuredClone(saved);
+  delete legacy.full_cohort;
+  for (const row of [...legacy.comparables, ...legacy.influential_transactions]) {
+    delete row.trade_id;
+    delete row.trade_package;
+  }
+  const sampled = nflTransactionMarketCohortEvidence(legacy);
+  const savedIds = new Set([...legacy.comparables, ...legacy.influential_transactions].map((row) => row.event_id));
+  assert.equal(sampled.complete, false);
+  assert.equal(sampled.rows.length, savedIds.size);
+  assert.equal(sampled.distinctTradeCount, null, 'a coverage total cannot recreate unsaved deal evidence');
+  assert.match(sampled.summary, /Sampled-only evidence/);
+  assert.match(sampled.summary, /Run the analysis again/);
+  assert.ok(sampled.rows.length < expected.length);
+  assert.ok(sampled.rows.every((row) => nflTransactionTradePackageLines(row).length === 0));
+
+  const truncated = { ...saved, full_cohort: saved.full_cohort!.slice(0, 1) };
+  assert.equal(nflTransactionMarketCohortEvidence(truncated).complete, false);
+  const empty = { ...saved, full_cohort: [], coverage: { ...saved.coverage, event_count: 0 } };
+  assert.equal(nflTransactionMarketCohortEvidence(empty).complete, true);
+  assert.equal(nflTransactionMarketCohortEvidence(empty).distinctTradeCount, 0);
+});
+
+test('asset labels preserve unknown pick information and recorded conditional terms', () => {
+  const asset: NflTransactionTradeAsset = {
+    asset_id: 'conditional-pick', trade_id: 'synthetic-deal', event_year: 2025, trade_date: '2025-06-01',
+    gave_team_id: 'AAA', received_team_id: 'BBB', asset_type: 'draft_pick',
+    pfr_id: null, pfr_name: null, pick_season: 2027, pick_round: 3, pick_number: null,
+    conditional: true, source_ref_id: 'synthetic-source',
+    raw_source_record: { conditional: 'if the player reaches the snap threshold' },
+  };
+  assert.match(nflTransactionTradeAssetLabel(asset), /2027 R3 \(pick number not recorded\)/);
+  assert.match(nflTransactionTradeAssetLabel(asset), /conditional: if the player reaches the snap threshold/);
+  assert.match(nflTransactionTradeAssetLabel({ ...asset, conditional: null, raw_source_record: null }), /condition not recorded/);
+  assert.doesNotMatch(nflTransactionTradeAssetLabel({ ...asset, conditional: false, raw_source_record: null }), /conditional/);
 });
 
 function brief(body: DataAnalysisBriefBody | null, status: Brief['status'] = 'ready'): Brief {

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import type { BriefSource } from '@shared/types';
+import type { BriefSource, NflTransactionComparable, NflTransactionMarketSourceRef } from '@shared/types';
+import { nflTransactionTradeAssetLabel } from '@shared/nflTransactionMarket';
 import { F, SPACE, TRACKING, TYPE } from '../theme/fenway';
 
 const URL_KEYS = new Set(['source_url', 'roster_source_url', 'contract_source_url', 'url', 'authoritative_url']);
@@ -11,6 +12,9 @@ export function NflSourceDetail({ source, onBack }: { source: BriefSource; onBac
   const contribution = typeof data.contribution === 'string' ? data.contribution : null;
   const rows = detailRows(source, data);
   const sourceUrls = directUrls(data);
+  const transaction = isRecord(data.transaction) && data.transaction.transaction_type === 'trade'
+    ? data.transaction as unknown as NflTransactionComparable
+    : null;
 
   return (
     <div className="gd-scroll" style={{ height: '100%', overflowY: 'auto', padding: SPACE.lg }}>
@@ -43,6 +47,9 @@ export function NflSourceDetail({ source, onBack }: { source: BriefSource; onBac
         </dl>
       </section>}
 
+      {transaction && <NflTransactionTradePackageDetail row={transaction}
+        sources={Array.isArray(data.transaction_sources) ? data.transaction_sources as NflTransactionMarketSourceRef[] : []} />}
+
       {sourceUrls.length > 0 && (
         <section style={{ marginTop: SPACE.xl }}>
           <SectionLabel>Source links</SectionLabel>
@@ -57,6 +64,43 @@ export function NflSourceDetail({ source, onBack }: { source: BriefSource; onBac
       )}
     </div>
   );
+}
+
+/** Kept outside the generic detail-row limit so every recorded asset stays inspectable. */
+export function NflTransactionTradePackageDetail({ row, sources = [] }: {
+  row: Pick<NflTransactionComparable, 'transaction_type' | 'trade_package'>;
+  sources?: NflTransactionMarketSourceRef[];
+}) {
+  if (row.transaction_type !== 'trade') return null;
+  const tradePackage = row.trade_package;
+  if (!tradePackage?.assets.length) {
+    return <p style={{ margin: `${SPACE.sm}px 0`, color: F.fgMuted, fontSize: TYPE.body.sm }}>
+      Full trade package unavailable in this saved result. A compensation summary does not establish all assets in both directions.
+    </p>;
+  }
+  return <details style={{ margin: `${SPACE.sm}px 0`, fontSize: TYPE.body.sm }}>
+    <summary style={{ cursor: 'pointer', color: F.fenway, fontWeight: 700 }}>
+      Trade package · {tradePackage.assets.length} recorded assets
+    </summary>
+    <p style={{ color: F.fgMuted, lineHeight: 1.5 }}>
+      All assets recorded for this deal in the snapshot. Conditional flags describe the source record; they do not confirm whether a condition was met.
+    </p>
+    <ul style={{ display: 'grid', gap: SPACE.sm, paddingLeft: SPACE.lg }}>
+      {tradePackage.assets.map((asset) => {
+        const source = sources.find((candidate) => candidate.id === asset.source_ref_id);
+        return <li key={asset.asset_id} style={{ color: F.inkSoft, lineHeight: 1.5, overflowWrap: 'anywhere' }}>
+          <strong>{asset.gave_team_id} → {asset.received_team_id}</strong>: {nflTransactionTradeAssetLabel(asset)}
+          <div style={{ color: F.fgMuted, fontSize: TYPE.meta.md }}>
+            Source: {source && isSafeUrl(source.url)
+              ? <a href={source.url} target="_blank" rel="noreferrer" style={{ color: F.fenway }}>{source.name}</a>
+              : asset.source_ref_id}
+            {source ? ` · as of ${humanDate(source.as_of_date)}` : ''}
+            {` · record ${asset.asset_id}`}
+          </div>
+        </li>;
+      })}
+    </ul>
+  </details>;
 }
 
 function Fact({ label: factLabel, value }: { label: string; value: string }) {
@@ -159,7 +203,7 @@ function allowedDetailLabel(source: BriefSource, value: string): boolean {
   const label = value.trim();
   if (source.data?.current_nfl_evidence && /^(?:dataset|contract field coverage|top cap contracts|position-group cap rollups|seller thesis|counterparty seller|required answer)/i.test(label)) return false;
   if (/^(?:player record|position mapping|identity match|raw position|normalization|source status|rows?|pff position|provider)/i.test(label)) return false;
-  const common = /^(?:as of|date|retrieved|source as of|source updated|season|period|player|position|position groups|team|teams|from|to|move|transaction|return|compensation|contract terms?|relevance|role|depth consequence|current 2026 cap space|2026 cap hit|2026 cap number|top 51 active spending|top cap contracts|dead money|applied team cap|accounting|carryover and adjustments|2026 league salary cap|cap space created|next-year cap effect|guaranteed remaining|contract confidence|contract field coverage|attribution|coverage|coverage range|records in this snapshot|trade sample|full-period pick bands|premium-pick share|price conclusion|comparison windows|observed returns|method|player matching|what this supports|what it does not show|current roster|roster players|active cornerbacks considered|explicit first-at-position cornerbacks|player signals|summary|posture|subject team|readiness|overall status|top gaps|why the team might listen|why it might not|what to confirm)$/i;
+  const common = /^(?:as of|date|retrieved|source as of|source updated|season|period|player|position|position groups|team|teams|from|to|move|transaction|return|compensation|trade package|full cohort|matching player events|player trade events|distinct trades|saved evidence|contract terms?|relevance|role|depth consequence|current 2026 cap space|2026 cap hit|2026 cap number|top 51 active spending|top cap contracts|dead money|applied team cap|accounting|carryover and adjustments|2026 league salary cap|cap space created|next-year cap effect|guaranteed remaining|contract confidence|contract field coverage|attribution|coverage|coverage range|records in this snapshot|trade sample|full-period pick bands|premium-pick share|price conclusion|comparison windows|observed returns|method|player matching|what this supports|what it does not show|current roster|roster players|active cornerbacks considered|explicit first-at-position cornerbacks|player signals|summary|posture|subject team|readiness|overall status|top gaps|why the team might listen|why it might not|what to confirm)$/i;
   const cba = /^(?:article|section|locator|exact location|rule|effective date|authority|citation|what it says|what still needs checking)$/i;
   return common.test(label) || (source.kind === 'CBA' && cba.test(label));
 }

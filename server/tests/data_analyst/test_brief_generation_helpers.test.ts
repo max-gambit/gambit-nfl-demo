@@ -1,5 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import type Anthropic from '@anthropic-ai/sdk';
+import type { Brief, DataAnalysisBriefBody } from '@shared/types';
+import { analyzeNflTransactionMarketSnapshot } from '../../src/nfl_transactions/analyze.js';
+import { BRIEF_MODEL } from '../../src/claude/client.js';
 import {
   BRIEF_GENERATION_DEADLINE_MS,
   CURRENT_NFL_PRIMARY_REQUEST_TIMEOUT_MS,
@@ -8,6 +12,10 @@ import {
   NFL_BRIEF_GENERATION_DEADLINE_MS,
   briefGenerationDeadlineMs,
   beginBriefGeneration,
+  claimHistoricalBriefGeneration,
+  composeNflArtifactInterpretation,
+  generateNflArtifactInterpretationWithDeadline,
+  transactionMarketArtifactBody,
   briefGenerationErrorMessage,
   briefProgressStreamPayload,
   buildBriefUserPrompt,
@@ -831,3 +839,224 @@ test('a retry invalidates the older in-process generation lease', () => {
   retry.stop();
   assert.equal(retry.isActive(), false);
 });
+
+const GROUNDED_MARKET_INTERPRETATION = 'EDGE activity should be read from the movement trend without collapsing every market signal into one label. For New York, the useful posture is to test availability against the closest returned trades before setting a negotiating position.';
+
+test('interpretation retries evaluator failures once without changing model settings', async () => {
+  const market = interpretationMarketFixture();
+  const requests: Anthropic.MessageCreateParamsNonStreaming[] = [];
+  const answer = await composeNflArtifactInterpretation({ question: 'How has the EDGE trade market changed?', market, seller_move: null },
+    async (params) => {
+      requests.push(structuredClone(params));
+      return interpretationMessage(requests.length === 1 ? 'EDGE player movement is shrinking.' : GROUNDED_MARKET_INTERPRETATION);
+    });
+  assert.equal(answer, GROUNDED_MARKET_INTERPRETATION);
+  assert.equal(requests.length, 2);
+  assert.match(JSON.stringify(requests[1].messages), /calculation says growing/);
+  assert.match(JSON.stringify(requests[0].system), /one named position and one named signal/);
+  for (const request of requests) {
+    assert.equal(request.model, BRIEF_MODEL);
+    assert.equal(request.max_tokens, 1200);
+  }
+  let attempts = 0;
+  await assert.rejects(composeNflArtifactInterpretation({ question: 'EDGE trend?', market, seller_move: null }, async () => {
+    attempts += 1;
+    return interpretationMessage('EDGE player movement is shrinking.');
+  }), /nfl_artifact_interpretation_rejected/);
+  assert.equal(attempts, 2);
+});
+
+test('empty or truncated interpretation gets the same bounded repair as a grounding failure', async () => {
+  for (const initial of [interpretationMessage(''), { ...interpretationMessage(GROUNDED_MARKET_INTERPRETATION), stop_reason: 'max_tokens' as const }]) {
+    let attempts = 0;
+    const answer = await composeNflArtifactInterpretation({ question: 'EDGE trend?', market: interpretationMarketFixture(), seller_move: null }, async () => {
+      attempts += 1;
+      return attempts === 1 ? initial : interpretationMessage(GROUNDED_MARKET_INTERPRETATION);
+    });
+    assert.equal(attempts, 2);
+    assert.equal(answer, GROUNDED_MARKET_INTERPRETATION);
+  }
+});
+
+test('optional prose success changes only interpretation fields of a ready sourced brief', async () => {
+  const fixture = interpretationPersistenceFixture();
+  const artifact = structuredClone(fixture.body);
+  await generateNflArtifactInterpretationWithDeadline(fixture.brief, fixture.body, fixture.context, {
+    persistence: fixture.persistence,
+    callModel: async () => interpretationMessage(GROUNDED_MARKET_INTERPRETATION),
+  });
+  const row = fixture.rows.get(fixture.brief.id)!;
+  assert.equal(row.status, 'ready');
+  assert.equal(row.thesis, GROUNDED_MARKET_INTERPRETATION);
+  assert.deepEqual(row.body, { ...artifact, answer: GROUNDED_MARKET_INTERPRETATION, analysis_interpretation_status: 'ready' });
+  assert.equal(row.question, fixture.brief.question);
+  assert.equal(row.error, null);
+  fixture.assertUnrelatedUnchanged();
+});
+
+test('provider rejection and rejected prose leave a terminal ready calculation with sources intact', async () => {
+  for (const callModel of [
+    async () => { throw new Error('synthetic provider unavailable'); },
+    async () => interpretationMessage('EDGE player movement is shrinking.'),
+  ]) {
+    const fixture = interpretationPersistenceFixture();
+    const artifact = structuredClone(fixture.body);
+    await generateNflArtifactInterpretationWithDeadline(fixture.brief, fixture.body, fixture.context, {
+      persistence: fixture.persistence, callModel,
+    });
+    const row = fixture.rows.get(fixture.brief.id)!;
+    assert.equal(row.status, 'ready');
+    assert.equal(row.error, null);
+    assert.deepEqual(row.body, { ...artifact, analysis_interpretation_status: 'unavailable' });
+    fixture.assertUnrelatedUnchanged();
+  }
+});
+
+test('hung prose is bounded, aborted, and cannot retry or overwrite after settling', async () => {
+  const fixture = interpretationPersistenceFixture();
+  let finish!: (response: Anthropic.Message) => void;
+  const captured: { signal?: AbortSignal | null } = {};
+  let attempts = 0;
+  const work = generateNflArtifactInterpretationWithDeadline(fixture.brief, fixture.body, fixture.context, {
+    persistence: fixture.persistence, deadlineMs: 5,
+    callModel: async (_params, options) => {
+      attempts += 1;
+      captured.signal = options?.signal;
+      return new Promise<Anthropic.Message>((resolve) => { finish = resolve; });
+    },
+  });
+  assert.equal(fixture.rows.get(fixture.brief.id)?.status, 'ready', 'the calculation is usable before prose settles');
+  await work;
+  assert.equal(captured.signal?.aborted, true);
+  const settled = structuredClone(fixture.rows.get(fixture.brief.id));
+  assert.equal(settled?.status, 'ready');
+  assert.equal((settled?.body as DataAnalysisBriefBody).analysis_interpretation_status, 'unavailable');
+  finish(interpretationMessage('EDGE player movement is shrinking.'));
+  await new Promise<void>((resolve) => setImmediate(resolve));
+  assert.equal(attempts, 1, 'a late invalid response must not start a repair request');
+  assert.deepEqual(fixture.rows.get(fixture.brief.id), settled);
+  fixture.assertUnrelatedUnchanged();
+});
+
+test('late interpretation respects regeneration leases, database revisions, and deleted briefs', async () => {
+  for (const change of ['lease', 'revision', 'deleted'] as const) {
+    const fixture = interpretationPersistenceFixture();
+    let finish!: (response: Anthropic.Message) => void;
+    const work = generateNflArtifactInterpretationWithDeadline(fixture.brief, fixture.body, fixture.context, {
+      persistence: fixture.persistence,
+      callModel: async () => new Promise<Anthropic.Message>((resolve) => { finish = resolve; }),
+    });
+    const retry = change === 'lease' ? beginBriefGeneration(fixture.brief.id) : null;
+    if (change === 'deleted') fixture.rows.delete(fixture.brief.id);
+    else fixture.rows.set(fixture.brief.id, { ...fixture.brief, updated_at: '2026-09-06T12:00:01.000Z', thesis: 'Newer saved result' });
+    const expected = structuredClone(fixture.rows.get(fixture.brief.id));
+    finish(interpretationMessage(GROUNDED_MARKET_INTERPRETATION));
+    await work;
+    assert.deepEqual(fixture.rows.get(fixture.brief.id), expected, change);
+    if (retry) {
+      assert.equal(retry.isActive(), true);
+      retry.stop();
+    }
+    fixture.assertUnrelatedUnchanged();
+  }
+});
+
+test('a losing same-revision historical retry cannot cancel the winning generation', async () => {
+  const fixture = interpretationPersistenceFixture();
+  const previous = beginBriefGeneration(fixture.brief.id);
+  const [winner, loser] = await Promise.all([
+    claimHistoricalBriefGeneration(fixture.brief, '2026-09-06T12:00:01.000Z', fixture.persistence),
+    claimHistoricalBriefGeneration(fixture.brief, '2026-09-06T12:00:02.000Z', fixture.persistence),
+  ]);
+  assert.ok(winner);
+  assert.equal(loser, null);
+  assert.equal(previous.isActive(), false);
+  assert.equal(winner.isActive(), true, 'the successful retry must remain able to finish its sources and result');
+  assert.equal(fixture.rows.get(fixture.brief.id)?.updated_at, '2026-09-06T12:00:01.000Z');
+  winner.stop();
+  fixture.assertUnrelatedUnchanged();
+});
+
+test('a stale historical retry leaves the current interpretation generation active', async () => {
+  const fixture = interpretationPersistenceFixture();
+  const current = beginBriefGeneration(fixture.brief.id);
+  fixture.rows.set(fixture.brief.id, { ...fixture.brief, updated_at: '2026-09-06T12:00:01.000Z' });
+  const result = await claimHistoricalBriefGeneration(fixture.brief, '2026-09-06T12:00:02.000Z', fixture.persistence);
+  assert.equal(result, null);
+  assert.equal(current.isActive(), true);
+  current.stop();
+  fixture.assertUnrelatedUnchanged();
+});
+
+function interpretationMessage(text: string): Anthropic.Message {
+  return { content: [{ type: 'text', text }], stop_reason: 'end_turn' } as Anthropic.Message;
+}
+
+function interpretationMarketFixture() {
+  const years = Array.from({ length: 10 }, (_, index) => 2016 + index);
+  return analyzeNflTransactionMarketSnapshot({
+    analysis_mode: 'ten_year_trend', start_year: 2016, end_year: 2025,
+    position_groups: ['EDGE'], transaction_types: ['trade'], max_comparables: 5,
+  }, {
+    snapshot_id: 'synthetic-interpretation-lifecycle',
+    events: years.flatMap((year) => Array.from({ length: year <= 2018 ? 5 : 8 }, (_, index) => ({
+      event_id: `edge-${year}-${index}`, event_year: year, event_date: `${year}-03-01`, date_precision: 'day' as const,
+      transaction_type: 'trade' as const, player_id: `player-${year}-${index}`, player_name: `Edge Player ${year} ${index}`,
+      position_group: 'EDGE' as const, from_team_id: 'AAA', to_team_id: 'BBB',
+      contract_value_dollars: null, contract_apy_dollars: null, guaranteed_dollars: null,
+      compensation_pick_rounds: [year >= 2023 ? 2 : 5], compensation_includes_player: false,
+      trade_player_asset_count: 1, compensation_band: year >= 2023 ? 'rounds_2_3' as const : 'rounds_4_7' as const,
+      compensation_summary: `Round ${year >= 2023 ? 2 : 5} pick`, identity_confidence: 'matched' as const, source_ref_ids: ['trades'],
+    }))),
+    roster_player_seasons: years.map((year) => ({ year, team_id: null, position_group: 'EDGE', roster_player_seasons: 100, source_ref_ids: ['trades'] })),
+    league_caps: years.map((year) => ({ year, league_cap_dollars: 200_000_000, source_ref_ids: ['trades'] })),
+    source_refs: [{
+      id: 'trades', name: 'Synthetic trades', url: 'https://example.invalid/synthetic-trades', upstream_attribution: 'Synthetic test',
+      retrieved_at: '2026-09-06T00:00:00.000Z', as_of_date: '2026-09-06', checksum_sha256: 'a'.repeat(64), coverage_note: 'Synthetic coverage.',
+    }],
+  }, { generatedAt: '2026-09-06T00:00:00.000Z' });
+}
+
+function interpretationPersistenceFixture() {
+  const market = interpretationMarketFixture();
+  const body = { ...transactionMarketArtifactBody(market), caveats: ['Keep the saved limitation.'], followups: ['Only include trades from 2020 through 2025.'] };
+  const brief: Brief = {
+    id: 'interpretation-brief', session_id: 'channel-a', mode: 'data_analyst', question: 'How has the EDGE trade market changed?',
+    thesis: null, body, status: 'ready', progress: null, error: null, duration_ms: null,
+    created_at: '2026-09-06T12:00:00.000Z', updated_at: '2026-09-06T12:00:00.000Z',
+  };
+  const unrelated = { ...brief, id: 'unrelated-brief', session_id: 'channel-b' };
+  const rows = new Map([[brief.id, structuredClone(brief)], [unrelated.id, structuredClone(unrelated)]]);
+  const sources = [{ id: 'source-1', brief_id: brief.id, ref_index: 1 }, { id: 'source-2', brief_id: unrelated.id, ref_index: 1 }];
+  const originalSources = structuredClone(sources);
+  type Dependencies = NonNullable<Parameters<typeof generateNflArtifactInterpretationWithDeadline>[3]>;
+  const persistence = {
+    from(table: string) {
+      assert.equal(table, 'briefs', 'optional interpretation must not mutate source, option, or conversation rows');
+      return {
+        update(patch: Partial<Brief>) {
+          const filters: Array<[keyof Brief, unknown]> = [];
+          const query = {
+            eq(key: keyof Brief, value: unknown) { filters.push([key, value]); return query; },
+            select() { return query; },
+            async maybeSingle() {
+              const row = [...rows.values()].find((candidate) => filters.every(([key, value]) => candidate[key] === value));
+              if (!row) return { data: null, error: null };
+              const updated = { ...row, ...structuredClone(patch) };
+              rows.set(row.id, updated);
+              return { data: { updated_at: updated.updated_at }, error: null };
+            },
+          };
+          return query;
+        },
+      };
+    },
+  } as unknown as Dependencies['persistence'];
+  return {
+    brief, body, context: { market, seller_move: null }, rows, persistence,
+    assertUnrelatedUnchanged() {
+      assert.deepEqual(rows.get(unrelated.id), unrelated);
+      assert.deepEqual(sources, originalSources);
+    },
+  };
+}

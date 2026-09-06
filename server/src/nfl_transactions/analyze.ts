@@ -3,6 +3,8 @@ import type {
   NflPositionMarketGroup,
   NflPositionMarketTrend,
   NflTradeCompensationBand,
+  NflTransactionTradeAsset,
+  NflTransactionTradePackage,
   NflTransactionComparable,
   NflTransactionMarketAnalysis,
   NflTransactionMarketRequest,
@@ -79,6 +81,8 @@ export interface NflTransactionMarketEvent {
   compensation_summary: string | null;
   identity_confidence: IdentityConfidence;
   source_ref_ids: string[];
+  /** Optional normalized source deal ID; public snapshots also retain it in raw_source_record. */
+  trade_id?: string | null;
   raw_source_record?: Record<string, unknown> | null;
 }
 
@@ -96,23 +100,7 @@ export interface NflTransactionLeagueCap {
   source_ref_ids?: string[];
 }
 
-export interface NflTransactionTradeAsset {
-  asset_id: string;
-  trade_id: string;
-  event_year: number;
-  trade_date: string | null;
-  gave_team_id: string;
-  received_team_id: string;
-  asset_type: 'player' | 'draft_pick';
-  pfr_id: string | null;
-  pfr_name: string | null;
-  pick_season: number | null;
-  pick_round: number | null;
-  pick_number: number | null;
-  conditional: boolean | null;
-  source_ref_id: string;
-  raw_source_record?: Record<string, unknown> | null;
-}
+export type { NflTransactionTradeAsset } from '@shared/types';
 
 export interface NflTransactionMarketSnapshot {
   snapshot_id: string;
@@ -197,12 +185,19 @@ export function analyzeNflTransactionMarketSnapshot(
     position, snapshot, query, leagueEvents, cohortEvents, identityAuditEvents, capByYear, thresholds,
   ));
   const coverage = buildCoverage(snapshot, query, cohortEvents, identityAuditEvents, capByYear);
-  const comparables = [...cohortEvents]
+  const tradePackages = buildTradePackages(snapshot);
+  const fullCohort = [...cohortEvents]
     .sort((a, b) => compareComparableEvents(a, b, query, capByYear))
-    .slice(0, query.max_comparables)
-    .map((event) => comparableFromEvent(event, capByYear));
+    .map((event) => comparableFromEvent(event, capByYear, tradePackages));
+  const comparables = fullCohort.slice(0, query.max_comparables);
+  const tradeEvents = fullCohort.filter((event) => event.transaction_type === 'trade');
+  const unidentifiedTrades = tradeEvents.filter((event) => event.trade_id == null).length;
+  coverage.unidentified_trade_event_count = unidentifiedTrades;
+  coverage.distinct_trade_count = unidentifiedTrades > 0
+    ? null
+    : new Set(tradeEvents.map((event) => event.trade_id)).size;
   const influentialTransactions = buildInfluentialTransactions(
-    snapshot, query, leagueEvents, cohortEvents, capByYear,
+    snapshot, query, leagueEvents, cohortEvents, capByYear, tradePackages,
   ).slice(0, query.max_comparables);
   const status = analysisStatus(positionTrends);
 
@@ -218,8 +213,9 @@ export function analyzeNflTransactionMarketSnapshot(
     yearly_series: yearlySeries,
     position_trends: positionTrends,
     comparables,
+    full_cohort: fullCohort,
     influential_transactions: influentialTransactions,
-    source_refs: usedSourceRefs(snapshot, query, cohortEvents),
+    source_refs: usedSourceRefs(snapshot, query, fullCohort),
     limitations: limitations(snapshot, query, cohortEvents, identityAuditEvents, capByYear, status),
   };
 }
@@ -652,6 +648,7 @@ function buildInfluentialTransactions(
   leagueEvents: NflTransactionMarketEvent[],
   cohortEvents: NflTransactionMarketEvent[],
   capByYear: ReadonlyMap<number, number>,
+  tradePackages: ReadonlyMap<string, NflTransactionTradePackage>,
 ): NflTransactionComparable[] {
   const recentEvents = cohortEvents.filter((event) => inPeriod(event.event_year, query.recent_years));
   const recentLeagueCount = leagueEvents.filter((event) => inPeriod(event.event_year, query.recent_years)).length;
@@ -705,7 +702,7 @@ function buildInfluentialTransactions(
     }).sort((a, b) => b.delta - a.delta || a.key.localeCompare(b.key));
     const largest = deltas[0];
     if (!largest || largest.delta === 0) return [];
-    return [comparableFromEvent(event, capByYear, largest.delta,
+    return [comparableFromEvent(event, capByYear, tradePackages, largest.delta,
       `Removing this observation changes the ${statisticLabel(largest.key)} recent-period statistic by ${largest.delta} basis points. This is leave-one-out statistical sensitivity, not a causal estimate.`)];
   }).sort((a, b) => (
     (b.influence_basis_points ?? 0) - (a.influence_basis_points ?? 0)
@@ -748,9 +745,34 @@ function medianSortedIntegerWithoutOne(values: readonly number[], removedValue: 
     : Math.round((valueAt(midpoint - 1) + valueAt(midpoint)) / 2);
 }
 
+function eventTradeId(event: NflTransactionMarketEvent): string | null {
+  if (event.transaction_type !== 'trade') return null;
+  const value = event.trade_id ?? event.raw_source_record?.trade_id;
+  if (typeof value === 'string' && value.trim()) return value.trim();
+  return typeof value === 'number' && Number.isSafeInteger(value) ? String(value) : null;
+}
+
+function buildTradePackages(snapshot: NflTransactionMarketSnapshot): Map<string, NflTransactionTradePackage> {
+  const packages = new Map<string, NflTransactionTradePackage>();
+  // Join by the whole deal, never by cohort position, team direction, or pick season.
+  for (const asset of [...(snapshot.trade_assets ?? [])].sort((a, b) => a.asset_id.localeCompare(b.asset_id))) {
+    let tradePackage = packages.get(asset.trade_id);
+    if (!tradePackage) {
+      tradePackage = { trade_id: asset.trade_id, assets: [], source_ref_ids: [] };
+      packages.set(asset.trade_id, tradePackage);
+    }
+    tradePackage.assets.push(structuredClone(asset));
+  }
+  for (const tradePackage of packages.values()) {
+    tradePackage.source_ref_ids = [...new Set(tradePackage.assets.map((asset) => asset.source_ref_id))].sort();
+  }
+  return packages;
+}
+
 function comparableFromEvent(
   event: NflTransactionMarketEvent,
   capByYear: ReadonlyMap<number, number>,
+  tradePackages: ReadonlyMap<string, NflTransactionTradePackage>,
   influenceBasisPoints: number | null = null,
   influenceExplanation: string | null = null,
 ): NflTransactionComparable {
@@ -761,6 +783,8 @@ function comparableFromEvent(
   const compensationSummary = multiPlayer
     ? [event.compensation_summary, 'Multi-player deal; compensation is not allocated per player.'].filter(isString).join(' ') || null
     : event.compensation_summary;
+  const tradeId = eventTradeId(event);
+  const tradePackage = tradeId == null ? null : tradePackages.get(tradeId) ?? null;
   return {
     event_id: event.event_id,
     event_year: event.event_year,
@@ -783,7 +807,9 @@ function comparableFromEvent(
     identity_confidence: event.identity_confidence,
     influence_basis_points: influenceBasisPoints,
     influence_explanation: influenceExplanation,
-    source_ref_ids: [...event.source_ref_ids].sort(),
+    source_ref_ids: [...new Set([...event.source_ref_ids, ...(tradePackage?.source_ref_ids ?? [])])].sort(),
+    trade_id: tradeId,
+    trade_package: tradePackage,
   };
 }
 
@@ -1081,7 +1107,7 @@ function limitations(
 function usedSourceRefs(
   snapshot: NflTransactionMarketSnapshot,
   query: NflTransactionMarketResolvedQuery,
-  events: NflTransactionMarketEvent[],
+  events: Pick<NflTransactionComparable, 'source_ref_ids'>[],
 ): NflTransactionMarketSourceRef[] {
   const ids = new Set(events.flatMap((event) => event.source_ref_ids));
   for (const row of snapshot.roster_player_seasons) {
@@ -1113,14 +1139,20 @@ function analysisId(
       event.guaranteed_dollars, event.league_cap_dollars, event.trade_player_asset_count,
       [...(event.compensation_pick_rounds ?? [])].sort((a, b) => a - b),
       event.compensation_includes_player, event.compensation_band, event.compensation_summary,
-      [...event.source_ref_ids].sort(), event.raw_source_record]);
+      [...event.source_ref_ids].sort(), event.raw_source_record, event.trade_id]);
+  const assetSignature = [...(snapshot.trade_assets ?? [])]
+    .sort((a, b) => a.asset_id.localeCompare(b.asset_id))
+    .map((asset) => [asset.asset_id, asset.trade_id, asset.event_year, asset.trade_date,
+      asset.gave_team_id, asset.received_team_id, asset.asset_type, asset.pfr_id, asset.pfr_name,
+      asset.pick_season, asset.pick_round, asset.pick_number, asset.conditional,
+      asset.source_ref_id, asset.raw_source_record]);
   const rosterSignature = [...snapshot.roster_player_seasons]
     .sort((a, b) => a.year - b.year || (a.team_id ?? '').localeCompare(b.team_id ?? '') || a.position_group.localeCompare(b.position_group))
     .map((row) => [row.year, row.team_id, row.position_group, row.roster_player_seasons]);
   const capSignature = [...snapshot.league_caps].sort((a, b) => a.year - b.year)
     .map((row) => [row.year, row.league_cap_dollars]);
   const hash = fnv1a(JSON.stringify([
-    snapshot.snapshot_id, query, thresholds, eventSignature, rosterSignature, capSignature, snapshot.source_refs,
+    snapshot.snapshot_id, query, thresholds, eventSignature, assetSignature, rosterSignature, capSignature, snapshot.source_refs,
   ]));
   return `nfl-market-${hash}`;
 }
@@ -1176,6 +1208,17 @@ function validateSnapshot(snapshot: NflTransactionMarketSnapshot): void {
     if (event.compensation_pick_rounds?.some((round) => !Number.isSafeInteger(round) || round < 1 || round > 7)) throw new Error(`invalid pick round on ${event.event_id}`);
     if (event.compensation_band != null && !ALL_COMPENSATION_BANDS.has(event.compensation_band)) throw new Error(`invalid compensation band on ${event.event_id}`);
     validateSourceIds(event.source_ref_ids, sourceIds, event.event_id);
+  }
+
+  if (snapshot.trade_assets != null && !Array.isArray(snapshot.trade_assets)) throw new Error('trade_assets must be an array');
+  const assetIds = new Set<string>();
+  for (const asset of snapshot.trade_assets ?? []) {
+    if (!asset.asset_id || assetIds.has(asset.asset_id)) throw new Error(`duplicate or empty trade asset ${asset.asset_id}`);
+    assetIds.add(asset.asset_id);
+    if (!asset.trade_id?.trim() || !asset.gave_team_id?.trim() || !asset.received_team_id?.trim()) {
+      throw new Error(`trade asset ${asset.asset_id} requires a deal ID and both team directions`);
+    }
+    validateSourceIds([asset.source_ref_id], sourceIds, asset.asset_id);
   }
 
   const rosterKeys = new Set<string>();

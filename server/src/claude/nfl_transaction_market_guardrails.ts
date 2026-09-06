@@ -5,8 +5,9 @@ import type {
   NflTransactionMarketAnalysis,
   SubmitDataAnalysisInput,
 } from '@shared/types';
-import { nflTransactionMarketFootballRead } from '@shared/nflTransactionMarket';
-import { teamIdsFromQuestion } from '../nfl_transactions/question.js';
+import { nflTransactionMarketFootballRead, nflTransactionTradePackageLines } from '@shared/nflTransactionMarket';
+import { positionGroupsFromQuestion, teamIdsFromQuestion } from '../nfl_transactions/question.js';
+import { nflTransactionMarketModelContext } from '../nfl_transactions/model_context.js';
 
 export interface NflTransactionMarketGuardrailResult {
   ok: boolean;
@@ -122,7 +123,7 @@ export function buildNflTransactionMarketSystemBlock(analysis: NflTransactionMar
     'It is the sole authority for market numbers, periods, filters, comparables, influence, sources, and limitations.',
     'Do not add calculations or citations. “Influential” means leave-one-out statistical sensitivity, never causality.',
     'If a signal is insufficient, say so. Include the mobility method and material coverage caveats.',
-    JSON.stringify(analysis),
+    JSON.stringify(nflTransactionMarketModelContext(analysis)),
   ].join('\n');
 }
 
@@ -226,7 +227,7 @@ export function deterministicMarketEventSourceRows(
   analysis: NflTransactionMarketAnalysis,
   startRefIndex: number,
 ): Omit<BriefSource, 'id' | 'brief_id'>[] {
-  const rows = [...analysis.comparables, ...analysis.influential_transactions]
+  const rows = [...analysis.comparables, ...analysis.influential_transactions, ...(analysis.full_cohort ?? [])]
     .filter((row, index, all) => all.findIndex((candidate) => candidate.event_id === row.event_id) === index);
   return rows.map((row, index) => {
     const preferredSourceId = row.transaction_type === 'trade' ? 'trades'
@@ -251,11 +252,14 @@ export function deterministicMarketEventSourceRows(
           { k: 'Teams', v: `${row.from_team_id ?? '—'} → ${row.to_team_id ?? '—'}` },
           { k: 'Player', v: row.player_name },
           { k: 'Compensation', v: row.compensation_summary ?? row.compensation_band ?? 'not available' },
+          ...(row.trade_package ? [{ k: 'Trade package', v: nflTransactionTradePackageLines(row).join(' / ') }] : []),
           { k: 'Contract terms', v: row.contract_apy_dollars == null ? 'not available' : `$${row.contract_apy_dollars.toLocaleString()} APY` },
           { k: 'Relevance', v: analysis.influential_transactions.some((candidate) => candidate.event_id === row.event_id) ? 'Key transaction in the displayed result' : 'Supporting comparison' },
         ],
         transaction: row,
+        transaction_sources: analysis.source_refs.filter((source) => row.source_ref_ids.includes(source.id)),
         snapshot_id: analysis.snapshot_id,
+        analysis_id: analysis.analysis_id,
       },
     };
   });
@@ -329,7 +333,7 @@ function allowedNumericTokens(
       Object.values(value as Record<string, unknown>).forEach(visit);
     }
   };
-  visit(analysis);
+  visit(nflTransactionMarketModelContext(analysis));
   visit(sellerMoveAnalysis);
   for (const trend of analysis.position_trends) {
     for (const signal of [trend.mobility, trend.transaction_share, trend.contract_price, trend.trade_compensation]) {
@@ -377,9 +381,7 @@ function validateInterpretationDirections(
   issues: string[],
 ): void {
   for (const sentence of proseSentences(answer)) {
-    const mentioned = analysis.position_trends.filter((trend) => (
-      new RegExp(`\\b${trend.position_group}\\b`, 'i').test(sentence)
-    ));
+    const mentioned = interpretationPositionTrends(sentence, analysis);
     if (mentioned.length !== 1) continue;
     const trend = mentioned[0];
     for (const clause of interpretationClauses(sentence)) {
@@ -395,6 +397,19 @@ function validateInterpretationDirections(
       }
     }
   }
+}
+
+function interpretationPositionTrends(sentence: string, analysis: NflTransactionMarketAnalysis): NflPositionMarketTrend[] {
+  const positions = positionGroupsFromQuestion(sentence);
+  const mentioned = analysis.position_trends.filter((trend) => positions.includes(trend.position_group));
+  if (mentioned.length || positions.length) return mentioned;
+  // A single-position answer can refer to its market without repeating the
+  // position in every sentence. Keep those claims subject to the same guard.
+  if (analysis.position_trends.length === 1
+    && /\b(?:market|movement|mobility|trade activity|trade returns?|compensation|premium[- ]pick|share of league trades)\b/i.test(sentence)) {
+    return analysis.position_trends;
+  }
+  return [];
 }
 
 function claimedDirection(value: string): NflPositionMarketTrend['direction'] | null {
@@ -628,9 +643,7 @@ function validatePositionSignalNumbers(
   issues: string[],
 ): void {
   for (const sentence of proseSentences(text)) {
-    const mentioned = analysis.position_trends.filter((trend) => (
-      new RegExp(`\\b${trend.position_group}\\b`, 'i').test(sentence)
-    ));
+    const mentioned = interpretationPositionTrends(sentence, analysis);
     if (mentioned.length !== 1) continue;
     const trend = mentioned[0];
     for (const clause of interpretationClauses(sentence)) {
@@ -657,7 +670,7 @@ function signalForClaim(
   clause: string,
   trend: NflPositionMarketTrend,
 ): NflPositionMarketTrend['mobility'] | number | null {
-  if (/\b(?:trade price|compensation|premium[- ]pick|day[- ]one|day[- ]two|pick share)\b/i.test(clause)) return trend.trade_compensation;
+  if (/\b(?:trade price|trade returns?|compensation|premium[- ]pick|day[- ]one|day[- ]two|pick share)\b/i.test(clause)) return trend.trade_compensation;
   if (/\b(?:contract price|apy|guaranteed share|salary[- ]cap price)\b/i.test(clause)) return trend.contract_price;
   if (/\b(?:move share|share of (?:league(?:wide|-wide)? )?(?:material moves|trades))\b/i.test(clause)) return trend.transaction_share;
   if (/\b(?:mobility|player movement|trade activity|market volume|material[- ]move rate|(?:events?|moves?|trades?) per 100)\b/i.test(clause)) return trend.mobility;

@@ -182,6 +182,30 @@ test('AI interpretation rejects a qualitative direction opposite the calculated 
   assert(result.issues.some((issue) => /calculation says/i.test(issue)));
 });
 
+test('single-position interpretation guards implied market claims and spelled-out positions', () => {
+  const analysis = analysisFixture();
+  const wrong = analysis.position_trends[0].direction === 'growing' ? 'shrinking' : 'growing';
+  for (const sentence of [
+    `The market is ${wrong}.`,
+    `The edge rusher market is ${wrong}.`,
+    `Player movement is ${wrong}.`,
+  ]) {
+    const result = evaluateNflArtifactInterpretation(sentence, analysis);
+    assert.equal(result.ok, false, sentence);
+    assert(result.issues.some((issue) => /calculation says/i.test(issue)), sentence);
+  }
+});
+
+test('interpretation can distinguish premium returns from the overall market read', () => {
+  const analysis = analysisFixture();
+  analysis.position_trends[0].trade_compensation.direction = 'flat';
+  assert.equal(evaluateNflArtifactInterpretation(
+    'EDGE trade returns are flat. For New York, compare the actual packages before setting an asking price.',
+    analysis,
+  ).ok, true);
+  assert.equal(evaluateNflArtifactInterpretation('Trade returns are shrinking.', analysis).ok, false);
+});
+
 test('AI interpretation rejects every raw basis-point value labeled as a per-100 rate', () => {
   const analysis = analysisFixture();
   const raw = analysis.position_trends[0].mobility.recent_value!;

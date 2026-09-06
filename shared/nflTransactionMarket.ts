@@ -2,12 +2,73 @@ import type {
   Brief,
   NflSellerMoveConversationArtifact,
   NflSellerMoveScenarioState,
+  NflTransactionComparable,
   NflTransactionMarketAnalysis,
+  NflTransactionTradeAsset,
 } from './types';
 
 export interface NflTransactionMarketFootballRead {
   conclusion: string;
   implication: string;
+}
+
+/** Saved evidence is complete only when the artifact actually contains the entire cohort. */
+export function nflTransactionMarketCohortEvidence(analysis: NflTransactionMarketAnalysis) {
+  const savedRows = analysis.full_cohort ?? [...analysis.comparables, ...analysis.influential_transactions];
+  const rows = [...new Map(savedRows.map((row) => [row.event_id, row])).values()];
+  const complete = analysis.full_cohort != null && rows.length === analysis.coverage.event_count;
+  const tradeRows = rows.filter((row) => row.transaction_type === 'trade');
+  const unidentifiedTradeEventCount = tradeRows.filter((row) => !row.trade_id).length;
+  const distinctTradeCount = complete && unidentifiedTradeEventCount === 0
+    ? new Set(tradeRows.map((row) => row.trade_id)).size
+    : null;
+  const summary = complete
+    ? `${rows.length.toLocaleString()} matching player events · ${tradeRows.length.toLocaleString()} player trade events · ${distinctTradeCount == null ? 'distinct trade count unavailable (missing deal IDs)' : `${distinctTradeCount.toLocaleString()} distinct trades`}. Complete matching cohort in this snapshot; multiple player events can belong to one deal.`
+    : `Sampled-only evidence: ${rows.length.toLocaleString()} saved player events of ${analysis.coverage.event_count.toLocaleString()} analyzed. The complete cohort and its distinct trade count are unavailable in this saved result. Run the analysis again to save the full cohort.`;
+  return { rows, complete, tradeEventCount: tradeRows.length, distinctTradeCount, unidentifiedTradeEventCount, summary };
+}
+
+export function nflTransactionTradeAssetLabel(asset: NflTransactionTradeAsset): string {
+  const name = asset.asset_type === 'player'
+    ? asset.pfr_name ?? asset.pfr_id ?? 'Unidentified player'
+    : `${asset.pick_season ?? 'Season unknown'} ${asset.pick_round == null ? 'round unknown' : `R${asset.pick_round}`}${asset.pick_number == null ? ' (pick number not recorded)' : ` No. ${asset.pick_number}`}`;
+  const rawCondition = asset.raw_source_record?.conditional;
+  const conditionText = typeof rawCondition === 'string'
+    && !['', '0', '1', 'true', 'false'].includes(rawCondition.trim().toLowerCase())
+    ? rawCondition.trim()
+    : null;
+  const condition = conditionText ? ` (conditional: ${conditionText})`
+    : asset.conditional === true ? ' (conditional)'
+      : asset.asset_type === 'draft_pick' && asset.conditional == null ? ' (condition not recorded)' : '';
+  return `${name}${condition}`;
+}
+
+/** Shared by the full-cohort view and evidence sources; no opposing-side asset is netted away. */
+export function nflTransactionTradePackageLines(row: NflTransactionComparable): string[] {
+  return (row.trade_package?.assets ?? []).map((asset) => (
+    `${asset.gave_team_id} → ${asset.received_team_id}: ${nflTransactionTradeAssetLabel(asset)}`
+  ));
+}
+
+/** Search all saved rows and whole packages before taking a page. */
+export function nflTransactionMarketCohortPage(
+  rows: readonly NflTransactionComparable[],
+  search = '',
+  requestedPage = 0,
+  pageSize = 12,
+) {
+  const terms = search.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const matches = terms.length === 0 ? [...rows] : rows.filter((row) => {
+    const text = [row.player_name, row.event_date, row.event_year, row.position_group,
+      row.from_team_id, row.to_team_id, row.transaction_type.replaceAll('_', ' '), row.trade_id,
+      row.compensation_summary, ...row.source_ref_ids, ...nflTransactionTradePackageLines(row)]
+      .join(' ').toLowerCase();
+    return terms.every((term) => text.includes(term));
+  });
+  const size = Number.isSafeInteger(pageSize) && pageSize > 0 ? pageSize : 12;
+  const pageCount = Math.ceil(matches.length / size);
+  const page = Math.max(0, Math.min(Number.isSafeInteger(requestedPage) ? requestedPage : 0, Math.max(0, pageCount - 1)));
+  return { rows: matches.slice(page * size, (page + 1) * size), matchCount: matches.length, page, pageCount };
 }
 
 export function transactionMarketAnalysisFromBrief(

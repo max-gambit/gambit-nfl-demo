@@ -8,6 +8,7 @@ import {
   buildMessagesWithDataAnalystLookups,
   dataAnalysisCbaCitationSources,
   dataAnalystTracesToBriefSources,
+  dataAnalystResultForModel,
   handleDataAnalystToolUse,
   isSubmitDataAnalysisInput,
   recommendationBriefCbaCitationSources,
@@ -67,7 +68,6 @@ import { buildSubmitBriefTool } from '../claude/tools.js';
 import { buildMessagesWithContextGraphLookups } from '../claude/tool_loop.js';
 import { inferBriefModeFromQuestion, stripBriefModePrefix } from '@shared/briefMode';
 import {
-  latestSellerMoveScenarioForSession,
   sellerMoveScenarioFromBrief,
   transactionMarketAnalysisFromBrief,
 } from '@shared/nflTransactionMarket';
@@ -131,6 +131,30 @@ function invalidateActiveBriefGeneration(briefId: string): void {
   activeBriefGenerations.delete(briefId);
 }
 
+export async function claimHistoricalBriefGeneration(
+  brief: Pick<Brief, 'id' | 'updated_at'>,
+  updatedAt: string,
+  persistence: Pick<typeof db, 'from'> = db,
+): Promise<ReturnType<typeof beginBriefGeneration> | null> {
+  const claimed = await persistence.from('briefs').update({ updated_at: updatedAt })
+    .eq('id', brief.id).eq('updated_at', brief.updated_at).select('updated_at').maybeSingle();
+  if (claimed.error) throw new Error(`market regeneration claim failed: ${claimed.error.message}`);
+  // A losing retry must leave the winning retry or existing prose task active.
+  return claimed.data ? beginBriefGeneration(brief.id) : null;
+}
+
+/** Newest-first channel history. A different topic ends implicit inheritance. */
+export function nflAnalysisContextForSession(
+  briefs: ReadonlyArray<Pick<Brief, 'body' | 'session_id'>>,
+  sessionId: string,
+) {
+  const latest = briefs.find((brief) => brief.session_id === sessionId);
+  return {
+    market: latest ? transactionMarketAnalysisFromBrief(latest) : null,
+    seller_scenario: latest ? sellerMoveScenarioFromBrief(latest) : null,
+  };
+}
+
 /**
  * POST /briefs
  *
@@ -187,10 +211,9 @@ briefRoutes.post('/', async (c) => {
     return c.json({ error: 'load_analysis_context_failed', detail: 'The prior conversation could not be loaded.' }, 500);
   }
   const contextBriefs = (contextRes.data ?? []) as Array<Pick<Brief, 'body' | 'session_id'>>;
-  const latestMarketAnalysis = contextBriefs
-    .map((prior) => transactionMarketAnalysisFromBrief(prior))
-    .find((analysis): analysis is NflTransactionMarketAnalysis => Boolean(analysis)) ?? null;
-  const latestSellerMove = latestSellerMoveScenarioForSession(contextBriefs, session_id);
+  const channelContext = nflAnalysisContextForSession(contextBriefs, session_id);
+  const latestMarketAnalysis = channelContext.market;
+  const latestSellerMove = channelContext.seller_scenario;
   const intent = classifyNflAnalysisTurn(question, {
     market_query: latestMarketAnalysis?.query ?? null,
     seller_scenario: latestSellerMove,
@@ -315,7 +338,7 @@ briefRoutes.post('/', async (c) => {
       thesis: preparedMarketBody?.answer || null,
       body: preparedMarketBody,
       progress: preparedProgress ?? initialBriefProgress(),
-      status: preparedInterpretation || !preparedMarketBody ? 'generating' : 'ready',
+      status: preparedMarketBody ? 'ready' : 'generating',
     })
     .select()
     .single();
@@ -800,6 +823,59 @@ export async function regenerateBriefById(
   const mode = preservingTemplate
     ? existingBrief.mode
     : (briefModeForTemplate(templateParse.selection) ?? 'brief');
+
+  // Recompute the saved executed scope before replacing anything. A short
+  // follow-up cannot be reconstructed as a fresh, context-free question.
+  if (inheritedMarketQuery) {
+    const lookup = await ensureNflTransactionMarketLookup(
+      '', // Re-execute the saved filters; do not reapply relative follow-up wording.
+      { messages: [{ role: 'user', content: existingBrief.question }], traces: [] },
+      inheritedMarketQuery,
+    );
+    const market = latestNflTransactionMarketAnalysis(lookup.traces);
+    if (!market) throw new Error('Required NFL transaction-market analysis was not returned.');
+    const immediateBody = transactionMarketArtifactBody(market);
+    const progress = marketArtifactBriefProgress();
+    // Always advance the revision, even for two requests in one millisecond.
+    progress.updated_at = new Date(Math.max(Date.now(), Date.parse(existingBrief.updated_at) + 1)).toISOString();
+    const generation = await claimHistoricalBriefGeneration(existingBrief, progress.updated_at);
+    if (!generation) return null;
+    try {
+      // Claim the saved revision before touching its child rows. A newer
+      // regeneration or a completed interpretation keeps its own sources.
+      for (const table of ['brief_options', 'brief_sources'] as const) {
+        if (!generation.isActive()) return null;
+        const removed = await db.from(table).delete().eq('brief_id', id);
+        if (removed.error) throw new Error(`${table} regeneration cleanup failed: ${removed.error.message}`);
+      }
+      if (!generation.isActive()) return null;
+      const sources = await insertMissingBriefSources(id,
+        deterministicMarketEvidenceRows(market, 1).map((source) => ({ ...source, brief_id: id })), generation);
+      if (!sources || !generation.isActive()) return null;
+      const reset = await db.from('briefs').update({
+        thesis: null,
+        body: immediateBody,
+        mode: 'data_analyst',
+        template_id: templateParse.selection.template_id,
+        template_base_id: templateParse.selection.base_template_id ?? null,
+        custom_template_id: templateParse.selection.custom_template_id ?? null,
+        template_instructions: templateParse.selection.instructions ?? null,
+        progress,
+        status: 'ready',
+        error: null,
+        duration_ms: null,
+        updated_at: progress.updated_at,
+      }).eq('id', id).eq('updated_at', progress.updated_at).select().maybeSingle();
+      if (reset.error) throw new Error(`market regeneration update failed: ${reset.error.message}`);
+      if (!reset.data || !generation.isActive()) return null;
+      const fresh = reset.data as Brief;
+      publishBriefProgress(briefProgressStreamPayload(fresh));
+      void generateNflArtifactInterpretationWithDeadline(fresh, immediateBody, { market, seller_move: null });
+      return fresh;
+    } finally {
+      generation.stop();
+    }
+  }
 
   // A retry owns the brief from this point forward. Any older provider task
   // may finish, but its generation guard will prevent or roll back child rows.
@@ -2055,6 +2131,7 @@ export async function composeNflArtifactInterpretation(
     seller_move: NflSellerMoveConversationArtifact | null;
   },
   callModel: typeof createClaudeMessage = createClaudeMessage,
+  requestOptions: Anthropic.RequestOptions = {},
 ): Promise<string> {
   const sellerResult = args.seller_move?.result ?? null;
   const formattedMarketFacts = buildDeterministicNflTransactionMarketFallback(args.market);
@@ -2076,6 +2153,11 @@ export async function composeNflArtifactInterpretation(
             ? 'The proposed return does not have enough comparison data for an above, within, or below classification; say that plainly.'
             : '',
         'Use only facts, transactions, periods, and figures present in the supplied data. Never imply causation from statistical influence.',
+        'Bind each claim to one named position and one named signal: player movement, share of moves, contract cost, or premium-pick trade compensation. Give different signals separate sentences.',
+        'Use each signal’s direction and status exactly. The overall market direction can be mixed even when movement grows; do not describe mixed as flat or extend a movement trend to price.',
+        'Insufficient evidence means the signal is unavailable, not flat, cheap, expensive, or evidence of no change. State the missing price evidence explicitly when relevant.',
+        'Distinguish full-period totals from baseline/recent windows and completed years from YTD. Do not turn an overall pick-share level into a claim that pick returns increased.',
+        'Use the exact displayed units. Include a brief coverage limitation; frame practical implications as conditional judgment rather than additional measured facts.',
         tradeOnly
           ? 'This query is trades-only. Describe transaction share as the position’s share of league trades, never as a share of all material moves.'
           : 'Describe the transaction scope exactly as listed in the supplied data.',
@@ -2111,44 +2193,44 @@ export async function composeNflArtifactInterpretation(
     content: `Question: ${args.question}\n\nWrite the grounded football interpretation now.`,
   }];
 
-  const first = await callModel({
-    model: BRIEF_MODEL,
-    max_tokens: 1200,
-    system,
-    messages,
-  });
-  let answer = nflArtifactInterpretationText(first);
-  let validation = evaluateNflArtifactInterpretation(answer, args.market, args.seller_move);
-  if (validation.ok) return answer;
-
-  const revised = await callModel({
-    model: BRIEF_MODEL,
-    max_tokens: 1200,
-    system,
-    messages: [
-      ...messages,
-      { role: 'assistant', content: answer },
-      {
-        role: 'user',
-        content: `Revise once using only the supplied facts. Correct these grounding problems:\n- ${validation.issues.join('\n- ')}\nReturn only the two corrected paragraphs.`,
-      },
-    ],
-  });
-  answer = nflArtifactInterpretationText(revised);
-  validation = evaluateNflArtifactInterpretation(answer, args.market, args.seller_move);
-  if (!validation.ok) {
-    throw new Error(`nfl_artifact_interpretation_rejected: ${validation.issues.join(' | ')}`);
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    if (requestOptions.signal?.aborted) throw new Error('nfl_artifact_interpretation_cancelled');
+    const response = await callModel({ model: BRIEF_MODEL, max_tokens: 1200, system, messages }, requestOptions);
+    if (requestOptions.signal?.aborted) throw new Error('nfl_artifact_interpretation_cancelled');
+    const answer = nflArtifactInterpretationText(response);
+    const validation = answer
+      ? evaluateNflArtifactInterpretation(answer, args.market, args.seller_move)
+      : { ok: false, issues: ['No plain-English interpretation was returned.'] };
+    if (response.stop_reason === 'max_tokens') {
+      validation.ok = false;
+      validation.issues.push('The response was truncated; shorten it to finish both paragraphs.');
+    }
+    if (validation.ok) return answer;
+    if (attempt === 1) throw new Error(`nfl_artifact_interpretation_rejected: ${validation.issues.join(' | ')}`);
+    if (answer) messages.push({ role: 'assistant', content: answer });
+    messages.push({
+      role: 'user',
+      content: `Revise once using only the supplied facts. Correct these grounding problems:\n- ${validation.issues.join('\n- ')}\nKeep each position and signal separate, preserve the executed filters and uncertainty, and omit unsupported claims. Return only the two corrected paragraphs.`,
+    });
   }
-  return answer;
+  throw new Error('nfl_artifact_interpretation_unavailable');
 }
 
-async function generateNflArtifactInterpretationWithDeadline(
+export async function generateNflArtifactInterpretationWithDeadline(
   brief: Brief,
   immediateBody: DataAnalysisBriefBody,
   context: NflArtifactInterpretationContext,
+  dependencies: {
+    callModel?: typeof createClaudeMessage;
+    persistence?: Pick<typeof db, 'from'>;
+    deadlineMs?: number;
+  } = {},
 ): Promise<void> {
   const startedAt = Date.now();
   const generation = beginBriefGeneration(brief.id);
+  const controller = new AbortController();
+  const persistence = dependencies.persistence ?? db;
+  const deadlineMs = dependencies.deadlineMs ?? NFL_ARTIFACT_INTERPRETATION_DEADLINE_MS;
   let timer: NodeJS.Timeout | null = null;
   try {
     const answer = await Promise.race([
@@ -2156,11 +2238,14 @@ async function generateNflArtifactInterpretationWithDeadline(
         question: brief.question,
         market: context.market,
         seller_move: context.seller_move,
-      }),
+      }, dependencies.callModel, { signal: controller.signal, timeout: deadlineMs }),
       new Promise<never>((_, reject) => {
         timer = setTimeout(
-          () => reject(new Error('nfl_artifact_interpretation_deadline_exceeded')),
-          NFL_ARTIFACT_INTERPRETATION_DEADLINE_MS,
+          () => {
+            controller.abort();
+            reject(new Error('nfl_artifact_interpretation_deadline_exceeded'));
+          },
+          deadlineMs,
         );
       }),
     ]);
@@ -2174,7 +2259,7 @@ async function generateNflArtifactInterpretationWithDeadline(
       'Analysis ready',
       'The live calculation, football interpretation, and source cards are ready.',
     );
-    const updated = await db
+    const updated = await persistence
       .from('briefs')
       .update({
         thesis: answer,
@@ -2186,11 +2271,12 @@ async function generateNflArtifactInterpretationWithDeadline(
         updated_at: progress.updated_at,
       })
       .eq('id', brief.id)
-      .eq('status', 'generating')
+      .eq('status', brief.status)
+      .eq('updated_at', brief.updated_at)
       .select('updated_at')
       .maybeSingle();
     if (updated.error) throw new Error(`NFL interpretation update failed: ${updated.error.message}`);
-    if (!updated.data) return;
+    if (!updated.data || !generation.isActive()) return;
     publishBriefProgress(briefProgressStreamPayload({
       id: brief.id,
       status: 'ready',
@@ -2210,9 +2296,10 @@ async function generateNflArtifactInterpretationWithDeadline(
       'Live analysis ready',
       'The sourced calculation is ready; the football interpretation is unavailable.',
     );
-    const updated = await db
+    const updated = await Promise.resolve(persistence
       .from('briefs')
       .update({
+        thesis: immediateBody.answer || null,
         body,
         status: 'ready',
         error: null,
@@ -2221,14 +2308,16 @@ async function generateNflArtifactInterpretationWithDeadline(
         updated_at: progress.updated_at,
       })
       .eq('id', brief.id)
-      .eq('status', 'generating')
+      .eq('status', brief.status)
+      .eq('updated_at', brief.updated_at)
       .select('updated_at')
-      .maybeSingle();
+      .maybeSingle())
+      .catch((settleError: unknown) => ({ data: null, error: settleError }));
     if (updated.error) {
       console.error('[briefs] failed to settle sourced NFL result', brief.id, updated.error);
       return;
     }
-    if (!updated.data) return;
+    if (!updated.data || !generation.isActive()) return;
     publishBriefProgress(briefProgressStreamPayload({
       id: brief.id,
       status: 'ready',
@@ -2239,6 +2328,7 @@ async function generateNflArtifactInterpretationWithDeadline(
     }));
   } finally {
     if (timer) clearTimeout(timer);
+    controller.abort();
     generation.stop();
   }
 }
@@ -2248,7 +2338,6 @@ function nflArtifactInterpretationText(response: Anthropic.Message): string {
     .flatMap((block) => block.type === 'text' ? [block.text] : [])
     .join('\n')
     .trim();
-  if (!text) throw new Error(`nfl_artifact_interpretation_missing_text: ${response.stop_reason ?? 'unknown'}`);
   return text;
 }
 
@@ -2568,7 +2657,7 @@ export async function ensureNflTransactionMarketLookup(
       },
       {
         role: 'user',
-        content: [{ type: 'tool_result', tool_use_id: toolUseId, content: JSON.stringify(result) }],
+        content: [{ type: 'tool_result', tool_use_id: toolUseId, content: JSON.stringify(dataAnalystResultForModel(result)) }],
       },
     ],
     traces: [...lookup.traces, trace],
@@ -3421,8 +3510,8 @@ function initialBriefProgress(label = 'Brief queued'): BriefProgress {
 
 export function marketArtifactBriefProgress(): BriefProgress {
   return briefProgressSnapshot({
-    phase: 'drafting',
-    pct: 60,
+    phase: 'ready',
+    pct: 100,
     label: 'Live analysis ready',
     detail: 'The calculation and sources are ready; the football interpretation is being written.',
     kind: 'data',

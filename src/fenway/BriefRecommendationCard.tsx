@@ -38,7 +38,7 @@ interface Props {
  * know about the brief's data — just hands over the row.
  */
 export function BriefRecommendationCard({ brief, embedTable = true, compact = false, onReply, isInThread = false }: Props) {
-  const { sourcesByBrief, artifactsByBrief, patchBrief } = useBriefs();
+  const { sourcesByBrief, artifactsByBrief, patchBrief, loadBriefData } = useBriefs();
   const { pushToast } = useToasts();
   const [changingTemplate, setChangingTemplate] = useState(false);
 
@@ -54,6 +54,8 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
 
   const isGenerating = brief.status === 'generating';
   const isFailed = brief.status === 'failed';
+  const needsRefresh = isGenerating || (brief.status === 'ready'
+    && dataAnalysisBody?.analysis_interpretation_status === 'pending');
 
   useEffect(() => {
     if (!isGenerating) return undefined;
@@ -111,15 +113,19 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
   }, [brief.id, isGenerating, patchBrief]);
 
   useEffect(() => {
-    if (!isGenerating) return undefined;
+    // Calculation readiness and optional prose completion are separate. Keep
+    // the fallback refresh alive when realtime is disconnected, without
+    // returning a usable calculation to the generating state.
+    if (!needsRefresh) return undefined;
     let cancelled = false;
 
     const poll = async () => {
       try {
         const fresh = await getBrief(brief.id);
         if (cancelled) return;
-        if (fresh.status !== 'generating' || fresh.body !== null) {
+        if (fresh.updated_at !== brief.updated_at || fresh.status !== brief.status) {
           patchBrief(brief.id, fresh);
+          await loadBriefData(brief.id);
         }
       } catch (err) {
         console.warn('[brief-card] polling failed', brief.id, err);
@@ -135,7 +141,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
       cancelled = true;
       window.clearInterval(timer);
     };
-  }, [brief.id, isGenerating, patchBrief]);
+  }, [brief.id, brief.updated_at, brief.status, needsRefresh, patchBrief, loadBriefData]);
 
   const dispatchAgent = useCallback(async (kind: AgentKind, label: string) => {
     try {

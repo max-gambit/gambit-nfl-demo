@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type {
   NflPositionMarketTrend,
   NflTransactionComparable,
@@ -5,6 +6,8 @@ import type {
   NflTransactionMarketSignal,
   NflTransactionMarketYearPoint,
 } from '@shared/types';
+import { nflTransactionMarketCohortEvidence, nflTransactionMarketCohortPage } from '@shared/nflTransactionMarket';
+import { NflTransactionTradePackageDetail } from './NflSourceDetail';
 import { fire } from '../lib/events';
 import { useBriefs, useUi } from '../store';
 import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
@@ -108,12 +111,15 @@ export function NflTransactionMarketAnalysisView({
                 key={row.event_id}
                 row={row}
                 sourceRef={eventSourceRefs.get(row.event_id)}
+                sources={analysis.source_refs}
                 onOpen={openComparableEvidence}
               />
             ))}
           </div>
         </section>
       )}
+
+      <FullCohortSection key={analysis.analysis_id} analysis={analysis} sourceRefs={eventSourceRefs} onOpen={openComparableEvidence} />
 
       {followups.length > 0 && (
         <section>
@@ -141,10 +147,10 @@ export function NflTransactionMarketAnalysisView({
           <FullSignalComparison trends={analysis.position_trends} />
           <Methodology analysis={analysis} />
           {analysis.comparables.length > 0 && (
-            <ComparableSection title="Supporting transactions" rows={analysis.comparables} sourceRefs={eventSourceRefs} onOpen={openComparableEvidence} />
+            <ComparableSection title={`Comparable sample (${analysis.comparables.length} player events)`} rows={analysis.comparables} sourceRefs={eventSourceRefs} sources={analysis.source_refs} onOpen={openComparableEvidence} />
           )}
           {analysis.influential_transactions.length > 0 && (
-            <ComparableSection title="Transactions that most affect the result" rows={analysis.influential_transactions} sourceRefs={eventSourceRefs} onOpen={openComparableEvidence} showInfluence />
+            <ComparableSection title="Transactions that most affect the result" rows={analysis.influential_transactions} sourceRefs={eventSourceRefs} sources={analysis.source_refs} onOpen={openComparableEvidence} showInfluence />
           )}
           <CoverageAndSources analysis={analysis} />
         </div>
@@ -226,20 +232,17 @@ function SignalRead({ signal }: { signal: NflTransactionMarketSignal }) {
   </span>;
 }
 
-function KeyTransaction({ row, sourceRef, onOpen }: {
+function KeyTransaction({ row, sourceRef, sources, onOpen }: {
   row: NflTransactionComparable;
   sourceRef: number | undefined;
+  sources: NflTransactionMarketAnalysis['source_refs'];
   onOpen: (row: NflTransactionComparable) => void;
 }) {
-  return <button
-    type="button"
-    disabled={sourceRef == null}
-    onClick={() => onOpen(row)}
-    aria-label={`Open evidence for ${row.player_name}`}
+  return <div
     style={{
       display: 'grid', gap: 4, padding: SPACE.md, width: '100%', textAlign: 'left',
       border: `1px solid ${F.border}`, borderRadius: RADIUS.md, background: F.surface,
-      color: 'inherit', cursor: sourceRef == null ? 'default' : 'pointer',
+      color: 'inherit',
     }}
   >
     <strong style={{ color: F.ink, fontSize: TYPE.body.md }}>{row.player_name}</strong>
@@ -252,10 +255,11 @@ function KeyTransaction({ row, sourceRef, onOpen }: {
       {row.compensation_summary ? ` · ${row.compensation_summary}` : ''}
       {row.contract_apy_dollars != null ? ` · ${formatDollars(row.contract_apy_dollars)} APY` : ''}
     </span>
-    <span style={{ color: sourceRef == null ? F.fgMuted : F.fenway, fontSize: TYPE.meta.md, fontWeight: 700 }}>
+    <NflTransactionTradePackageDetail row={row} sources={sources} />
+    <button type="button" disabled={sourceRef == null} onClick={() => onOpen(row)} aria-label={`Open evidence for ${row.player_name}`} style={{ ...evidenceButtonStyle, color: sourceRef == null ? F.fgMuted : F.fenway }}>
       {sourceRef == null ? 'Source detail available after a live refresh' : 'Open transaction evidence →'}
-    </span>
-  </button>;
+    </button>
+  </div>;
 }
 
 function ScopeSummary({ analysis }: { analysis: NflTransactionMarketAnalysis }) {
@@ -379,7 +383,8 @@ function CoverageAndSources({ analysis }: { analysis: NflTransactionMarketAnalys
     <SectionLabel>Coverage, limits, and sources</SectionLabel>
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: SPACE.sm, marginBottom: SPACE.sm }}>
       <Metric label="Player moves analyzed" value={analysis.coverage.event_count.toLocaleString()} />
-      <Metric label="Trades" value={analysis.coverage.trade_count.toLocaleString()} />
+      <Metric label="Player trade events" value={analysis.coverage.trade_count.toLocaleString()} />
+      <Metric label="Distinct trades" value={analysis.coverage.distinct_trade_count == null ? 'Not available' : analysis.coverage.distinct_trade_count.toLocaleString()} />
       <Metric label="Contracts with terms" value={analysis.coverage.priced_contract_count.toLocaleString()} />
       <Metric label="Identity coverage" value={formatPercentDetailed(analysis.coverage.position_match_basis_points)} />
     </div>
@@ -396,10 +401,47 @@ function CoverageAndSources({ analysis }: { analysis: NflTransactionMarketAnalys
   </section>;
 }
 
-function ComparableSection({ title, rows, sourceRefs, onOpen, showInfluence = false }: {
+function FullCohortSection({ analysis, sourceRefs, onOpen }: {
+  analysis: NflTransactionMarketAnalysis;
+  sourceRefs: Map<string, number>;
+  onOpen: (row: NflTransactionComparable) => void;
+}) {
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(0);
+  const evidence = nflTransactionMarketCohortEvidence(analysis);
+  const result = nflTransactionMarketCohortPage(evidence.rows, search, page);
+  return <section data-testid="nfl-full-cohort">
+    <SectionLabel>{evidence.complete ? 'Full matching history' : 'Saved transaction sample'}</SectionLabel>
+    <p style={{ color: F.fgMuted, fontSize: TYPE.body.sm, lineHeight: 1.5 }}>{evidence.summary}</p>
+    <details style={{ border: `1px solid ${F.border}`, borderRadius: RADIUS.md, padding: SPACE.md }}>
+      <summary style={{ cursor: 'pointer', color: F.ink, fontWeight: 700 }}>
+        Browse {evidence.rows.length.toLocaleString()} {evidence.complete ? 'matching' : 'saved'} player events and trade packages
+      </summary>
+      <label style={{ display: 'grid', gap: SPACE.xs, margin: `${SPACE.md}px 0`, color: F.inkSoft, fontSize: TYPE.body.sm }}>
+        Search player, team, year, or trade asset
+        <input type="search" value={search} onChange={(event) => { setSearch(event.target.value); setPage(0); }}
+          placeholder="e.g. Brian Burns or CAR 166"
+          style={{ padding: SPACE.sm, border: `1px solid ${F.border}`, borderRadius: RADIUS.sm, background: F.surface, color: F.ink, minWidth: 0 }} />
+      </label>
+      <p role="status" style={{ color: F.fgMuted, fontSize: TYPE.meta.md }}>
+        {result.matchCount.toLocaleString()} player events match{result.pageCount > 0 ? ` · Page ${result.page + 1} of ${result.pageCount}` : ''}
+      </p>
+      {result.rows.length > 0
+        ? <ComparableSection title="Matching player events" rows={result.rows} sourceRefs={sourceRefs} sources={analysis.source_refs} onOpen={onOpen} />
+        : <p style={{ color: F.fgMuted }}>No matching saved player events. Try another player, team, year, or pick.</p>}
+      {result.pageCount > 1 && <nav aria-label="Historical cohort pages" style={{ display: 'flex', gap: SPACE.lg, marginTop: SPACE.md }}>
+        <button type="button" disabled={result.page === 0} onClick={() => setPage(result.page - 1)}>Previous</button>
+        <button type="button" disabled={result.page + 1 >= result.pageCount} onClick={() => setPage(result.page + 1)}>Next</button>
+      </nav>}
+    </details>
+  </section>;
+}
+
+function ComparableSection({ title, rows, sourceRefs, sources, onOpen, showInfluence = false }: {
   title: string;
   rows: NflTransactionComparable[];
   sourceRefs: Map<string, number>;
+  sources: NflTransactionMarketAnalysis['source_refs'];
   onOpen: (row: NflTransactionComparable) => void;
   showInfluence?: boolean;
 }) {
@@ -408,10 +450,10 @@ function ComparableSection({ title, rows, sourceRefs, onOpen, showInfluence = fa
     <div style={{ display: 'grid', gap: SPACE.sm }}>
       {rows.map((row) => {
         const sourceRef = sourceRefs.get(row.event_id);
-        return <button type="button" key={row.event_id} disabled={sourceRef == null} onClick={() => onOpen(row)} aria-label={`Open evidence for ${row.player_name}`} style={{
+        return <div key={row.event_id} style={{
           display: 'grid', gap: SPACE.xs, padding: SPACE.md, border: `1px solid ${F.border}`,
           borderRadius: RADIUS.md, background: F.surface, width: '100%', textAlign: 'left',
-          color: 'inherit', cursor: sourceRef == null ? 'default' : 'pointer',
+          color: 'inherit',
         }}>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: SPACE.sm }}>
             <strong style={{ color: F.ink, fontSize: TYPE.body.sm }}>{row.player_name}</strong>
@@ -426,10 +468,11 @@ function ComparableSection({ title, rows, sourceRefs, onOpen, showInfluence = fa
           {showInfluence && row.influence_explanation && (
             <div style={{ color: F.fgMuted, fontSize: TYPE.meta.md }}>{row.influence_explanation}</div>
           )}
-          <div style={{ color: sourceRef == null ? F.fgMuted : F.fenway, fontSize: TYPE.meta.xs, fontWeight: 700 }}>
+          <NflTransactionTradePackageDetail row={row} sources={sources} />
+          <button type="button" disabled={sourceRef == null} onClick={() => onOpen(row)} aria-label={`Open evidence for ${row.player_name}`} style={{ ...evidenceButtonStyle, color: sourceRef == null ? F.fgMuted : F.fenway }}>
             {sourceRef == null ? 'Transaction source unavailable for this saved result' : 'Open transaction source →'}
-          </div>
-        </button>;
+          </button>
+        </div>;
       })}
     </div>
   </section>;
@@ -546,6 +589,11 @@ const tableHeaderStyle = {
   letterSpacing: TRACKING.micro,
   textTransform: 'uppercase' as const,
   borderBottom: `1px solid ${F.border}`,
+};
+
+const evidenceButtonStyle = {
+  border: 'none', background: 'transparent', padding: 0, textAlign: 'left' as const,
+  cursor: 'pointer', fontSize: TYPE.meta.md, fontWeight: 700,
 };
 
 function tableCellStyle(index: number, total: number) {

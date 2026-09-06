@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { NflSellerMoveScenarioState, NflTransactionMarketResolvedQuery } from '@shared/types';
 import { classifyNflAnalysisTurn } from '../../src/nfl_transactions/intent.js';
+import { transactionMarketRequestFromQuestion } from '../../src/nfl_transactions/question.js';
+import { resolveNflTransactionMarketQuery } from '../../src/nfl_transactions/analyze.js';
 
 const market: NflTransactionMarketResolvedQuery = {
   analysis_mode: 'ten_year_trend',
@@ -61,6 +63,7 @@ test('server intent matrix keeps prior context bounded to recognizable continuat
     ['How much cap room do the Giants have?', marketChannel, 'current_team', false],
     ['Who are the Giants starting cornerbacks right now?', marketChannel, 'current_team', false],
     ['Which Giants contracts have the largest 2026 cap hits?', sellerChannel, 'current_team', false],
+    ['Show me the Giants wide receiver contracts.', marketChannel, 'current_team', false],
     ['How much cap space do the New York Jets have?', marketChannel, 'general', false],
     ['Who is on the Giants roster?', marketChannel, 'general', false],
     ['How would a scout grade the current edge depth?', sellerChannel, 'general', false],
@@ -77,4 +80,57 @@ test('server intent matrix keeps prior context bounded to recognizable continuat
 test('seller scenario state cannot activate a shorthand turn in another channel', () => {
   assert.equal(classifyNflAnalysisTurn('Make it a first.', sellerChannel).kind, 'seller_move');
   assert.equal(classifyNflAnalysisTurn('Make it a first.', fresh).kind, 'seller_modifier_without_context');
+});
+
+test('historical EDGE trade follow-up executes its bounded date refinement', () => {
+  const initial = resolveNflTransactionMarketQuery(transactionMarketRequestFromQuestion(
+    'How has the EDGE trade market changed from 2016 through 2025?',
+  ));
+  const question = 'Only include trades from 2020 through 2025.';
+  const intent = classifyNflAnalysisTurn(question, { market_query: initial, seller_scenario: null });
+  assert.equal(intent.kind, 'transaction_market');
+  if (intent.kind !== 'transaction_market') return;
+  const query = resolveNflTransactionMarketQuery(transactionMarketRequestFromQuestion(question, intent.inherited_query));
+  assert.equal(query.start_year, 2020);
+  assert.equal(query.end_year, 2025);
+  assert.equal(query.analysis_mode, initial.analysis_mode);
+  assert.deepEqual(query.position_groups, ['EDGE']);
+  assert.deepEqual(query.transaction_types, ['trade']);
+});
+
+test('only complete supported filter phrases inherit prior Analysis scope', () => {
+  for (const question of [
+    'Only include trades from 2020 through 2025.',
+    'Limit the sample to 2020–2025.',
+    'From 2020 to 2025.',
+    'Since 2020.',
+    'Only contracts.',
+    'Include only releases and waiver claims.',
+    'Only EDGE.',
+    'What about IOL instead?',
+    'Show me Giants trades only.',
+    'Only include PHI.',
+    'Compare Giants with Eagles.',
+    'Show me trades across the NFL.',
+    'Show me all positions.',
+  ]) {
+    const intent = classifyNflAnalysisTurn(question, marketChannel);
+    assert.equal(intent.kind, 'transaction_market', question);
+    assert.strictEqual(intent.kind === 'transaction_market' && intent.inherited_query, market, question);
+    const freshIntent = classifyNflAnalysisTurn(question, fresh);
+    assert.equal(freshIntent.kind === 'transaction_market' && freshIntent.inherited_query !== null, false, question);
+  }
+  for (const question of [
+    'Compare EDGE draft needs for the Giants.',
+    'Only include trades in our offseason plan.',
+    'Show me supporting transactions for a new stadium.',
+    'What changed after 2020 in the CBA?',
+    'Show me the Giants roster.',
+    'What are the rules for trades only after June 1?',
+    'How has the Eagles contract market changed since 2022?',
+  ]) {
+    const intent = classifyNflAnalysisTurn(question, marketChannel);
+    assert.equal(intent.kind === 'transaction_market' && intent.inherited_query !== null, false, question);
+  }
+  assert.equal(classifyNflAnalysisTurn('What about EDGE instead?', sellerChannel).kind, 'transaction_market');
 });

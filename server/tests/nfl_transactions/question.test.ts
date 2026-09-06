@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { isNflTransactionMarketQuestion, transactionMarketRequestFromQuestion } from '../../src/nfl_transactions/question.js';
+import { resolveNflTransactionMarketQuery } from '../../src/nfl_transactions/analyze.js';
 
 test('recognizes novel market-analysis questions without matching stored answer text', () => {
   assert.equal(isNflTransactionMarketQuestion('Which position markets have grown or shrunk over the last 10 years?'), true);
@@ -81,4 +82,68 @@ test('fresh questions resolve explicit team names and safe uppercase ids', () =>
     transactionMarketRequestFromQuestion('No team filter; compare trades leaguewide.').team_ids,
     undefined,
   );
+});
+
+test('bounded refinements change only explicit filters and keep the analysis mode', () => {
+  const inherited = resolveNflTransactionMarketQuery({
+    analysis_mode: 'ten_year_trend', start_year: 2016, end_year: 2025,
+    position_groups: ['EDGE'], transaction_types: ['trade', 'extension'], team_ids: ['PHI'], max_comparables: 7,
+  });
+  const original = structuredClone(inherited);
+  for (const wording of [
+    'Only include trades from 2020 through 2025.',
+    'Limit the sample to trades between 2020 and 2025.',
+    'Show me trades from 2020–2025.',
+  ]) {
+    const query = resolveNflTransactionMarketQuery(transactionMarketRequestFromQuestion(wording, inherited));
+    assert.deepEqual(query.position_groups, ['EDGE'], wording);
+    assert.deepEqual(query.team_ids, ['PHI'], wording);
+    assert.deepEqual(query.transaction_types, ['trade'], wording);
+    assert.equal(query.start_year, 2020);
+    assert.equal(query.end_year, 2025);
+    assert.equal(query.analysis_mode, 'ten_year_trend');
+    assert.equal(query.max_comparables, 7);
+  }
+  for (const [wording, types] of [
+    ['Only include contracts.', ['free_agent_signing', 're_signing', 'extension', 'tag']],
+    ['Include only free agent signings.', ['free_agent_signing']],
+    ['Only releases and waiver claims.', ['waiver_claim', 'release']],
+    ['Only re-signings and extensions.', ['re_signing', 'extension']],
+  ] as const) {
+    const request = transactionMarketRequestFromQuestion(wording, inherited);
+    assert.deepEqual(request.transaction_types, types, wording);
+    assert.deepEqual(request.position_groups, inherited.position_groups);
+  }
+  const position = transactionMarketRequestFromQuestion('Only include defensive tackles.', inherited);
+  assert.deepEqual(position.position_groups, ['IDL']);
+  const team = transactionMarketRequestFromQuestion('Only include Giants trades.', inherited);
+  assert.deepEqual(team.team_ids, ['NYG']);
+  assert.deepEqual(team.position_groups, ['EDGE']);
+  assert.equal(transactionMarketRequestFromQuestion('Show me all teams.', inherited).team_ids, undefined);
+  assert.equal(transactionMarketRequestFromQuestion('Show me all positions.', inherited).position_groups, undefined);
+  assert.deepEqual(inherited, original, 'parsing must not mutate the executed parent query');
+});
+
+test('date bounds reset stale YTD and out-of-range comparison state', () => {
+  const inherited = resolveNflTransactionMarketQuery({
+    analysis_mode: 'period_comparison', start_year: 2016, end_year: 2026,
+    comparison_year: 2018, include_ytd: true, position_groups: ['EDGE'], transaction_types: ['trade'],
+  });
+  const query = resolveNflTransactionMarketQuery(transactionMarketRequestFromQuestion(
+    'Only include trades from 2020 through 2025.', inherited,
+  ));
+  assert.equal(query.include_ytd, false);
+  assert.equal(query.comparison_year, null);
+  assert.equal(query.start_year, 2020);
+  assert.equal(query.end_year, 2025);
+  assert.deepEqual(query.position_groups, ['EDGE']);
+  assert.equal(query.analysis_mode, 'period_comparison');
+
+  assert.equal(transactionMarketRequestFromQuestion('Only trades before 2026.', inherited).include_ytd, false);
+  const after = transactionMarketRequestFromQuestion('Only trades after 2020.', inherited);
+  assert.equal(after.start_year, 2021);
+  assert.equal(after.comparison_year, undefined);
+  assert.equal(transactionMarketRequestFromQuestion('What changed after 2020?', inherited).comparison_year, 2020);
+  assert.deepEqual(resolveNflTransactionMarketQuery(transactionMarketRequestFromQuestion('', query)), query,
+    'regeneration re-executes the saved scope without reapplying follow-up wording');
 });

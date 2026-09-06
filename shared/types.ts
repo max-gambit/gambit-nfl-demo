@@ -2196,7 +2196,11 @@ export interface NflTransactionMarketResolvedQuery {
 
 export interface NflTransactionMarketCoverage {
   event_count: number;
+  /** Player trade events, retained for existing calculation consumers. */
   trade_count: number;
+  /** Null when any matching trade event lacks a source deal ID; absent on legacy artifacts. */
+  distinct_trade_count?: number | null;
+  unidentified_trade_event_count?: number;
   contract_count: number;
   roster_player_seasons: number;
   matched_position_count: number;
@@ -2242,6 +2246,32 @@ export interface NflPositionMarketTrend {
   trade_compensation: NflTransactionMarketSignal;
 }
 
+/** One recorded asset, retaining direction, conditional terms and upstream provenance. */
+export interface NflTransactionTradeAsset {
+  asset_id: string;
+  trade_id: string;
+  event_year: number;
+  trade_date: string | null;
+  gave_team_id: string;
+  received_team_id: string;
+  asset_type: 'player' | 'draft_pick';
+  pfr_id: string | null;
+  pfr_name: string | null;
+  pick_season: number | null;
+  pick_round: number | null;
+  pick_number: number | null;
+  conditional: boolean | null;
+  source_ref_id: string;
+  raw_source_record?: Record<string, unknown> | null;
+}
+
+export interface NflTransactionTradePackage {
+  trade_id: string;
+  /** Every asset recorded for this deal, including assets outside the player cohort. */
+  assets: NflTransactionTradeAsset[];
+  source_ref_ids: string[];
+}
+
 export interface NflTransactionComparable {
   event_id: string;
   event_year: number;
@@ -2265,6 +2295,10 @@ export interface NflTransactionComparable {
   influence_basis_points: number | null;
   influence_explanation: string | null;
   source_ref_ids: string[];
+  /** Source deal identity; never inferred from a player's name or transaction date. */
+  trade_id?: string | null;
+  /** Null when the snapshot lacks linked assets; absent on legacy saved results. */
+  trade_package?: NflTransactionTradePackage | null;
 }
 
 export interface NflTransactionMarketSourceRef {
@@ -2303,6 +2337,8 @@ export interface NflTransactionMarketAnalysis {
   yearly_series: NflTransactionMarketYearPoint[];
   position_trends: NflPositionMarketTrend[];
   comparables: NflTransactionComparable[];
+  /** All matching player events, independent of max_comparables. Absent means sampled-only evidence. */
+  full_cohort?: NflTransactionComparable[];
   influential_transactions: NflTransactionComparable[];
   source_refs: NflTransactionMarketSourceRef[];
   limitations: string[];
