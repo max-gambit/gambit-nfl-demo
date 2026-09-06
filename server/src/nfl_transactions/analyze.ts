@@ -13,6 +13,7 @@ import type {
   NflTransactionMarketYearPoint,
   NflTransactionType,
 } from '@shared/types';
+import { canonicalNflTeamId } from './team_ids.js';
 
 const DEFAULT_START_YEAR = 2016;
 const DEFAULT_END_YEAR = 2025;
@@ -263,8 +264,8 @@ export function resolveNflTransactionMarketQuery(
     'transaction_types',
   );
   const teamIds = [...new Set((request.team_ids ?? [])
-    .map((team) => team.trim().toUpperCase())
-    .filter(Boolean))].sort();
+    .map(canonicalNflTeamId)
+    .filter((team): team is string => team != null))].sort();
   const maxComparables = request.max_comparables ?? 12;
   if (!Number.isSafeInteger(maxComparables) || maxComparables < 1 || maxComparables > 50) {
     throw new Error('max_comparables must be an integer from 1 through 50');

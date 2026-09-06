@@ -53,3 +53,14 @@ test('Giants seed content does not contain active basketball or NBA terminology'
     assert.equal(activeSeed.includes(banned), false, `active Giants seed contains banned term: ${banned}`);
   }
 });
+
+test('workspace continuation carries its active session and decision question into Analysis', async () => {
+  const serviceSource = await readFile(new URL('../../src/nfl_workspace/service.ts', import.meta.url), 'utf8');
+  const appSource = await readFile(new URL('../../../src/nyg/NygApp.tsx', import.meta.url), 'utf8');
+  assert.match(serviceSource, /session_id: sessionId/);
+  assert.match(serviceSource, /\.is\('archived_at', null\)[\s\S]*\.in\('seed_key', seedKeys\)/);
+  assert.match(appSource, /setActiveSession\(workspace\?\.session_id \?\? null\)/);
+  assert.match(appSource, /setPendingAnalysisQuestion\(workspace\?\.question \?\? null\)/);
+  assert.match(appSource, /fire\('v6d3cf:prefill-composer', \{ text: pendingAnalysisQuestion \}\)/);
+  assert.match(appSource, /onClick=\{\(\) => onOpenAnalysis\(selected\)\}/);
+});

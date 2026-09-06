@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { isNflTransactionMarketQuestion, transactionMarketRequestFromQuestion } from '../../src/nfl_transactions/question.js';
+import { isNflTransactionMarketQuestion, positionGroupsFromQuestion, transactionMarketRequestFromQuestion } from '../../src/nfl_transactions/question.js';
 
 test('recognizes novel market-analysis questions without matching stored answer text', () => {
   assert.equal(isNflTransactionMarketQuestion('Which position markets have grown or shrunk over the last 10 years?'), true);
@@ -81,4 +81,11 @@ test('fresh questions resolve explicit team names and safe uppercase ids', () =>
     transactionMarketRequestFromQuestion('No team filter; compare trades leaguewide.').team_ids,
     undefined,
   );
+});
+
+test('defensive and nose tackles do not also enter the offensive-tackle cohort', () => {
+  assert.deepEqual(positionGroupsFromQuestion('Compare defensive tackles after 2020.'), ['IDL']);
+  assert.deepEqual(positionGroupsFromQuestion('Show the nose tackle market.'), ['IDL']);
+  assert.deepEqual(positionGroupsFromQuestion('Compare offensive tackles after 2020.'), ['OT']);
+  assert.deepEqual(positionGroupsFromQuestion('How many tackles were recorded?'), []);
 });

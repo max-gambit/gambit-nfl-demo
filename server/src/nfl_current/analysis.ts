@@ -20,7 +20,9 @@ export type LoadCurrentNflTeam = (teamId: string) => Promise<NflCurrentDataLoadR
 export function classifyNflCurrentQuestion(question: string): NflCurrentQuestionKind | null {
   const value = question.trim();
   if (!/\b(?:giants|nyg)\b/i.test(value)) return null;
-  if (/\b(?:how much|what(?:'s| is))\b.*\b(?:cap space|cap room)\b|\b(?:cap space|cap room)\b.*\b(?:how much|what(?:'s| is))\b/i.test(value)) {
+  const conditionalMove = /\b(?:cut(?:s|ting)?|releas(?:e|ed|ing)|trad(?:e|ed|ing)|mov(?:e|ed|ing)|waiv(?:e|ed|ing)|restructur(?:e|ed|ing)|extend(?:ed|ing)?|sign(?:ed|ing)?)\b/i.test(value)
+    && /\b(?:if|would|could|after|before|save|create|clear|gain|lose|change|increase|decrease)\b/i.test(value);
+  if (!conditionalMove && /\b(?:how much|what(?:'s| is))\b.*\b(?:cap space|cap room)\b|\b(?:cap space|cap room)\b.*\b(?:how much|what(?:'s| is))\b/i.test(value)) {
     return 'cap_space';
   }
   if (/\b(?:starting|starters?|first[- ]team)\b.*\b(?:cornerbacks?|corners?|cbs?)\b|\b(?:cornerbacks?|corners?|cbs?)\b.*\b(?:starting|starters?|first[- ]team)\b/i.test(value)) {

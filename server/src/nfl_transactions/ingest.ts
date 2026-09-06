@@ -16,8 +16,9 @@ import type {
   NflTransactionMarketSnapshot,
   NflTransactionRosterPlayerSeason,
 } from './analyze.js';
+import { canonicalNflTeamId } from './team_ids.js';
 
-const TRANSFORMATION_VERSION = 'nfl-transaction-normalization.v7';
+const TRANSFORMATION_VERSION = 'nfl-transaction-normalization.v8';
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const DEFAULT_OUTPUT_DIR = path.join(REPO_ROOT, 'data/nfl-transactions');
 const COMPLETED_YEARS = Array.from({ length: 10 }, (_, index) => 2016 + index);
@@ -335,7 +336,9 @@ function normalizeTradeAssets(rows: CsvRow[]): NflTradeAssetRow[] {
   return rows.flatMap((row, index) => {
     const year = integer(row.season);
     const tradeDate = row.trade_date;
-    if (year == null || !/^\d{4}-\d{2}-\d{2}$/.test(tradeDate)) return [];
+    const gaveTeamId = canonicalNflTeamId(row.gave);
+    const receivedTeamId = canonicalNflTeamId(row.received);
+    if (year == null || !/^\d{4}-\d{2}-\d{2}$/.test(tradeDate) || !gaveTeamId || !receivedTeamId) return [];
     const isPick = integer(row.pick_round) != null;
     if (!isPick && !row.pfr_name) return [];
     return [{
@@ -343,8 +346,8 @@ function normalizeTradeAssets(rows: CsvRow[]): NflTradeAssetRow[] {
       trade_id: row.trade_id,
       event_year: year,
       trade_date: tradeDate,
-      gave_team_id: row.gave,
-      received_team_id: row.received,
+      gave_team_id: gaveTeamId,
+      received_team_id: receivedTeamId,
       asset_type: isPick ? 'draft_pick' as const : 'player' as const,
       pfr_id: row.pfr_id || null,
       pfr_name: isPick ? null : row.pfr_name || null,
@@ -464,7 +467,7 @@ function normalizeContractEvents(
     if (seen.has(dedupe)) continue;
     seen.add(dedupe);
     const eventId = `contract-${hashText(dedupe).slice(0, 24)}`;
-    const teamId = normalizeTeam(row.team ?? history?.team ?? '');
+    const teamId = canonicalNflTeamId(row.team ?? history?.team ?? '');
     const sourceRefIds = player ? ['contracts', 'players'] : ['contracts'];
     events.push({
       event_id: eventId,
@@ -561,8 +564,9 @@ function normalizeRosterPopulations(
     const normalized = normalizePosition(player?.pff_position, player?.position || row.depth_chart_position || row.position, player?.position_group || row.position);
     if (!normalized.group) continue;
     const playerKey = row.gsis_id || row.pfr_id || `${row.full_name}|${row.birth_date}`;
-    if (!playerKey || !row.team) continue;
-    unique.set(`${year}|${row.team}|${playerKey}`, { year, team: row.team, position: normalized.group });
+    const teamId = canonicalNflTeamId(row.team);
+    if (!playerKey || !teamId) continue;
+    unique.set(`${year}|${teamId}|${playerKey}`, { year, team: teamId, position: normalized.group });
   }
   const teamCounts = new Map<string, number>();
   const leaguePlayers = new Map<string, Set<string>>();
@@ -798,20 +802,6 @@ function assetLookup(assets: ReleaseAsset[]): Map<string, ReleaseAsset> {
     if (!result.has(required)) throw new Error(`source manifest is missing ${required}`);
   }
   return result;
-}
-
-function normalizeTeam(value: string): string | null {
-  const normalized = value.trim();
-  if (!normalized || normalized.includes('/')) return null;
-  const map: Record<string, string> = {
-    '49ers': 'SF', Bears: 'CHI', Bengals: 'CIN', Bills: 'BUF', Broncos: 'DEN', Browns: 'CLE', Buccaneers: 'TB',
-    Cardinals: 'ARI', Chargers: 'LAC', Chiefs: 'KC', Colts: 'IND', Commanders: 'WAS', Cowboys: 'DAL', Dolphins: 'MIA',
-    Eagles: 'PHI', Falcons: 'ATL', Giants: 'NYG', Jaguars: 'JAX', Jets: 'NYJ', Lions: 'DET', Packers: 'GB',
-    Panthers: 'CAR', Patriots: 'NE', Raiders: 'LV', Rams: 'LAR', Ravens: 'BAL', Saints: 'NO', Seahawks: 'SEA',
-    Steelers: 'PIT', Texans: 'HOU', Titans: 'TEN', Vikings: 'MIN', Redskins: 'WAS', 'Football Team': 'WAS',
-    Oakland: 'LV', 'St. Louis': 'LAR', 'San Diego': 'LAC',
-  };
-  return map[normalized] ?? (/^[A-Z]{2,3}$/.test(normalized) ? normalized : null);
 }
 
 function millionsToDollars(value: number): number {

@@ -5,7 +5,7 @@ import { resolveBriefShareToken } from '../api/briefs';
 import { getNflRuleArticle, listNflRules } from '../api/nflRules';
 import { createNflWorkspace, listNflWorkspaces } from '../api/nflWorkspace';
 import { AnalysisWorkspace } from '../analysis/AnalysisWorkspace';
-import { on as onEvt } from '../lib/events';
+import { fire, on as onEvt } from '../lib/events';
 import { useBriefs, useSessions, useToasts, useUi } from '../store';
 import './nyg.css';
 
@@ -25,6 +25,7 @@ export function NygApp() {
   const [focusedRule, setFocusedRule] = useState<CbaSection | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [deepLinkHandled, setDeepLinkHandled] = useState(false);
+  const [pendingAnalysisQuestion, setPendingAnalysisQuestion] = useState<string | null>(null);
   const { sessionsLoaded, setActiveSession } = useSessions();
   const { briefs, briefsLoaded, setActiveBrief } = useBriefs();
   const { pushToast } = useToasts();
@@ -50,6 +51,13 @@ export function NygApp() {
     setView('workspaces');
     if (refresh) void listNflWorkspaces().then(setWorkspaces).catch((caught) => setError(caught instanceof Error ? caught.message : String(caught)));
   }), []);
+
+  useEffect(() => {
+    if (view !== 'analysis' || !pendingAnalysisQuestion) return;
+    fire('v6d3cf:prefill-composer', { text: pendingAnalysisQuestion });
+    fire('v6d3cf:focus-composer');
+    setPendingAnalysisQuestion(null);
+  }, [pendingAnalysisQuestion, view]);
 
   useEffect(() => {
     if (deepLinkHandled || !sessionsLoaded || !briefsLoaded) return;
@@ -100,6 +108,13 @@ export function NygApp() {
     catch (caught) { setError(caught instanceof Error ? caught.message : String(caught)); }
   }
 
+  function openWorkspaceAnalysis(workspace: NflWorkspaceSummary | null): void {
+    setActiveSession(workspace?.session_id ?? null);
+    setActiveBrief(null);
+    setPendingAnalysisQuestion(workspace?.question ?? null);
+    setView('analysis');
+  }
+
   const sourceDate = health?.datasets.find((dataset) => dataset.id === 'roster')?.as_of_date;
   return <div className="nyg-app">
     <header className="nyg-header">
@@ -112,7 +127,7 @@ export function NygApp() {
     <main className={`nyg-main ${view === 'analysis' ? 'nyg-main-analysis' : ''}`}>
       {view === 'analysis' && <><div className="analysis-modebar analysis-modebar-single"><div><strong>Analysis</strong></div></div><AnalysisWorkspace /></>}
       {view === 'briefing' && <Briefing health={health} onOpenAnalysis={() => setView('analysis')} onOpenRoster={() => setView('roster')} />}
-      {view === 'workspaces' && <Workspaces workspaces={workspaces} onCreate={createWorkspace} onOpenAnalysis={() => setView('analysis')} />}
+      {view === 'workspaces' && <Workspaces workspaces={workspaces} onCreate={createWorkspace} onOpenAnalysis={openWorkspaceAnalysis} />}
       {view === 'roster' && <RosterCap roster={roster} />}
       {view === 'rulebook' && <Rulebook rules={rules} focused={focusedRule} onOpen={(id) => void openRule(id)} onAnalyze={() => setView('analysis')} />}
       {view === 'settings' && <Settings health={health} />}
@@ -129,7 +144,7 @@ function Briefing({ health, onOpenAnalysis, onOpenRoster }: { health: NflDataHea
   </section>;
 }
 
-function Workspaces({ workspaces, onCreate, onOpenAnalysis }: { workspaces: NflWorkspaceSummary[]; onCreate: (question: string) => Promise<void>; onOpenAnalysis: () => void }) {
+function Workspaces({ workspaces, onCreate, onOpenAnalysis }: { workspaces: NflWorkspaceSummary[]; onCreate: (question: string) => Promise<void>; onOpenAnalysis: (workspace: NflWorkspaceSummary | null) => void }) {
   const stages = [
     { id: 'question', label: 'Question', note: 'State the football decision.' },
     { id: 'evidence', label: 'Evidence', note: 'Review market history and current team facts.' },
@@ -154,7 +169,7 @@ function Workspaces({ workspaces, onCreate, onOpenAnalysis }: { workspaces: NflW
   return <section className="page-shell"><div className="workspace-title-row"><PageTitle eyebrow="Workspaces · NYG" title={selected?.title ?? 'Decision workspaces'} subtitle="Keep the question, supporting history, scenarios, decision, and action plan together." /><button className="primary-button" onClick={() => setDraftOpen(true)}>+ New workspace</button></div>
     {draftOpen && <article className="workspace-draft"><div><span className="kicker">New workspace</span><h2>Start with the decision question</h2><p>The workspace begins when you submit the first question.</p></div><textarea aria-label="New workspace question" placeholder="What football decision needs a market and team-data check?" value={draftQuestion} onChange={(event) => setDraftQuestion(event.target.value)} /><div className="draft-actions"><button className="quiet-button" onClick={() => { setDraftOpen(false); setDraftQuestion(''); setCreateError(null); }}>Cancel</button><button className="primary-button" onClick={() => void submitDraft()} disabled={!draftQuestion.trim() || creating}>{creating ? 'Creating…' : 'Create from first question'}</button></div>{createError && <p className="settings-blocker">{createError}</p>}</article>}
     {workspaces.length > 0 && <div className="workspace-list" aria-label="NYG decision workspaces">{workspaces.map((workspace) => <button key={workspace.id} className={selected?.id === workspace.id ? 'selected' : ''} onClick={() => setSelectedId(workspace.id)}><span>{workspace.seeded ? 'Public data' : 'In progress'}</span><strong>{workspace.title}</strong><small>{workspace.question}</small></button>)}</div>}
-    <div className="workspace-overview"><div><span className="kicker">Decision owner</span><strong>Football Operations</strong></div><div><span className="kicker">Current stage</span><strong>{selected ? stageLabel(selected.stage) : 'Question'}</strong></div><div><span className="kicker">Starting point</span><strong>Live Analysis</strong></div><button className="primary-button" onClick={onOpenAnalysis}>Continue in Analysis</button></div><div className="stage-track">{stages.map((stage, index) => <div key={stage.id} className={index < currentStage ? 'complete' : index === currentStage ? 'current' : ''}><span>{index < currentStage ? '✓' : index + 1}</span><strong>{stage.label}</strong><small>{stage.note}</small></div>)}</div><div className="workspace-notes"><article><span className="kicker">Decision statement</span><h3>{selected?.question ?? 'Which position market gives New York the best opportunity, and what terms would justify a move?'}</h3></article><article><span className="kicker">Next action</span><h3>Run the market question, inspect the strongest comparables, and confirm the selected Giants contract.</h3></article></div></section>;
+    <div className="workspace-overview"><div><span className="kicker">Decision owner</span><strong>Football Operations</strong></div><div><span className="kicker">Current stage</span><strong>{selected ? stageLabel(selected.stage) : 'Question'}</strong></div><div><span className="kicker">Starting point</span><strong>Live Analysis</strong></div><button className="primary-button" onClick={() => onOpenAnalysis(selected)} disabled={!selected}>Continue in Analysis</button></div><div className="stage-track">{stages.map((stage, index) => <div key={stage.id} className={index < currentStage ? 'complete' : index === currentStage ? 'current' : ''}><span>{index < currentStage ? '✓' : index + 1}</span><strong>{stage.label}</strong><small>{stage.note}</small></div>)}</div><div className="workspace-notes"><article><span className="kicker">Decision statement</span><h3>{selected?.question ?? 'Which position market gives New York the best opportunity, and what terms would justify a move?'}</h3></article><article><span className="kicker">Next action</span><h3>Run the market question, inspect the strongest comparables, and confirm the selected Giants contract.</h3></article></div></section>;
 }
 
 function RosterCap({ roster }: { roster: GetCurrentNflTeamResponse | null }) {

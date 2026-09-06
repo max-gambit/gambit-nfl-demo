@@ -40,7 +40,25 @@ export async function listNygWorkspaces(): Promise<NflWorkspaceSummary[]> {
     .is('archived_at', null)
     .order('updated_at', { ascending: false });
   if (result.error) throw new Error(`load NYG workspaces failed: ${result.error.message}`);
-  return (result.data ?? []).map(workspaceSummary);
+  const rows = result.data ?? [];
+  const seedKeys = [...new Set(rows.flatMap((row) => typeof row.seed_key === 'string' ? [row.seed_key] : []))];
+  const activeSessionBySeed = new Map<string, string>();
+  if (seedKeys.length) {
+    const sessions = await db
+      .from('sessions')
+      .select('id,seed_key')
+      .eq('workspace_key', NYG_DEMO_WORKSPACE_KEY)
+      .is('archived_at', null)
+      .in('seed_key', seedKeys);
+    if (sessions.error) throw new Error(`load NYG workspace sessions failed: ${sessions.error.message}`);
+    for (const session of sessions.data ?? []) {
+      if (typeof session.seed_key === 'string') activeSessionBySeed.set(session.seed_key, String(session.id));
+    }
+  }
+  return rows.map((row) => workspaceSummary(
+    row,
+    typeof row.seed_key === 'string' ? activeSessionBySeed.get(row.seed_key) ?? null : null,
+  ));
 }
 
 export async function createNygWorkspace(question: string, now = new Date().toISOString()): Promise<NflWorkspaceSummary> {
@@ -110,7 +128,7 @@ export async function createNygWorkspace(question: string, now = new Date().toIS
       updated_at: now,
     })));
     if (tasks.error) throw new Error(`create NYG tasks failed: ${tasks.error.message}`);
-    return workspaceSummary(project.data);
+    return workspaceSummary(project.data, sessionId);
   } catch (error) {
     if (projectCreated) await db.from('projects').delete().eq('id', projectId);
     if (sessionCreated) await db.from('sessions').delete().eq('id', sessionId);
@@ -118,10 +136,11 @@ export async function createNygWorkspace(question: string, now = new Date().toIS
   }
 }
 
-function workspaceSummary(row: Record<string, unknown>): NflWorkspaceSummary {
+function workspaceSummary(row: Record<string, unknown>, sessionId: string | null): NflWorkspaceSummary {
   const step = isStep(row.active_step) ? row.active_step : 'research';
   return {
     id: String(row.id),
+    session_id: sessionId,
     title: String(row.title),
     question: String(row.question),
     objective: String(row.objective ?? ''),

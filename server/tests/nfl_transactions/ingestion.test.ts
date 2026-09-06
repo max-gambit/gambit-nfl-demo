@@ -6,10 +6,19 @@ import {
   loadReviewedNflTransactionSnapshot,
 } from '../../src/nfl_transactions/seed.js';
 import { parseCsv } from '../../src/nfl_transactions/ingest.js';
+import { canonicalNflTeamId } from '../../src/nfl_transactions/team_ids.js';
 
 test('CSV parser preserves quoted raw source fields', () => {
   const rows = parseCsv('trade_id,pfr_name,note\n1,"Smith, John","pick ""condition"""\n');
   assert.deepEqual(rows, [{ trade_id: '1', pfr_name: 'Smith, John', note: 'pick "condition"' }]);
+});
+
+test('historical franchise aliases normalize to the current query contract', () => {
+  assert.equal(canonicalNflTeamId('LA'), 'LAR');
+  assert.equal(canonicalNflTeamId('STL'), 'LAR');
+  assert.equal(canonicalNflTeamId('OAK'), 'LV');
+  assert.equal(canonicalNflTeamId('SD'), 'LAC');
+  assert.equal(canonicalNflTeamId('New York/Los Angeles'), null);
 });
 
 test('reviewed transaction snapshot is checksum verified and covers completed years', async () => {
@@ -27,6 +36,16 @@ test('reviewed transaction snapshot is checksum verified and covers completed ye
   assert.ok(snapshot.source_refs.every((source) => Number.isSafeInteger(source.row_count) && source.row_count! > 0));
   assert.ok(snapshot.source_refs.every((source) => source.coverage_start_date && source.coverage_end_date));
   assert.equal(new Set(snapshot.roster_player_seasons.filter((row) => row.team_id == null).map((row) => row.year)).size, 10);
+  const historicalAliases = new Set(['LA', 'STL', 'OAK', 'SD']);
+  const storedTeamIds = [
+    ...snapshot.trade_assets.flatMap((asset) => [asset.gave_team_id, asset.received_team_id]),
+    ...snapshot.events.flatMap((event) => [event.from_team_id, event.to_team_id]).filter((team): team is string => team != null),
+    ...snapshot.roster_player_seasons.flatMap((row) => row.team_id == null ? [] : [row.team_id]),
+  ];
+  assert.equal(storedTeamIds.some((team) => historicalAliases.has(team)), false);
+  assert.equal(snapshot.roster_player_seasons.filter((row) => row.team_id === 'LAR').length, 120);
+  assert.ok(snapshot.events.some((event) => event.event_year >= 2016 && event.event_year <= 2025
+    && event.transaction_type === 'trade' && (event.from_team_id === 'LAR' || event.to_team_id === 'LAR')));
 });
 
 test('snapshot preserves raw boundaries while analytical values stay safe', async () => {

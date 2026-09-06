@@ -13,6 +13,9 @@ let seedPromise: Promise<NflDemoSeed> | null = null;
 
 test('basic Giants cap and roster questions have a bounded deterministic route', () => {
   assert.equal(classifyNflCurrentQuestion('How much 2026 cap space do the Giants currently have?'), 'cap_space');
+  assert.equal(classifyNflCurrentQuestion('How much cap space would the Giants save by cutting Darius Slayton?'), null);
+  assert.equal(classifyNflCurrentQuestion('How much cap space do the Giants save by cutting Darius Slayton?'), null);
+  assert.equal(classifyNflCurrentQuestion('What is the Giants cap room if they trade a player?'), null);
   assert.equal(classifyNflCurrentQuestion('Who are the Giants starting cornerbacks right now?'), 'starting_cornerbacks');
   assert.equal(classifyNflCurrentQuestion('Which Giants contracts have the largest 2026 cap hits?'), 'largest_cap_hits');
   assert.equal(classifyNflCurrentQuestion('Show our current Giants wide receiver contracts in a table.'), 'wide_receiver_contracts');

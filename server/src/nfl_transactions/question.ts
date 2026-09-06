@@ -16,7 +16,7 @@ const POSITION_PATTERNS: Array<[NflPositionMarketGroup, RegExp]> = [
   ['RB', /\b(?:running[- ]backs?|tailbacks?|rbs?)\b/i],
   ['WR', /\b(?:wide receivers?|receivers?|wrs?)\b/i],
   ['TE', /\b(?:tight ends?|tes?)\b/i],
-  ['OT', /\b(?:offensive tackles?|tackles?|ots?)\b/i],
+  ['OT', /\b(?:offensive tackles?|ots?)\b/i],
   ['IOL', /\b(?:interior offensive line(?:men)?|interior o-?line(?:men)?|guards?|centers?|iols?)\b/i],
   ['EDGE', /\b(?:edge rushers?|edge defenders?|edges?)\b/i],
   ['IDL', /\b(?:interior defensive line(?:men)?|defensive tackles?|nose tackles?|idls?)\b/i],

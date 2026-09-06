@@ -2571,6 +2571,7 @@ export type NflWorkspaceStage = 'question' | 'evidence' | 'scenarios' | 'decisio
 
 export interface NflWorkspaceSummary {
   id: string;
+  session_id: string | null;
   title: string;
   question: string;
   objective: string;
