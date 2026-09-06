@@ -46,6 +46,7 @@ import {
   currentNflEvidenceScopeForQuestion,
   currentNflEvidenceTeamIds as resolveCurrentNflEvidenceTeamIds,
   defaultNflEvidenceTeamId,
+  extractNflTeamIds as resolveExplicitNflTeamIds,
   isNflTradeGoalQuestion,
   type CurrentNflEvidencePack,
 } from '../claude/nfl_evidence.js';
@@ -3197,12 +3198,12 @@ function canInheritCurrentNflConversation(
 ): boolean {
   if (!CURRENT_NFL_CONTINUATION_CUE_RE.test(question)) return false;
   if (!prior.body || prior.body.kind !== 'data_analysis') return false;
-  const explicitCurrentTeams = currentNflEvidenceTeamIds(question, null);
-  const priorTeams = currentNflEvidenceTeamIds(priorScopeQuestion, null);
+  const explicitCurrentTeams = resolveExplicitNflTeamIds(question);
+  const priorTeams = currentNflEvidenceTeamIds(priorScopeQuestion);
   if (explicitCurrentTeams.some((teamId) => !priorTeams.includes(teamId))) return false;
 
   const deicticContinuation = CURRENT_NFL_DEICTIC_CUE_RE.test(question);
-  const domainContinuation = /\b(?:pick\s+(?:budget|ceiling)|internal\s+(?:replacement|option)|rental|multi[-\s]?year)\b/i.test(question);
+  const domainContinuation = /\b(?:cap(?:\s+(?:fit|risk|space|room))?|pick\s+(?:budget|ceiling)|internal\s+(?:replacement|option)|rental|multi[-\s]?year)\b/i.test(question);
   if (currentNflEvidenceTeamIds(question).length > 0 && !deicticContinuation && !domainContinuation) {
     return false;
   }

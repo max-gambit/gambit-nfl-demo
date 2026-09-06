@@ -9,6 +9,9 @@
     "canonical": "tsx src/run.ts --mode canonical",
     "adversarial": "tsx src/run.ts --mode adversarial",
     "smoke:model-move": "tsx src/model-move-smoke.ts",
+    "reliability:nfl": "tsx src/nfl-answer-reliability.ts",
+    "reliability:nfl:live": "tsx src/nfl-answer-reliability.ts --live --judge",
+    "test:terra-judge": "tsx --test src/terra-judge.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

@@ -89,7 +89,8 @@ export function parseNflSellerMoveTurn(
 
   const contextualCue = /\b(?:what if|suppose|if)\s+(?:the giants|new york|we)\s+(?:(?:were to|could|should)\s+)?(?:move|moved|trade|traded|trading)(?!\s+for\b)\b/i.exec(value);
   const imperativeCue = /^\s*(?:move|trade)\s+.+?\s+(?:for|in exchange for|in return for)\b/i.exec(value);
-  const scenarioCue = contextualCue ?? imperativeCue;
+  const proposalCue = /^\s*(?:would\s+)?(?:model\s+)?(?:moving|trading)\s+.+?\s+(?:for|in exchange for|in return for)\b/i.exec(value);
+  const scenarioCue = contextualCue ?? imperativeCue ?? proposalCue;
   if (!scenarioCue) return null;
 
   // Parse only the explicit seller clause. A compound question can contain
@@ -97,8 +98,8 @@ export function parseNflSellerMoveTurn(
   // from the start of the sentence would incorrectly treat "market" as the
   // player and the historical start year as part of the proposed return.
   const sellerClause = value.slice(scenarioCue.index);
-  const playerMatch = sellerClause.match(/\b(?:move|moved|trade|traded|trading)\s+(.+?)(?:\s+away)?\s+(?:for|in exchange for|in return for)\b/i)
-    ?? sellerClause.match(/\b(?:move|moved|trade|traded|trading)\s+(.+?)(?:\?|$)/i);
+  const playerMatch = sellerClause.match(/\b(?:move|moved|moving|trade|traded|trading)\s+(.+?)(?:\s+away)?\s+(?:for|in exchange for|in return for)\b/i)
+    ?? sellerClause.match(/\b(?:move|moved|moving|trade|traded|trading)\s+(.+?)(?:\?|$)/i);
   const compensationMatch = sellerClause.match(/\b(?:for|in exchange for|in return for)\s+(.+)$/i);
   const compensationClause = compensationMatch?.[1] ?? sellerClause;
   const years = uniqueMatches(compensationClause, /\b(20\d{2})\b/g).map(Number);
