@@ -11,6 +11,7 @@ import {
   briefGenerationErrorMessage,
   briefProgressStreamPayload,
   buildBriefUserPrompt,
+  buildCurrentNflConversationContext,
   buildCurrentNflReasoningSystem,
   currentNflRepairTimeoutMs,
   currentNbaEvidenceTeamIds,
@@ -704,6 +705,127 @@ test('current NFL briefs get enough time for source-backed model reasoning', () 
   assert.equal(currentNflRepairTimeoutMs(10_000, 10_000 + NFL_BRIEF_GENERATION_DEADLINE_MS), 0);
 });
 
+test('clicked current-NFL follow-ups inherit the prior analysis scope and deadline', () => {
+  const followup = 'Is the Nabers concern a multi-week absence or season-threatening? That changes rental vs. multi-year target logic.';
+  const context = buildCurrentNflConversationContext(followup, [{
+    id: 'prior-brief',
+    session_id: 'session',
+    question: "If we're concerned about Malik Nabers' knee in Week 1, what are realistic trade targets for us?",
+    thesis: 'Call Tre Tucker, Marvin Mims Jr., and Andrei Iosivas first.',
+    body: {
+      kind: 'data_analysis',
+      answer: 'Call Tre Tucker, Marvin Mims Jr., and Andrei Iosivas first; none is confirmed available.',
+      key_findings: [],
+      tables: [],
+      calculations: [],
+      caveats: [],
+      followups: [],
+    },
+    status: 'ready',
+    mode: 'data_analyst',
+    template_id: 'decision_brief',
+    created_at: '2026-09-06T14:50:05.000Z',
+  }]);
+
+  assert(context);
+  assert.match(context.reasoning_question, /Malik Nabers/);
+  assert.match(context.reasoning_question, /Current follow-up/);
+  assert.match(context.model_prompt, /conversation context only; it is not evidence/i);
+  assert.equal(briefGenerationDeadlineMs({ question: followup }), BRIEF_GENERATION_DEADLINE_MS);
+  assert.equal(briefGenerationDeadlineMs({ question: followup }, context), NFL_BRIEF_GENERATION_DEADLINE_MS);
+});
+
+test('unrelated questions do not silently inherit a prior current-NFL analysis', () => {
+  const context = buildCurrentNflConversationContext('Summarize the decision for ownership.', [{
+    id: 'prior-brief',
+    session_id: 'session',
+    question: 'Which receivers should the Giants trade for?',
+    thesis: 'Call three teams.',
+    body: {
+      kind: 'data_analysis',
+      answer: 'Call Las Vegas, Denver, and Cincinnati.',
+      key_findings: [],
+      tables: [],
+      calculations: [],
+      caveats: [],
+      followups: [],
+    },
+    status: 'ready',
+    mode: 'data_analyst',
+    template_id: 'decision_brief',
+    created_at: '2026-09-06T14:50:05.000Z',
+  }]);
+
+  assert.equal(context, null);
+});
+
+test('an explicit new team and position question does not inherit the prior Giants scope', () => {
+  const context = buildCurrentNflConversationContext('Which guards should the Bengals target in a trade?', [{
+    id: 'prior-brief',
+    session_id: 'session',
+    question: 'Which receivers should the Giants trade for?',
+    thesis: 'Call three teams.',
+    body: {
+      kind: 'data_analysis',
+      answer: 'The Giants should call Las Vegas, Denver, and Cincinnati about receivers.',
+      key_findings: [],
+      tables: [],
+      calculations: [],
+      caveats: [],
+      followups: [],
+    },
+    status: 'ready',
+    mode: 'data_analyst',
+    template_id: 'decision_brief',
+    created_at: '2026-09-06T14:50:05.000Z',
+  }]);
+
+  assert.equal(context, null);
+});
+
+test('a third current-NFL turn preserves the intervening follow-up constraint', () => {
+  const initial = {
+    id: 'initial-brief',
+    session_id: 'session',
+    question: 'Which receivers should the Giants trade for?',
+    thesis: 'Call three teams.',
+    body: {
+      kind: 'data_analysis' as const,
+      answer: 'The Giants should call Las Vegas, Denver, and Cincinnati about receivers.',
+      key_findings: [],
+      tables: [],
+      calculations: [],
+      caveats: [],
+      followups: [],
+    },
+    status: 'ready' as const,
+    mode: 'data_analyst' as const,
+    template_id: 'decision_brief' as const,
+    created_at: '2026-09-06T14:50:05.000Z',
+  };
+  const constrained = {
+    ...initial,
+    id: 'constrained-brief',
+    question: 'Limit the pick budget to Day 3.',
+    thesis: 'With a Day 3 ceiling, prioritize the lower-cost receiver calls.',
+    body: {
+      ...initial.body,
+      answer: 'With a Day 3 ceiling, prioritize Tre Tucker and Andrei Iosivas before the premium names.',
+    },
+    created_at: '2026-09-06T14:51:05.000Z',
+  };
+
+  const context = buildCurrentNflConversationContext(
+    'Which of those targets should we call first?',
+    [constrained, initial],
+  );
+
+  assert(context);
+  assert.equal(context.prior_question, constrained.question);
+  assert.match(context.reasoning_question, /Limit the pick budget to Day 3/);
+  assert.match(context.model_prompt, /Day 3 ceiling/);
+});
+
 test('current NFL reasoning treats injury language as a user scenario and constrains named targets', () => {
   const question = "If we're concerned about Malik Nabers' knee week 1, what are potential trade targets for us?";
   const system = buildCurrentNflReasoningSystem(
@@ -714,6 +836,7 @@ test('current NFL reasoning treats injury language as a user scenario and constr
   assert.match(system, /user-entered scenarios, not sourced facts/i);
   assert.match(system, /Name a player or counterparty only when it appears in the supplied evidence/i);
   assert.match(system, /The user wants a live football judgment, not a canned response/i);
+  assert.match(system, /Every follow-up must be an executable question the user can ask you next/i);
   assert.doesNotMatch(system, new RegExp(question.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 });
 

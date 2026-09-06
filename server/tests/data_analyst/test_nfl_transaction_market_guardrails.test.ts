@@ -182,6 +182,17 @@ test('AI interpretation rejects a qualitative direction opposite the calculated 
   assert(result.issues.some((issue) => /calculation says/i.test(issue)));
 });
 
+test('AI interpretation does not attach an unlabeled pay clause to the overall EDGE direction', () => {
+  const analysis = analysisFixture();
+  const movementDirection = analysis.position_trends[0].mobility.direction;
+  const result = evaluateNflArtifactInterpretation(
+    `EDGE player movement is ${movementDirection}, while what teams pay held flat.`,
+    analysis,
+  );
+
+  assert.deepEqual(result, { ok: true, issues: [] });
+});
+
 test('AI interpretation rejects every raw basis-point value labeled as a per-100 rate', () => {
   const analysis = analysisFixture();
   const raw = analysis.position_trends[0].mobility.recent_value!;

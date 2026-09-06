@@ -102,6 +102,57 @@ test('seller interpretation must preserve the calculated player and historical r
   assert(rejected.issues.some((issue) => /calculation says/i.test(issue)));
 });
 
+test('seller interpretation accepts governed draft-round labels beside an EDGE market signal', async () => {
+  const fixture = await liveFixture();
+  const artifact = answer(fixture, 'What if we moved Brian Burns for a 2027 second?', null);
+  const result = artifact.result!;
+  const compensation = fixture.market.position_trends.find((trend) => trend.position_group === 'EDGE')!.trade_compensation;
+  assert(result.market.range);
+  assert.equal(typeof compensation.recent_value, 'number');
+  const recentShare = (compensation.recent_value! / 100).toFixed(2);
+  const grounded = `A 2027 Round 2 return for ${result.player.player_name} sits ${result.market.range} the historical range in the EDGE compensation sample at ${recentShare}%, 1 round stronger than the Round 3-to-Round 6 middle band.`;
+
+  assert.deepEqual(
+    evaluateNflArtifactInterpretation(grounded, fixture.market, artifact),
+    { ok: true, issues: [] },
+  );
+});
+
+test('seller interpretation binds cap space and dead money within their prose clauses', async () => {
+  const fixture = await liveFixture();
+  const artifact = answer(fixture, 'What if we moved Brian Burns for a 2027 second?', null);
+  const result = artifact.result!;
+  assert(result.market.range);
+  const capSpace = (result.cap.current_year_cap_space_created_dollars / 1_000_000).toFixed(1);
+  const deadMoney = (result.cap.current_year_dead_money_dollars / 1_000_000).toFixed(6);
+  const grounded = `${result.player.player_name} for a 2027 second sits ${result.market.range} the historical range. New York's cap space would increase by $${capSpace}M, while dead money would be $${deadMoney}M.`;
+  const groundedWithStandaloneRelief = `${result.player.player_name} for a 2027 second sits ${result.market.range} the historical range. The move creates only $${capSpace}M of 2026 relief, while leaving $${deadMoney}M in dead money.`;
+  const groundedWithCreatedDeadMoney = `${result.player.player_name} for a 2027 second sits ${result.market.range} the historical range. The trade creates $${deadMoney}M in dead money and only $${capSpace}M in cap room.`;
+  const groundedWithCostContrast = `${result.player.player_name} for a 2027 second sits ${result.market.range} the historical range. The cost is $${deadMoney}M in dead money against just $${capSpace}M of current-year relief.`;
+  const groundedWithDecimalLeadingClause = `${result.player.player_name} for a 2027 second sits ${result.market.range} the historical range. The move creates $${capSpace}M in cap space; $${deadMoney}M would remain as dead money.`;
+
+  assert.deepEqual(
+    evaluateNflArtifactInterpretation(grounded, fixture.market, artifact),
+    { ok: true, issues: [] },
+  );
+  assert.deepEqual(
+    evaluateNflArtifactInterpretation(groundedWithStandaloneRelief, fixture.market, artifact),
+    { ok: true, issues: [] },
+  );
+  assert.deepEqual(
+    evaluateNflArtifactInterpretation(groundedWithCreatedDeadMoney, fixture.market, artifact),
+    { ok: true, issues: [] },
+  );
+  assert.deepEqual(
+    evaluateNflArtifactInterpretation(groundedWithCostContrast, fixture.market, artifact),
+    { ok: true, issues: [] },
+  );
+  assert.deepEqual(
+    evaluateNflArtifactInterpretation(groundedWithDecimalLeadingClause, fixture.market, artifact),
+    { ok: true, issues: [] },
+  );
+});
+
 test('seller interpretation cannot swap cap space and dead money or change the proposed pick', async () => {
   const fixture = await liveFixture();
   const artifact = answer(fixture, 'What if we moved Brian Burns for a 2027 second?', null);

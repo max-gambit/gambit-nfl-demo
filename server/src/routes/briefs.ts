@@ -108,9 +108,19 @@ export const CURRENT_NFL_REASONING_MODEL = process.env.ANTHROPIC_CURRENT_NFL_MOD
 export const NFL_ARTIFACT_INTERPRETATION_DEADLINE_MS = 30_000;
 const MAX_BRIEF_PROGRESS_EVENTS = 12;
 type DataAnalysisLookup = { messages: Anthropic.MessageParam[]; traces: DataAnalystTrace[] };
+type BriefConversationRow = Pick<
+  Brief,
+  'id' | 'body' | 'created_at' | 'mode' | 'question' | 'session_id' | 'status' | 'template_id' | 'thesis'
+>;
 type NflArtifactInterpretationContext = {
   market: NflTransactionMarketAnalysis;
   seller_move: NflSellerMoveConversationArtifact | null;
+};
+export type CurrentNflConversationContext = {
+  prior_question: string;
+  prior_answer: string;
+  reasoning_question: string;
+  model_prompt: string;
 };
 export type BriefGenerationGuard = { isActive: () => boolean };
 const ALWAYS_ACTIVE_GENERATION: BriefGenerationGuard = { isActive: () => true };
@@ -179,14 +189,14 @@ briefRoutes.post('/', async (c) => {
   }
   const contextRes = await db
     .from('briefs')
-    .select('body, session_id')
+    .select('id, body, created_at, mode, question, session_id, status, template_id, thesis')
     .eq('session_id', session_id)
     .order('created_at', { ascending: false })
     .limit(50);
   if (contextRes.error) {
     return c.json({ error: 'load_analysis_context_failed', detail: 'The prior conversation could not be loaded.' }, 500);
   }
-  const contextBriefs = (contextRes.data ?? []) as Array<Pick<Brief, 'body' | 'session_id'>>;
+  const contextBriefs = (contextRes.data ?? []) as BriefConversationRow[];
   const latestMarketAnalysis = contextBriefs
     .map((prior) => transactionMarketAnalysisFromBrief(prior))
     .find((analysis): analysis is NflTransactionMarketAnalysis => Boolean(analysis)) ?? null;
@@ -208,23 +218,29 @@ briefRoutes.post('/', async (c) => {
   const preparedCurrentAnswer = intent.kind === 'current_team'
     ? await buildNflCurrentAnswer(intent.question_kind)
     : null;
+  const currentNflConversationContext = intent.kind === 'general'
+    ? buildCurrentNflConversationContext(question, contextBriefs)
+    : null;
   const explicitMode = normalizeBriefMode(body.mode);
   const transactionMarketQuestion = intent.kind === 'transaction_market';
   const immediateClarification = intent.kind === 'seller_modifier_without_context';
-  const marketContextActive = intent.kind === 'seller_move'
+  const directDataAnswerActive = intent.kind === 'seller_move'
     || transactionMarketQuestion
     || Boolean(preparedRuleAnswer)
     || intent.kind === 'current_team'
     || immediateClarification;
-  const requestedMode = marketContextActive
+  const currentNflContextActive = Boolean(currentNflConversationContext);
+  const requestedMode = directDataAnswerActive || currentNflContextActive
     ? 'data_analyst'
     : parsedQuestion.mode ?? explicitMode ?? inferBriefModeFromQuestion(question);
   const templateParse = parseBriefTemplateSelection(body.template, body.question);
   if (templateParse.errors.length > 0) {
     return c.json({ error: 'invalid_template', detail: templateParse.errors }, 400);
   }
-  const templateSelection = marketContextActive || requestedMode === 'data_analyst'
+  const templateSelection = directDataAnswerActive || (requestedMode === 'data_analyst' && !currentNflContextActive)
     ? { template_id: 'data_table' as const }
+    : currentNflContextActive
+      ? { template_id: 'decision_brief' as const }
     : templateParse.selection;
   const mode = briefModeForTemplate(templateSelection)
     ?? requestedMode
@@ -361,7 +377,7 @@ briefRoutes.post('/', async (c) => {
 
   // Kick off generation in the background — the route returns immediately.
   // Errors are caught and persisted as `status='failed'` rather than crashing.
-  void generateBriefWithDeadline(brief).catch(async (err) => {
+  void generateBriefWithDeadline(brief, null, null, currentNflConversationContext).catch(async (err) => {
     console.error('[briefs] generate failed', brief.id, err);
     const errorMessage = briefGenerationErrorMessage(err);
     const progress = failedBriefProgress(err);
@@ -792,12 +808,30 @@ export async function regenerateBriefById(
   if (currentQuestionKind) {
     return regenerateCurrentNflBrief(existingBrief, currentQuestionKind);
   }
+  const priorContextRes = await db
+    .from('briefs')
+    .select('id, body, created_at, mode, question, session_id, status, template_id, thesis')
+    .eq('session_id', existingBrief.session_id)
+    .neq('id', existingBrief.id)
+    .lt('created_at', existingBrief.created_at)
+    .order('created_at', { ascending: false })
+    .limit(50);
+  const currentNflConversationContext = priorContextRes.error
+    ? null
+    : buildCurrentNflConversationContext(
+      existingBrief.question,
+      (priorContextRes.data ?? []) as BriefConversationRow[],
+    );
   const preservingTemplate = templateOverride === undefined;
-  const templateParse = preservingTemplate
+  const templateParse = preservingTemplate && !currentNflConversationContext
     ? { selection: templateSelectionFromBrief(existingBrief), errors: [] as string[] }
+    : preservingTemplate
+      ? { selection: { template_id: 'decision_brief' as const }, errors: [] as string[] }
     : parseBriefTemplateSelection(templateOverride, existingBrief.question);
   if (templateParse.errors.length > 0) return 'invalid_template';
-  const mode = preservingTemplate
+  const mode = currentNflConversationContext
+    ? 'data_analyst'
+    : preservingTemplate
     ? existingBrief.mode
     : (briefModeForTemplate(templateParse.selection) ?? 'brief');
 
@@ -832,7 +866,7 @@ export async function regenerateBriefById(
   if (reset.error || !reset.data) return null;
   const fresh = reset.data as Brief;
 
-  void generateBriefWithDeadline(fresh, inheritedMarketQuery).catch(async (err) => {
+  void generateBriefWithDeadline(fresh, inheritedMarketQuery, null, currentNflConversationContext).catch(async (err) => {
     console.error('[briefs] regenerate failed', fresh.id, err);
     const errorMessage = briefGenerationErrorMessage(err);
     const progress = failedBriefProgress(err);
@@ -921,8 +955,17 @@ export async function generateBriefForMode(
   inheritedMarketQuery: NflTransactionMarketAnalysis['query'] | null = null,
   preparedMarketLookup: DataAnalysisLookup | null = null,
   generation: BriefGenerationGuard = ALWAYS_ACTIVE_GENERATION,
+  currentNflConversationContext: CurrentNflConversationContext | null = null,
 ) {
-  if (brief.mode === 'data_analyst') return generateDataAnalysisBrief(brief, inheritedMarketQuery, preparedMarketLookup, generation);
+  if (brief.mode === 'data_analyst') {
+    return generateDataAnalysisBrief(
+      brief,
+      inheritedMarketQuery,
+      preparedMarketLookup,
+      generation,
+      currentNflConversationContext,
+    );
+  }
   return generateBrief(brief, generation);
 }
 
@@ -930,13 +973,20 @@ async function generateBriefWithDeadline(
   brief: Brief,
   inheritedMarketQuery: NflTransactionMarketAnalysis['query'] | null = null,
   preparedMarketLookup: DataAnalysisLookup | null = null,
+  currentNflConversationContext: CurrentNflConversationContext | null = null,
 ): Promise<void> {
   let timer: NodeJS.Timeout | null = null;
   const generation = beginBriefGeneration(brief.id);
-  const deadlineMs = briefGenerationDeadlineMs(brief);
+  const deadlineMs = briefGenerationDeadlineMs(brief, currentNflConversationContext);
   try {
     await Promise.race([
-      generateBriefForMode(brief, inheritedMarketQuery, preparedMarketLookup, generation),
+      generateBriefForMode(
+        brief,
+        inheritedMarketQuery,
+        preparedMarketLookup,
+        generation,
+        currentNflConversationContext,
+      ),
       new Promise<never>((_, reject) => {
         timer = setTimeout(
           () => {
@@ -953,8 +1003,12 @@ async function generateBriefWithDeadline(
   }
 }
 
-export function briefGenerationDeadlineMs(brief: Pick<Brief, 'question'>): number {
-  return currentNflEvidenceTeamIds(brief.question).length > 0
+export function briefGenerationDeadlineMs(
+  brief: Pick<Brief, 'question'>,
+  currentNflConversationContext: CurrentNflConversationContext | null = null,
+): number {
+  const reasoningQuestion = currentNflConversationContext?.reasoning_question ?? brief.question;
+  return currentNflEvidenceTeamIds(reasoningQuestion).length > 0
     ? NFL_BRIEF_GENERATION_DEADLINE_MS
     : BRIEF_GENERATION_DEADLINE_MS;
 }
@@ -1404,6 +1458,7 @@ async function generateCurrentNflReasonedAnswer(args: {
   brief: Brief;
   currentNflEvidence: CurrentNflEvidencePack;
   composedNflContext: ComposedNflContext;
+  modelPrompt?: string;
   heartbeat: BriefGenerationHeartbeat;
   generation: BriefGenerationGuard;
   progress: ReturnType<typeof createBriefProgressTracker>;
@@ -1425,7 +1480,7 @@ async function generateCurrentNflReasonedAnswer(args: {
       system: buildCurrentNflReasoningSystem(args.currentNflEvidence, args.composedNflContext),
       tools: [submitDataAnalysisTool],
       tool_choice: { type: 'tool', name: 'submit_data_analysis', disable_parallel_tool_use: true },
-      messages: [{ role: 'user', content: args.brief.question }],
+      messages: [{ role: 'user', content: args.modelPrompt ?? args.brief.question }],
     }, {
       timeout: CURRENT_NFL_PRIMARY_REQUEST_TIMEOUT_MS,
       maxRetries: 0,
@@ -1447,7 +1502,7 @@ async function generateCurrentNflReasonedAnswer(args: {
     const retryTimeoutMs = currentNflRepairTimeoutMs(args.startedAt);
     const retryInput = retryTimeoutMs > 0
       ? await repairCurrentNflAnalysisMarkup({
-        question: args.brief.question,
+        question: args.modelPrompt ?? args.brief.question,
         currentNflEvidence: args.currentNflEvidence,
         composedNflContext: args.composedNflContext,
         timeoutMs: retryTimeoutMs,
@@ -1475,7 +1530,7 @@ async function generateCurrentNflReasonedAnswer(args: {
     const repairTimeoutMs = currentNflRepairTimeoutMs(args.startedAt);
     const repairedInput = repairTimeoutMs > 0
       ? await repairCurrentNflAnalysisMarkup({
-        question: args.brief.question,
+        question: args.modelPrompt ?? args.brief.question,
         currentNflEvidence: args.currentNflEvidence,
         composedNflContext: args.composedNflContext,
         timeoutMs: repairTimeoutMs,
@@ -1513,7 +1568,7 @@ async function generateCurrentNflReasonedAnswer(args: {
     const repairTimeoutMs = currentNflRepairTimeoutMs(args.startedAt);
     const repairedInput = repairTimeoutMs > 0
       ? await repairCurrentNflAnalysisMarkup({
-        question: args.brief.question,
+        question: args.modelPrompt ?? args.brief.question,
         currentNflEvidence: args.currentNflEvidence,
         composedNflContext: args.composedNflContext,
         timeoutMs: repairTimeoutMs,
@@ -1626,6 +1681,7 @@ export function buildCurrentNflReasoningSystem(
         'Use direct football language throughout. Avoid internal product jargon such as seller thesis, seller cards, seller signal, lane, screen, call-now, check-call, directional, source-needed, evidence boundary, preflight, model, runtime, artifact, deterministic, posture, gating issue, lever, salary-out, pick-led, construction, contract fit, current file, reject-unless, or contend-mode. Never mention an internal confidence label, row, gate, grade, or workflow. Use football terms, not baseball metaphors such as premium bat.',
         'Use only figures and source references present below. Preserve material freshness, coverage, and uncertainty caveats.',
         'Keep the lead answer under 75 words. Return exactly 3 key findings; keep each label under 7 words and each body under 45 words. Return no tables or calculations for this answer. Include at most 2 caveats and 3 short follow-up questions.',
+        'Every follow-up must be an executable question the user can ask you next. Do not ask the user to supply a missing fact or medical certainty; when an unknown changes the recommendation, offer a scenario comparison such as “Compare the target list for a multi-week absence versus a season-threatening absence.”',
         'Return exactly one complete submit_data_analysis call. Server-provided source cards are already reserved, so return sources: [].',
       ].join('\n'),
     },
@@ -2075,6 +2131,9 @@ export async function composeNflArtifactInterpretation(
           : sellerResult
             ? 'The proposed return does not have enough comparison data for an above, within, or below classification; say that plainly.'
             : '',
+        sellerResult
+          ? `If you mention current-year cap figures, bind each amount to its label in a separate clause. Use this wording: “creates ${formatSellerMoveDollars(sellerResult.cap.current_year_cap_space_created_dollars)} of ${sellerResult.cap.current_year} cap space; leaves ${formatSellerMoveDollars(sellerResult.cap.current_year_dead_money_dollars)} in ${sellerResult.cap.current_year} dead money.” You may omit those figures, but never swap or leave their labels implicit.`
+          : '',
         'Use only facts, transactions, periods, and figures present in the supplied data. Never imply causation from statistical influence.',
         tradeOnly
           ? 'This query is trades-only. Describe transaction share as the position’s share of league trades, never as a share of all material moves.'
@@ -2257,15 +2316,20 @@ export async function generateDataAnalysisBrief(
   inheritedMarketQuery: NflTransactionMarketAnalysis['query'] | null = null,
   preparedMarketLookup: DataAnalysisLookup | null = null,
   generation: BriefGenerationGuard = ALWAYS_ACTIVE_GENERATION,
+  currentNflConversationContext: CurrentNflConversationContext | null = null,
 ) {
   const startedAt = Date.now();
   const heartbeat = startBriefGenerationHeartbeat(brief);
   const progress = createBriefProgressTracker(brief, heartbeat);
   const templateSelection = templateSelectionForBrief(brief);
+  const reasoningQuestion = currentNflConversationContext?.reasoning_question ?? brief.question;
   try {
-    const currentNflTeamIds = currentNflEvidenceTeamIds(brief.question, defaultBriefTeamId());
+    const currentNflTeamIds = currentNflEvidenceTeamIds(reasoningQuestion, defaultBriefTeamId());
     if (
       currentNflTeamIds.length > 0
+      // Classify the actual turn, not the concatenated conversation. Separate
+      // phrases such as "trade targets" in the prior question and "changes"
+      // in the follow-up must not combine into a false historical-market ask.
       && !isNflTransactionMarketQuestion(brief.question)
       && !inheritedMarketQuery
       && !requestsStructuredCurrentNflAnswer(brief.question)
@@ -2277,18 +2341,19 @@ export async function generateDataAnalysisBrief(
         `Loading roster, contract, performance, and team information for ${currentNflTeamIds.join(', ')}.`,
         'data',
       );
-      const currentNflEvidence = await buildCurrentNflEvidence(brief.question, {
+      const currentNflEvidence = await buildCurrentNflEvidence(reasoningQuestion, {
         teamIds: currentNflTeamIds,
-        scope: currentNflEvidenceScopeForQuestion(brief.question) ?? 'transaction_full',
+        scope: currentNflEvidenceScopeForQuestion(reasoningQuestion) ?? 'transaction_full',
       });
       const composedNflContext = currentNflEvidence
-        ? buildNflContextComposerForEvidence(brief.question, currentNflEvidence)
+        ? buildNflContextComposerForEvidence(reasoningQuestion, currentNflEvidence)
         : null;
       if (currentNflEvidence && composedNflContext) {
         await generateCurrentNflReasonedAnswer({
           brief,
           currentNflEvidence,
           composedNflContext,
+          modelPrompt: currentNflConversationContext?.model_prompt,
           heartbeat,
           generation,
           progress,
@@ -3048,6 +3113,117 @@ export function currentNbaEvidenceTeamIds(question: string, defaultTeamId: strin
 
 export function currentNflEvidenceTeamIds(question: string, defaultTeamId = defaultBriefTeamId()): string[] {
   return resolveCurrentNflEvidenceTeamIds(question, defaultTeamId);
+}
+
+const CURRENT_NFL_CONTINUATION_CUE_RE = /\b(?:that|this|these|those|it|they|them|he|him|his|concern|absence|injur(?:y|ies)|target(?:s)?|option(?:s)?|rental|multi[-\s]?year|pick\s+(?:budget|ceiling)|internal\s+(?:replacement|option))\b/i;
+const CURRENT_NFL_DEICTIC_CUE_RE = /\b(?:that|this|these|those|it|they|them|he|him|his)\b/i;
+const CURRENT_NFL_CONTINUATION_STOP_WORDS = new Set([
+  'about', 'after', 'again', 'against', 'also', 'another', 'because', 'before', 'between',
+  'could', 'does', 'from', 'have', 'into', 'multi', 'question', 'season', 'should', 'their',
+  'there', 'these', 'those', 'through', 'versus', 'what', 'when', 'where', 'which', 'with', 'would',
+]);
+
+/**
+ * Recover only a nearby, completed current-NFL analysis when the new question
+ * reads like a continuation. This keeps a short clicked follow-up from losing
+ * its team/player/decision scope without allowing arbitrary session history to
+ * silently change an unrelated question.
+ */
+export function buildCurrentNflConversationContext(
+  question: string,
+  priorBriefs: BriefConversationRow[],
+): CurrentNflConversationContext | null {
+  const resolvedTurns = resolveCurrentNflConversationTurns(priorBriefs);
+  for (const resolved of [...resolvedTurns].reverse()) {
+    const resolvedBody = resolved.row.body;
+    if (!resolvedBody || resolvedBody.kind !== 'data_analysis') continue;
+    if (!canInheritCurrentNflConversation(question, resolved.row, resolved.scope_question)) continue;
+    const priorAnswer = resolvedBody.answer.trim();
+    const boundedPriorAnswer = priorAnswer.slice(0, 4_000);
+    const reasoningQuestion = [
+      `Prior conversation questions: ${resolved.scope_question}`,
+      `Current follow-up: ${question}`,
+    ].join('\n');
+    return {
+      prior_question: resolved.row.question,
+      prior_answer: boundedPriorAnswer,
+      reasoning_question: reasoningQuestion,
+      model_prompt: [
+        'Continue the same NFL front-office analysis and answer the current follow-up directly.',
+        `Prior conversation questions and constraints:\n${resolved.scope_question}`,
+        'Previous answer (conversation context only; it is not evidence and every factual claim must be re-grounded in the supplied current evidence):',
+        boundedPriorAnswer,
+        `Current follow-up: ${question}`,
+      ].join('\n\n'),
+    };
+  }
+  return null;
+}
+
+type ResolvedCurrentNflConversationTurn = {
+  row: BriefConversationRow;
+  scope_question: string;
+};
+
+function resolveCurrentNflConversationTurns(
+  priorBriefs: BriefConversationRow[],
+): ResolvedCurrentNflConversationTurn[] {
+  const resolved: ResolvedCurrentNflConversationTurn[] = [];
+  const chronological = [...priorBriefs].sort((left, right) => (
+    new Date(left.created_at).getTime() - new Date(right.created_at).getTime()
+  ));
+  for (const row of chronological) {
+    if (row.status !== 'ready' || row.mode !== 'data_analyst') continue;
+    if (!row.body || row.body.kind !== 'data_analysis' || !row.body.answer.trim()) continue;
+    const parent = [...resolved].reverse().find((candidate) => (
+      canInheritCurrentNflConversation(row.question, candidate.row, candidate.scope_question)
+    ));
+    if (parent) {
+      resolved.push({
+        row,
+        scope_question: `${parent.scope_question}\nFollow-up constraint: ${row.question}`,
+      });
+    } else if (currentNflEvidenceTeamIds(row.question).length > 0) {
+      resolved.push({ row, scope_question: row.question });
+    }
+  }
+  return resolved;
+}
+
+function canInheritCurrentNflConversation(
+  question: string,
+  prior: BriefConversationRow,
+  priorScopeQuestion: string,
+): boolean {
+  if (!CURRENT_NFL_CONTINUATION_CUE_RE.test(question)) return false;
+  if (!prior.body || prior.body.kind !== 'data_analysis') return false;
+  const explicitCurrentTeams = currentNflEvidenceTeamIds(question, null);
+  const priorTeams = currentNflEvidenceTeamIds(priorScopeQuestion, null);
+  if (explicitCurrentTeams.some((teamId) => !priorTeams.includes(teamId))) return false;
+
+  const deicticContinuation = CURRENT_NFL_DEICTIC_CUE_RE.test(question);
+  const domainContinuation = /\b(?:pick\s+(?:budget|ceiling)|internal\s+(?:replacement|option)|rental|multi[-\s]?year)\b/i.test(question);
+  if (currentNflEvidenceTeamIds(question).length > 0 && !deicticContinuation && !domainContinuation) {
+    return false;
+  }
+
+  const questionTokens = currentNflContinuationTokens(question);
+  const priorTokens = currentNflContinuationTokens(`${priorScopeQuestion}\n${prior.question}\n${prior.body.answer}`);
+  const sharesContext = [...questionTokens].some((token) => priorTokens.has(token));
+  const shortDeicticContinuation = deicticContinuation
+    && question.trim().split(/\s+/).length <= 14;
+  return sharesContext || shortDeicticContinuation || domainContinuation;
+}
+
+function currentNflContinuationTokens(value: string): Set<string> {
+  const tokens = value.toLowerCase().match(/[a-z][a-z'-]{3,}/g) ?? [];
+  return new Set(tokens
+    .map((token) => token
+      .replace(/['’]s$/u, '')
+      .replace(/ies$/u, 'y')
+      .replace(/(?:ing|ed)$/u, '')
+      .replace(/s$/u, ''))
+    .filter((token) => token.length >= 4 && !CURRENT_NFL_CONTINUATION_STOP_WORDS.has(token)));
 }
 
 async function loadCbaArticlesForAnalysis(): Promise<CbaArticle[]> {

@@ -386,6 +386,13 @@ function validateInterpretationDirections(
       const claimed = claimedDirection(clause);
       if (!claimed) continue;
       const signal = signalForClaim(clause, trend);
+      if (signal == null && !new RegExp(`\\b(?:${trend.position_group}|overall|market)\\b`, 'i').test(clause)) {
+        // A sentence can introduce EDGE and then contrast an unlabeled item
+        // such as "what teams pay" in a later clause. Do not attach that
+        // clause's direction to the overall market unless the clause itself
+        // actually makes an overall/position-market claim.
+        continue;
+      }
       const expected = typeof signal === 'object' && signal != null ? signal.direction : trend.direction;
       const status = typeof signal === 'object' && signal != null ? signal.status : trend.status;
       if (status === 'insufficient_evidence') {
@@ -510,22 +517,42 @@ function nearestMoneyField(
     field: 'cap_space' | 'dead_money' | 'scheduled_cap' | 'cap_effect';
     regex: RegExp;
   }> = [
-    { field: 'cap_space', regex: /\b(?:cap space|space created|cap savings|cap relief)\b/gi },
+    {
+      field: 'cap_space',
+      regex: /\b(?:(?:cap )?(?:space|room|savings|relief)|space created)\b/gi,
+    },
     { field: 'dead_money', regex: /\b(?:dead money|dead cap|accelerat(?:ed|ing|ion)|dead)\b/gi },
     { field: 'scheduled_cap', regex: /\b(?:scheduled cap|cap number|cap hit)\b/gi },
     { field: 'cap_effect', regex: /\b(?:next[- ]year cap effect|cap effect)\b/gi },
   ];
-  const afterClaim = value.slice(claimIndex);
-  const afterCandidates = patterns.flatMap(({ field, regex }) => (
-    [...afterClaim.matchAll(regex)].map((match) => ({ field, distance: match.index ?? 0 }))
-  ));
-  if (afterCandidates.length > 0) {
-    return afterCandidates.sort((left, right) => left.distance - right.distance)[0].field;
-  }
+  const clause = moneyClaimClause(value, claimIndex);
   const candidates = patterns.flatMap(({ field, regex }) => (
-    [...value.matchAll(regex)].map((match) => ({ field, distance: Math.abs((match.index ?? 0) - claimIndex) }))
+    [...value.matchAll(regex)].map((match) => ({
+      field,
+      index: match.index ?? 0,
+      distance: Math.abs((match.index ?? 0) - claimIndex),
+    }))
   ));
-  return candidates.sort((left, right) => left.distance - right.distance)[0]?.field ?? null;
+  const sameClause = candidates.filter((candidate) => (
+    candidate.index >= clause.start && candidate.index < clause.end
+  ));
+  return (sameClause.length ? sameClause : candidates)
+    .sort((left, right) => left.distance - right.distance)[0]?.field ?? null;
+}
+
+function moneyClaimClause(value: string, claimIndex: number): { start: number; end: number } {
+  let start = 0;
+  let end = value.length;
+  for (const match of value.matchAll(/;|(?<!\d)\.|\.(?!\d)|,\s+|\b(?:and|while|but|whereas|yet|against|versus|compared\s+(?:with|to))\b/gi)) {
+    const boundaryIndex = match.index ?? 0;
+    if (boundaryIndex < claimIndex) {
+      start = boundaryIndex + match[0].length;
+      continue;
+    }
+    end = boundaryIndex;
+    break;
+  }
+  return { start, end };
 }
 
 function moneyClaimMatches(claim: MoneyClaim, expectedDollars: number): boolean {
@@ -642,9 +669,16 @@ function validatePositionSignalNumbers(
       if (/\b(?:event count|events? (?:analyzed|observed)|cohort (?:of )?\d+ events?)\b/i.test(clause)) {
         allowed.add(normalizeNumber(String(trend.event_count)));
       }
-      for (const token of numericTokens(clause)) {
+      for (const match of numericTokenMatches(clause)) {
+        const token = match.value;
         const value = Number(token);
         if ((value >= 1900 && value <= 2100) || ['5', '10', '20', '85', '95', '100'].includes(normalizeNumber(token))) continue;
+        // Draft-round and draft-day labels are categorical proposal/market
+        // descriptors, not measurements of the position signal. Seller-side
+        // proposal values are validated separately by
+        // validateSellerProposalClaims, so do not misclassify "Round 2" or
+        // "one round stronger" as unsupported EDGE-rate figures here.
+        if (isDraftRoundOrDayToken(clause, match.index, match.raw.length)) continue;
         if (!allowed.has(normalizeNumber(token))) {
           issues.push(`Numeric token ${token} is not attached to the claimed ${trend.position_group} signal in the deterministic artifact.`);
         }
@@ -732,6 +766,23 @@ function proseSentences(text: string): string[] {
 
 function interpretationClauses(sentence: string): string[] {
   return sentence.split(/;|\b(?:but|while|whereas|yet|without)\b|,\s+(?=and\s)/i);
+}
+
+function numericTokenMatches(text: string): Array<{ raw: string; value: string; index: number }> {
+  return [...text.matchAll(/(?<![A-Za-z0-9_.])(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?(?![A-Za-z0-9_.])/g)]
+    .map((match) => ({
+      raw: match[0],
+      value: match[0].replaceAll(',', ''),
+      index: match.index ?? 0,
+    }));
+}
+
+function isDraftRoundOrDayToken(text: string, index: number, length: number): boolean {
+  const before = text.slice(Math.max(0, index - 28), index);
+  const after = text.slice(index + length, index + length + 20);
+  const roundOrDayBefore = /\b(?:rounds?|day)[-\s]*(?:(?:[1-7](?:st|nd|rd|th)?|one|two|three|four|five|six|seven)[-\s]*(?:to|through|[-–—])?[-\s]*)?$/i;
+  const roundOrDayAfter = /^\s*(?:st|nd|rd|th)?\s*(?:draft[-\s]+)?(?:rounds?|day)\b/i;
+  return roundOrDayBefore.test(before) || roundOrDayAfter.test(after);
 }
 
 function sameSet(left: Set<string>, right: Set<string>): boolean {
