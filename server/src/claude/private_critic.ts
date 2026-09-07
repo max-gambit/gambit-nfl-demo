@@ -1,7 +1,8 @@
 import type Anthropic from '@anthropic-ai/sdk';
-import type { SubmitBriefInput, SubmitDataAnalysisInput } from '@shared/types';
+import type { NflCapRosterDecisionResponse, NflTransactionMarketAnalysis, SubmitBriefInput, SubmitDataAnalysisInput } from '@shared/types';
 import { BRIEF_MODEL, createClaudeMessage } from './client.js';
 import type { ComposedNflContext } from './nfl_context_composer.js';
+import { evaluateNflTransactionMarketDraft } from './nfl_transaction_market_guardrails.js';
 
 export type NflPrivateCriticVerdict = 'accept' | 'revise';
 export type NflPrivateCriticIssueCategory =
@@ -18,7 +19,9 @@ export type NflPrivateCriticIssueCategory =
   | 'missing_trade_price'
   | 'unsupported_role_fit'
   | 'unsupported_benchmark_claim'
-  | 'confidence_mismatch';
+  | 'confidence_mismatch'
+  | 'missing_rule_citation'
+  | 'transaction_artifact_mismatch';
 
 export interface NflPrivateCriticIssue {
   category: NflPrivateCriticIssueCategory;
@@ -40,7 +43,17 @@ export interface RunNflPrivateCriticArgs {
   composedContext: ComposedNflContext | null;
   draftKind: 'brief' | 'data_analysis';
   draft: SubmitBriefInput | SubmitDataAnalysisInput;
+  transactionMarketAnalysis?: NflTransactionMarketAnalysis | null;
   createMessage?: typeof createClaudeMessage;
+}
+
+export interface NflCapRosterNarrativeDraft {
+  summary: string;
+  rationale: string;
+  risks: string[];
+  next_actions: string[];
+  player_ids: string[];
+  rule_ids: string[];
 }
 
 const privateCriticTool: Anthropic.Tool = {
@@ -73,6 +86,8 @@ const privateCriticTool: Anthropic.Tool = {
                 'unsupported_role_fit',
                 'unsupported_benchmark_claim',
                 'confidence_mismatch',
+                'missing_rule_citation',
+                'transaction_artifact_mismatch',
               ],
             },
             severity: { type: 'string', enum: ['high', 'medium', 'low'] },
@@ -99,7 +114,7 @@ const privateCriticTool: Anthropic.Tool = {
 };
 
 export async function runNflPrivateCritic(args: RunNflPrivateCriticArgs): Promise<NflPrivateCriticResult> {
-  if (!args.composedContext) return acceptCritique();
+  if (!args.composedContext && !args.transactionMarketAnalysis) return acceptCritique();
   const deterministic = evaluateNflDraftForPrivateCritic(args);
   const callModel = args.createMessage ?? createClaudeMessage;
 
@@ -116,7 +131,7 @@ export async function runNflPrivateCritic(args: RunNflPrivateCriticArgs): Promis
             'Accept compact, natural, judgment-led prose when it is supported. Revise only when the issue would make a Giants/front-office demo answer less credible.',
             'Never add public sources. Never expose this critique to the user. Return exactly one submit_private_critique tool call.',
             '',
-            args.composedContext.system_block,
+            args.composedContext?.system_block ?? 'No roster/cap composer context applies to this transaction-market artifact.',
           ].join('\n'),
         },
       ],
@@ -144,10 +159,10 @@ export async function runNflPrivateCritic(args: RunNflPrivateCriticArgs): Promis
 }
 
 export function evaluateNflDraftForPrivateCritic(args: RunNflPrivateCriticArgs): NflPrivateCriticResult {
-  if (!args.composedContext) return acceptCritique();
+  if (!args.composedContext && !args.transactionMarketAnalysis) return acceptCritique();
   const draftText = draftToText(args.draft);
   const question = args.question;
-  const contextText = [
+  const contextText = args.composedContext ? [
     args.composedContext.must_use_facts.join('\n'),
     args.composedContext.decision_primitives.map((primitive) => [
       primitive.key,
@@ -157,8 +172,23 @@ export function evaluateNflDraftForPrivateCritic(args: RunNflPrivateCriticArgs):
     ].join('\n')).join('\n'),
     args.composedContext.coverage_boundaries.join('\n'),
     args.composedContext.do_not_claim.join('\n'),
-  ].join('\n');
+  ].join('\n') : '';
   const issues: NflPrivateCriticIssue[] = [];
+
+  if (args.transactionMarketAnalysis && 'answer' in args.draft) {
+    const marketGuardrail = evaluateNflTransactionMarketDraft(args.draft, args.transactionMarketAnalysis);
+    for (const issue of marketGuardrail.issues) {
+      issues.push({
+        category: 'transaction_artifact_mismatch',
+        severity: 'high',
+        claim: issue,
+        evidence_boundary: 'Historical market prose must be a faithful explanation of the attached deterministic artifact.',
+        fix: 'Remove or correct the unsupported claim using only the artifact periods, filters, numbers, comparables, source references, methodology, and limitations.',
+      });
+    }
+  }
+
+  if (!args.composedContext) return critiqueFromIssues(issues);
 
   if (/Vita Vea/i.test(draftText)
     && /(highest[-\s]?confidence|lead lane|lead path|cleanest route|best lane)/i.test(draftText)
@@ -200,7 +230,7 @@ export function evaluateNflDraftForPrivateCritic(args: RunNflPrivateCriticArgs):
       severity: 'medium',
       claim: 'The draft leads with product/schema language.',
       evidence_boundary: 'Visible prose should translate data quality into front-office language.',
-      fix: 'Use high confidence, directional, priced in the current cap file, or needs source review only where it changes the recommendation.',
+      fix: 'Rewrite in plain football language. State the practical fact, uncertainty, or next action without exposing internal labels or workflow terms.',
     });
   }
 
@@ -249,6 +279,47 @@ export function evaluateNflDraftForPrivateCritic(args: RunNflPrivateCriticArgs):
       claim: 'The draft recommends a trade lane without a price boundary.',
       evidence_boundary: 'Trade price discipline requires at least a range, pick band, or validation target before treating a call as executable.',
       fix: 'Add a non-final price boundary such as conditional/day-three, seller-signal watch, or explicit ask-to-validate language.',
+    });
+  }
+
+  const userRequestsTradePrice = /\b(?:day[-\s]?[123]|first[-\s]?round|second[-\s]?round|third[-\s]?round|fourth[-\s]?round|fifth[-\s]?round|sixth[-\s]?round|seventh[-\s]?round|round\s*[1-7]|r[1-7]|draft[-\s]?(?:pick|capital)|compensation|asking price|trade price)\b/i.test(question);
+  const draftAcknowledgesUnknownPrice = /\b(?:asking price|trade price|compensation|return|day[-\s]?3 (?:price|pick|capital))\b.{0,120}\b(?:unknown|unconfirmed|not (?:known|established|supported)|must be confirmed|needs? confirmation|confirm(?:ed|ation)?)\b|\b(?:unknown|unconfirmed|not (?:known|established|supported)|must be confirmed|needs? confirmation)\b.{0,120}\b(?:asking price|trade price|compensation|return|day[-\s]?3 (?:price|pick|capital))\b/is.test(draftText)
+    || (/\b(?:opening|starting) (?:offer|range)\b/i.test(draftText)
+      && /\b(?:availability|seller|team)\b.{0,100}\b(?:unconfirmed|not confirmed|must be confirmed|needs? confirmation)\b|\b(?:unconfirmed|not confirmed)\b.{0,100}\bsellers?\b/is.test(draftText))
+    || /\b(?:historical|market)\b.{0,140}\b(?:range|sample|returns?)\b.{0,80}\b(?:is not|isn't|does not establish|cannot establish|does not show|cannot show)\b.{0,80}\b(?:current )?(?:asking price|ask|willingness)\b/is.test(draftText);
+  const hasHistoricalTradePriceEvidence = /\bTrade sample:\s*\d+ trades\b|\bObserved returns:\s*.+\bTrade compensation uses\b/is.test(contextText);
+  const historicalPriceEvidenceIsInsufficient = /\b(?:Historical price comparison|Price conclusion):\s*Too few\b/i.test(contextText);
+  const draftUsesHistoricalPriceFrame = /\b(?:historical(?:ly)?|prior trades?|observed returns?|trade sample|comparables?|market range|full[-\s]?period|since\s+20\d{2})\b|\b20\d{2}[–-]20\d{2}\b/i.test(draftText);
+  const draftMakesPriceJudgment = /\b(?:day[-\s]?[123]|(?:first|second|third|fourth|fifth|sixth|seventh)[-\s]?round|round\s*[1-7]|r[1-7])\b.{0,80}\b(?:is enough|would be enough|gets|lands|fits|matches|falls within|is above|is below|market|range|price|ask|return|cost)\b|\b(?:not realistic|realistic|obtainable|available|price|ask|return|cost|market|range)\b.{0,80}\b(?:day[-\s]?[123]|(?:first|second|third|fourth|fifth|sixth|seventh)[-\s]?round|round\s*[1-7]|r[1-7])\b/is.test(draftText);
+  const draftClaimsCurrentSellerPrice = draftText
+    .split(/(?<=[.!?])\s+|\n+/)
+    .some((sentence) => {
+      const sellerAcceptanceClaim = /\b(?:would|could|can)\s+(?:accept|take|move|trade|deal).{0,100}\b(?:day[-\s]?[123]|(?:first|second|third|fourth|fifth|sixth|seventh)[-\s]?round|round\s*[1-7]|r[1-7])\b/is.test(sentence);
+      const statedAsk = /\b(?:asking price|trade price|price|ask)\s+(?:is|equals?|will be|would be)\s+(?:a )?(?:day[-\s]?[123]|(?:first|second|third|fourth|fifth|sixth|seventh)[-\s]?round|round\s*[1-7]|r[1-7])\b|\b(?:team|club|front office|[A-Z][a-z]+)\b.{0,50}\b(?:wants?|demands?|is asking for)\b.{0,50}\b(?:day[-\s]?[123]|(?:first|second|third|fourth|fifth|sixth|seventh)[-\s]?round|round\s*[1-7]|r[1-7])\b/s.test(sentence);
+      const negatedOrQualified = /\b(?:does not|do not|cannot|can't|unknown|unconfirmed|not (?:known|established|supported)|no (?:public )?(?:evidence|source)|must be confirmed|needs? confirmation)\b/i.test(sentence);
+      return (sellerAcceptanceClaim || statedAsk) && !negatedOrQualified;
+    });
+  const historicalSampleContainsPremiumReturns = /\bFull-period pick bands:\s*Round 1:\s*(?:[1-9]\d*)\b|\bFull-period pick bands:[^\n]*Rounds 2–3:\s*(?:[1-9]\d*)\b/i.test(contextText);
+  const draftErasesFullPeriodPremiumReturns = /\b(?:every|all)\b.{0,160}\b(?:2016[–-]2025|ten[-\s]?year|full[-\s]?decade)\b.{0,180}\b(?:rounds? 4[–-]7|day[-\s]?3)\b|\b(?:2016[–-]2025|ten[-\s]?year|full[-\s]?decade)\b.{0,160}\b(?:every|all)\b.{0,120}\b(?:rounds? 4[–-]7|day[-\s]?3)\b/is.test(draftText);
+  if (userRequestsTradePrice
+    && hasPrimitive(args.composedContext, 'trade_price_discipline')
+    && (
+      draftClaimsCurrentSellerPrice
+      || (historicalSampleContainsPremiumReturns && draftErasesFullPeriodPremiumReturns)
+      || (!hasHistoricalTradePriceEvidence && !draftAcknowledgesUnknownPrice)
+      || (historicalPriceEvidenceIsInsufficient && (draftMakesPriceJudgment || !draftAcknowledgesUnknownPrice))
+      || (draftMakesPriceJudgment && !draftUsesHistoricalPriceFrame)
+    )) {
+    issues.push({
+      category: 'missing_trade_price',
+      severity: 'high',
+      claim: 'The draft does not cleanly separate the historical trade range from a current seller\'s unconfirmed price.',
+      evidence_boundary: hasHistoricalTradePriceEvidence
+        ? 'The attached trade history supports a market-based comparison, but it does not reveal a current team\'s asking price or willingness to trade.'
+        : 'No same-position historical trade sample or current asking price is attached.',
+      fix: hasHistoricalTradePriceEvidence
+        ? 'Make the football judgment from the historical same-position trades, name the closest comparables, label player-specific pricing as an inference, and state that the current ask and availability still need confirmation.'
+        : 'Do not classify the proposed pick as enough or too little; state that compensation and availability need confirmation.',
     });
   }
 
@@ -314,6 +385,154 @@ export function evaluateNflDraftForPrivateCritic(args: RunNflPrivateCriticArgs):
   }
 
   return critiqueFromIssues(issues);
+}
+
+export function evaluateNflCapRosterNarrative(
+  decision: NflCapRosterDecisionResponse,
+  draft: NflCapRosterNarrativeDraft,
+): NflPrivateCriticResult {
+  const branch = decision.branches.find((candidate) => candidate.id === decision.recommended_branch_id)
+    ?? decision.branches.find((candidate) => candidate.id === 'maximize_relief')
+    ?? null;
+  const text = [draft.summary, draft.rationale, ...draft.risks, ...draft.next_actions].join('\n');
+  const issues: NflPrivateCriticIssue[] = [];
+  const branchPlayerIds = new Set(branch?.actions.map((action) => action.player_id) ?? []);
+  const branchRuleIds = new Set(branch?.actions.flatMap((action) => action.rule_references.map((rule) => rule.rule_id)) ?? []);
+  const unsupportedPlayerIds = draft.player_ids.filter((playerId) => !branchPlayerIds.has(playerId));
+  const declaredPlayerIds = new Set(draft.player_ids);
+  const namedPlayers = new Map(
+    decision.branches.flatMap((candidate) => candidate.actions).map((action) => [action.player_name, action.player_id]),
+  );
+  const undeclaredPlayerNames = [...namedPlayers]
+    .filter(([name, playerId]) => containsPhrase(text, name) && !declaredPlayerIds.has(playerId))
+    .map(([name]) => name);
+
+  if ((branch?.actions.length ?? 0) > 0 && draft.player_ids.length === 0) {
+    issues.push({
+      category: 'unsupported_player_quality',
+      severity: 'high',
+      claim: 'The explanation omits the player-row links behind the selected actions.',
+      evidence_boundary: 'Every material branch explanation must expose at least one supporting player row.',
+      fix: 'Include the player IDs used by the validated branch so the UI can render their sourced rows.',
+    });
+  } else if (unsupportedPlayerIds.length) {
+    issues.push({
+      category: 'unsupported_player_quality',
+      severity: 'high',
+      claim: `The explanation references players outside the validated branch: ${unsupportedPlayerIds.join(', ')}.`,
+      evidence_boundary: 'Player references must be copied from the selected deterministic branch.',
+      fix: 'Remove player references that are not present in the validated branch payload.',
+    });
+  }
+  if (undeclaredPlayerNames.length) {
+    issues.push({
+      category: 'unsupported_player_quality',
+      severity: 'high',
+      claim: `The prose names players without linking their validated rows: ${undeclaredPlayerNames.join(', ')}.`,
+      evidence_boundary: 'Every named player in a material recommendation must be declared by ID and resolve to the selected branch.',
+      fix: 'Add the selected-branch player ID for each named player or remove the unsupported name.',
+    });
+  }
+
+  const allowedDollars = new Set<number>([
+    decision.baseline.total_cap_commitments_dollars,
+    ...(branch ? [branch.target_relief_dollars, branch.total_relief_dollars, branch.total_dead_money_dollars] : []),
+    ...(branch?.actions.flatMap((action) => [action.relief_dollars, action.dead_money_dollars, action.cap_number_dollars]) ?? []),
+  ]);
+  const unsupportedDollars = extractDollarAmounts(text).filter((value) => !allowedDollars.has(value));
+  const spelledDollarClaims = [...text.matchAll(/\b(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred)(?:[-\s]+(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred))*\s+(?:million|thousand)\s+(?:dollars?|in\s+(?:relief|savings|dead\s+money))\b/gi)].map((match) => match[0]);
+  if (unsupportedDollars.length || spelledDollarClaims.length) {
+    issues.push({
+      category: 'cap_math_mismatch',
+      severity: 'high',
+      claim: `The explanation introduces unsupported or non-machine-verifiable dollar figures: ${[...new Set([...unsupportedDollars.map(String), ...spelledDollarClaims])].join(', ')}.`,
+      evidence_boundary: 'All dollar values must already exist in the validated deterministic branch payload.',
+      fix: 'Use only the exact target, branch totals, or per-player figures from the deterministic payload.',
+    });
+  }
+
+  const unsupportedRules = draft.rule_ids.filter((ruleId) => !branchRuleIds.has(ruleId));
+  const missingBranchRules = [...branchRuleIds].filter((ruleId) => !draft.rule_ids.includes(ruleId));
+  if ((branch?.actions.length ?? 0) > 0 && draft.rule_ids.length === 0) {
+    issues.push({
+      category: 'missing_rule_citation',
+      severity: 'high',
+      claim: 'The explanation omits rule citations for transaction actions.',
+      evidence_boundary: 'Every modeled transaction action carries an authoritative rule reference.',
+      fix: 'Include the rule IDs already attached to the validated branch actions.',
+    });
+  } else if (unsupportedRules.length) {
+    issues.push({
+      category: 'missing_rule_citation',
+      severity: 'high',
+      claim: `The explanation cites rules outside the validated branch: ${unsupportedRules.join(', ')}.`,
+      evidence_boundary: 'Rule citations must be copied from the deterministic branch payload.',
+      fix: 'Remove invented rule IDs and use only branch-attached rule references.',
+    });
+  }
+  if (missingBranchRules.length) {
+    issues.push({
+      category: 'missing_rule_citation',
+      severity: 'high',
+      claim: `The explanation omits selected-branch rule references: ${missingBranchRules.join(', ')}.`,
+      evidence_boundary: 'Every rule family used by the selected deterministic branch must remain attached to the explanation.',
+      fix: 'Include every rule ID carried by the selected branch.',
+    });
+  }
+
+  if (/\b(private|confidential|internal (?:medical|scouting|board)|medical grade|coach(?:ing)? trust|owner pressure)\b/i.test(text)) {
+    issues.push({
+      category: 'private_data_bluff',
+      severity: 'high',
+      claim: 'The explanation relies on private or team-only context.',
+      evidence_boundary: 'The analysis uses public demo data and has no private Giants inputs.',
+      fix: 'Remove the private claim and turn it into an explicit validation question.',
+    });
+  }
+
+  if (/\b(elite|poor player|replacement[- ]level|locker room|scheme fit|medical risk|low[- ]risk|declining|ascending)\b/i.test(text)) {
+    issues.push({
+      category: 'unsupported_player_quality',
+      severity: 'high',
+      claim: 'The explanation introduces a player-quality, fit, or medical judgment absent from the branch.',
+      evidence_boundary: 'The deterministic branch supports contract mechanics and a bounded depth-effect label only.',
+      fix: 'Limit the explanation to sourced economics, modeled depth effect, blockers, and confirmation actions.',
+    });
+  }
+
+  if (branch?.actions.some((action) => action.depth_effect !== 'none')
+    && /\b(no|zero|without any)\s+(?:modeled\s+)?depth (?:effect|impact|cost)\b/i.test(text)) {
+    issues.push({
+      category: 'row_count_depth_overclaim',
+      severity: 'high',
+      claim: 'The explanation erases a modeled depth effect present in the validated branch.',
+      evidence_boundary: 'Depth effects must be copied from the deterministic player actions.',
+      fix: 'State the branch depth tradeoff and preserve its validation boundary.',
+    });
+  }
+
+  return critiqueFromIssues(issues);
+}
+
+function extractDollarAmounts(text: string): number[] {
+  const values: number[] = [];
+  const add = (raw: string, unit = '') => {
+    const base = Number(raw.replace(/,/g, ''));
+    const normalized = unit.toLowerCase();
+    const multiplier = normalized === 'm' || normalized === 'million' ? 1_000_000 : normalized === 'k' || normalized === 'thousand' ? 1_000 : 1;
+    const value = base * multiplier;
+    if (Number.isSafeInteger(value)) values.push(value);
+  };
+  for (const match of text.matchAll(/\$\s*([0-9]+(?:,[0-9]{3})*(?:\.[0-9]+)?)\s*([mk])?/gi)) add(match[1], match[2]);
+  for (const match of text.matchAll(/\b([0-9]+(?:\.[0-9]+)?)\s*(million|thousand|m|k)\b/gi)) add(match[1], match[2]);
+  for (const match of text.matchAll(/\b([0-9]{1,3}(?:,[0-9]{3})+)\b/g)) add(match[1]);
+  for (const match of text.matchAll(/\b([0-9]{5,})\b/g)) add(match[1]);
+  return values;
+}
+
+function containsPhrase(text: string, phrase: string): boolean {
+  const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`\\b${escaped}\\b`, 'i').test(text);
 }
 
 export function buildNflPrivateCriticRevisionBlock(critique: NflPrivateCriticResult): string {
@@ -519,6 +738,7 @@ function criticCategory(value: unknown): NflPrivateCriticIssueCategory {
     case 'unsupported_role_fit':
     case 'unsupported_benchmark_claim':
     case 'confidence_mismatch':
+    case 'missing_rule_citation':
       return value;
     default:
       return 'missed_user_decision';

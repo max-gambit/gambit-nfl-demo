@@ -117,23 +117,42 @@ function tradePriceDiscipline(args: BuildNflDecisionPrimitivesArgs): NflDecision
   if (!args.intentTags.includes('trade')) return null;
   const tradeRows = rowsForDataset(args.rowsByRef, 'nfl_trade_screen_current');
   const intelRows = rowsForDataset(args.rowsByRef, 'nfl_context_graph');
+  const historicalTradeRows = rowsForDataset(args.rowsByRef, 'nfl_transaction_market_history');
+  const historicalPriceConclusion = historicalTradeRows
+    ? valueFor(historicalTradeRows, 'Price conclusion')
+    : null;
+  const historicalPriceSupportsRange = Boolean(
+    historicalPriceConclusion
+    && !/too few|cannot|not enough|insufficient/i.test(historicalPriceConclusion),
+  );
   return primitive(args, 'trade_price_discipline', {
     facts: compactRows([
       valueFact(tradeRows, 'Seller thesis cards'),
       valueFact(tradeRows, 'Counterparty seller summaries'),
       valueFact(tradeRows, 'Required answer checks'),
       valueFact(intelRows, 'Seller thesis summaries'),
+      valueFact(historicalTradeRows, 'Trade sample'),
+      valueFact(historicalTradeRows, 'Full-period pick bands'),
+      valueFact(historicalTradeRows, 'Premium-pick share'),
+      valueFact(historicalTradeRows, 'Price conclusion'),
+      valueFact(historicalTradeRows, 'Observed returns'),
+      valueFact(historicalTradeRows, 'What this supports'),
+      valueFact(historicalTradeRows, 'What it does not show'),
     ]),
     decision_checks: [
       'Any recommended call needs a price boundary, seller reason, seller objection, and availability validation trigger.',
-      'Default price posture: check-call rentals live in conditional/day-three territory unless role fit and seller thesis justify more.',
+      historicalPriceSupportsRange
+        ? 'Use the attached same-position historical trades to set a market-based opening range, then explain why the current player may be a stronger or weaker comparable.'
+        : historicalTradeRows
+          ? 'The same-position price sample is too small for a reliable range. Show the observed trades, but do not use them to price a current player.'
+          : 'Without a same-position historical sample, treat any pick range as a working negotiation hypothesis rather than a market conclusion.',
       'Monitor-only or posture-change targets should be described as watch lanes, not priced acquisitions.',
     ],
     boundaries: [
       'Cap fit is not availability.',
       'Do not imply an exact asking price, final trade value, medical clearance, or seller intent unless supplied by authoritative private data.',
     ],
-    source_refs: refsForDatasets(args, ['nfl_trade_screen_current', 'nfl_context_graph']),
+    source_refs: refsForDatasets(args, ['nfl_trade_screen_current', 'nfl_context_graph', 'nfl_transaction_market_history']),
   });
 }
 

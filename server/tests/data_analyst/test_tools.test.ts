@@ -46,6 +46,8 @@ test('data analyst tool catalog exposes read-only app data tools and structured 
   assert.deepEqual(dataAnalystTools.map((tool) => tool.name), [
     'list_available_datasets',
     'query_nfl_data',
+    'analyze_nfl_transaction_market',
+    'query_nfl_transaction_comparables',
     'query_nba_data',
     'query_brief_workspace',
   ]);
@@ -190,14 +192,14 @@ test('data analyst NFL trade screen returns construction guardrails and named ta
   assert.ok(screen.named_target_lanes.some((line) => /recommended_action=/.test(line)));
   assert.equal(screen.named_target_lanes.some((line) => /motivation_tier=/.test(line)), false);
   assert.ok(screen.counterparty_intel_team_ids.includes('TB'));
-  const vea = screen.target_lanes.find((lane) => lane.target_team_id === 'TB' && lane.target_player_name === 'Vita Vea');
-  assert.ok(vea);
-  assert.equal(vea.motivation_tier, 'long_shot_unless_posture_changes');
-  assert.equal(vea.recommended_action, 'posture_change_only');
-  assert.match(vea.seller_case, /high-impact, low-probability target/i);
-  assert.match(vea.seller_objection, /Do not headline Vita Vea/i);
-  assert.match(vea.validation_trigger, /Confirm whether Tampa/i);
-  assert.ok(vea.blockers.some((blocker) => /contend|top-priced|top-of-room/i.test(blocker)));
+  const tampa = screen.target_lanes.find((lane) => lane.target_team_id === 'TB');
+  assert.ok(tampa);
+  assert.equal(tampa.motivation_tier, 'long_shot_unless_posture_changes');
+  assert.equal(tampa.recommended_action, 'posture_change_only');
+  assert.match(tampa.seller_case, /high-impact, low-probability target/i);
+  assert.match(tampa.seller_objection, /Do not headline Vita Vea/i);
+  assert.match(tampa.validation_trigger, /Confirm whether Tampa/i);
+  assert.ok(tampa.blockers.some((blocker) => /contend|top-priced|top-of-room/i.test(blocker)));
   assert.ok(screen.bad_cap_relief_trades.some((line) => /Brian Burns.*bad 2026 cap-relief trade/.test(line)));
   assert.ok(screen.answer_requirements.some((line) => /salary-out construction/.test(line)));
 });

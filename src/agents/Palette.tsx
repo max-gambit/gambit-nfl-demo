@@ -251,7 +251,7 @@ export function Palette({ liveInput = true, onClose }: PaletteProps) {
         console.error('[palette] runAgent failed', err);
         pushToast({
           tone: 'error',
-          message: 'Couldn’t start agent',
+          message: 'Couldn’t start analysis',
           detail: err instanceof Error ? err.message : 'Server unreachable.',
         });
       }

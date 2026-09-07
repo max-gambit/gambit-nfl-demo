@@ -3,13 +3,18 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "description": "Claude operates the Gambit prototype as a real user, surfaces bugs / UX issues / product gaps.",
+  "description": "Deterministic browser and API acceptance harness for the Giants football-operations demo.",
   "scripts": {
-    "start": "tsx src/run.ts",
+    "start": "tsx src/run.ts --mode canonical",
+    "canonical": "tsx src/run.ts --mode canonical",
+    "adversarial": "tsx src/run.ts --mode adversarial",
+    "smoke:model-move": "tsx src/model-move-smoke.ts",
+    "reliability:nfl": "tsx src/nfl-answer-reliability.ts",
+    "reliability:nfl:live": "tsx src/nfl-answer-reliability.ts --live --judge",
+    "test:terra-judge": "tsx --test src/terra-judge.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.91.1",
     "@supabase/supabase-js": "^2.45.4",
     "dotenv": "^16.4.5",
     "playwright": "^1.59.1"

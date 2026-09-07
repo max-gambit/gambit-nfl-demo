@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
-import { OptionsTable } from './OptionsTable';
+import { NflOptionsTable } from './NflOptionsTable';
 import { BriefActions } from './BriefActions';
 import { RecommendationCardBody } from './RecommendationCardBody';
 import { TemplateBriefBody } from './TemplateBriefBody';
@@ -92,6 +92,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
         progress: payload.progress,
         updated_at: payload.updated_at,
         error: payload.error,
+        ...(payload.body !== undefined ? { body: payload.body } : {}),
       });
       if (payload.status === 'failed') source.close();
     };
@@ -117,7 +118,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
       try {
         const fresh = await getBrief(brief.id);
         if (cancelled) return;
-        if (fresh.status !== 'generating') {
+        if (fresh.status !== 'generating' || fresh.body !== null) {
           patchBrief(brief.id, fresh);
         }
       } catch (err) {
@@ -148,7 +149,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
       console.error('[brief-card] runAgent failed', err);
       pushToast({
         tone: 'error',
-        message: 'Couldn’t start agent',
+        message: 'Couldn’t start analysis',
         detail: err instanceof Error ? err.message : 'Server unreachable.',
       });
     }
@@ -176,8 +177,55 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
     }
   }, [brief.id, changingTemplate, patchBrief, pushToast]);
 
-  // Generating: show the placeholder card. Realtime UPDATE flips status='ready'
-  // and the next render falls through to the normal branch.
+  if (isGenerating && dataAnalysisBody?.market_analysis) {
+    return (
+      <div data-recommendation-card="true" aria-live="polite" style={{
+        background: F.surface,
+        border: `1px solid ${isInThread ? F.fenway : F.border}`,
+        borderRadius: RADIUS.lg,
+        padding: `${SPACE.xl}px ${SPACE['2xl']}px`,
+        marginBottom: SPACE.xl,
+        boxShadow: isInThread ? `0 0 0 1px ${F.fenway}, ${F.shadowChat}` : F.shadowChat,
+        scrollMarginTop: SPACE.md,
+        minWidth: 0,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: SPACE.md, marginBottom: SPACE.lg }}>
+          <div style={{
+            width: 28, height: 28, background: F.ink, color: F.accent,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: 'var(--font-display)', fontSize: TYPE.body.md, fontWeight: 700,
+            borderRadius: RADIUS.pill,
+          }}>G</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontFamily: 'var(--font-sans)', fontSize: TYPE.body.md, fontWeight: 500, color: F.ink }}>
+              Gambit Analyst
+            </div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.md, color: F.fgMuted, marginTop: 1 }}>
+              Live analysis ready · football interpretation in progress
+            </div>
+          </div>
+          <span style={{
+            width: 8, height: 8, borderRadius: RADIUS.pill, background: F.fenway,
+            animation: 'dot-pulse 1.2s ease-in-out infinite',
+          }} />
+        </div>
+        <DataAnalysisCardBody body={dataAnalysisBody} />
+        <div style={{
+          marginTop: SPACE.lg,
+          paddingTop: SPACE.md,
+          borderTop: `1px solid ${F.border}`,
+          fontFamily: 'var(--font-sans)',
+          fontSize: TYPE.body.sm,
+          color: F.fgMuted,
+        }}>
+          Writing the football interpretation…
+        </div>
+      </div>
+    );
+  }
+
+  // Generating without a deterministic artifact: show the placeholder card.
+  // Realtime UPDATE flips status='ready' and the next render falls through.
   if (isGenerating) {
     return <GeneratingBriefCard question={brief.question} startedAt={brief.updated_at} progress={brief.progress} />;
   }
@@ -193,9 +241,9 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
     );
   }
 
-  const sourcesNote = brief.duration_ms
-    ? `${sources.length || 0} sources · ${(brief.duration_ms / 1000).toFixed(1)}s`
-    : `${sources.length || 0} sources`;
+  const sourcesNote = isDataAnalyst
+    ? (sources.length > 0 ? `${sources.length} public sources` : 'Football analysis')
+    : (sources.length > 0 ? `${sources.length} sources checked` : 'Public source analysis');
 
   // Shared button styles — Phase 10 button system anticipated. Three
   // variants: primary (filled fenway), secondary (outline), tertiary (text).
@@ -259,7 +307,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
         letterSpacing: TRACKING.micro, textTransform: 'uppercase',
         marginBottom: SPACE.sm,
       }}>
-        {isDataAnalyst ? 'Data answer' : presentationFirst ? 'Current lean' : 'Working thesis'}
+        {isDataAnalyst ? 'Answer' : presentationFirst ? 'Current lean' : 'Working thesis'}
       </div>
       <p style={{
         margin: 0,
@@ -298,18 +346,18 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
           }}>G</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontFamily: 'var(--font-sans)', fontSize: TYPE.body.md, fontWeight: 500, color: F.ink }}>
-              {isDataAnalyst ? 'Gambit Data Analyst' : 'Gambit Analyst'}
+              Gambit Analyst
             </div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.md, color: F.fgMuted, marginTop: 1 }}>{sourcesNote}</div>
           </div>
-          <BriefTemplatePicker
+          {!dataAnalysisBody?.market_analysis && <BriefTemplatePicker
             selected={templateSelection}
             onChange={(selection) => void changeTemplate(selection)}
             draftQuestion={brief.question}
             disabled={changingTemplate}
             align="right"
             placement="below"
-          />
+          />}
         </div>
 
         <div style={{
@@ -322,7 +370,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
         }}>
           {presentationFirst && recommendationBody && <TemplateBriefBody body={recommendationBody} />}
 
-          {summaryBlock}
+          {!dataAnalysisBody?.market_analysis && summaryBlock}
 
           {dataAnalysisBody
             ? <DataAnalysisCardBody body={dataAnalysisBody} />
@@ -337,12 +385,12 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
               marginTop: SPACE.xl,
               marginLeft: -SPACE['2xl'], marginRight: -SPACE['2xl'],
             }}>
-              <OptionsTable embedded />
+              <NflOptionsTable />
             </div>
           )}
         </div>
 
-        {sources.length > 0 && (
+        {sources.length > 0 && !isDataAnalyst && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: SPACE.sm,
             marginTop: SPACE.md, flexWrap: 'wrap',
@@ -376,7 +424,7 @@ export function BriefRecommendationCard({ brief, embedTable = true, compact = fa
 
         {agentActionsBlock}
 
-        {!compact && <BriefActions />}
+        {!compact && <BriefActions allowRegenerate={!dataAnalysisBody?.seller_move_analysis} />}
 
         {onReply && (
           <div style={{

@@ -82,7 +82,7 @@ function evidenceRefsFor(row: BriefOption): number[] {
 function rowsToCsv(rows: BriefOption[]): string {
   const head = [
     'Ref', 'Option', 'Subtitle', 'Type', 'Path', 'Decision question',
-    'Cap impact ($M)', 'Cap label', 'EPM', 'CBA', 'Timing',
+    'Cap impact ($M)', 'Cap label', 'Quality', 'NFL rule', 'Timing',
     'Likelihood', 'Likelihood %', 'Sources', 'Evidence refs', 'Next step',
   ];
   const lines = [head.join(',')];
@@ -186,7 +186,7 @@ function optionFollowupPrompt(row: BriefOption, details: BriefOptionDetails, evi
   return [
     `Analyze strategic option [${row.ref_index}] "${row.title}" further.`,
     'Treat the scope as the whole strategic option, not just candidate moves.',
-    'Lay out specific candidate moves or targets if supportable: target player/team, outgoing construction, salary/CBA mechanics, likely cost, constraint/unknown, and evidence refs.',
+    'Lay out specific candidate moves or targets if supportable: target player/team, outgoing construction, cap/rule mechanics, likely cost, constraint/unknown, and evidence refs.',
     refs ? `Use the current option evidence refs ${refs} and say plainly if no named target is supportable from the available data.` : 'Say plainly if no named target is supportable from the available data.',
     details.downside ? `Current known tradeoff: ${details.downside}` : '',
   ].filter(Boolean).join(' ');
@@ -207,7 +207,7 @@ export function OptionsTable({ embedded = false }: OptionsTableProps) {
   } = useBriefs();
   const {
     setSourceFilterRefs, setHighlightedSourceRef, setSelectedSourceRef,
-    setSelectedOptionRef, setExpandedBrief, setRightPanelMode, setRightPanelOpen,
+    setSelectedOptionRef,
   } = useUi();
   const { pushToast } = useToasts();
   const filterRef = useRef<HTMLDivElement>(null);
@@ -341,19 +341,16 @@ export function OptionsTable({ embedded = false }: OptionsTableProps) {
     const details = detailsFor(row);
     const evidenceRefs = evidenceRefsFor(row);
     setActiveBrief(activeBriefId);
-    setExpandedBrief(activeBriefId);
-    setRightPanelMode('thread');
-    setRightPanelOpen(true);
     setSelectedOptionRef(row.ref_index);
     window.setTimeout(() => {
-      fire('v6d3cf:prefill-reply-composer', {
+      fire('v6d3cf:prefill-composer', {
         text: optionFollowupPrompt(row, details, evidenceRefs),
       });
     }, 0);
     pushToast({
       tone: 'info',
-      message: `Option [${row.ref_index}] staged`,
-      detail: 'Right panel opened with a focused follow-up draft.',
+      message: 'Follow-up ready',
+      detail: 'The Analysis composer now contains the option follow-up.',
     });
   };
 
@@ -762,7 +759,7 @@ function MoveCandidateCard({
   const refs = candidateEvidenceRefs(candidate, fallbackRefs);
   const target = candidateTargetLabel(candidate) ?? candidate.label;
   const fit = detailText(candidate.basketball_fit) ?? detailText(candidate.why);
-  const subjectTeamId = candidate.subject_team_id?.trim().toUpperCase() || 'GSW';
+  const subjectTeamId = candidate.subject_team_id?.trim().toUpperCase() || 'NYG';
   return (
     <div
       style={moveCandidateCardStyle}
@@ -802,7 +799,7 @@ function MoveCandidateCard({
       {fit && <div style={moveCandidateWhyStyle}>{fit}</div>}
       <div style={candidateFactGridStyle}>
         <CandidateFact label={candidate.outgoing_package ? `${subjectTeamId} sends` : 'Construction'} text={candidate.outgoing_package ?? candidate.mechanism} />
-        <CandidateFact label="Salary / CBA" text={candidate.salary_match} />
+        <CandidateFact label="Cap / NFL rule" text={candidate.salary_match} />
         <CandidateFact label="Likely cost" text={candidate.cost} />
         <CandidateFact label="Constraint" text={candidate.constraints} />
       </div>

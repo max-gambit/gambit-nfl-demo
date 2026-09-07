@@ -1,4 +1,12 @@
-import type { BriefSource, DataAnalystTrace, DataAnalystTraceDataset, EffectiveTeamContext } from '@shared/types';
+import type {
+  BriefSource,
+  DataAnalystTrace,
+  DataAnalystTraceDataset,
+  EffectiveTeamContext,
+  NflPositionMarketGroup,
+  NflTransactionComparable,
+  NflTransactionMarketSourceRef,
+} from '@shared/types';
 import {
   loadCurrentNflData,
   type NflCapRow,
@@ -10,6 +18,12 @@ import {
 import { getEffectiveTeamContext } from '../context_graph/preferences.js';
 import { buildNflCoverageMatrix, normalizePositionGroup } from '../nfl_coverage/coverage.js';
 import type { NflCoverageTeamRow } from '@shared/types';
+import { analyzeNflTransactionMarket } from '../nfl_transactions/analyze.js';
+import type { NflTransactionMarketSnapshot } from '../nfl_transactions/analyze.js';
+import {
+  loadCurrentNflTransactionMarketSnapshot,
+  loadReviewedNflTransactionSnapshot,
+} from '../nfl_transactions/seed.js';
 
 export type CurrentNflEvidenceScope = 'roster_only' | 'transaction_full';
 
@@ -25,6 +39,200 @@ const NFL_EVIDENCE_TEAM_IDS = [
 type NflEvidenceTeamId = typeof NFL_EVIDENCE_TEAM_IDS[number];
 
 const NFL_EVIDENCE_TEAM_ID_SET = new Set<string>(NFL_EVIDENCE_TEAM_IDS);
+
+export function humanizeNflVisibleText(value: string): string {
+  return value
+    .replace(/\bcurrent evidence supports only (?:an option|a lane), not (?:whether the team would trade him|seller intent)\b/gi, 'public data identifies a possible fit but does not show that the team would trade him')
+    .replace(/\bnone of the available receivers are confirmed\b/gi, 'none of the receivers considered are confirmed')
+    .replace(/\b(?:current )?cap[-\s]?file and counterparty screens?\b/gi, 'current public roster and contract data')
+    .replace(/\bno (?:receiver|target|trade|seller) lane clears\b/gi, 'no trade candidate is supported by')
+    .replace(/\blower[-\s]?pain salary[-\s]?out levers\b/gi, 'lower-cost contracts New York could move')
+    .replace(/\blower[-\s]?pain salary[-\s]?out lever\b/gi, 'lower-cost contract New York could move')
+    .replace(/\bsource limits?, not a runtime guarantee\b/gi, 'source limit, not a guarantee')
+    .replace(/\bseller[-\s]?thesis(?:\s+cards?|\s+summaries)?\b/gi, 'reason the other team might engage')
+    .replace(/\bseller cards?\b/gi, 'team context')
+    .replace(/\bseller cases?\b/gi, 'reasons the other team might listen')
+    .replace(/\bcounterparties\b/gi, 'other teams')
+    .replace(/\bcounterparty\b/gi, 'other team')
+    .replace(/\btrade\/seller lanes?\b/gi, 'trade options')
+    .replace(/\b(?:receiver|target|trade|seller) lanes\b/gi, 'trade candidates')
+    .replace(/\b(?:receiver|target|trade|seller) lane\b/gi, 'trade candidate')
+    .replace(/\bcall[_\s-]?now\b/gi, 'priority call')
+    .replace(/\bcheck[_\s-]?call\b/gi, 'exploratory call')
+    .replace(/\bposture[_\s-]?change[_\s-]?only\b/gi, 'unlikely unless the team changes direction')
+    .replace(/\bdo(?:_|-)not(?:_|-)lead\b/gi, 'not a priority')
+    .replace(/\bsalary[-\s]?out levers\b/gi, 'contracts New York could move')
+    .replace(/\bsalary[-\s]?out lever\b/gi, 'contract New York could move')
+    .replace(/\blower[-\s]?pain\b/gi, 'lower-cost')
+    .replace(/\btrade room\b/gi, '2026 cap space created')
+    .replace(/\bcap[-\s]?file\b/gi, 'public contract data')
+    .replace(/\bsource[-\s]?needed\b/gi, 'missing contract detail')
+    .replace(/\bsource refs?\b/gi, 'sources')
+    .replace(/\bdirectional\b/gi, 'limited')
+    .replace(/\bevidence boundar(?:y|ies)\b/gi, 'source limits')
+    .replace(/\bpreflight\b/gi, 'readiness check')
+    .replace(/\bruntime\b/gi, 'service')
+    .replace(/\bthe model\b/gi, 'the analysis')
+    .replace(/\bdeterministic\b/gi, 'calculated')
+    .replace(/\bartifact\b/gi, 'result')
+    .replace(/\b(?:seller|trade|target|counterparty) screens?\b/gi, 'trade review')
+    .replace(/\bclears? (?:our|the|this|current) screen\b/gi, 'meets the current bar')
+    .replace(/\b(?:passed?|passes) (?:our|the|this|current) screen\b/gi, 'meets the current bar')
+    .replace(/\bre[-\s]?run (?:the )?(?:seller |target |trade )?screen\b/gi, 'refresh the target list')
+    .replace(/\bseller readiness\b/gi, 'the other team’s willingness to trade')
+    .replace(/\bseller signal\b/gi, 'sign the other team would listen')
+    .replace(/\bcap fit\b/gi, 'contract fit')
+    .replace(/\bpriced with high confidence\b/gi, 'supported by the loaded contract details')
+    .replace(/\bwith high[-\s]?confidence\b/gi, 'with complete contract details')
+    .replace(/\bhigh[-\s]?confidence\b/gi, 'contract details complete')
+    .replace(/\b(?:seller|other team) receiver values are limited \(captured-season reads\)\b/gi, 'public information about receiver availability is limited')
+    .replace(/\b(?:seller|other team) receiver values\b/gi, 'public information about receiver availability')
+    .replace(/\bcaptured[-\s]?season reads\b/gi, 'available public information')
+    .replace(/\bContract Ledger v1\b/gi, 'contract data')
+    .replace(/\bapp data\b/gi, 'public data')
+    .replace(/\bdata rows?\b/gi, 'information')
+    .replace(/\bsource review\b/gi, 'source check')
+    .replace(/\bsource check\b/gi, 'source confirmation')
+    .replace(/\bpriced in our reads as\b/gi, 'listed in the current information as')
+    .replace(/\bgrades? as\b/gi, 'is')
+    .replace(/\brows? (?:are|is) limited \(from captured seasons\)\b/gi, 'public information is limited')
+    .replace(/\bfrom captured seasons\b/gi, 'from the available seasons')
+    .replace(/\bcap fit alone\b/gi, 'workable contract numbers alone')
+    .replace(/\bcontract fits?\b/gi, 'workable contract numbers')
+    .replace(/\bcontract[-\s]?fits?\b/gi, 'workable contract numbers')
+    .replace(/\bhigh[-\s]?impact top[-\s]?of[-\s]?room WRs\b/gi, 'high-impact receivers')
+    .replace(/\btop[-\s]?of[-\s]?room\b/gi, 'premium')
+    .replace(/\bsame[-\s]?group rotation bod(?:y|ies)\b/gi, 'rotation player at that position')
+    .replace(/\b(?:counterparty|other team) posture is retool\b/gi, 'the team appears to be retooling')
+    .replace(/\b(?:counterparty|other team) posture suggests decision pressure\b/gi, 'the team may be approaching a roster decision point')
+    .replace(/\b(?:counterparty|other team) posture is contend_now\b/gi, 'the team is trying to win now')
+    .replace(/\b(?:counterparty|other team) posture is contend_soon\b/gi, 'the team expects to contend soon')
+    .replace(/\b(?:counterparty|other team) posture is not specific enough to infer seller motivation\b/gi, 'there is not enough public information to know whether the team would listen')
+    .replace(/\bseller Intel posture is asset_accumulator\b/gi, 'team context suggests it may value draft capital')
+    .replace(/\bseller Intel posture is cap_seller\b/gi, 'team context suggests it may value cap flexibility')
+    .replace(/\bseller Intel posture allows selective veteran movement\b/gi, 'team context suggests it may consider moving selected veterans')
+    .replace(/\bseller Intel posture is buyer-hold\b/gi, 'team context suggests it is more likely to add or hold players')
+    .replace(/\bseller Intel says this is posture-change only\b/gi, 'team context suggests this becomes realistic only if its direction changes')
+    .replace(/\b(?:counterparty|other team) has cap room\b/gi, 'the other team has cap space')
+    .replace(/\b(?:counterparty|other team) cap posture is near_cap\b/gi, 'the other team is tight against the cap')
+    .replace(/\b(?:counterparty|other team) cap posture is over_cap\b/gi, 'the other team must create cap space')
+    .replace(/\b(?:counterparty|other team) cap posture is restructure_needed\b/gi, 'the other team likely needs contract adjustments to create space')
+    .replace(/\b(?:counterparty|other team) cap posture is cash_constrained\b/gi, 'the other team may be managing cash spending')
+    .replace(/\bcontract profile passes the initial cap screen\b/gi, 'the contract is financially workable')
+    .replace(/\bcontend_now\b/gi, 'trying to win now')
+    .replace(/\bcontend_soon\b/gi, 'expecting to contend soon')
+    .replace(/\basset_accumulator\b/gi, 'focused on adding draft capital')
+    .replace(/\bcap_seller\b/gi, 'open to moves that create cap space')
+    .replace(/\bselective_seller\b/gi, 'open to selected veteran trades')
+    .replace(/\bbuyer_hold\b/gi, 'more likely to add or hold players')
+    .replace(/\bcap_room\b/gi, 'has cap space')
+    .replace(/\bnear_cap\b/gi, 'tight against the cap')
+    .replace(/\bover_cap\b/gi, 'must create cap space')
+    .replace(/\brestructure_needed\b/gi, 'likely needs contract adjustments')
+    .replace(/\bcash_constrained\b/gi, 'may be managing cash spending')
+    .replace(/\b(?:seller|other team) Intel\b/gi, 'team context')
+    .replace(/\bpostures?\b/gi, 'team situation')
+    .replace(/\ba user[-\s]?entered scenario\b/gi, 'an assumption you supplied')
+    .replace(/\buser[-\s]?entered scenario\b/gi, 'assumption you supplied')
+    .replace(/\ba user scenario\b/gi, 'an assumption you supplied')
+    .replace(/\buser scenario\b/gi, 'assumption you supplied')
+    .replace(/\ba assumption\b/gi, 'an assumption')
+    .replace(/\bnot a sourced injury fact\b/gi, 'not a reported injury')
+    .replace(/\bnot a sourced injury report\b/gi, 'not confirmed by public injury reporting')
+    .replace(/\bnot a sourced injury\b/gi, 'not confirmed by public injury reporting')
+    .replace(/\bbad 2026 cap[-\s]?relief trade because acceleration overwhelms savings\b/gi, 'would add 2026 cap cost because bonuses accelerate')
+    .replace(/\bcore\/ascending contract; only discuss as a football blockbuster, not a cap lever\b/gi, 'core player; only discuss for an exceptional football return, not to create cap space')
+    .replace(/\bcap lever\b/gi, 'cap move')
+    .replace(/\bseller signals?\b/gi, 'public signs the other team would listen')
+    .replace(/\bseller motive\b/gi, 'reason for the other team to trade')
+    .replace(/\bseller asking price\b/gi, 'the other team’s asking price')
+    .replace(/\bseller intent\b/gi, 'whether the team would trade him')
+    .replace(/\bother team room\b/gi, 'in 2026 cap space for the other team')
+    .replace(/\bcurrent file\b/gi, 'public data')
+    .replace(/\breceiving grades?\b/gi, 'receiving performance data')
+    .replace(/\bnot sourced injury or medical data\b/gi, 'not confirmed by public injury or medical reporting')
+    .replace(/\bchange[-\s]?of[-\s]?direction only\b/gi, 'realistic only if the team changes direction')
+    .replace(/\bgating issue\b/gi, 'key question')
+    .replace(/\bdiscipline path\b/gi, 'Prudent approach')
+    .replace(/\bcurrent evidence supports only an option, not other team intent\b/gi, 'public data identifies a possible fit but does not show that the team would trade him')
+    .replace(/\bother team intent\b/gi, 'whether the team would trade him')
+    .replace(/\bvalidating whether the team would trade him\b/gi, 'confirming whether the team would trade him')
+    .replace(/\btrigger to upgrade\b/gi, 'What would make a call more realistic')
+    .replace(/\buseful trench starters\b/gi, 'useful starters')
+    .replace(/\bmore plausible trade options\b/gi, 'a more plausible trade option')
+    .replace(/\bhigh[-\s]?value salary[-\s]?out options\b/gi, 'trading a core Giant to create cap space')
+    .replace(/\byour salary[-\s]?out levers are bad economics anyway\b/gi, 'trading core Giants would hurt the cap')
+    .replace(/\bsalary[-\s]?out path\b/gi, 'move involving a current Giant')
+    .replace(/\bsalary[-\s]?out\b/gi, 'trade a current Giant')
+    .replace(/\bpick[-\s]?led offer\b/gi, 'draft-pick')
+    .replace(/\bpick[-\s]?led\b/gi, 'offer draft picks')
+    .replace(/\bconstructions\b/gi, 'options')
+    .replace(/\bwatch[-\s]?option\b/gi, 'name to monitor')
+    .replace(/\bcontend[-\s]?soon\b/gi, 'trying to contend soon')
+    .replace(/\bcontend[-\s]?now\b/gi, 'trying to win now')
+    .replace(/\bnot a priority with these\b/gi, 'Do not pursue either today')
+    .replace(/\breal gate\b/gi, 'main unknown')
+    .replace(/\bgating question\b/gi, 'main question')
+    .replace(/\bdirection[-\s]?change bets\b/gi, 'long shots')
+    .replace(/\bdirection[-\s]?change only\b/gi, 'Only if the team changes direction')
+    .replace(/\bon a other team direction change\b/gi, 'if the other team changes direction')
+    .replace(/\bshift team situation toward selling\b/gi, 'decide to sell')
+    .replace(/\bcompetitive team situation changes\b/gi, 'team falls out of contention')
+    .replace(/\bour readiness for identifying available targets and (?:executing trades|trading) is (?:thin|not strong right now)\b/gi, 'Our public information on player availability is thin')
+    .replace(/\bour readiness (?:on|for) identifying available targets is thin\b/gi, 'Our public information on player availability is thin')
+    .replace(/\bcap and workable contract numbers are loaded(?: and reliable)?\b/gi, 'cap and contract figures are available')
+    .replace(/\btrying to contend soon team situation\b/gi, 'push to contend')
+    .replace(/\bWant trade a current Giant, offer draft picks, and stay[-\s]?disciplined options\b/gi, 'Want to compare trading a current Giant, offering draft picks, and standing pat')
+    .replace(/\bwhich of these clubs' team situation are closest to a sell signal\b/gi, 'which of these clubs is most likely to consider a receiver trade')
+    .replace(/\bshould be offer draft picks rather than\b/gi, 'should rely on draft picks rather than')
+    .replace(/\btrade availability across the league reads as not[-\s]?enough[-\s]?information in current coverage\b/gi, 'public information does not establish which receivers are available across the league')
+    .replace(/\bidentifying available targets reads as not[-\s]?enough[-\s]?information(?: in our current readiness)?\b/gi, 'public data does not confirm which receivers are available')
+    .replace(/\blimited target reads\b/gi, 'preliminary scouting names')
+    .replace(/\bContract figures for these targets are limited from the available seasons\b/gi, 'Contract details for these targets come from prior public seasons')
+    .replace(/\bscreen as monitor[-\s]?only\b/gi, 'are names to monitor')
+    .replace(/\bmonitor[-\s]?only\b/gi, 'names to monitor')
+    .replace(/\bflagged as\b/gi, 'are')
+    .replace(/\bshifts team situation\b/gi, 'falls out of contention')
+    .replace(/\bsupported by the loaded contract details\b/gi, 'from public contract data')
+    .replace(/\byour biggest ['“”]?cap move['“”]? names are bad economics:\s*/gi, 'Trading your most important players would hurt the cap: ')
+    .replace(/\(all contract details complete\)/gi, '')
+    .replace(/\bcleaner trade a current Giant flexibility\b/gi, 'cleaner ways to create room')
+    .replace(/\bworkable contract numbers alone is\b/gi, 'workable contract numbers alone are')
+    .replace(/\badd on draft capital\b/gi, 'acquire for draft capital')
+    .replace(/\bacross (\d+) rows\b/gi, 'for $1 relevant players')
+    .replace(/\ban offer draft picks add\b/gi, 'a draft-pick acquisition')
+    .replace(/\bPrice team situation should stay in\b/gi, 'Keep the price in')
+    .replace(/\bvalidation gates\b/gi, 'Questions to answer')
+    .replace(/\bbase[-\s]?case targets\b/gi, 'primary targets')
+    .replace(/\bBoth are are\b/gi, 'Both are')
+    .replace(/\bShould we model\b/gi, 'Should we compare')
+    .replace(/\bAdams is contract details complete\b/gi, 'Adams has fuller public contract data')
+    .replace(/\bWant me to flag what sign the other team would listen would move\b/gi, 'Want me to identify what would move')
+    .replace(/\bdepth\/comp\b/gi, 'depth and compensation')
+    .replace(/\bscorecards?\b/gi, 'player comparisons')
+    .replace(/\blower[-\s]?cost levers\b/gi, 'lower-cost alternatives')
+    .replace(/\buse a offer draft picks offer instead\b/gi, 'offer draft picks instead')
+    .replace(/\boffer draft picks offer\b/gi, 'draft-pick offer')
+    .replace(/\ba offer\b/gi, 'an offer')
+    .replace(/\btrade impact\b/gi, '2026 cap effect')
+    .replace(/; contract details complete\b/gi, '')
+    .replace(/\bworkable contract numbers is\b/gi, 'workable contract numbers are')
+    .replace(/\bcleaner contract New York could move\b/gi, 'New York could move this contract with limited cap pain')
+    .replace(/\bcompare against cut path\b/gi, 'compare with a release')
+    .replace(/\bpremium bats\b/gi, 'premium veterans')
+    .replace(/\bcomp\/depth\b/gi, 'compensation and depth')
+    .replace(/\broster rows?\b/gi, 'players listed at the position')
+    .replace(/\bcap rows?\b/gi, 'contracts listed at the position')
+    .replace(/\blanes\b/gi, 'options')
+    .replace(/\blane\b/gi, 'option')
+    .replace(/\bcurrent evidence supports only an option, not whether the team would trade him\b/gi, 'public data identifies a possible fit but does not show that the team would trade him')
+    .replace(/^Read$/i, 'Status')
+    .replace(/\s+->\s+/g, '. ')
+    .replace(/\$-([0-9.]+[KMB]?)/g, (_match, amount: string) => `-$${amount}`)
+    .replace(/~([−-])\$/g, '$1$')
+    .replace(/\ba option\b/gi, 'an option')
+    .replace(/\ba exploratory\b/gi, 'an exploratory');
+}
 
 const NFL_EVIDENCE_TEAM_ALIASES: Record<string, NflEvidenceTeamId> = {
   ARI: 'ARI', CARDINALS: 'ARI', ARIZONA: 'ARI', 'ARIZONA CARDINALS': 'ARI',
@@ -62,7 +270,7 @@ const NFL_EVIDENCE_TEAM_ALIASES: Record<string, NflEvidenceTeamId> = {
 };
 
 const TRANSACTION_NFL_EVIDENCE_RE =
-  /\b(cap|cap room|cap space|cap sheet|cap number|cap hit|cap ledger|contract|contracts|contract lever|guarantees?|cash due|dead money|cut|cuts|release|post[-\s]?june 1|cut savings|restructure|convert salary|signing bonus|extension|extend|tag|franchise tag|transition tag|tender|trade|audit|position[-\s]?group|spend share|over[-\s]?invested|under[-\s]?invested|roster\/cap|salary|clean\s+2026\s+room|create\s+room|open\s+room|clear\s+room|2027\s+hangover|future[-\s]?(?:cap|year))\b/i;
+  /\b(cap|cap room|cap space|cap sheet|cap number|cap hit|cap ledger|contract|contracts|contract lever|guarantees?|cash due|dead money|cut|cuts|release|post[-\s]?june 1|cut savings|restructure|convert salary|signing bonus|extension|extend|tag|franchise tag|transition tag|tender|trade|traded|trading|acquire|acquisition|audit|position[-\s]?group|spend share|over[-\s]?invested|under[-\s]?invested|roster\/cap|salary|clean\s+2026\s+room|create\s+room|open\s+room|clear\s+room|2027\s+hangover|future[-\s]?(?:cap|year))\b/i;
 
 const ROSTER_NFL_EVIDENCE_RE =
   /\b(roster|current players?|offseason roster|depth chart|position groups?|who do we have|player-team membership|active roster|practice squad|injury|availability)\b/i;
@@ -109,8 +317,43 @@ export interface NflTradeGoalScreen {
   counterparty_intel_team_ids: string[];
   counterparty_intel_summary: string[];
   bad_cap_relief_trades: string[];
+  historical_trade_price: NflHistoricalTradePriceEvidence | null;
+  historical_trade_price_requested: boolean;
   answer_requirements: string[];
   row_count: number;
+}
+
+export interface NflHistoricalTradePriceComparable extends NflTransactionComparable {
+  source_url: string | null;
+}
+
+export interface NflHistoricalTradePriceEvidence {
+  snapshot_id: string;
+  analysis_id: string;
+  start_year: number;
+  end_year: number;
+  baseline_years: [number, number];
+  recent_years: [number, number];
+  position_groups: NflPositionMarketGroup[];
+  status: 'supported' | 'directional' | 'insufficient_evidence';
+  trade_count: number;
+  allocable_trade_count: number;
+  position_match_basis_points: number;
+  comparison_sample_size: number;
+  full_period_compensation_mix: {
+    round_1: number;
+    rounds_2_3: number;
+    rounds_4_7: number;
+    player_only: number;
+  };
+  full_period_premium_share_basis_points: number | null;
+  compensation_status: 'supported' | 'directional' | 'insufficient_evidence';
+  compensation_direction: string;
+  compensation_explanation: string;
+  trade_price_method: string;
+  comparables: NflHistoricalTradePriceComparable[];
+  trade_source: NflTransactionMarketSourceRef | null;
+  limitations: string[];
 }
 
 export type NflTradeMotivationTier = 'credible_call' | 'monitor_only' | 'long_shot_unless_posture_changes';
@@ -141,6 +384,8 @@ export interface NflTradeTargetLane {
   what_they_lose: string;
   availability_validation: string;
   source_refs: string[];
+  contract_source_url: string | null;
+  roster_source_url: string | null;
 }
 
 export interface NflTradeMotivationInput {
@@ -188,6 +433,8 @@ interface TeamEvidence {
   coverageRefIndex: number | null;
   tradeRefIndex: number | null;
   intelRefIndex: number | null;
+  targetRefIndexes: number[];
+  historicalTradePriceSources: Array<Omit<BriefSource, 'id' | 'brief_id'>>;
   seed: NflDemoSeed;
 }
 
@@ -367,6 +614,13 @@ export async function buildCurrentNflEvidence(
       : null;
     const tradeRefIndex = tradeGoalScreen ? nextRefIndex++ : null;
     const intelRefIndex = tradeGoalScreen ? nextRefIndex++ : null;
+    const targetRefIndexes = tradeGoalScreen
+      ? tradeGoalScreen.target_lanes.map(() => nextRefIndex++)
+      : [];
+    const historicalTradePriceSources = tradeGoalScreen?.historical_trade_price
+      ? historicalTradePriceEvidenceSources(tradeGoalScreen.historical_trade_price, nextRefIndex)
+      : [];
+    nextRefIndex += historicalTradePriceSources.length;
     return {
       team_id: teamId,
       scope,
@@ -384,6 +638,8 @@ export async function buildCurrentNflEvidence(
       coverageRefIndex,
       tradeRefIndex,
       intelRefIndex,
+      targetRefIndexes,
+      historicalTradePriceSources,
       seed,
     };
   }));
@@ -429,6 +685,8 @@ function renderCurrentNflEvidenceBlock(
       ...(team.coverageRefIndex ? [team.coverageRefIndex] : []),
       ...(team.tradeRefIndex ? [team.tradeRefIndex] : []),
       ...(team.intelRefIndex ? [team.intelRefIndex] : []),
+      ...team.targetRefIndexes,
+      ...team.historicalTradePriceSources.map((source) => source.ref_index),
     ]
   ));
   const scope = teamEvidence[0]?.scope ?? 'transaction_full';
@@ -441,7 +699,7 @@ function renderCurrentNflEvidenceBlock(
     'Rows needing source review are caveats inside the audit, not a reason to reject the whole audit when current roster/cap coverage matches.',
     'Player Quality Metrics v3 is position-specific evidence, not a universal grade. Cite scorecards before claims like disruptive, coverage liability, separation, run-stopping, or replaceable. Cap hit, roster membership, and snaps alone are not player quality. OL public evidence is continuity/availability only unless a reviewed OL quality source is present.',
     'Coverage matrix status is mandatory readiness context: strong means the current app can support the claim; directional means caveat it; weak/blocked means do not make a strong claim without explicitly limiting the answer.',
-    'Visible answer style: translate data-quality labels into front-office language. Say "high confidence", "directional", "needs source review", "one unpriced row", or "priced in the current cap file"; avoid leading with product/schema terms like "Contract Ledger v1", "captured", "derived", "estimated", "source-needed", "row parity", "app rows", or "source status".',
+    'Visible answer style: state the football fact or the specific missing information. Never repeat schema labels, confidence tiers, source-status labels, internal action codes, or workflow language.',
     'Trade-goal answers must run four checks before recommending a move: depth after trading the outgoing player; lower-pain outgoing hierarchy before premium starters; named target/counterparty lanes from the current cap file; and clean caveat logic for negative trade economics.',
     'Trade-goal target lanes must also pass seller-thesis cards from counterparty Intel. Lead only with call_now or check_call actions. Treat monitor as a watch/check lane, posture_change_only as high impact but low probability, and do_not_lead as a lane to reject unless a new seller signal appears. Do not recite internal motivation_tier labels in visible prose.',
     consumer === 'brief'
@@ -459,7 +717,12 @@ function renderCurrentNflEvidenceBlock(
     lines.push(renderTeamAppEvidence(team));
     lines.push('');
     if (team.tradeGoalScreen) {
-      lines.push(renderTradeGoalScreen(team.tradeGoalScreen, team.tradeRefIndex));
+      lines.push(renderTradeGoalScreen(
+        team.tradeGoalScreen,
+        team.tradeRefIndex,
+        team.targetRefIndexes,
+        team.historicalTradePriceSources.map((source) => source.ref_index),
+      ));
       lines.push('');
     }
   }
@@ -507,17 +770,16 @@ function evidenceSourcesForTeam(team: TeamEvidence): Omit<BriefSource, 'id' | 'b
     ref_index: team.rosterRefIndex,
     kind: 'ANALYST_DATA',
     source: 'GAMBIT_APP_DATA',
-    title: `Current NFL app roster - ${team.team_id} - ${team.team.full_name}`,
+    title: `${team.team.full_name} roster`,
     updated_at: team.seed.as_of_date,
     data: {
       rows: [
         { k: 'Dataset', v: 'nfl_rosters_current' },
         { k: 'Team', v: `${team.team_id} - ${team.team.full_name}` },
-        { k: 'Roster rows', v: String(team.rosterRows.length) },
-        { k: 'Roster source', v: team.seed.source_name },
-        { k: 'Roster as of', v: team.seed.as_of_date },
+        { k: 'Summary', v: `${team.rosterRows.length} players in the current public roster data` },
+        { k: 'Source', v: 'NFL.com roster pages and OverTheCap contract data' },
+        { k: 'Source as of', v: team.seed.as_of_date },
         { k: 'Roster players', v: team.rosterRows.map((row) => row.player_name).join(', ') },
-        { k: 'Roster precedence', v: 'NFL app roster rows override Intel roster narrative.' },
       ],
       current_nfl_evidence: {
         dataset_id: 'nfl_rosters_current',
@@ -538,18 +800,21 @@ function evidenceSourcesForTeam(team: TeamEvidence): Omit<BriefSource, 'id' | 'b
     ref_index: team.capRefIndex ?? team.rosterRefIndex + 1,
     kind: 'ANALYST_DATA',
     source: 'GAMBIT_APP_DATA',
-    title: `Current NFL app cap/contracts - ${team.team_id} - ${team.team.full_name}`,
+    title: `${team.team.full_name} contracts and cap`,
     updated_at: team.seed.as_of_date,
     data: {
       rows: [
         { k: 'Dataset', v: 'nfl_cap_sheets_current' },
         { k: 'Team', v: `${team.team_id} - ${team.team.full_name}` },
-        { k: 'Cap rows', v: String(team.capRows.length) },
-        { k: 'Source-needed cap rows', v: String(team.sourceNeededCapRows.length) },
+        { k: 'Summary', v: `${team.capRows.length} player contracts reviewed` },
+        { k: 'What still needs checking', v: `${team.sourceNeededCapRows.length} contracts are missing at least one important detail` },
+        { k: 'Coverage', v: plainContractCoverage(contractLedgerCompleteness(team.capRows)) },
+        { k: 'Player signals', v: plainCapRows(team.capRows).join(' | ') },
+        { k: 'Position groups', v: team.positionRollups.map(plainPositionRollup).join(' | ') },
         { k: 'Contract field coverage', v: formatContractLedgerCompleteness(contractLedgerCompleteness(team.capRows)) },
         { k: 'Top cap contracts', v: topCapRows(team.capRows).join(', ') },
         { k: 'Position-group cap rollups', v: team.positionRollups.map(formatRollup).join(' | ') },
-        { k: 'Cap precedence', v: 'NFL app cap rows override Intel roster narrative for cap/completeness claims.' },
+        { k: 'Source', v: 'OverTheCap contract data' },
       ],
       current_nfl_evidence: {
         dataset_id: 'nfl_cap_sheets_current',
@@ -569,7 +834,107 @@ function evidenceSourcesForTeam(team: TeamEvidence): Omit<BriefSource, 'id' | 'b
     ...coverageSources,
     ...(team.tradeGoalScreen && team.tradeRefIndex ? [tradeGoalSourceForTeam(team, team.tradeGoalScreen, team.tradeRefIndex)] : []),
     ...(team.tradeGoalScreen && team.intelRefIndex ? [tradeGoalIntelSourceForTeam(team, team.tradeGoalScreen, team.intelRefIndex)] : []),
+    ...(team.tradeGoalScreen ? team.tradeGoalScreen.target_lanes.flatMap((lane, index) => {
+      const refIndex = team.targetRefIndexes[index];
+      return refIndex ? [tradeTargetSource(lane, refIndex, team.seed.as_of_date)] : [];
+    }) : []),
+    ...team.historicalTradePriceSources,
   ];
+}
+
+function tradeTargetSource(
+  lane: NflTradeTargetLane,
+  refIndex: number,
+  asOfDate: string,
+): Omit<BriefSource, 'id' | 'brief_id'> {
+  return {
+    ref_index: refIndex,
+    kind: 'CONTRACT',
+    source: 'OverTheCap and NFL.com',
+    title: `${lane.target_player_name} — ${lane.target_team_id} contract and team context`,
+    updated_at: asOfDate,
+    data: {
+      ...(lane.contract_source_url ? { source_url: lane.contract_source_url } : {}),
+      ...(lane.roster_source_url ? { roster_source_url: lane.roster_source_url } : {}),
+      rows: [
+        { k: 'Player', v: lane.target_player_name },
+        { k: 'Team', v: lane.target_team_id },
+        { k: 'Position', v: lane.position ?? 'Not listed' },
+        { k: '2026 cap number', v: formatMoney(lane.cap_number_2026) ?? 'Not available' },
+        { k: 'Contract term', v: lane.contract_years_remaining == null ? 'Not available' : `${lane.contract_years_remaining} year${lane.contract_years_remaining === 1 ? '' : 's'} remaining` },
+        { k: 'Why the team might listen', v: humanizeNflVisibleText(lane.seller_case) },
+        { k: 'Why it might not', v: humanizeNflVisibleText(lane.seller_objection) },
+        { k: 'What to confirm', v: humanizeNflVisibleText(lane.validation_trigger) },
+      ],
+      contribution: `Supports the contract and team context used when discussing ${lane.target_player_name}. It does not establish that the player is available.`,
+      current_nfl_evidence: {
+        dataset_id: 'nfl_trade_target_current',
+        team_id: lane.target_team_id,
+        player_name: lane.target_player_name,
+        as_of_date: asOfDate,
+        source_name: 'OverTheCap and NFL.com',
+      },
+    },
+  };
+}
+
+function historicalTradePriceEvidenceSources(
+  evidence: NflHistoricalTradePriceEvidence,
+  startRefIndex: number,
+): Array<Omit<BriefSource, 'id' | 'brief_id'>> {
+  const positionLabel = evidence.position_groups.join(' and ');
+  const sourceUrl = evidence.trade_source?.url;
+  const summary: Omit<BriefSource, 'id' | 'brief_id'> = {
+    ref_index: startRefIndex,
+    kind: 'ANALYST_DATA',
+    source: evidence.trade_source?.name ?? 'nflverse trades',
+    title: `Historical ${positionLabel} trade prices · ${evidence.start_year}–${evidence.end_year}`,
+    updated_at: evidence.trade_source?.as_of_date ?? String(evidence.end_year),
+    data: {
+      ...(sourceUrl ? { source_url: sourceUrl } : {}),
+      internal_dataset_id: 'nfl_transaction_market_history',
+      rows: [
+        { k: 'Position', v: positionLabel },
+        { k: 'Period', v: `${evidence.start_year}–${evidence.end_year}` },
+        { k: 'Trade sample', v: `${evidence.trade_count} trades; ${evidence.allocable_trade_count} had a single-player draft-pick return that could be placed in a round band` },
+        { k: 'Full-period pick bands', v: formatHistoricalCompensationMix(evidence.full_period_compensation_mix) },
+        { k: 'Premium-pick share', v: evidence.full_period_premium_share_basis_points == null ? 'Not available' : `${formatBasisPointsAsPercent(evidence.full_period_premium_share_basis_points)} of allocable returns included a Round 1–3 pick` },
+        { k: 'Price conclusion', v: historicalTradePriceSupport(evidence.compensation_status) },
+        { k: 'Comparison windows', v: `${evidence.baseline_years.join('–')} and ${evidence.recent_years.join('–')}` },
+        { k: 'Observed returns', v: humanizeTradePriceExplanation(evidence.compensation_explanation) },
+        { k: 'Method', v: evidence.trade_price_method },
+        { k: 'Player matching', v: `${formatBasisPointsAsPercent(evidence.position_match_basis_points)} of in-scope player identities were matched` },
+        { k: 'What this supports', v: 'A historical starting point for draft-pick value and selection of comparable trades.' },
+        { k: 'What it does not show', v: 'Whether a current team would trade a player or what that team is asking today.' },
+      ],
+      snapshot_id: evidence.snapshot_id,
+      analysis_id: evidence.analysis_id,
+      contribution: 'Shows the observed draft-pick returns for the requested position so the football answer can compare the user’s price limit with actual trades.',
+    },
+  };
+  const comparables = evidence.comparables.map((row, index): Omit<BriefSource, 'id' | 'brief_id'> => ({
+    ref_index: startRefIndex + index + 1,
+    kind: 'ANALYST_DATA',
+    source: evidence.trade_source?.name ?? 'nflverse trades',
+    title: `${row.player_name} trade · ${row.compensation_summary ?? row.compensation_band ?? 'return not allocated'}`,
+    updated_at: row.event_date ?? String(row.event_year),
+    data: {
+      ...(row.source_url ? { source_url: row.source_url } : {}),
+      internal_dataset_id: 'nfl_transaction_market_comparable',
+      rows: [
+        { k: 'Date', v: row.event_date ?? `${row.event_year} (${row.date_precision} date)` },
+        { k: 'Player', v: row.player_name },
+        { k: 'Position', v: row.position_group ?? 'Not matched' },
+        { k: 'Teams', v: `${row.from_team_id ?? '—'} → ${row.to_team_id ?? '—'}` },
+        { k: 'Return', v: row.compensation_summary ?? row.compensation_band ?? 'Not available' },
+        { k: 'Position mapping', v: row.normalization_basis ?? row.raw_position ?? 'Not available' },
+      ],
+      transaction: row,
+      snapshot_id: evidence.snapshot_id,
+      contribution: 'A same-position historical trade used to judge the user’s proposed draft-pick range.',
+    },
+  }));
+  return [summary, ...comparables];
 }
 
 function metricSourceForTeam(
@@ -581,16 +946,17 @@ function metricSourceForTeam(
     ref_index: refIndex,
     kind: 'ANALYST_DATA',
     source: 'GAMBIT_APP_DATA',
-    title: `Current NFL player metrics - ${team.team_id} - ${team.team.full_name}`,
+    title: `${team.team.full_name} player performance`,
     updated_at: team.seed.as_of_date,
     data: {
       rows: [
         { k: 'Dataset', v: 'nfl_player_metrics_current' },
         { k: 'Team', v: `${team.team_id} - ${team.team.full_name}` },
-        { k: 'Metric rows', v: String(team.playerMetrics.length) },
-        { k: 'Metric coverage', v: formatPlayerMetricCompleteness(completeness) },
-        { k: 'Top position scorecards', v: topMetricRows(team.playerMetrics).join(' | ') || 'None' },
-        { k: 'Metric precedence', v: 'Use position scorecards for player-quality claims. Do not treat cap hit, roster membership, or snaps alone as quality. OL rows are continuity/availability only unless a reviewed public OL quality source is present.' },
+        { k: 'Summary', v: `${team.playerMetrics.length} players in the current public performance data` },
+        { k: 'Coverage', v: plainPlayerMetricCoverage(completeness) },
+        { k: 'Player signals', v: plainPlayerMetricRows(team.playerMetrics).join(' | ') || 'No reviewed player performance is loaded.' },
+        { k: 'What still needs checking', v: 'A player’s cap hit, roster status, or snap count does not by itself establish quality. Offensive-line data supports availability and continuity only unless a reviewed performance source is loaded.' },
+        { k: 'Source', v: 'NFL.com roster pages and reviewed public performance data' },
       ],
       current_nfl_evidence: {
         dataset_id: 'nfl_player_metrics_current',
@@ -613,17 +979,17 @@ function coverageSourceForTeam(
     ref_index: refIndex,
     kind: 'ANALYST_DATA',
     source: 'GAMBIT_APP_DATA',
-    title: `NFL coverage matrix - ${team.team_id} - ${team.team.full_name}`,
+    title: `What the public data covers - ${team.team.full_name}`,
     updated_at: team.seed.as_of_date,
     data: {
       rows: [
         { k: 'Dataset', v: 'nfl_coverage_current' },
         { k: 'Team', v: `${team.team_id} - ${team.team.full_name}` },
-        { k: 'Overall status', v: coverage.status },
-        { k: 'Readiness', v: coverage.readiness.map((item) => `${item.key}: ${item.status}`).join(' | ') },
-        { k: 'Position groups', v: coverage.position_groups.map((item) => `${item.group}: ${item.status}; metrics=${item.metric_source_status}; seller=${item.seller_thesis_status}`).join(' | ') },
-        { k: 'Top gaps', v: coverage.top_gaps.map((item) => `${item.label}: ${item.detail}`).join(' | ') || 'None' },
-        { k: 'Coverage precedence', v: 'Use readiness to decide how strong the answer can be before making a roster, cap, trade, rules, or player-quality claim.' },
+        { k: 'Overall status', v: plainCoverageStatus(coverage.status) },
+        { k: 'Readiness', v: coverage.readiness.map((item) => `${plainKey(item.key)}: ${plainCoverageStatus(item.status)}`).join(' | ') },
+        { k: 'Position groups', v: coverage.position_groups.map((item) => `${item.group}: ${plainCoverageStatus(item.status)}; performance data ${plainCoverageStatus(item.metric_source_status)}; trade availability ${plainCoverageStatus(item.seller_thesis_status)}`).join(' | ') },
+        { k: 'Top gaps', v: coverage.top_gaps.map((item) => plainCoverageGap(item.label, item.detail)).join(' | ') || 'None' },
+        { k: 'Summary', v: 'This shows which questions the public data can answer confidently and where it cannot.' },
       ],
       current_nfl_evidence: {
         dataset_id: 'nfl_coverage_current',
@@ -645,19 +1011,21 @@ function tradeGoalSourceForTeam(
     ref_index: refIndex,
     kind: 'ANALYST_DATA',
     source: 'GAMBIT_APP_DATA',
-    title: `Current NFL trade-goal screen - ${team.team_id} - ${team.team.full_name}`,
+    title: `Trade candidates for the ${team.team.full_name}`,
     updated_at: team.seed.as_of_date,
     data: {
       rows: [
         { k: 'Dataset', v: 'nfl_trade_screen_current' },
         { k: 'Team', v: `${team.team_id} - ${team.team.full_name}` },
-        { k: 'Objective', v: screen.objective },
-        { k: 'Lower-pain outgoing hierarchy', v: screen.outgoing_hierarchy.join(' | ') },
-        { k: 'Depth-after-trade checks', v: screen.depth_after_trade.join(' | ') },
+        { k: 'Summary', v: humanizeNflVisibleText(screen.objective) },
+        { k: 'Current roster', v: humanizeNflVisibleText(screen.outgoing_hierarchy.join(' | ')) },
+        { k: 'Depth consequence', v: humanizeNflVisibleText(screen.depth_after_trade.join(' | ')) },
+        { k: 'Player signals', v: screen.target_lanes.map(plainTradeTargetEvidence).join(' | ') || 'No named trade candidates are supported by the loaded public data.' },
+        { k: 'Teams', v: screen.counterparty_intel_team_ids.join(', ') },
+        { k: 'Top gaps', v: 'Player availability and asking price must be confirmed directly with the other team.' },
+        { k: 'What still needs checking', v: humanizeNflVisibleText(screen.bad_cap_relief_trades.join(' | ')) },
         { k: 'Seller thesis cards', v: screen.named_target_lanes.join(' | ') },
-        { k: 'Counterparty Intel teams', v: screen.counterparty_intel_team_ids.join(', ') },
         { k: 'Counterparty seller summaries', v: screen.counterparty_intel_summary.join(' | ') },
-        { k: 'Bad cap-relief trades', v: screen.bad_cap_relief_trades.join(' | ') },
         { k: 'Required answer checks', v: screen.answer_requirements.join(' | ') },
       ],
       current_nfl_evidence: {
@@ -680,15 +1048,16 @@ function tradeGoalIntelSourceForTeam(
     ref_index: refIndex,
     kind: 'ANALYST_DATA',
     source: 'GAMBIT_APP_DATA',
-    title: `Current NFL counterparty Intel - ${team.team_id} trade screen`,
+    title: `Team context behind the trade candidates - ${team.team.full_name}`,
     updated_at: team.seed.as_of_date,
     data: {
       rows: [
         { k: 'Dataset', v: 'nfl_context_graph' },
-        { k: 'Subject team', v: `${team.team_id} - ${team.team.full_name}` },
-        { k: 'Counterparty Intel teams', v: screen.counterparty_intel_team_ids.join(', ') },
+        { k: 'Team', v: `${team.team_id} - ${team.team.full_name}` },
+        { k: 'Teams', v: screen.counterparty_intel_team_ids.join(', ') },
+        { k: 'Player signals', v: screen.target_lanes.map(plainTradeTargetEvidence).join(' | ') || 'No named trade candidates are supported by the loaded public data.' },
+        { k: 'Summary', v: 'This adds public context about why another team might listen. Roster membership and cap figures come from the current roster and contract sources.' },
         { k: 'Seller thesis summaries', v: screen.counterparty_intel_summary.join(' | ') },
-        { k: 'Intel precedence', v: 'Use for counterparty motivation and posture only; current roster/cap rows remain authoritative for player-team and cap claims.' },
       ],
       current_nfl_evidence: {
         dataset_id: 'nfl_context_graph',
@@ -702,8 +1071,27 @@ function tradeGoalIntelSourceForTeam(
   };
 }
 
-function renderTradeGoalScreen(screen: NflTradeGoalScreen, refIndex: number | null): string {
+function renderTradeGoalScreen(
+  screen: NflTradeGoalScreen,
+  refIndex: number | null,
+  targetRefIndexes: number[],
+  historicalTradePriceRefIndexes: number[],
+): string {
   const ref = refIndex ? `[${refIndex}] ` : '';
+  const historicalPrice = screen.historical_trade_price;
+  const historicalLines = historicalPrice ? [
+    `Historical trade-price refs: ${historicalTradePriceRefIndexes.map((item) => `[${item}]`).join(' ')}`,
+    `Historical ${historicalPrice.position_groups.join(' and ')} trade sample: ${historicalPrice.trade_count} trades from ${historicalPrice.start_year}–${historicalPrice.end_year}; ${historicalPrice.allocable_trade_count} allocable single-player returns; ${formatBasisPointsAsPercent(historicalPrice.position_match_basis_points)} identity coverage.`,
+    `Full-period pick bands: ${formatHistoricalCompensationMix(historicalPrice.full_period_compensation_mix)}; premium-pick share=${historicalPrice.full_period_premium_share_basis_points == null ? 'not available' : formatBasisPointsAsPercent(historicalPrice.full_period_premium_share_basis_points)}.`,
+    `Historical price comparison: ${historicalTradePriceSupport(historicalPrice.compensation_status)}`,
+    `Historical pick-band result: ${historicalPrice.compensation_explanation}`,
+    `Historical comparables: ${historicalPrice.comparables.map((row, index) => `[${historicalTradePriceRefIndexes[index + 1]}] ${row.player_name}, ${row.event_date ?? row.event_year}, ${row.from_team_id ?? '—'}→${row.to_team_id ?? '—'}, ${row.compensation_summary ?? row.compensation_band ?? 'return not allocated'}`).join(' | ') || 'none'}`,
+    historicalPrice.compensation_status === 'insufficient_evidence'
+      ? 'Show the observed trades as examples, but do not use this sample to price a current player. It is too small for a reliable historical range.'
+      : 'Use those trades to reason about the historical price range and which deals are most comparable. A historical range is not evidence of a current team’s asking price or willingness to trade.',
+  ] : screen.historical_trade_price_requested ? [
+    'Historical trade-price evidence could not be loaded. Do not infer whether the user’s proposed pick limit is above, within, or below the market.',
+  ] : [];
   return [
     `${ref}ANALYST_DATA - ${screen.subject_team_id} trade-goal checks`,
     `Objective: ${screen.objective}`,
@@ -711,9 +1099,106 @@ function renderTradeGoalScreen(screen: NflTradeGoalScreen, refIndex: number | nu
     `Lower-pain outgoing hierarchy: ${screen.outgoing_hierarchy.join(' | ')}`,
     `Seller thesis cards: ${screen.named_target_lanes.join(' | ')}`,
     `Counterparty seller screen: ${screen.counterparty_intel_summary.join(' | ')}`,
+    `Player-specific source refs: ${screen.target_lanes.map((lane, index) => `[${targetRefIndexes[index]}] ${lane.target_player_name} (${lane.target_team_id})`).join(' | ') || 'none'}`,
+    'Cite the player-specific ref for every named target. Use the broader trade and team-context refs only for cross-player context.',
+    ...historicalLines,
     `Bad cap-relief/non-core guardrails: ${screen.bad_cap_relief_trades.join(' | ')}`,
     `Required answer structure: ${screen.answer_requirements.join(' | ')}`,
   ].join('\n');
+}
+
+function humanizeTradePriceExplanation(value: string): string {
+  return value
+    .replace(/round 1=/gi, 'Round 1: ')
+    .replace(/rounds 2–3=/gi, 'Rounds 2–3: ')
+    .replace(/rounds 4–7=/gi, 'Rounds 4–7: ')
+    .replace(/player-only=/gi, 'player-only: ')
+    .replace(/Exact identity coverage across the scoped identity-audit cohort/gi, 'Player match coverage');
+}
+
+function formatBasisPointsAsPercent(value: number): string {
+  return `${(value / 100).toFixed(value % 100 === 0 ? 0 : 1)}%`;
+}
+
+function formatHistoricalCompensationMix(
+  mix: NflHistoricalTradePriceEvidence['full_period_compensation_mix'],
+): string {
+  return `Round 1: ${mix.round_1}; Rounds 2–3: ${mix.rounds_2_3}; Rounds 4–7: ${mix.rounds_4_7}; player-only: ${mix.player_only}`;
+}
+
+function historicalTradePriceSupport(
+  status: NflHistoricalTradePriceEvidence['compensation_status'],
+): string {
+  if (status === 'supported') return 'Enough trades in both comparison windows for a firm historical price comparison.';
+  if (status === 'directional') return 'The sample supports only a cautious historical price comparison.';
+  return 'Too few allocable trades in at least one comparison window to set a reliable historical price range.';
+}
+
+function plainTradeTargetEvidence(lane: NflTradeTargetLane): string {
+  const action = lane.recommended_action === 'call_now' ? 'priority call'
+    : lane.recommended_action === 'check_call' ? 'exploratory call'
+      : lane.recommended_action === 'monitor' ? 'monitor'
+        : lane.recommended_action === 'posture_change_only' ? 'unlikely unless the team changes direction'
+          : 'not a priority';
+  return humanizeNflVisibleText([
+    `${lane.target_player_name} (${lane.target_team_id}, ${lane.position ?? 'position not listed'}; ${action})`,
+    `Why a deal might happen: ${lane.seller_case}`,
+    `Why it might not: ${lane.seller_objection}`,
+    `What to confirm: ${lane.validation_trigger}`,
+  ].join(' - '));
+}
+
+function plainKey(value: string): string {
+  const normalized = value.trim().toLowerCase();
+  const labels: Record<string, string> = {
+    roster_cap_audit: 'Roster and cap questions',
+    cut_restructure: 'Cuts and restructures',
+    trade_outgoing: 'Trading a Giants player',
+    seller_trade: 'Identifying available targets',
+    player_quality: 'Player comparisons',
+    rules_question: 'NFL rule questions',
+  };
+  if (labels[normalized]) return labels[normalized];
+  return value.replace(/_/g, ' ').replace(/\b\w/g, (character) => character.toUpperCase());
+}
+
+function plainCoverageGap(label: string, detail: string): string {
+  const fraction = detail.match(/(\d+)\/(\d+)/);
+  const count = fraction?.[1];
+  const total = fraction?.[2];
+  const key = label.toLowerCase();
+  if (count && total && key.includes('contract') && key.includes('source')) {
+    return `${count} of ${total} contracts need more detail.`;
+  }
+  if (count && total && key.includes('cap row') && key.includes('source')) {
+    return `${count} of ${total} contracts need more detail.`;
+  }
+  if (count && total && key.includes('contract fields')) {
+    return `${count} of ${total} contracts include term, cut and dead-money, post-June, and trade figures.`;
+  }
+  if (count && total && key.includes('scorecard')) {
+    return `${count} of ${total} likely contributors have only usage, role, availability, or continuity information; public blocking-quality data for offensive linemen is not loaded.`;
+  }
+  if (key.includes('mini-roster') || key.includes('graph')) {
+    return 'Team context helps explain club direction; it is not used to establish the current roster.';
+  }
+  if (key.includes('public sample ceiling')) {
+    return 'Some players are rookies or did not play in 2025; do not infer NFL performance from those cases.';
+  }
+  if (key.includes('player metrics need context')) {
+    return 'Some players are rookies, did not play in 2025, or could not be matched to public performance data.';
+  }
+  return humanizeNflVisibleText(`${label}: ${detail}`)
+    .replace(/\bscorecards?\b/gi, 'player comparisons')
+    .replace(/\bgraph\b/gi, 'team context');
+}
+
+function plainCoverageStatus(value: string): string {
+  const normalized = value.trim().toLowerCase().replace(/[\s-]+/g, '_');
+  if (['ready', 'strong', 'high', 'complete', 'captured'].includes(normalized)) return 'strong';
+  if (['degraded', 'directional', 'medium', 'partial', 'limited'].includes(normalized)) return 'usable with caveats';
+  if (['blocked', 'weak', 'low', 'missing', 'unavailable', 'source_needed'].includes(normalized)) return 'not enough information';
+  return plainKey(value);
 }
 
 function traceDatasetsForSources(
@@ -768,7 +1253,7 @@ export async function buildNflTradeGoalScreen(
     buildOutgoingTradeCandidates(capRows, rollups, goalProtectedGroups, teamId),
   );
   const badCapReliefTrades = buildBadCapReliefTradeLines(capRows, teamId).slice(0, 7);
-  const targetRows = buildNamedTargetLaneRows(seed, teamId, question).slice(0, 20);
+  const targetRows = buildNamedTargetLaneRows(seed, teamId, question);
   const counterpartyContexts = await loadCounterpartyContexts([teamId, ...targetRows.map((row) => row.team_id)]);
   const scoredTargetLaneRows = targetRows
     .map((row) => buildNflTradeTargetLane(seed, row, teamId, counterpartyContexts.get(row.team_id)))
@@ -779,6 +1264,10 @@ export async function buildNflTradeGoalScreen(
       || a.target_player_name.localeCompare(b.target_player_name)
     ));
   const targetLaneRows = selectCounterpartyTargetLanes(scoredTargetLaneRows);
+  const historicalTradePriceRequested = requestsHistoricalTradePrice(question);
+  const historicalTradePrice = historicalTradePriceRequested
+    ? await loadHistoricalTradePriceEvidence(question, targetLaneRows).catch(() => null)
+    : null;
   const namedTargetLanes = targetLaneRows.map(formatTargetLane);
   const depthAfterTrade = outgoingCandidates.slice(0, 5).map((candidate) => candidate.depthLine);
 
@@ -806,6 +1295,8 @@ export async function buildNflTradeGoalScreen(
     counterparty_intel_team_ids: counterpartyIntelTeamIds,
     counterparty_intel_summary: counterpartyIntelSummary,
     bad_cap_relief_trades: badCapReliefTrades.length ? badCapReliefTrades : ['No bad cap-relief guardrails identified from current cap file.'],
+    historical_trade_price: historicalTradePrice,
+    historical_trade_price_requested: historicalTradePriceRequested,
     answer_requirements: [
       'Show a salary-out construction, a pick-led acquisition construction, and a stay-disciplined/no-trade path when the user asks for trade constructions.',
       'Before recommending Adebo/Holland or another premium starter, compare lower-pain outgoing contracts first and name the post-trade position-depth consequence.',
@@ -814,19 +1305,198 @@ export async function buildNflTradeGoalScreen(
       'For every named target, answer from the seller-thesis card: why would they say yes, what do they lose, and what validates availability.',
       'If a target keeps 2027 clean, make that conditional on no extension, restructure, or new-money component being added to the acquisition.',
       'If trade impact is negative on a high-confidence row, call it bad economics, not a source-review issue.',
+      ...(historicalTradePrice?.compensation_status === 'insufficient_evidence' ? [
+        'Show the available same-position trades as examples, but say the sample is too small to set a reliable draft-pick range.',
+      ] : historicalTradePrice ? [
+        'Use the historical same-position trade sample to judge whether the user’s draft-pick limit resembles prior returns.',
+        'Separate the historical market range from any current team’s unconfirmed asking price, and explain which comparable deals are closest.',
+      ] : []),
     ],
-    row_count: outgoingHierarchy.length + targetLanes.length + badCapReliefTrades.length + counterpartyIntelTeamIds.length,
+    row_count: outgoingHierarchy.length + targetLanes.length + badCapReliefTrades.length + counterpartyIntelTeamIds.length + (historicalTradePrice?.comparables.length ?? 0),
   };
 }
 
+async function loadHistoricalTradePriceEvidence(
+  question: string,
+  targetLanes: NflTradeTargetLane[],
+): Promise<NflHistoricalTradePriceEvidence | null> {
+  const positionGroups = historicalTradePositionGroups(question, targetLanes);
+  if (positionGroups.length === 0) return null;
+  const snapshot = await loadHistoricalTradeSnapshot();
+  const analysis = await analyzeNflTransactionMarket({
+    analysis_mode: 'comparables',
+    start_year: 2016,
+    end_year: 2025,
+    position_groups: positionGroups,
+    transaction_types: ['trade'],
+    max_comparables: 20,
+  }, { snapshot });
+  const tradeSource = analysis.source_refs.find((source) => source.id === 'trades')
+    ?? analysis.source_refs.find((source) => /trade/i.test(source.name))
+    ?? null;
+  const trends = analysis.position_trends.filter((trend) => positionGroups.includes(trend.position_group));
+  const compensationStatuses = trends.map((trend) => trend.trade_compensation.status);
+  const compensationStatus = compensationStatuses.length > 0
+    && compensationStatuses.every((status) => status === 'supported')
+    ? 'supported'
+    : compensationStatuses.length > 0
+      && compensationStatuses.every((status) => status !== 'insufficient_evidence')
+      ? 'directional'
+      : 'insufficient_evidence';
+  const comparisonSampleSize = trends.reduce((total, trend) => total + trend.trade_compensation.sample_size, 0);
+  const fullPeriodCompensationMix = historicalCompensationMix(
+    snapshot,
+    analysis.query.start_year,
+    analysis.query.end_year,
+    analysis.query.position_groups,
+  );
+  const fullPeriodAllocableCount = Object.values(fullPeriodCompensationMix).reduce((sum, count) => sum + count, 0);
+  const fullPeriodPremiumShareBasisPoints = fullPeriodAllocableCount === 0
+    ? null
+    : Math.round(((fullPeriodCompensationMix.round_1 + fullPeriodCompensationMix.rounds_2_3) * 10_000) / fullPeriodAllocableCount);
+  const compensationDirection = trends.length === 1
+    ? trends[0].trade_compensation.direction
+    : trends.map((trend) => `${trend.position_group}: ${trend.trade_compensation.direction}`).join('; ');
+  const compensationExplanation = trends
+    .map((trend) => `${trend.position_group}: ${trend.trade_compensation.explanation}`)
+    .join(' | ');
+  const comparables = analysis.comparables
+    .filter((row) => row.identity_confidence === 'matched')
+    .filter((row) => isClearHistoricalPositionComparable(row, positionGroups))
+    .filter((row) => row.compensation_summary || row.compensation_band)
+    .slice(0, 8)
+    .map((row) => ({
+      ...row,
+      source_url: tradeSource && row.source_ref_ids.includes(tradeSource.id) ? tradeSource.url : null,
+    }));
+  return {
+    snapshot_id: analysis.snapshot_id,
+    analysis_id: analysis.analysis_id,
+    start_year: analysis.query.start_year,
+    end_year: analysis.query.end_year,
+    baseline_years: analysis.query.baseline_years,
+    recent_years: analysis.query.recent_years,
+    position_groups: analysis.query.position_groups,
+    status: analysis.status,
+    trade_count: analysis.coverage.trade_count,
+    allocable_trade_count: analysis.coverage.allocable_trade_count,
+    position_match_basis_points: analysis.coverage.position_match_basis_points,
+    comparison_sample_size: comparisonSampleSize,
+    full_period_compensation_mix: fullPeriodCompensationMix,
+    full_period_premium_share_basis_points: fullPeriodPremiumShareBasisPoints,
+    compensation_status: compensationStatus,
+    compensation_direction: compensationDirection,
+    compensation_explanation: compensationExplanation,
+    trade_price_method: analysis.methodology.trade_price,
+    comparables,
+    trade_source: tradeSource,
+    limitations: analysis.limitations,
+  };
+}
+
+function historicalCompensationMix(
+  snapshot: NflTransactionMarketSnapshot,
+  startYear: number,
+  endYear: number,
+  positionGroups: NflPositionMarketGroup[],
+): NflHistoricalTradePriceEvidence['full_period_compensation_mix'] {
+  const mix = { round_1: 0, rounds_2_3: 0, rounds_4_7: 0, player_only: 0 };
+  for (const event of snapshot.events) {
+    if (event.transaction_type !== 'trade'
+      || event.event_year < startYear
+      || event.event_year > endYear
+      || !event.position_group
+      || !positionGroups.includes(event.position_group)
+      || event.trade_player_asset_count !== 1) continue;
+    const rounds = event.compensation_pick_rounds ?? [];
+    if (rounds.some((round) => round === 1)) mix.round_1 += 1;
+    else if (rounds.some((round) => round === 2 || round === 3)) mix.rounds_2_3 += 1;
+    else if (rounds.some((round) => round >= 4 && round <= 7)) mix.rounds_4_7 += 1;
+    else if (event.compensation_includes_player === true) mix.player_only += 1;
+    else if (event.compensation_band === 'round_1') mix.round_1 += 1;
+    else if (event.compensation_band === 'rounds_2_3') mix.rounds_2_3 += 1;
+    else if (event.compensation_band === 'rounds_4_7') mix.rounds_4_7 += 1;
+    else if (event.compensation_band === 'player_only') mix.player_only += 1;
+  }
+  return mix;
+}
+
+async function loadHistoricalTradeSnapshot() {
+  if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    try {
+      return await loadCurrentNflTransactionMarketSnapshot();
+    } catch {
+      // The checked-in snapshot is checksum-verified and keeps local analysis
+      // useful when the database is temporarily unavailable.
+    }
+  }
+  return (await loadReviewedNflTransactionSnapshot()).snapshot;
+}
+
+function requestsHistoricalTradePrice(question: string): boolean {
+  return /\b(?:day[-\s]?[123]|first[-\s]?round|second[-\s]?round|third[-\s]?round|fourth[-\s]?round|fifth[-\s]?round|sixth[-\s]?round|seventh[-\s]?round|round\s*[1-7]|r[1-7]|draft[-\s]?(?:pick|capital)|compensation|asking price|trade price)\b/i.test(question);
+}
+
+function historicalTradePositionGroups(
+  question: string,
+  targetLanes: NflTradeTargetLane[],
+): NflPositionMarketGroup[] {
+  if (asksForInteriorOffensiveLine(question)) return ['IOL'];
+  if (/\b(?:offensive tackles?|left tackle|right tackle|ot)\b/i.test(question)) return ['OT'];
+  if (/\b(?:wide receivers?|receivers?|wideouts?|wr)\b/i.test(question)) return ['WR'];
+  if (/\b(?:edge|outside rush|pass[-\s]?rush)\b/i.test(question)) return ['EDGE'];
+  if (/\b(?:interior defensive (?:line|lineman|linemen)|defensive tackles?|3[-\s]?tech|nose tackles?|idl|dt)\b/i.test(question)) return ['IDL'];
+  if (asksForBareTackle(question)) return ['OT'];
+  if (/\b(?:cornerbacks?|corners?|cb)\b/i.test(question)) return ['CB'];
+  if (/\b(?:safet(?:y|ies)|free safety|strong safety)\b/i.test(question)) return ['S'];
+  if (/\b(?:linebackers?|off[-\s]?ball|lb)\b/i.test(question)) return ['LB'];
+  if (/\b(?:running backs?|rb)\b/i.test(question)) return ['RB'];
+  if (/\b(?:tight ends?|te)\b/i.test(question)) return ['TE'];
+  if (/\b(?:quarterbacks?|qb)\b/i.test(question)) return ['QB'];
+  const inferred = targetLanes
+    .map((lane) => transactionMarketPositionGroup(lane.position))
+    .filter((group): group is NflPositionMarketGroup => Boolean(group));
+  return [...new Set(inferred)].slice(0, 2);
+}
+
+function transactionMarketPositionGroup(position: string | null): NflPositionMarketGroup | null {
+  const normalized = normalizedPosition(position);
+  if (['G', 'C', 'OL', 'IOL'].includes(normalized)) return 'IOL';
+  if (['OT', 'T'].includes(normalized)) return 'OT';
+  if (normalized === 'WR') return 'WR';
+  if (['EDGE', 'DE', 'OLB'].includes(normalized)) return 'EDGE';
+  if (['IDL', 'DT', 'NT', 'DL'].includes(normalized)) return 'IDL';
+  if (normalized === 'CB') return 'CB';
+  if (['S', 'FS', 'SS', 'DB'].includes(normalized)) return 'S';
+  if (['LB', 'ILB', 'MLB'].includes(normalized)) return 'LB';
+  if (['RB', 'FB'].includes(normalized)) return 'RB';
+  if (normalized === 'TE') return 'TE';
+  if (normalized === 'QB') return 'QB';
+  return null;
+}
+
+function isClearHistoricalPositionComparable(
+  row: NflTransactionComparable,
+  requested: NflPositionMarketGroup[],
+): boolean {
+  if (!row.position_group || !requested.includes(row.position_group)) return false;
+  if (row.position_group !== 'IOL') return true;
+  return ['G', 'C', 'OG', 'OL', 'IOL'].includes(normalizedPosition(row.raw_position));
+}
+
 function tradeGoalObjective(question: string): string {
+  if (asksForInteriorOffensiveLine(question)) {
+    return 'add interior offensive-line help without overpaying in draft capital';
+  }
+  if (asksForOffensiveLine(question)) return 'add offensive-line help without overpaying in draft capital';
   if (/\b(interior|3[-\s]?tech|dt|defensive tackle|inside pass|interior pass)\b/i.test(question)) {
     return /\b2027|future cap|new money|long deal|backloaded\b/i.test(question)
       ? 'add interior pass-rush juice without creating a 2027 cap problem'
       : 'add interior defensive-line/pass-rush help';
   }
+  if (asksForBareTackle(question)) return 'add offensive-tackle help without overpaying in draft capital';
   if (/\bpass[-\s]?rush|pressure|rush\b/i.test(question)) return 'add pass-rush pressure while preserving cap flexibility';
-  return 'evaluate trade constructions with roster-depth and cap-discipline checks';
+  return 'identify realistic trade options without weakening the roster or creating a cap problem';
 }
 
 function buildOutgoingTradeCandidates(
@@ -982,7 +1652,8 @@ function buildNamedTargetLaneRows(
   subjectTeamId: string,
   question: string,
 ): NflCapRow[] {
-  const targetPositions = targetPositionsForQuestion(question);
+  const targetPositions = targetPositionsForQuestion(question)
+    ?? targetPositionsForNamedSubjectPlayer(seed, subjectTeamId, question);
   if (!targetPositions) return [];
   const maxYears = /\b2027|future cap|new money|long deal|backloaded\b/i.test(question) ? 1 : 2;
   return seed.cap_rows
@@ -1005,7 +1676,33 @@ function buildNamedTargetLaneRows(
       || (b.cap_number_2026 ?? 0) - (a.cap_number_2026 ?? 0)
       || a.player_name.localeCompare(b.player_name)
     ))
-    .slice(0, 20);
+    .slice(0, 120);
+}
+
+function targetPositionsForNamedSubjectPlayer(
+  seed: NflDemoSeed,
+  subjectTeamId: string,
+  question: string,
+): Set<string> | null {
+  const subjectPlayers = seed.roster_entries
+    .filter((row) => row.team_id === subjectTeamId && row.player_name.trim())
+    .sort((a, b) => b.player_name.length - a.player_name.length);
+  for (const player of subjectPlayers) {
+    if (!containsPlayerName(question, player.player_name)) continue;
+    const position = normalizedPosition(player.position);
+    return position === 'SAF' ? new Set(['S', 'SAF', 'FS', 'SS', 'DB'])
+      : position === 'DB' ? new Set(['CB', 'DB', 'S', 'SAF', 'FS', 'SS'])
+        : position === 'DE' ? new Set(['DE', 'EDGE', 'OLB', 'LB'])
+          : position === 'G' || position === 'C' || position === 'OT' || position === 'T'
+            ? new Set(['OL', 'G', 'C', 'OT', 'T'])
+            : new Set([position]);
+  }
+  return null;
+}
+
+function containsPlayerName(question: string, playerName: string): boolean {
+  const escaped = playerName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(?:^|[^A-Za-z])${escaped}(?=$|[^A-Za-z])`, 'i').test(question);
 }
 
 function selectCounterpartyTargetLanes(lanes: NflTradeTargetLane[]): NflTradeTargetLane[] {
@@ -1016,8 +1713,9 @@ function selectCounterpartyTargetLanes(lanes: NflTradeTargetLane[]): NflTradeTar
     }
   };
 
-  for (const lane of lanes.filter((item) => item.motivation_tier === 'credible_call').slice(0, 4)) addLane(lane);
-  for (const lane of lanes.filter((item) => item.motivation_tier === 'monitor_only').slice(0, 6)) addLane(lane);
+  for (const lane of lanes.filter((item) => item.recommended_action === 'call_now').slice(0, 3)) addLane(lane);
+  for (const lane of lanes.filter((item) => item.recommended_action === 'check_call').slice(0, 6)) addLane(lane);
+  for (const lane of lanes.filter((item) => item.recommended_action === 'monitor').slice(0, 4)) addLane(lane);
   const topLongShots = lanes
     .filter((item) => item.motivation_tier === 'long_shot_unless_posture_changes' && item.contract_fit.includes('high impact'))
     .sort((a, b) => (
@@ -1031,12 +1729,21 @@ function selectCounterpartyTargetLanes(lanes: NflTradeTargetLane[]): NflTradeTar
 
   return selected
     .sort((a, b) => (
-      motivationTierRank(a.motivation_tier) - motivationTierRank(b.motivation_tier)
+      recommendedActionRank(a.recommended_action) - recommendedActionRank(b.recommended_action)
+      || motivationTierRank(a.motivation_tier) - motivationTierRank(b.motivation_tier)
       || b.motivation_score - a.motivation_score
       || (b.contract_fit.includes('high impact') ? 1 : 0) - (a.contract_fit.includes('high impact') ? 1 : 0)
       || a.target_player_name.localeCompare(b.target_player_name)
     ))
     .slice(0, 9);
+}
+
+function recommendedActionRank(action: NflTradeRecommendedAction): number {
+  if (action === 'call_now') return 0;
+  if (action === 'check_call') return 1;
+  if (action === 'monitor') return 2;
+  if (action === 'posture_change_only') return 3;
+  return 4;
 }
 
 async function loadCounterpartyContexts(teamIds: string[]): Promise<Map<string, EffectiveTeamContext>> {
@@ -1125,6 +1832,8 @@ function buildNflTradeTargetLane(
     what_they_lose: whatSellerLoses(row, rank, sellerDepthConsequence),
     availability_validation: validationTrigger,
     source_refs: sourceRefs,
+    contract_source_url: row.source_url,
+    roster_source_url: seed.teams.find((team) => team.team_id === row.team_id)?.source_url ?? null,
   };
 }
 
@@ -1409,9 +2118,12 @@ function recommendedActionForTradeLane(
 ): NflTradeRecommendedAction {
   const friction = signals.tradeMarketIntel?.market_preferences.division_rivalry_friction ?? '';
   const divisionFriction = subjectTeamId === 'NYG' && /\bNFC East\b|division/i.test(friction);
+  const playerStatus = tradeStancePlayerStatus(row, stance);
   if (!signals.tradeMarketIntel || !stance || signals.generic) {
     return motivation.tier === 'long_shot_unless_posture_changes' ? 'posture_change_only' : 'monitor';
   }
+  if (playerStatus === 'core') return 'do_not_lead';
+  if (playerStatus === 'unlisted') return 'monitor';
   if (signals.sellerPosture === 'posture_change_only') return 'posture_change_only';
   if (signals.sellerPosture === 'buyer_hold' && divisionFriction) return 'do_not_lead';
   if (motivation.tier === 'long_shot_unless_posture_changes') return signals.sellerPosture === 'buyer_hold' ? 'do_not_lead' : 'posture_change_only';
@@ -1436,6 +2148,13 @@ function sellerCaseForTradeLane(
   signals: ReturnType<typeof tradeContextSignals>,
   stance: TradeMarketIntelSignals['position_group_stance'][number] | null,
 ): string {
+  const playerStatus = tradeStancePlayerStatus(row, stance);
+  if (playerStatus === 'core') {
+    return `Current team context lists ${row.player_name} as a player the club intends to keep; there is no supported reason to expect a trade.`;
+  }
+  if (playerStatus === 'unlisted') {
+    return `Current team context does not identify ${row.player_name} as a player the club is open to moving.`;
+  }
   if (signals.tradeMarketIntel?.seller_posture.evidence && stance?.stance) {
     const returnTypes = signals.tradeMarketIntel.market_preferences.desired_return_types
       .slice(0, 2)
@@ -1454,8 +2173,13 @@ function sellerObjectionForTradeLane(
   stance: TradeMarketIntelSignals['position_group_stance'][number] | null,
   sellerDepthConsequence: string,
 ): string {
+  const playerStatus = tradeStancePlayerStatus(row, stance);
+  if (playerStatus === 'core') return `${row.player_name} is listed as a core player at the position.`;
+  if (playerStatus === 'unlisted' && stance?.movable_players.length) {
+    return `The current team context identifies ${stance.movable_players.join(', ')} as more plausible trade options at the position.`;
+  }
   const guardrail = signals.tradeMarketIntel?.no_trade_guardrails[0]?.guardrail;
-  if (guardrail) return guardrail;
+  if (guardrail && stance) return guardrail;
   if (stance?.seller_depth_notes || stance?.sell_threshold) {
     return [stance.seller_depth_notes, stance.sell_threshold].filter(Boolean).join(' ');
   }
@@ -1469,8 +2193,13 @@ function validationTriggerForTradeLane(
   signals: ReturnType<typeof tradeContextSignals>,
   stance: TradeMarketIntelSignals['position_group_stance'][number] | null,
 ): string {
-  const validation = signals.tradeMarketIntel?.availability_validation[0]?.check;
-  const trigger = signals.tradeMarketIntel?.trade_triggers[0];
+  const playerStatus = tradeStancePlayerStatus(row, stance);
+  if (playerStatus === 'core') return `Do not treat ${row.player_name} as available unless the club’s competitive direction changes.`;
+  if (playerStatus === 'unlisted' && stance?.movable_players.length) {
+    return `Ask whether ${row.player_name} is actually outside the weekly plan; public team context instead identifies ${stance.movable_players.join(', ')} as movable.`;
+  }
+  const validation = stance ? signals.tradeMarketIntel?.availability_validation[0]?.check : undefined;
+  const trigger = stance ? signals.tradeMarketIntel?.trade_triggers[0] : undefined;
   if (validation && trigger) return `${validation} Trigger to upgrade: ${trigger.trigger} -> ${trigger.implication}`;
   if (validation) return validation;
   if (stance?.sell_threshold) return `Validate seller threshold: ${stance.sell_threshold}`;
@@ -1478,6 +2207,21 @@ function validationTriggerForTradeLane(
     return 'Confirm seller asking price, medicals, role, and whether draft capital beats their comp/depth alternatives.';
   }
   return `Confirm availability before treating ${row.player_name} as a real target; current evidence supports only a lane, not seller intent.`;
+}
+
+function tradeStancePlayerStatus(
+  row: NflCapRow,
+  stance: TradeMarketIntelSignals['position_group_stance'][number] | null,
+): 'core' | 'movable' | 'unlisted' | 'unknown' {
+  if (!stance) return 'unknown';
+  const player = comparablePlayerName(row.player_name);
+  if (stance.core_players.some((name) => comparablePlayerName(name) === player)) return 'core';
+  if (stance.movable_players.some((name) => comparablePlayerName(name) === player)) return 'movable';
+  return stance.core_players.length || stance.movable_players.length ? 'unlisted' : 'unknown';
+}
+
+function comparablePlayerName(value: string): string {
+  return value.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, ' ').trim();
 }
 
 function formatTargetLane(lane: NflTradeTargetLane): string {
@@ -1521,9 +2265,16 @@ function motivationTierRank(tier: NflTradeMotivationTier): number {
 }
 
 function targetPositionsForQuestion(question: string): Set<string> | null {
+  if (asksForInteriorOffensiveLine(question)) {
+    return new Set(['OL', 'G', 'C']);
+  }
+  if (asksForOffensiveLine(question)) {
+    return new Set(['OL', 'G', 'C', 'OT', 'T']);
+  }
   if (/\b(interior|3[-\s]?tech|dt|defensive tackle|inside pass|interior pass)\b/i.test(question)) {
     return new Set(['DT', 'NT', 'DL']);
   }
+  if (asksForBareTackle(question)) return new Set(['OT', 'T']);
   if (/\b(edge|outside rush|pass[-\s]?rush|pressure)\b/i.test(question)) {
     return new Set(['DE', 'EDGE', 'OLB', 'LB']);
   }
@@ -1535,18 +2286,29 @@ function targetPositionsForQuestion(question: string): Set<string> | null {
     return new Set(['S', 'SAF', 'FS', 'SS', 'DB']);
   }
   if (/\b(linebacker|off[-\s]?ball|lb)\b/i.test(question)) return new Set(['LB', 'ILB', 'MLB', 'OLB']);
-  if (/\b(offensive line|o-line|ol|guard|center|tackle|interior offensive line|iOL)\b/i.test(question)) {
-    return new Set(['OL', 'G', 'C', 'OT', 'T']);
-  }
   if (/\b(quarterback|qb)\b/i.test(question)) return new Set(['QB']);
   return null;
 }
 
 function goalProtectedPositionGroups(question: string): Set<string> {
   const groups = new Set<string>();
-  if (/\b(interior|3[-\s]?tech|dt|defensive tackle|inside pass|interior pass)\b/i.test(question)) groups.add('DL');
+  if (asksForOffensiveLine(question)) groups.add('OL');
+  else if (/\b(interior|3[-\s]?tech|dt|defensive tackle|inside pass|interior pass)\b/i.test(question)) groups.add('DL');
+  else if (asksForBareTackle(question)) groups.add('OL');
   if (/\b(edge|outside rush|pass[-\s]?rush|pressure)\b/i.test(question) && !groups.has('DL')) groups.add('EDGE/LB');
   return groups;
+}
+
+function asksForInteriorOffensiveLine(question: string): boolean {
+  return /\b(?:interior offensive (?:line|lineman|linemen)|interior o[-\s]?line|guards?(?:\s+and\s+centers?)?|centers?(?:\s+and\s+guards?)?|iol)\b/i.test(question);
+}
+
+function asksForOffensiveLine(question: string): boolean {
+  return /\b(?:interior offensive (?:line|lineman|linemen)|offensive line|offensive lineman|offensive linemen|offensive tackles?|o[-\s]?line|guards?|centers?|iol|ol)\b/i.test(question);
+}
+
+function asksForBareTackle(question: string): boolean {
+  return /\btackles?\b/i.test(question);
 }
 
 function capRankInGroup(row: NflCapRow, capRows: NflCapRow[]): number {
@@ -1629,6 +2391,32 @@ function topCapRows(rows: NflCapRow[], limit = 8): string[] {
     });
 }
 
+function plainCapRows(rows: NflCapRow[], limit = 8): string[] {
+  return rows
+    .slice()
+    .sort((a, b) => (
+      (b.cap_number_2026 ?? -1) - (a.cap_number_2026 ?? -1)
+      || (a.source_order ?? 9999) - (b.source_order ?? 9999)
+    ))
+    .slice(0, limit)
+    .map((row) => {
+      const years = row.contract_years_remaining ?? row.years_remaining;
+      const tradeEffect = row.trade_savings_2026 == null
+        ? 'trade cap effect not available'
+        : row.trade_savings_2026 >= 0
+          ? `${formatMoney(row.trade_savings_2026)} in 2026 cap space created by a trade`
+          : `${formatMoney(Math.abs(row.trade_savings_2026))} in additional 2026 cap cost from a trade`;
+      return `${row.player_name} (${row.position ?? 'position not listed'}): ${formatMoney(row.cap_number_2026) ?? '2026 cap hit not available'} cap hit; ${formatMoney(row.guaranteed_remaining) ?? 'remaining guarantees not available'} guaranteed; ${tradeEffect}; ${years == null ? 'contract term not available' : `${years} year${years === 1 ? '' : 's'} left`}`;
+    });
+}
+
+function plainPositionRollup(rollup: PositionGroupRollup): string {
+  const topNames = rollup.top_contracts
+    .map((contract) => contract.match(/^([^()]+)\s*\(/)?.[1]?.trim())
+    .filter((name): name is string => Boolean(name));
+  return `${rollup.group}: ${rollup.roster_count} players; ${formatMoney(rollup.cap_total) ?? '$0.00M'} in 2026 cap commitments; ${rollup.source_needed_count} contract${rollup.source_needed_count === 1 ? '' : 's'} ${rollup.source_needed_count === 1 ? 'needs' : 'need'} more detail; largest deals ${topNames.join(', ') || 'not available'}`;
+}
+
 function formatRollup(rollup: PositionGroupRollup): string {
   return `${rollup.group}: roster=${rollup.roster_count}; cap_rows=${rollup.cap_row_count}; cap=${formatMoney(rollup.cap_total) ?? '$0.00M'}; source_needed=${rollup.source_needed_count}; top=${rollup.top_contracts.join(', ') || 'none'}`;
 }
@@ -1680,6 +2468,11 @@ function formatPlayerMetricCompleteness(completeness: PlayerMetricCompleteness):
   ].join('; ');
 }
 
+function plainPlayerMetricCoverage(completeness: PlayerMetricCompleteness): string {
+  const denominator = completeness.row_count;
+  return `${completeness.captured_count} of ${denominator} players have reviewed public performance data; ${completeness.strong_scorecard_count} have enough position-specific information for a firm football comparison; ${completeness.directional_scorecard_count} can support only a cautious comparison; ${completeness.gap_scorecard_count} do not have enough performance detail.`;
+}
+
 function topMetricRows(rows: NflPlayerMetricRow[], limit = 8): string[] {
   return rows
     .filter((row) => row.source_status === 'captured')
@@ -1700,6 +2493,30 @@ function topMetricRows(rows: NflPlayerMetricRow[], limit = 8): string[] {
       const families = (row.metric_families ?? []).length ? row.metric_families?.join('+') : row.metric_source_family;
       const flags = (row.quality_flags ?? []).length ? `; flags=${row.quality_flags?.join(',')}` : '';
       return `${row.player_name} (${row.position ?? 'UNK'}; coverage=${row.metric_coverage_level ?? 'directional'}; snaps=${row.snaps_2025 ?? 0}; games=${row.games_2025 ?? 'unknown'}; ${production || 'production=n/a'}; ${scorecard}; source=${families ?? 'public metrics'}${flags})`;
+    });
+}
+
+function plainPlayerMetricRows(rows: NflPlayerMetricRow[], limit = 8): string[] {
+  return rows
+    .filter((row) => row.source_status === 'captured')
+    .slice()
+    .sort((a, b) => (b.snaps_2025 ?? 0) - (a.snaps_2025 ?? 0) || a.player_name.localeCompare(b.player_name))
+    .slice(0, limit)
+    .map((row) => {
+      const production = [
+        row.passing_yards_2025 ? `${row.passing_yards_2025} passing yards` : null,
+        row.rushing_yards_2025 ? `${row.rushing_yards_2025} rushing yards` : null,
+        row.receiving_yards_2025 ? `${row.receiving_yards_2025} receiving yards` : null,
+        row.tackles_2025 ? `${row.tackles_2025} tackle${row.tackles_2025 === 1 ? '' : 's'}` : null,
+        row.sacks_2025 ? `${row.sacks_2025} sack${row.sacks_2025 === 1 ? '' : 's'}` : null,
+        row.interceptions_2025 ? `${row.interceptions_2025} interception${row.interceptions_2025 === 1 ? '' : 's'}` : null,
+        row.touchdowns_2025 ? `${row.touchdowns_2025} touchdown${row.touchdowns_2025 === 1 ? '' : 's'}` : null,
+      ].filter(Boolean).join(', ');
+      const position = normalizedPosition(row.position);
+      const limitation = ['OL', 'G', 'C', 'OT', 'T'].includes(position)
+        ? '; public data shows availability and continuity, not blocking quality'
+        : '';
+      return `${row.player_name} (${row.position ?? 'position not listed'}): ${row.snaps_2025 ?? 0} snaps in ${row.games_2025 ?? 'an unlisted number of'} games${production ? `; ${production}` : ''}${limitation}`;
     });
 }
 
@@ -1736,6 +2553,11 @@ function formatContractLedgerCompleteness(completeness: ContractLedgerCompletene
     `void_years=${completeness.void_year_count}/${denominator}`,
     `evidence_quality_counts(${confidence || 'none'})`,
   ].join('; ');
+}
+
+function plainContractCoverage(completeness: ContractLedgerCompleteness): string {
+  const denominator = completeness.row_count;
+  return `${completeness.guarantee_count} of ${denominator} contracts include remaining guarantees; ${completeness.dead_money_count} include cut and dead-money figures; ${completeness.post_june_count} include post-June figures; ${completeness.trade_count} include trade figures; ${completeness.contract_year_count} include the remaining term.`;
 }
 
 function friendlyLedgerConfidence(confidence: string | null | undefined): string {

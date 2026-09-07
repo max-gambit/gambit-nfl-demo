@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "season": "2026",
+  "as_of_date": "2026-09-03",
+  "retrieved_at": "2026-09-03T21:41:25Z",
+  "summaries": [
+    {
+      "team_id": "NYG",
+      "season": "2026",
+      "as_of_date": "2026-09-03",
+      "current_cap_space_dollars": 10392701,
+      "effective_cap_space_dollars": 10392701,
+      "league_cap_dollars": 301200000,
+      "applied_team_cap_dollars": 300195334,
+      "carryover_dollars": null,
+      "adjustments_dollars": null,
+      "top_51_cap_spending_dollars": 261190088,
+      "dead_money_dollars": 28612545,
+      "accounting_basis": "Top 51 offseason accounting",
+      "accounting_note": "Over The Cap calculates current room from the Top 51 active cap spending and dead-money totals shown in its 2026 table. Its current public pages do not separate carryover from other club adjustments.",
+      "source_status": "captured",
+      "source_urls": [
+        "https://overthecap.com/salary-cap-space",
+        "https://overthecap.com/calculator/new-york-giants",
+        "https://operations.nfl.com/calendar-events/nfl-free-agency/nfl-salary-cap"
+      ],
+      "source_content_sha256": {
+        "https://overthecap.com/salary-cap-space": "sha256:2fde3005dde78f9a56f9388cb3f4de9f95c27973c5555cc2dcd0ddccca2721e7",
+        "https://overthecap.com/salary-cap/new-york-giants": "sha256:31f089ddcda779a0dc6f1876b9838dbf828de513e7fc3204829bf9d77db34d1f",
+        "https://overthecap.com/calculator/new-york-giants": "sha256:e60f1ae1fbfb994f4680809c3ea2264aca23a315763abbf60b7097080e2e4ec9"
+      }
+    }
+  ],
+  "source_refs": [
+    {
+      "id": "overthecap_2026_cap_space_20260903",
+      "name": "Over The Cap 2026 salary-cap space table",
+      "url": "https://overthecap.com/salary-cap-space"
+    },
+    {
+      "id": "overthecap_nyg_calculator_20260903",
+      "name": "Over The Cap New York Giants calculator",
+      "url": "https://overthecap.com/calculator/new-york-giants"
+    },
+    {
+      "id": "nfl_official_2026_salary_cap",
+      "name": "NFL Football Operations 2026 salary cap",
+      "url": "https://operations.nfl.com/calendar-events/nfl-free-agency/nfl-salary-cap"
+    }
+  ],
+  "limitations": [
+    "The current public Over The Cap pages expose the applied team cap but do not separate carryover from other club adjustments, so both fields remain null.",
+    "Cap space changes with transactions and league accounting updates; the snapshot is labeled with its retrieval date and must be refreshed before later use."
+  ]
+}

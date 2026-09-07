@@ -1,0 +1,42 @@
+{
+  "schema": "codex_task_orchestrator_intent.v1",
+  "task_id": "nyg-demo-level-up-20260902-run6-red-team",
+  "objective_summary": "Independently red-team the accepted Giants demo candidate for football-operations usefulness, deterministic data integrity, and browser-reachable NBA contamination.",
+  "durable_recovery": true,
+  "requires_live_dirty_state": false,
+  "nodes": [
+    {
+      "id": "football_ops_red_team",
+      "goal": "Review the active product and hero fixtures as a skeptical New York Giants football-operations presenter. Test actionability, football language, evidence boundaries, presenter reliability, and meeting risk against plans/nyg-demo-level-up-20260902.md. Report only reproducible findings, sorted BLOCKER/HIGH/MEDIUM/LOW, and return codex_task_worker_result.v1.",
+      "dependencies": [],
+      "worker_class": "sandboxed_read",
+      "reservation": { "mode": "read", "paths": ["src/nyg", "shared/types.ts", "data/nfl-demo", "plans/nyg-demo-level-up-20260902.md"] },
+      "expected_output": "A reproducible football-operations review with exact file references and a PASS only if no meeting-risk defect remains.",
+      "verification": "Trace each finding to active code or fixtures and grade it against the saved GoalSpec.",
+      "stop_condition": "Stop after all reproducible findings are classified; do not propose speculative product expansion.",
+      "public_web_search": false
+    },
+    {
+      "id": "data_integrity_red_team",
+      "goal": "Independently recompute every hero branch total and inspect the data-health, exact-row, protection, fallback, model-explanation, and rule-citation gates. Report only reproducible findings, sorted BLOCKER/HIGH/MEDIUM/LOW, and return codex_task_worker_result.v1.",
+      "dependencies": [],
+      "worker_class": "sandboxed_read",
+      "reservation": { "mode": "read", "paths": ["server/src/nfl_data", "server/src/nfl_coverage", "server/src/nfl_rules", "server/src/nfl_decision", "server/src/claude/private_critic.ts", "server/tests/nfl_decision", "data/nfl-demo", "data/nfl-rules"] },
+      "expected_output": "An independent reconciliation report for figures, protections, readiness states, and authoritative citations.",
+      "verification": "Recompute totals from player actions and trace every rule ID to an exact authoritative locator.",
+      "stop_condition": "Return PASS only when totals and references independently reconcile; never repair missing evidence by assumption.",
+      "public_web_search": false
+    },
+    {
+      "id": "nba_bleed_red_team",
+      "goal": "Inspect the active import graph, NYG shell, seeds, QA flows, and browser exports for reachable NBA contamination or NBA-only fields. Distinguish dormant legacy files from active reachability. Report exact strings and paths, sorted BLOCKER/HIGH/MEDIUM/LOW, and return codex_task_worker_result.v1.",
+      "dependencies": [],
+      "worker_class": "sandboxed_read",
+      "reservation": { "mode": "read", "paths": ["src/App.tsx", "src/nyg", "src/api", "shared/types.ts", "server/src/routes/nfl.ts", "server/src/nfl_workspace", "qa-harness", "dist"] },
+      "expected_output": "A reachability-based contamination report that separates active user-visible output from dormant compatibility code.",
+      "verification": "Trace imports from src/App.tsx, scan active fixtures and rendered-copy sources, and inspect generated exports where available.",
+      "stop_condition": "PASS requires zero banned visible NBA terms or NBA-only fields in active outputs.",
+      "public_web_search": false
+    }
+  ]
+}

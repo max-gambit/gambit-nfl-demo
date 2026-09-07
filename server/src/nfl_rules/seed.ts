@@ -10,7 +10,15 @@ export interface NflRuleRow {
   title: string;
   summary: string;
   analysis_use: string;
+  authority_type: 'executed_cba' | 'nfl_operations';
+  source_document: string;
   source_url: string;
+  source_locator: string;
+  effective_date: string;
+  retrieved_at: string;
+  source_hash: string | null;
+  bounded_excerpt: string;
+  analysis_boundary: string;
   source_note: string;
 }
 
@@ -43,8 +51,31 @@ export function validateNflRulesCorpus(corpus: NflRulesCorpus): void {
   }
   const families = new Set<string>();
   for (const rule of corpus.rules) {
-    if (!rule.rule_family || !rule.summary || !rule.source_url) {
+    if (
+      !rule.rule_family
+      || !rule.title
+      || !rule.summary
+      || !rule.analysis_use
+      || !rule.authority_type
+      || !rule.source_document
+      || !rule.source_url
+      || !rule.source_locator
+      || !rule.effective_date
+      || !rule.retrieved_at
+      || !rule.bounded_excerpt
+      || !rule.analysis_boundary
+    ) {
       throw new Error('NFL rules corpus has an incomplete rule row');
+    }
+    const source = new URL(rule.source_url);
+    if (!['nflpaweb.blob.core.windows.net', 'operations.nfl.com'].includes(source.hostname)) {
+      throw new Error(`NFL rule ${rule.rule_family} does not use an approved authoritative source`);
+    }
+    if (rule.authority_type === 'executed_cba' && !/^sha256:[a-f0-9]{64}$/.test(rule.source_hash ?? '')) {
+      throw new Error(`NFL rule ${rule.rule_family} is missing a valid executed-CBA SHA-256 source hash`);
+    }
+    if (!/(Article|Section|page|heading)/i.test(rule.source_locator)) {
+      throw new Error(`NFL rule ${rule.rule_family} lacks an exact authority locator`);
     }
     if (families.has(rule.rule_family)) throw new Error(`NFL rules corpus duplicate rule family ${rule.rule_family}`);
     families.add(rule.rule_family);

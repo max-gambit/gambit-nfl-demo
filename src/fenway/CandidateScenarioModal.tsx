@@ -140,7 +140,7 @@ export function CandidateScenarioModal({
         project = await createProject({
           title: defaultProjectTitle,
           question: activeBrief?.question ?? details.decision_question,
-          objective: `Convert named candidate moves from option [${option.ref_index}] into trade scenarios for cap, CBA, basketball, and phone-framing validation.`,
+          objective: `Convert named candidate moves from option [${option.ref_index}] into roster scenarios for cap, NFL rule, football, and market validation.`,
           workflow_type: 'inbound_trade',
           subject_team_id: seed.model.subject_team_id,
           counterparty_team_id: seed.model.target_team_id,
@@ -220,7 +220,7 @@ export function CandidateScenarioModal({
         </div>
 
         <div style={mechanicsGridStyle}>
-          <MechanicsBlock title="Salary / CBA" body={candidate.salary_match} />
+          <MechanicsBlock title="Cap / NFL rule" body={candidate.salary_match} />
           <MechanicsBlock title="Likely cost" body={candidate.cost} />
           <MechanicsBlock title="Constraint" body={candidate.constraints} />
         </div>

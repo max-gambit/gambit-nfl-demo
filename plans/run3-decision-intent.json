@@ -1,0 +1,46 @@
+{
+  "schema": "codex_task_orchestrator_intent.v1",
+  "task_id": "nyg-demo-level-up-20260902-run3-decision",
+  "objective_summary": "Independently harden the deterministic NYG cap-roster engine and the NFL answer guardrails against numeric, citation, provenance, and private-input errors.",
+  "durable_recovery": true,
+  "requires_live_dirty_state": false,
+  "nodes": [
+    {
+      "id": "cap_roster_engine",
+      "goal": "Review and harden the existing deterministic cap-roster engine. Preserve the public API. Add or fix focused fixtures for negative economics, one action per player, exact branch reconciliation, protected players/groups, source-needed exclusion, stale/fallback readiness, missing locators, impossible targets, and user-entered assumptions. Do not touch routes or shared types. Return codex_task_worker_result.v1.",
+      "dependencies": [],
+      "worker_class": "sandboxed_write",
+      "reservation": {
+        "mode": "write",
+        "paths": [
+          "server/src/nfl_decision",
+          "server/tests/nfl_decision/test_cap_roster.test.ts"
+        ]
+      },
+      "expected_output": "A minimal reviewed patch to the deterministic engine and its focused fixture suite, or an explicit no-change result with evidence.",
+      "verification": "Run the focused nfl_decision test and server typecheck. Demonstrate every invariant from the goal in test assertions.",
+      "stop_condition": "Stop rather than allowing estimated/source-needed rows to drive exact recommendations or weakening any fail-closed guard.",
+      "public_web_search": false
+    },
+    {
+      "id": "answer_guardrails",
+      "goal": "Harden the NFL composer/private critic so an LLM may explain a validated deterministic cap-roster payload but cannot originate, repair, or alter integer dollar figures, branch totals, rule citations, or private inputs. Add focused adversarial tests and deterministic-summary fallback behavior without importing NBA concepts. Return codex_task_worker_result.v1.",
+      "dependencies": [],
+      "worker_class": "sandboxed_write",
+      "reservation": {
+        "mode": "write",
+        "paths": [
+          "server/src/claude/nfl_context_composer.ts",
+          "server/src/claude/private_critic.ts",
+          "server/src/claude/nfl_analyze_preview.ts",
+          "server/tests/data_analyst/test_nfl_context_composer_private_critic.test.ts",
+          "server/tests/data_analyst/test_nfl_analyze_preview.test.ts"
+        ]
+      },
+      "expected_output": "Branch-aware prompt contracts, deterministic-number/citation enforcement, abstention behavior, and adversarial fixtures.",
+      "verification": "Run the two focused test files and server typecheck; show that numeric/citation drift is rejected and deterministic fallback remains renderable.",
+      "stop_condition": "After two same-scope attempts, stop on unsupported output rather than relaxing the critic or inventing private team inputs.",
+      "public_web_search": false
+    }
+  ]
+}

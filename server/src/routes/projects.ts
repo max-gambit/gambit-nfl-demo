@@ -71,6 +71,14 @@ const DEFAULT_STAGE_NOTES: Record<ProjectStepId, string> = {
   proposal: 'Draft the decision package: recommended action, source-backed evidence, cap/tax impact, risks, formal execution checklist, ownership/league approval needs, and next steps.',
 };
 
+const NFL_STAGE_NOTES: Record<ProjectStepId, string> = {
+  research: 'Question: define the football decision, target, protected players and position groups, timing, and the private inputs that are explicitly unavailable.',
+  validate: 'Evidence: attach current roster and contract rows, exact rule locators, arithmetic checks, source boundaries, and the facts that still require club confirmation.',
+  feedback: 'Scenarios: compare deterministic branches, depth effects, replacement plans, and the conditions that would change the ordering.',
+  gm: 'Decision: select the smallest supported branch that meets the target, name unresolved football judgments, and record the decision owner.',
+  proposal: 'Action Plan: assign contract, personnel, medical, transaction-timing, and re-model checks without implying an executed move.',
+};
+
 const DEFAULT_COUNTERPARTY_CONTEXT: ProjectCounterpartyContext = {
   apron_level: '',
   cap_room: '',
@@ -105,8 +113,22 @@ export function defaultProjectTasks(): ProjectTaskTemplate[] {
   ];
 }
 
+export function defaultNflProjectTasks(): ProjectTaskTemplate[] {
+  return [
+    { step: 'research', label: 'Confirm the decision target, timing, and protected depth.', required: true, sort_order: 0 },
+    { step: 'research', label: 'Separate public facts, user-entered assumptions, and unavailable team-only inputs.', required: true, sort_order: 1 },
+    { step: 'validate', label: 'Reconcile every displayed dollar to a captured or defensibly derived contract row.', required: true, sort_order: 0 },
+    { step: 'validate', label: 'Open each material transaction rule at its exact official locator.', required: true, sort_order: 1 },
+    { step: 'feedback', label: 'Review depth effects and replacement plans with football operations.', required: true, sort_order: 0 },
+    { step: 'feedback', label: 'Record the evidence or threshold change that would alter the call.', required: false, sort_order: 1 },
+    { step: 'gm', label: 'Choose the smallest supported branch that clears the target.', required: true, sort_order: 0 },
+    { step: 'proposal', label: 'Assign contract, personnel, medical, timing, and re-model owners.', required: true, sort_order: 0 },
+  ];
+}
+
 projectRoutes.get('/', async (c) => {
-  const projects = await loadProjectSummaries();
+  const workspaceKey = c.req.query('workspace_key');
+  const projects = await loadProjectSummaries(workspaceKey);
   if (projects instanceof Error) return c.json({ error: 'load_projects_failed', detail: projects.message }, 500);
   return c.json({ projects });
 });
@@ -134,6 +156,8 @@ projectRoutes.post('/', async (c) => {
     .from('projects')
     .insert({
       title: normalized.input.title,
+      workspace_key: normalized.input.workspace_key,
+      seed_key: normalized.input.seed_key,
       question: normalized.input.question,
       objective: normalized.input.objective,
       workflow_type: normalized.input.workflow_type ?? 'inbound_trade',
@@ -155,7 +179,7 @@ projectRoutes.post('/', async (c) => {
   }
 
   const project = normalizeProject(insert.data);
-  const seed = await seedProjectWorkspace(project.id, normalized.sourceBrief ?? null);
+  const seed = await seedProjectWorkspace(project.id, normalized.sourceBrief ?? null, project.workspace_key);
   if (seed instanceof Error) return c.json({ error: 'seed_project_failed', detail: seed.message }, 500);
 
   if (normalized.input.source_brief_id) {
@@ -1410,6 +1434,10 @@ async function normalizeCreateProjectInput(
   const triggerSummary = typeof body.trigger_summary === 'string' && body.trigger_summary.trim()
     ? body.trigger_summary.trim()
     : (brief ? brief.question : derivedQuestion);
+  const workspaceKey = body.workspace_key === 'nyg-demo' ? 'nyg-demo' : 'legacy';
+  const seedKey = typeof body.seed_key === 'string' && body.seed_key.trim()
+    ? body.seed_key.trim().slice(0, 160)
+    : null;
 
   if (!derivedTitle) return { status: 400, error: 'title_required' };
   if (!derivedQuestion) return { status: 400, error: 'question_required' };
@@ -1419,6 +1447,8 @@ async function normalizeCreateProjectInput(
     status: 200,
     input: {
       title: derivedTitle.slice(0, 120),
+      workspace_key: workspaceKey,
+      seed_key: seedKey,
       question: derivedQuestion,
       objective: derivedObjective,
       workflow_type: workflowType,
@@ -1433,12 +1463,13 @@ async function normalizeCreateProjectInput(
   };
 }
 
-async function loadProjectSummaries(): Promise<ProjectSummary[] | Error> {
-  const res = await db
+async function loadProjectSummaries(workspaceKey?: string): Promise<ProjectSummary[] | Error> {
+  let query = db
     .from('projects')
     .select('*')
-    .is('archived_at', null)
-    .order('updated_at', { ascending: false });
+    .is('archived_at', null);
+  if (workspaceKey === 'nyg-demo' || workspaceKey === 'legacy') query = query.eq('workspace_key', workspaceKey);
+  const res = await query.order('updated_at', { ascending: false });
   if (res.error) return new Error(res.error.message);
   const projects = res.data ?? [];
   const projectIds = projects.map((project) => String(project.id));
@@ -1561,7 +1592,13 @@ async function attachBrief(projectId: string, briefId: string): Promise<ProjectS
   return normalizeProjectSourceBrief(insert.data);
 }
 
-async function seedProjectWorkspace(projectId: string, sourceBrief: Pick<Brief, 'thesis' | 'question'> | null): Promise<true | Error> {
+async function seedProjectWorkspace(
+  projectId: string,
+  sourceBrief: Pick<Brief, 'thesis' | 'question'> | null,
+  workspaceKey: string = 'legacy',
+): Promise<true | Error> {
+  const stageNotes = workspaceKey === 'nyg-demo' ? NFL_STAGE_NOTES : DEFAULT_STAGE_NOTES;
+  const taskTemplates = workspaceKey === 'nyg-demo' ? defaultNflProjectTasks() : defaultProjectTasks();
   const noteRows = STAGE_IDS.map((step) => {
     const sourceContext = step === 'research' && sourceBrief
       ? `\n\nInitial source: ${sourceBrief.thesis || sourceBrief.question}`
@@ -1569,8 +1606,8 @@ async function seedProjectWorkspace(projectId: string, sourceBrief: Pick<Brief, 
     return {
       project_id: projectId,
       step,
-      body: `${DEFAULT_STAGE_NOTES[step]}${sourceContext}`,
-      ai_draft: DEFAULT_STAGE_NOTES[step],
+      body: `${stageNotes[step]}${sourceContext}`,
+      ai_draft: stageNotes[step],
       citation_refs: [],
       updated_at: new Date().toISOString(),
     };
@@ -1583,7 +1620,7 @@ async function seedProjectWorkspace(projectId: string, sourceBrief: Pick<Brief, 
   const existing = await db.from('project_tasks').select('step, label').eq('project_id', projectId);
   if (existing.error) return new Error(existing.error.message);
   const existingKeys = new Set((existing.data ?? []).map((row) => `${String(row.step)}:${String(row.label)}`));
-  const missingTasks = defaultProjectTasks()
+  const missingTasks = taskTemplates
     .filter((task) => !existingKeys.has(`${task.step}:${task.label}`))
     .map((task) => ({ ...task, project_id: projectId, source: 'system' }));
   if (missingTasks.length > 0) {
@@ -1647,6 +1684,8 @@ function normalizeProject(row: Record<string, unknown>): Project {
     id: String(row.id),
     user_id: stringOrNull(row.user_id),
     title: String(row.title ?? 'Untitled project'),
+    workspace_key: row.workspace_key === 'nyg-demo' ? 'nyg-demo' : 'legacy',
+    seed_key: stringOrNull(row.seed_key),
     question: String(row.question ?? row.title ?? 'Untitled project'),
     objective: String(row.objective ?? ''),
     workflow_type: isProjectWorkflowType(row.workflow_type) ? row.workflow_type : 'inbound_trade',

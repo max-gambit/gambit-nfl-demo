@@ -9,7 +9,6 @@ import { briefRoutes } from './routes/briefs.js';
 import { cbaRoutes } from './routes/cba.js';
 import { contextGraphRoutes } from './routes/context_graph.js';
 import { monitorRoutes } from './routes/monitors.js';
-import { nbaRoutes } from './routes/nba.js';
 import { nflRoutes } from './routes/nfl.js';
 import { projectRoutes } from './routes/projects.js';
 import { startMonitorScheduler } from './scheduler/monitors.js';
@@ -53,7 +52,6 @@ app.route('/briefs', briefRoutes);
 app.route('/cba', cbaRoutes);
 app.route('/monitors', monitorRoutes);
 app.route('/context-graph', contextGraphRoutes);
-app.route('/nba', nbaRoutes);
 app.route('/nfl', nflRoutes);
 app.route('/projects', projectRoutes);
 

@@ -1,0 +1,42 @@
+{
+  "schema": "codex_task_orchestrator_intent.v1",
+  "task_id": "nyg-demo-level-up-20260902-run4-product-shell",
+  "objective_summary": "Independently polish and modularize the active Giants football-operations shell, deterministic decision presentation, and evidence inspector without changing public API contracts.",
+  "durable_recovery": true,
+  "requires_live_dirty_state": false,
+  "nodes": [
+    {
+      "id": "nfl_shell",
+      "goal": "Inspect the active src/nyg shell and improve only its CSS for sober football-operations hierarchy, legibility, responsive behavior at 1440x900, 1280x720, and 1024x768, keyboard focus visibility, and presenter-safe overflow. Do not change component contracts or copy. Return codex_task_worker_result.v1.",
+      "dependencies": [],
+      "worker_class": "sandboxed_write",
+      "reservation": { "mode": "write", "paths": ["src/nyg/nyg.css"] },
+      "expected_output": "A bounded CSS-only patch with responsive and accessibility improvements, or a no-change result with evidence.",
+      "verification": "Run root typecheck/build if dependencies are available; otherwise run static syntax/banned-term checks and report the environment boundary.",
+      "stop_condition": "Stop rather than hiding material content, shrinking text below usable presentation size, or adding decorative theatrics.",
+      "public_web_search": false
+    },
+    {
+      "id": "decision_room_ui",
+      "goal": "Extract a focused Decision Room component from the current active src/nyg/NygApp.tsx into src/nyg/DecisionRoom.tsx. Preserve behavior and public props, strengthen loading/insufficient-evidence/impossible-target rendering, and keep deterministic values immutable. Do not edit NygApp.tsx; root will integrate the exported component. Return codex_task_worker_result.v1.",
+      "dependencies": [],
+      "worker_class": "sandboxed_write",
+      "reservation": { "mode": "write", "paths": ["src/nyg/DecisionRoom.tsx"] },
+      "expected_output": "A reusable DecisionRoom component ready for root integration with explicit blocked, insufficient, and loading states.",
+      "verification": "Typecheck the new component against shared NFL types if dependencies are available; otherwise perform a syntax review and document the gap.",
+      "stop_condition": "Stop rather than inventing numbers, citations, private inputs, or changing server contracts.",
+      "public_web_search": false
+    },
+    {
+      "id": "evidence_ui",
+      "goal": "Extract a focused NFL evidence inspector from the current active src/nyg/NygApp.tsx into src/nyg/EvidencePanel.tsx. It must expose player contract source, captured/derived boundary, exact rule locators, claim usage, football consequence, and next confirmation actions. Do not edit NygApp.tsx; root will integrate it. Return codex_task_worker_result.v1.",
+      "dependencies": [],
+      "worker_class": "sandboxed_write",
+      "reservation": { "mode": "write", "paths": ["src/nyg/EvidencePanel.tsx"] },
+      "expected_output": "A reusable NFL-only evidence component ready for root integration.",
+      "verification": "Typecheck if dependencies are available and perform a static scan showing no NBA-only API or type usage.",
+      "stop_condition": "Stop when a claim cannot be tied to a player row and exact rule reference; never fabricate missing provenance.",
+      "public_web_search": false
+    }
+  ]
+}

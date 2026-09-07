@@ -18,8 +18,13 @@
     "build:nba-player-stats": "node --import tsx src/nba_player_stats/build_reviewed_snapshot.ts",
     "build:nfl-data": "tsx src/nfl_data/build_reviewed_snapshot.ts",
     "seed:nfl-data": "tsx src/db/seed-nfl-data.ts",
+    "build:nfl-transactions": "tsx src/nfl_transactions/ingest.ts --download",
+    "seed:nfl-transactions": "tsx src/db/seed-nfl-transactions.ts",
+    "seed:nfl-workspace": "tsx src/db/seed-nfl-demo-workspace.ts",
+    "verify:nfl": "tsx src/nfl_verify/verify.ts",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/context_graph/*.test.ts tests/nfl_data/*.test.ts tests/nfl_rules/*.test.ts tests/nba_rosters/*.test.ts tests/nba_cap_sheets/*.test.ts tests/nba_player_stats/*.test.ts tests/data_analyst/*.test.ts",
+    "test": "tsx --test tests/context_graph/*.test.ts tests/nfl_data/*.test.ts tests/nfl_decision/*.test.ts tests/nfl_rules/*.test.ts tests/nfl_transactions/*.test.ts tests/nfl_workspace/*.test.ts tests/nba_rosters/*.test.ts tests/nba_cap_sheets/*.test.ts tests/nba_player_stats/*.test.ts tests/data_analyst/*.test.ts",
+    "test:reliability": "tsx --test --test-reporter=dot tests/data_analyst/test_nfl_answer_reliability_matrix.test.ts",
     "test:cba": "tsx --test tests/data_analyst/test_cba_workbench.test.ts tests/data_analyst/test_cba_retrieval_eval.test.ts",
     "acceptance:nfl-analyze": "tsx src/claude/nfl_analyze_preview.ts",
     "context-graph:validate": "tsx src/context_graph/cli.ts validate",
@@ -35,6 +40,7 @@
     "@supabase/supabase-js": "^2.45.4",
     "dotenv": "^16.4.5",
     "hono": "^4.12.15",
+    "hyparquet": "^1.29.2",
     "yaml": "^2.8.4"
   },
   "devDependencies": {

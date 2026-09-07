@@ -5,10 +5,13 @@ export async function listSessions(): Promise<Session[]> {
   throw new NotImplementedError(2, 'listSessions');
 }
 
-export async function createSession(label: string): Promise<Session> {
+export async function createSession(
+  label: string,
+  options: { workspaceKey?: 'legacy' | 'nyg-demo'; seedKey?: string | null } = {},
+): Promise<Session> {
   const { data, error } = await supabase
     .from('sessions')
-    .insert({ label })
+    .insert({ label, workspace_key: options.workspaceKey ?? 'legacy', seed_key: options.seedKey ?? null })
     .select()
     .single();
   if (error || !data) throw error ?? new Error('createSession failed');

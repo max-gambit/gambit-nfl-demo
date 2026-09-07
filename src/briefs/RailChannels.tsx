@@ -12,7 +12,7 @@ import { Icon } from '../ds/Icon';
  * "+ New" creates an Untitled channel directly (no modal) — composer in the
  * main pane gets focus, ready for the first question.
  */
-export function RailChannels() {
+export function RailChannels({ readOnly = false }: { readOnly?: boolean }) {
   const { briefs, activeBriefId, setActiveBrief, removeBriefsForSession } = useBriefs();
   const { sessions, activeSessionId, setActiveSession, removeSession } = useSessions();
   const { setExpandedBrief, setRightPanelMode, setRightPanelOpen, setActiveNav, expandedBriefId } = useUi();
@@ -135,7 +135,7 @@ export function RailChannels() {
             color: F.fgMuted, letterSpacing: TRACKING.micro, textTransform: 'uppercase',
           }}>Channels · {sessions.length}</span>
           <div style={{ flex: 1 }} />
-          <button onClick={() => void startNewChannel()} title="New channel (⌘N)"
+          {!readOnly && <button onClick={() => void startNewChannel()} title="New channel (⌘N)"
             style={{
               padding: `2px ${SPACE.sm}px`,
               background: 'transparent', color: F.fenway,
@@ -146,14 +146,14 @@ export function RailChannels() {
             }}>
             <span style={{ fontSize: TYPE.meta.md, lineHeight: 1 }}>+</span>
             New
-          </button>
+          </button>}
         </div>
         {sortedSessions.length === 0 && (
           <div style={{
             padding: `${SPACE.xl}px ${SPACE.xs}px`, textAlign: 'center',
             fontFamily: 'var(--font-mono)', fontSize: TYPE.meta.md, color: F.fgFaint,
           }}>
-            No channels yet. Click <span style={{ color: F.fenway, fontWeight: 600 }}>+ New</span> to make one.
+            {readOnly ? 'No saved analyses in this presentation.' : <>No channels yet. Click <span style={{ color: F.fenway, fontWeight: 600 }}>+ New</span> to make one.</>}
           </div>
         )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -202,7 +202,7 @@ export function RailChannels() {
                     fontVariantNumeric: 'tabular-nums', flexShrink: 0,
                   }}>{count}</span>
                 </button>
-                <div data-channel-actions="true" style={{ position: 'relative', flexShrink: 0 }}>
+                {!readOnly && <div data-channel-actions="true" style={{ position: 'relative', flexShrink: 0 }}>
                   <button
                     type="button"
                     aria-label={`Channel actions for ${s.label}`}
@@ -248,7 +248,7 @@ export function RailChannels() {
                       />
                     </div>
                   )}
-                </div>
+                </div>}
               </div>
             );
           })}

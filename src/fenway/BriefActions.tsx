@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { F } from '../theme/fenway';
-import { useBriefs, useProjects, useToasts, useUi } from '../store';
-import { on as onEvt } from '../lib/events';
+import { useBriefs, useProjects, useToasts } from '../store';
+import { fire, on as onEvt } from '../lib/events';
 import { regenerateBrief } from '../api/briefs';
 import { BriefShareFlow } from './BriefShareFlow';
 import { Icon } from '../ds/Icon';
 
-export function BriefActions() {
+export function BriefActions({ allowRegenerate = true }: { allowRegenerate?: boolean }) {
   const { activeBriefId, briefs } = useBriefs();
   const {
     projects,
@@ -15,7 +15,6 @@ export function BriefActions() {
     createProject,
     attachBrief,
   } = useProjects();
-  const { setActiveNav } = useUi();
   const { pushToast } = useToasts();
   const [projectOpen, setProjectOpen] = useState(false);
   const [projectTitle, setProjectTitle] = useState('');
@@ -40,7 +39,10 @@ export function BriefActions() {
 
   // Slash-command bridge from the composer so `/regenerate` works without
   // aiming at the card footer.
-  useEffect(() => onEvt('v6d3cf:slash-regenerate', () => { void onRegenerate(); }), [briefId]);
+  useEffect(() => {
+    if (!allowRegenerate) return undefined;
+    return onEvt('v6d3cf:slash-regenerate', () => { void onRegenerate(); });
+  }, [allowRegenerate, briefId]);
 
   const onRegenerate = async () => {
     if (!briefId || regenerating) return;
@@ -71,12 +73,15 @@ export function BriefActions() {
       const project = await createProject({
         title: projectTitle.trim() || defaultProjectTitle || brief.question,
         question: brief.question,
-        objective: 'Connect basketball context, cap/CBA validation, stakeholder feedback, and GM-ready recommendation from this source brief.',
+        objective: 'Connect football context, cap and rule validation, stakeholder feedback, and a GM-ready recommendation from this source brief.',
+        workspace_key: 'nyg-demo',
+        workflow_type: 'decision',
+        subject_team_id: 'NYG',
         source_brief_id: briefId,
       });
       if (project) {
         setProjectOpen(false);
-        setActiveNav('projects');
+        fire('nyg:open-workspaces', { refresh: true });
         pushToast({
           tone: 'success',
           message: 'Project started',
@@ -101,7 +106,7 @@ export function BriefActions() {
       const result = await attachBrief(projectId, briefId);
       if (result) {
         setProjectOpen(false);
-        setActiveNav('projects');
+        fire('nyg:open-workspaces', { refresh: true });
         pushToast({
           tone: result.already_attached ? 'info' : 'success',
           message: result.already_attached ? 'Already in project' : 'Added to project',
@@ -369,7 +374,7 @@ export function BriefActions() {
       </div>
       <BriefShareFlow briefId={briefId} />
       <div style={{ flex: '1 1 12px', minWidth: 8 }} />
-      <button onClick={() => void onRegenerate()} disabled={!briefId || regenerating}
+      {allowRegenerate && <button onClick={() => void onRegenerate()} disabled={!briefId || regenerating}
         style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -386,7 +391,7 @@ export function BriefActions() {
         }}>
           <Icon name="refresh" size={12} />
           {regenerating ? 'Regenerating…' : 'Regenerate'}
-        </button>
+        </button>}
     </div>
   );
 }

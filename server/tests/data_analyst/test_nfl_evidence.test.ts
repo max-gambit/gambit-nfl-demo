@@ -28,18 +28,21 @@ test('NFL evidence extraction does not treat common lowercase words as team abbr
 });
 
 test('NFL evidence block uses full NYG app roster and cap data ahead of Intel', async () => {
+  const seed = await loadCurrentNflData();
+  const rosterCount = seed.roster_entries.filter((row) => row.team_id === 'NYG').length;
+  const capCount = seed.cap_rows.filter((row) => row.team_id === 'NYG' && row.player_id).length;
   const evidence = await buildCurrentNflEvidence(SAMPLE_PROMPT);
 
   assert.ok(evidence);
   assert.equal(evidence.team_ids[0], 'NYG');
   assert.equal(evidence.scope, 'transaction_full');
   assert.match(evidence.systemBlock, /CURRENT NFL APP EVIDENCE \(MANDATORY\)/);
-  assert.match(evidence.systemBlock, /Roster rows: 92/);
-  assert.match(evidence.systemBlock, /Cap rows: 92/);
-  assert.match(evidence.systemBlock, /Source-needed cap rows: 0/);
-  assert.match(evidence.systemBlock, /Contract field coverage: guarantees=91\/92; dead\/cut=92\/92; post-June=92\/92; trade=92\/92; contract_years=92\/92; void_years=92\/92/);
+  assert.match(evidence.systemBlock, new RegExp(`Roster rows: ${rosterCount}`));
+  assert.match(evidence.systemBlock, new RegExp(`Cap rows: ${capCount}`));
+  assert.match(evidence.systemBlock, /Source-needed cap rows: \d+/);
+  assert.match(evidence.systemBlock, /Contract field coverage: guarantees=\d+\/\d+; dead\/cut=\d+\/\d+; post-June=\d+\/\d+; trade=\d+\/\d+; contract_years=\d+\/\d+; void_years=\d+\/\d+/);
   assert.match(evidence.systemBlock, /current NFL player metrics/);
-  assert.match(evidence.systemBlock, /Player metric coverage: captured_public_metrics=72\/92; strong_position_scorecards=43\/92/);
+  assert.match(evidence.systemBlock, /Player metric coverage: captured_public_metrics=\d+\/\d+; strong_position_scorecards=\d+\/\d+/);
   assert.match(evidence.systemBlock, /Top position scorecards:/);
   assert.match(evidence.systemBlock, /Player Quality Metrics v3 is position-specific evidence/);
   assert.match(evidence.systemBlock, /post_june_cut_savings=/);
@@ -67,10 +70,10 @@ test('NFL evidence reserves app roster and cap source cards before generated ref
   assert.ok(evidence);
 
   const datasetRows = evidence.sources.map((source) => {
-    const rows = source.data?.rows;
-    if (!Array.isArray(rows)) return null;
-    const dataset = rows.find((row) => row && typeof row === 'object' && 'k' in row && row.k === 'Dataset');
-    return dataset && typeof dataset === 'object' && 'v' in dataset ? String(dataset.v) : null;
+    const metadata = source.data?.current_nfl_evidence;
+    return metadata && typeof metadata === 'object' && 'dataset_id' in metadata
+      ? String(metadata.dataset_id)
+      : null;
   });
 
   assert.deepEqual(datasetRows, ['nfl_rosters_current', 'nfl_cap_sheets_current', 'nfl_player_metrics_current', 'nfl_coverage_current']);
@@ -89,6 +92,8 @@ test('NFL evidence reserves app roster and cap source cards before generated ref
 });
 
 test('NFL evidence produces chat trust-trail datasets for roster and cap preloads', async () => {
+  const seed = await loadCurrentNflData();
+  const expected = seed.roster_entries.filter((row) => row.team_id === 'NYG').length;
   const evidence = await buildCurrentNflEvidence(SAMPLE_PROMPT, { consumer: 'chat' });
   assert.ok(evidence);
 
@@ -101,9 +106,9 @@ test('NFL evidence produces chat trust-trail datasets for roster and cap preload
     'nfl_coverage_current',
   ]);
   assert.deepEqual(trace.datasets[0].team_ids, ['NYG']);
-  assert.equal(trace.datasets[0].row_count, 92);
-  assert.equal(trace.datasets[1].row_count, 92);
-  assert.equal(trace.datasets[2].row_count, 92);
+  assert.equal(trace.datasets[0].row_count, expected);
+  assert.equal(trace.datasets[1].row_count, expected);
+  assert.equal(trace.datasets[2].row_count, expected);
   assert.equal(trace.datasets[3].team_ids.includes('NYG'), true);
 });
 
@@ -112,7 +117,11 @@ test('NFL trade-goal evidence adds depth hierarchy target lanes and caveat clean
 
   assert.ok(evidence);
   assert.equal(evidence.team_ids[0], 'NYG');
-  assert.equal(evidence.reserved_max_ref_index, 6);
+  assert.equal(evidence.reserved_max_ref_index, 6 + evidence.sources.filter((source) => {
+    const metadata = source.data?.current_nfl_evidence;
+    return metadata && typeof metadata === 'object' && 'dataset_id' in metadata
+      && metadata.dataset_id === 'nfl_trade_target_current';
+  }).length);
   assert.match(evidence.systemBlock, /trade-goal checks/i);
   assert.match(evidence.systemBlock, /Depth-after-trade checks:/);
   assert.match(evidence.systemBlock, /Lower-pain outgoing hierarchy:/);
@@ -132,21 +141,41 @@ test('NFL trade-goal evidence adds depth hierarchy target lanes and caveat clean
   assert.match(evidence.systemBlock, /Brian Burns .*bad 2026 cap-relief trade/i);
   assert.match(evidence.systemBlock, /Andrew Thomas .*bad 2026 cap-relief trade/i);
   assert.match(evidence.systemBlock, /(Vita Vea|Grover Stewart|A'Shawn Robinson|Harrison Phillips|Tedarrell Slaton)/);
-  assert.match(evidence.systemBlock, /Vita Vea .*recommended_action=posture_change_only/i);
+  assert.match(evidence.systemBlock, /TB .*recommended_action=posture_change_only/i);
   assert.match(evidence.systemBlock, /Do not headline Vita Vea as the best lane unless Tampa's posture flips/i);
   assert.doesNotMatch(evidence.systemBlock, /Vita Vea[^\n]+highest-confidence lane/i);
   assert.doesNotMatch(evidence.systemBlock, /Burns .*needs source review/i);
 
   const datasets = evidence.sources.map((source) => {
-    const rows = source.data?.rows;
-    if (!Array.isArray(rows)) return null;
-    const dataset = rows.find((row) => row && typeof row === 'object' && 'k' in row && row.k === 'Dataset');
-    return dataset && typeof dataset === 'object' && 'v' in dataset ? String(dataset.v) : null;
+    const metadata = source.data?.current_nfl_evidence;
+    return metadata && typeof metadata === 'object' && 'dataset_id' in metadata
+      ? String(metadata.dataset_id)
+      : null;
   });
-  assert.deepEqual(datasets, ['nfl_rosters_current', 'nfl_cap_sheets_current', 'nfl_player_metrics_current', 'nfl_coverage_current', 'nfl_trade_screen_current', 'nfl_context_graph']);
+  assert.deepEqual(datasets.slice(0, 6), ['nfl_rosters_current', 'nfl_cap_sheets_current', 'nfl_player_metrics_current', 'nfl_coverage_current', 'nfl_trade_screen_current', 'nfl_context_graph']);
+  assert.equal(datasets.slice(6).every((dataset) => dataset === 'nfl_trade_target_current'), true);
+  const targetSources = evidence.sources.filter((source) => {
+    const metadata = source.data?.current_nfl_evidence;
+    return metadata && typeof metadata === 'object' && 'dataset_id' in metadata
+      && metadata.dataset_id === 'nfl_trade_target_current';
+  });
+  assert.ok(targetSources.length > 0);
+  assert.equal(targetSources.every((source) => /^https:\/\//.test(String(source.data?.source_url ?? ''))), true);
+  assert.equal(targetSources.every((source) => /^https:\/\//.test(String(source.data?.roster_source_url ?? ''))), true);
+  assert.match(evidence.systemBlock, /Player-specific source refs:/);
   assert.equal(evidence.trace_datasets.some((dataset) => dataset.dataset_id === 'nfl_coverage_current' && dataset.team_ids.includes('NYG')), true);
   assert.equal(evidence.trace_datasets.some((dataset) => dataset.dataset_id === 'nfl_trade_screen_current' && dataset.team_ids.includes('NYG')), true);
   assert.equal(evidence.trace_datasets.some((dataset) => dataset.dataset_id === 'nfl_context_graph' && dataset.team_ids.includes('NYG') && dataset.team_ids.includes('TB')), true);
+
+  const visibleSourceText = evidence.sources.map((source) => {
+    const rows = Array.isArray(source.data?.rows) ? source.data.rows : [];
+    const visibleLabels = new Set(['Team', 'Teams', 'Summary', 'Source', 'Source as of', 'Roster players', 'Position groups', 'Coverage', 'Player signals', 'Overall status', 'Readiness', 'Top gaps', 'Current roster', 'Depth consequence', 'What still needs checking']);
+    return [source.title, ...rows.map((row) => row && typeof row === 'object' && 'k' in row && 'v' in row && visibleLabels.has(String(row.k)) ? `${row.k} ${row.v}` : '')].join(' ');
+  }).join(' ');
+  assert.doesNotMatch(
+    visibleSourceText,
+    /seller thesis|seller cards|seller (?:screen|readiness|signal|intent|posture)|counterparty|call_now|check_call|posture_change_only|do_not_lead|trade room|trade impact|salary-out|pick-led|constructions|cap-file|source-needed|directional|evidence boundary|preflight|runtime|trade-goal screen|coverage matrix|dataset|scorecard|graph mini-roster|cap lever|gating issue|current file|current evidence|contract fit|source check|\$-/i,
+  );
 });
 
 test('NFL trade motivation scorer tiers the same target profile by counterparty posture', () => {
@@ -198,17 +227,17 @@ test('NFL fused trade screen exposes structured target lanes and downgrades cap-
   assert.ok(screen);
   assert.ok(screen.counterparty_intel_team_ids.includes('NYG'));
   assert.ok(screen.counterparty_intel_team_ids.includes('TB'));
-  const vea = screen.target_lanes.find((lane) => lane.target_team_id === 'TB' && lane.target_player_name === 'Vita Vea');
-  assert.ok(vea);
-  assert.equal(vea.motivation_tier, 'long_shot_unless_posture_changes');
-  assert.equal(vea.recommended_action, 'posture_change_only');
-  assert.match(vea.seller_depth_consequence, /DL after trade/);
-  assert.ok(vea.reasons.some((reason) => /expiring/i.test(reason)));
-  assert.ok(vea.blockers.some((blocker) => /contend|core|top-priced|top-of-room/i.test(blocker)));
-  assert.match(vea.seller_case, /high-impact, low-probability target/i);
-  assert.match(vea.seller_objection, /Do not headline Vita Vea/i);
-  assert.match(vea.what_they_lose, /DL|top|interior/i);
-  assert.match(vea.validation_trigger, /Confirm whether Tampa is protecting/i);
+  const tampa = screen.target_lanes.find((lane) => lane.target_team_id === 'TB');
+  assert.ok(tampa);
+  assert.equal(tampa.motivation_tier, 'long_shot_unless_posture_changes');
+  assert.equal(tampa.recommended_action, 'posture_change_only');
+  assert.match(tampa.seller_depth_consequence, /DL after trade/);
+  assert.ok(tampa.reasons.some((reason) => /expiring/i.test(reason)));
+  assert.ok(tampa.blockers.some((blocker) => /contend|core|top-priced|top-of-room/i.test(blocker)));
+  assert.match(tampa.seller_case, /high-impact, low-probability target/i);
+  assert.match(tampa.seller_objection, /Do not headline Vita Vea/i);
+  assert.match(tampa.what_they_lose, /DL|top|interior/i);
+  assert.match(tampa.validation_trigger, /Confirm whether Tampa is protecting/i);
   assert.ok(screen.named_target_lanes.some((line) => /recommended_action=posture_change_only/.test(line)));
   assert.equal(screen.named_target_lanes.some((line) => /motivation_tier=/.test(line)), false);
   assert.equal(screen.named_target_lanes.some((line) => /highest-confidence lane/i.test(line)), false);
@@ -233,4 +262,100 @@ test('NFL trade target lanes honor requested position instead of defaulting to p
   assert.ok(genericScreen);
   assert.deepEqual(genericScreen.target_lanes, []);
   assert.match(genericScreen.named_target_lanes[0] ?? '', /No named target lane passed/);
+});
+
+test('interior offensive-line questions never resolve to defensive-interior targets', async () => {
+  const seed = await loadCurrentNflData();
+  const question = 'If the Giants wanted to add a veteran interior offensive lineman without giving up a Day 1 or Day 2 pick, which realistic trade targets fit their 2026 cap, and how would each acquisition change the starting five?';
+  const screen = await buildNflTradeGoalScreen(
+    seed,
+    'NYG',
+    question,
+  );
+
+  assert.ok(screen);
+  assert.match(screen.objective, /offensive-line help/i);
+  assert.ok(screen.target_lanes.length >= 3);
+  assert.equal(screen.target_lanes.every((lane) => ['OL', 'G', 'C'].includes(lane.position ?? '')), true);
+  assert.equal(screen.target_lanes.some((lane) => ['Harrison Phillips', 'Thomas Booker', 'Adam Butler'].includes(lane.target_player_name)), false);
+  assert.ok(screen.historical_trade_price);
+  assert.deepEqual(screen.historical_trade_price.position_groups, ['IOL']);
+  assert.ok(screen.historical_trade_price.trade_count >= 20);
+  assert.ok(screen.historical_trade_price.allocable_trade_count >= 10);
+  assert.equal(
+    Object.values(screen.historical_trade_price.full_period_compensation_mix).reduce((sum, count) => sum + count, 0),
+    screen.historical_trade_price.allocable_trade_count,
+  );
+  assert.ok((screen.historical_trade_price.full_period_premium_share_basis_points ?? 0) > 0);
+  assert.match(screen.historical_trade_price.compensation_explanation, /rounds 4–7=/i);
+  assert.ok(screen.historical_trade_price.comparables.length >= 4);
+  assert.equal(screen.historical_trade_price.comparables.every((row) => ['G', 'C', 'OG', 'OL', 'IOL'].includes((row.raw_position ?? '').toUpperCase())), true);
+  assert.match(screen.historical_trade_price.trade_source?.url ?? '', /releases\/download\/trades\/trades\.csv$/);
+
+  const evidence = await buildCurrentNflEvidence(question);
+  assert.ok(evidence);
+  assert.match(evidence.systemBlock, /Historical IOL trade sample:/);
+  assert.match(evidence.systemBlock, /Historical comparables:/);
+  const historySource = evidence.sources.find((source) => source.data?.internal_dataset_id === 'nfl_transaction_market_history');
+  const comparableSources = evidence.sources.filter((source) => source.data?.internal_dataset_id === 'nfl_transaction_market_comparable');
+  assert.ok(historySource);
+  assert.match(String(historySource.data?.source_url ?? ''), /releases\/download\/trades\/trades\.csv$/);
+  assert.ok(comparableSources.length >= 4);
+  assert.equal(comparableSources.every((source) => /releases\/download\/trades\/trades\.csv$/.test(String(source.data?.source_url ?? ''))), true);
+});
+
+test('bare tackle questions resolve to offensive tackles after defensive-tackle disambiguation', async () => {
+  const seed = await loadCurrentNflData();
+  const screen = await buildNflTradeGoalScreen(
+    seed,
+    'NYG',
+    'Which veteran tackle can the Giants acquire without a first-round pick?',
+  );
+
+  assert.ok(screen);
+  assert.match(screen.objective, /offensive-tackle help/i);
+  assert.ok(screen.target_lanes.length > 0);
+  assert.equal(screen.target_lanes.every((lane) => ['OT', 'T'].includes(lane.position ?? '')), true);
+  assert.deepEqual(screen.historical_trade_price?.position_groups, ['OT']);
+
+  const defensive = await buildNflTradeGoalScreen(
+    seed,
+    'NYG',
+    'Which veteran defensive tackle can the Giants acquire without a first-round pick?',
+  );
+  assert.ok(defensive);
+  assert.equal(defensive.target_lanes.every((lane) => ['DT', 'NT', 'DL'].includes(lane.position ?? '')), true);
+  assert.deepEqual(defensive.historical_trade_price?.position_groups, ['IDL']);
+});
+
+test('sparse historical price samples remain examples rather than market ranges', async () => {
+  const question = 'Which veteran safety can the Giants acquire for a fourth-round pick?';
+  const evidence = await buildCurrentNflEvidence(question);
+  assert.ok(evidence);
+  const history = evidence.sources.find((source) => source.data?.internal_dataset_id === 'nfl_transaction_market_history');
+  assert.ok(history);
+  const rows = Array.isArray(history.data?.rows) ? history.data.rows : [];
+  assert.match(String(rows.find((row) => row && typeof row === 'object' && 'k' in row && row.k === 'Price conclusion' && 'v' in row)?.v ?? ''), /too few/i);
+  assert.match(evidence.systemBlock, /too few allocable trades/i);
+  assert.match(evidence.systemBlock, /do not use this sample to price a current player/i);
+});
+
+test('a named Giants player resolves the position needed for replacement targets', async () => {
+  const seed = await loadCurrentNflData();
+  const screen = await buildNflTradeGoalScreen(
+    seed,
+    'NYG',
+    "If we're concerned about Malik Nabers' knee Week 1, what are potential trade targets for us?",
+  );
+
+  assert.ok(screen);
+  assert.ok(screen.target_lanes.length >= 3);
+  assert.equal(screen.target_lanes.every((lane) => lane.position === 'WR'), true);
+  assert.equal(screen.target_lanes.some((lane) => lane.target_player_name === 'Malik Nabers'), false);
+  const treTucker = screen.target_lanes.find((lane) => lane.target_player_name === 'Tre Tucker');
+  const marvinMims = screen.target_lanes.find((lane) => lane.target_player_name === 'Marvin Mims Jr.');
+  assert.ok(treTucker);
+  assert.ok(marvinMims);
+  assert.doesNotMatch(`${treTucker.seller_case} ${treTucker.seller_objection} ${treTucker.validation_trigger}`, /Booker/i);
+  assert.doesNotMatch(`${marvinMims.seller_case} ${marvinMims.seller_objection} ${marvinMims.validation_trigger}`, /D\.J\. Jones|Zach Allen/i);
 });

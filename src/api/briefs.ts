@@ -6,7 +6,7 @@ import type {
   ResolveBriefShareLinkResponse, SavedBriefTemplate, Session,
 } from '@shared/types';
 import { postJson, SERVER_URL, supabase, NotImplementedError } from './client';
-import { createSession } from './sessions';
+import { createSession, deleteSession } from './sessions';
 import { stripBriefModePrefix } from '@shared/briefMode';
 
 export async function createBrief(req: CreateBriefRequest): Promise<Brief> {
@@ -34,7 +34,7 @@ export async function saveBriefTemplate(req: CreateSavedBriefTemplateRequest): P
   return res.template;
 }
 
-export async function getBriefShareSnapshot(briefId: string, teamId = 'GSW'): Promise<BriefShareSnapshot> {
+export async function getBriefShareSnapshot(briefId: string, teamId = 'NYG'): Promise<BriefShareSnapshot> {
   const params = new URLSearchParams({ team_id: teamId });
   const res = await fetch(`${SERVER_URL}/briefs/${briefId}/share?${params.toString()}`);
   if (!res.ok) {
@@ -96,9 +96,18 @@ export async function createBriefWithSession(
   const trimmed = parsed.question.trim();
   const briefMode = mode ?? parsed.mode ?? undefined;
   const label = deriveSessionLabel(trimmed);
-  const session = await createSession(label);
-  const brief = await createBrief({ session_id: session.id, question: trimmed, mode: briefMode, template });
-  return { session, brief };
+  const session = await createSession(label, { workspaceKey: 'nyg-demo' });
+  try {
+    const brief = await createBrief({ session_id: session.id, question: trimmed, mode: briefMode, template });
+    return { session, brief };
+  } catch (error) {
+    try {
+      await deleteSession(session.id);
+    } catch (rollbackError) {
+      console.error('[briefs] failed to roll back empty session', rollbackError);
+    }
+    throw error;
+  }
 }
 
 function deriveSessionLabel(question: string): string {

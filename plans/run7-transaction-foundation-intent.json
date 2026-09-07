@@ -1,0 +1,50 @@
+{
+  "schema": "codex_task_orchestrator_intent.v1",
+  "task_id": "nyg-demo-transaction-market-20260902-run7-foundation",
+  "objective_summary": "Build independent source-ingestion/database and deterministic-methodology foundations for live NFL transaction-market analysis inside Gambit Analysis.",
+  "durable_recovery": true,
+  "requires_live_dirty_state": false,
+  "nodes": [
+    {
+      "id": "transaction_ingestion",
+      "goal": "parent_id=root. Implement the governed public-release ingestion and local Supabase persistence foundation described in plans/nfl-transaction-market-analysis-20260902.md and the frozen shared NFL transaction types. Use nflverse trades, players, historical rosters, and OverTheCap-derived historical contracts; do not scrape NFL.com. Preserve release URLs, upstream attribution, retrieval timestamps, SHA-256 checksums, raw values, normalized values, date precision, identity confidence, and coverage statistics. Create an immutable/idempotent migration and seed path plus focused ingestion tests. A reviewed compact snapshot/manifest may live only under data/nfl-transactions. Do not author conclusions or edit unreserved files. Return codex_task_worker_result.v1.",
+      "dependencies": [],
+      "worker_class": "sandboxed_write",
+      "reservation": {
+        "mode": "write",
+        "paths": [
+          "supabase/migrations/20260902000200_nfl_transaction_market.sql",
+          "server/src/nfl_transactions/ingest.ts",
+          "server/src/nfl_transactions/seed.ts",
+          "server/src/db/seed-nfl-transactions.ts",
+          "server/tests/nfl_transactions/ingestion.test.ts",
+          "server/package.json",
+          "server/package-lock.json",
+          "data/nfl-transactions"
+        ]
+      },
+      "expected_output": "An authenticated patch providing reproducible source ingestion, normalized snapshot metadata, idempotent DB seeding, and tests, or a precise source/parser blocker.",
+      "verification": "Run the focused ingestion tests and server typecheck; inspect snapshot checksums, 2016-2025 coverage, identity match rates, date precision, integer dollars, and two consecutive idempotent seeds when local Supabase is available.",
+      "stop_condition": "Stop rather than scrape NFL.com, fabricate unavailable release/waiver dates or positions, import a source without attribution, persist generated conclusions, or weaken source/coverage validation.",
+      "public_web_search": true
+    },
+    {
+      "id": "transaction_methodology",
+      "goal": "parent_id=root. Implement the pure deterministic NFL transaction-market analysis engine described in plans/nfl-transaction-market-analysis-20260902.md against the frozen shared types. Own cohort/filter resolution, yearly aggregation, mobility per 100 roster player-seasons, transaction share, trade compensation bands, cap-adjusted contract price, sample/identity coverage gates, signal classification, comparables, and leave-one-out statistical influence. Make DB loading injectable so fixtures can prove an inserted event changes the result. Do not edit routes, prompts, shared types, database migrations, packages, or UI. Return codex_task_worker_result.v1.",
+      "dependencies": [],
+      "worker_class": "sandboxed_write",
+      "reservation": {
+        "mode": "write",
+        "paths": [
+          "server/src/nfl_transactions/analyze.ts",
+          "server/src/nfl_transactions/index.ts",
+          "server/tests/nfl_transactions/analyze.test.ts"
+        ]
+      },
+      "expected_output": "An authenticated patch with a pure, testable deterministic engine and fixture suite matching the public response contract.",
+      "verification": "Run focused engine tests covering default and post-2020 periods, trades-only, EDGE versus IOL, sparse samples, conflicting signals, multi-player trade price exclusion, identity downgrades, integer-dollar preservation, and mutation sensitivity.",
+      "stop_condition": "Stop rather than invent missing denominators, allocate multi-player compensation to one player, collapse conflicting signals into a composite score, or let model prose perform arithmetic.",
+      "public_web_search": false
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "schema": "codex_task_orchestrator_intent.v1",
+  "task_id": "nyg-demo-transaction-market-20260902-run7b-foundation-recovery",
+  "objective_summary": "Second and final detached-worker attempt for the governed NFL transaction ingestion/schema and pure deterministic market methodology foundations, with root-owned runtime execution and public-release fetches.",
+  "durable_recovery": true,
+  "requires_live_dirty_state": false,
+  "nodes": [
+    {
+      "id": "transaction_ingestion_recovery",
+      "goal": "parent_id=root. Second same-scope attempt. Implement the code, migration, immutable seed service, source manifest shape, and focused fixtures required by plans/nfl-transaction-market-analysis-20260902.md. Use the frozen shared types and the published nflverse release URLs for trades, players, historical rosters, and historical_contracts.parquet; never scrape NFL.com and never infer a missing contract_type. The root explicitly owns downloading the real reviewed snapshot, running Node/npm, applying the migration, and exercising local Supabase after import. Do not set sandbox_denial merely because the isolated worker lacks Node, DNS, or local Supabase; record those checks as parent-required evidence and return a valid codex_task_worker_result.v1 for the authored patch. Do not edit unreserved files or persist generated conclusions.",
+      "dependencies": [],
+      "worker_class": "sandboxed_write",
+      "reservation": {
+        "mode": "write",
+        "paths": [
+          "supabase/migrations/20260902000200_nfl_transaction_market.sql",
+          "server/src/nfl_transactions/ingest.ts",
+          "server/src/nfl_transactions/seed.ts",
+          "server/src/db/seed-nfl-transactions.ts",
+          "server/tests/nfl_transactions/ingestion.test.ts",
+          "server/package.json",
+          "server/package-lock.json",
+          "data/nfl-transactions"
+        ]
+      },
+      "expected_output": "An authenticated code patch for reproducible governed ingestion, normalized snapshot metadata, immutable/idempotent persistence, and fixtures; runtime/network verification may be explicitly delegated to the root without marking the patch blocked.",
+      "verification": "Root will run focused tests, server typecheck, current release download/checksum validation, 2016-2025 coverage checks, and three local Supabase seeds before settling the patch.",
+      "stop_condition": "Stop rather than scrape NFL.com, fabricate source rows, infer unsupported contract types, persist generated conclusions, or delete existing snapshots.",
+      "public_web_search": false
+    },
+    {
+      "id": "transaction_methodology_recovery",
+      "goal": "parent_id=root. Second same-scope attempt. Implement the pure deterministic NFL transaction-market analysis engine from plans/nfl-transaction-market-analysis-20260902.md using the frozen shared types. Include injectable snapshot loading, filter/cohort resolution, yearly series, mobility per 100 roster player-seasons, move share, compensation bands, cap-adjusted contract price, sample and identity gates, non-conflicting multi-signal classification, comparables, and leave-one-out statistical influence. The root explicitly owns executing Node/npm tests after import. Do not set sandbox_denial merely because the isolated worker lacks Node; record execution as parent-required evidence and return a valid codex_task_worker_result.v1. Do not edit routes, prompts, shared types, DB migrations, packages, or UI.",
+      "dependencies": [],
+      "worker_class": "sandboxed_write",
+      "reservation": {
+        "mode": "write",
+        "paths": [
+          "server/src/nfl_transactions/analyze.ts",
+          "server/src/nfl_transactions/index.ts",
+          "server/tests/nfl_transactions/analyze.test.ts"
+        ]
+      },
+      "expected_output": "An authenticated pure deterministic engine patch and fixture suite, with parent-owned runtime execution clearly identified.",
+      "verification": "Root will execute fixtures for default and post-2020 periods, trades-only, EDGE versus IOL, sparse/conflicting signals, multi-player compensation exclusion, identity downgrades, integer dollars, and mutation sensitivity before settlement.",
+      "stop_condition": "Stop rather than invent denominators, allocate multi-player compensation per player, collapse conflicting signals into one score, call statistical influence causal, or let prose perform math.",
+      "public_web_search": false
+    }
+  ]
+}

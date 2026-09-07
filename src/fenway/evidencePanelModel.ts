@@ -53,6 +53,7 @@ export interface EvidencePackItem {
 }
 
 export interface EvidencePackModel {
+  hasCompletedAnswer: boolean;
   title: string;
   subtitle: string;
   sectionTitle: string;
@@ -115,6 +116,21 @@ export function buildEvidencePackModel(
   sourceFilterRefs: number[] | null,
   selectedOptionRef: number | null,
 ): EvidencePackModel {
+  const hasCompletedAnswer = activeBrief?.status === 'ready' && Boolean(activeBrief.body) && sources.length > 0;
+  if (!hasCompletedAnswer) {
+    return {
+      hasCompletedAnswer: false,
+      title: 'Evidence for this answer',
+      subtitle: '',
+      sectionTitle: 'Used in this answer',
+      totalRefs: 0,
+      usedRefs: 0,
+      statusChips: [],
+      checkedItems: [],
+      backgroundItems: [],
+      refToItemKey: {},
+    };
+  }
   const sourceRows = sources.map((source) => {
     const classification = classifyEvidenceSource(source);
     return evidenceRowForSource(source, classification);
@@ -124,29 +140,54 @@ export function buildEvidencePackModel(
   const focusRefs = new Set((sourceFilterRefs ?? []).filter((ref) => Number.isInteger(ref) && ref > 0));
   const hasFocus = focusRefs.size > 0;
 
-  const claimSpecs = hasFocus
+  const sourceFirstSpecs = sourceFirstNflClaimSpecs(activeBrief, sources, hasFocus ? focusRefs : null);
+  const claimSpecs = sourceFirstSpecs ?? (hasFocus
     ? focusedClaimSpecs(activeBrief, options, focusRefs, selectedOptionRef)
-    : defaultClaimSpecs(activeBrief, options);
-  const checkedItems = claimSpecs
+    : defaultClaimSpecs(activeBrief, options));
+  if (hasFocus) {
+    const coveredFocusRefs = new Set(claimSpecs.flatMap((spec) => spec.refs));
+    for (const ref of focusRefs) {
+      const row = rowsByRef.get(ref);
+      if (!row || coveredFocusRefs.has(ref)) continue;
+      claimSpecs.push({
+        key: `source:${ref}`,
+        type: 'claim',
+        title: row.title,
+        proof: row.proof,
+        refs: [ref],
+      });
+    }
+  }
+  const allCheckedItems = claimSpecs
     .map((spec) => auditItemFromSpec(spec, rowsByRef, hasFocus, focusRefs))
     .filter((item): item is EvidencePackItem => item !== null)
     .sort(compareItems);
+  const checkedItems = hasFocus ? allCheckedItems : allCheckedItems.slice(0, 5);
 
   const coveredRefs = new Set(checkedItems.flatMap((item) => item.refs));
   const backgroundItems = hasFocus
     ? []
-    : sourceGroups.filter((item) => !item.refs.some((ref) => coveredRefs.has(ref)));
+    : sourceGroups.flatMap((item): EvidencePackItem[] => {
+      const rows = item.rows.filter((row) => !coveredRefs.has(row.refIndex));
+      if (rows.length === 0) return [];
+      return [{
+        ...item,
+        rows,
+        refs: uniqueSorted(rows.map((row) => row.refIndex)),
+        meta: summarizeItemMeta(rows),
+        freshness: freshestLabel(rows.map((row) => row.freshness)),
+      }];
+    });
 
   const modelItems = [...checkedItems, ...backgroundItems];
   const refToItemKey = refMapForItems(checkedItems, backgroundItems);
   const usedRefs = uniqueSorted(checkedItems.flatMap((item) => item.refs)).length;
   const backgroundRefCount = uniqueSorted(backgroundItems.flatMap((item) => item.refs)).length;
-  const sectionTitle = hasFocus
-    ? selectedOptionRef !== null ? `Audit for option [${selectedOptionRef}]` : 'Focused audit'
-    : 'Claims checked for this answer';
+  const sectionTitle = hasFocus ? 'Cited evidence' : 'Used in this answer';
 
   return {
-    title: 'Evidence Pack',
+    hasCompletedAnswer: true,
+    title: 'Evidence for this answer',
     subtitle: subtitleForModel(hasFocus, selectedOptionRef, checkedItems.length, backgroundRefCount),
     sectionTitle,
     totalRefs: sources.length,
@@ -181,9 +222,69 @@ export function classifyEvidenceSource(source: BriefSource): EvidenceSourceClass
   const rows = dataRows(source);
   const text = `${source.kind} ${source.source ?? ''} ${source.title} ${rows.map((row) => `${row.k} ${row.v}`).join(' ')}`.toLowerCase();
   const teamLabel = teamLabelForSource(source, rows);
+  const nflEvidence = currentNflEvidence(source);
+
+  if (nflEvidence) {
+    const dataset = typeof nflEvidence.dataset_id === 'string' ? nflEvidence.dataset_id : '';
+    if (dataset === 'nfl_rosters_current') {
+      return classification(source, 'roster', 'roster', cleanTitle(source.title), 'Confirms the loaded players and positions.', 'clipboard', teamLabel);
+    }
+    if (dataset === 'nfl_cap_sheets_current') {
+      return classification(source, 'contract', 'cap', cleanTitle(source.title), 'Shows the public contract and salary-cap figures.', 'doc', teamLabel);
+    }
+    if (dataset === 'nfl_player_metrics_current') {
+      return classification(source, 'stats', 'roster', cleanTitle(source.title), 'Shows the public performance information used in the football comparison.', 'pulse', teamLabel);
+    }
+    if (dataset === 'nfl_coverage_current') {
+      return classification(source, 'supporting', 'supporting', cleanTitle(source.title), 'Shows where the public data is complete and where the answer needs caution.', 'shield', teamLabel);
+    }
+    if (dataset === 'nfl_trade_screen_current') {
+      return classification(source, 'supporting', 'supporting', cleanTitle(source.title), 'Shows the players considered, roster impact, and cap consequences.', 'search', teamLabel);
+    }
+    if (dataset === 'nfl_trade_target_current') {
+      return classification(source, 'contract', 'contract', cleanTitle(source.title), sourceContribution(source, 'Shows the public contract and team information used for this specific player.'), 'doc', teamLabel);
+    }
+    if (dataset === 'nfl_context_graph') {
+      return classification(source, 'context', 'context', cleanTitle(source.title), 'Shows public clues about why another team might or might not listen.', 'link', teamLabel);
+    }
+  }
+
+  if (source.data?.current_team_cap_summary === true) {
+    return classification(source, 'cap', 'cap', cleanTitle(source.title), sourceContribution(source, 'Establishes the current cap figures used in this answer.'), 'clipboard', teamLabel);
+  }
+  if (source.data?.current_team_cap_calculation === true) {
+    return classification(source, 'cap', 'cap', cleanTitle(source.title), sourceContribution(source, 'Establishes the applied team cap and accounting used in this answer.'), 'clipboard', teamLabel);
+  }
+  if (source.data?.current_league_cap === true) {
+    return classification(source, 'cap', 'cap', cleanTitle(source.title), sourceContribution(source, 'Establishes the official league salary-cap baseline.'), 'shield', teamLabel);
+  }
+  if (source.data?.current_team_contract === true) {
+    return classification(source, 'contract', 'cap', cleanTitle(source.title), sourceContribution(source, 'Establishes the player cap hit used in the ranking.'), 'doc', teamLabel);
+  }
+  if (source.data?.current_team_roster === true) {
+    return classification(source, 'roster', 'roster', cleanTitle(source.title), sourceContribution(source, 'Confirms the current active roster.'), 'clipboard', teamLabel);
+  }
+  if (source.data?.current_team_depth === true || source.data?.current_team_role_history === true) {
+    return classification(source, 'roster', 'roster', cleanTitle(source.title), sourceContribution(source, 'Supports the stated current role and any labeled inference.'), 'clipboard', teamLabel);
+  }
+  if (source.data?.seller_move_contract === true) {
+    return classification(source, 'contract', 'contract', 'Contract and cap calculation', sourceContribution(source, 'Shows the loaded contract figures used for cap space and dead money.'), 'doc', teamLabel);
+  }
+  if (source.data?.seller_move_role === true) {
+    return classification(source, 'roster', 'roster', 'Current role and depth', sourceContribution(source, 'Shows the public role information used for the depth consequence.'), 'clipboard', teamLabel);
+  }
+  if (source.data?.seller_move_rule === true) {
+    return classification(source, 'cba', 'cba', 'Trade cap accounting rule', sourceContribution(source, 'Shows the rule used for trade-related signing-bonus accounting.'), 'shield', teamLabel);
+  }
+  if (source.data?.seller_move_comparable === true) {
+    return classification(source, 'market', 'market', cleanTitle(source.title), sourceContribution(source, 'Shows the historical trade used to compare the proposed return.'), 'search', teamLabel);
+  }
 
   if (source.kind === 'CBA' || /\bcba\b|cba_articles|article [ivx]+|section/.test(text)) {
-    return classification(source, 'cba', 'cba', 'CBA constraint check', 'Flags transaction-rule constraints that affect execution.', 'shield', teamLabel);
+    return classification(source, 'cba', 'cba', cleanTitle(source.title) || 'CBA rule', sourceContribution(source, 'Shows the exact rule location supporting this answer.'), 'shield', teamLabel);
+  }
+  if (/nfl[_\s-]transaction[_\s-]market|historical transaction|nflverse|trade comparables?/.test(text)) {
+    return classification(source, 'market', 'market', cleanTitle(source.title), sourceContribution(source, 'Shows the public market data or transaction used in the calculation.'), 'search', teamLabel);
   }
   if (source.kind === 'ANALYST_DATA' && currentNbaEvidence(source)) {
     return classification(source, 'current_team_data', 'current_team_data', 'Current team data', 'Confirms roster, cap posture, and player-stat baseline.', 'clipboard', teamLabel);
@@ -195,7 +296,15 @@ export function classifyEvidenceSource(source: BriefSource): EvidenceSourceClass
     return classification(source, 'contract', 'contract', 'Contract mechanics', 'Shows salary structure, guarantees, and contract-specific constraints.', 'doc', teamLabel);
   }
   if (source.kind === 'NEWS' || source.kind === 'PROJECTION') {
-    return classification(source, 'market', 'market', 'Market signal', 'Adds reporting, projection, or market context around the decision.', 'search', teamLabel);
+    return classification(
+      source,
+      'market',
+      'market',
+      cleanTitle(source.title) || 'Public market report',
+      sourceContribution(source, 'Shows the public report or projection cited in this answer.'),
+      'search',
+      teamLabel,
+    );
   }
   if (source.kind === 'CAP' || /\bcap\b|apron|payroll|salary|guarantee|nba_cap_sheet|cap_sheet/.test(text)) {
     return classification(source, 'cap', groupForAppData(source, teamLabel), 'Cap sheet and apron position', 'Shows payroll, salary guarantees, and constraint posture.', 'clipboard', teamLabel);
@@ -216,13 +325,63 @@ export function classifyEvidenceSource(source: BriefSource): EvidenceSourceClass
 export function formatEvidenceFreshness(source: BriefSource): string | null {
   const rows = dataRows(source);
   const asOf = rowValue(rows, 'As of') ?? rowValue(rows, 'Roster as of') ?? rowValue(rows, 'Cap as of') ?? rowValue(rows, 'Stats as of');
-  return meaningful(asOf) ?? meaningful(source.updated_at);
+  const value = meaningful(asOf) ?? meaningful(source.updated_at);
+  return value ? humanEvidenceDate(value) : null;
+}
+
+function humanEvidenceDate(value: string): string {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})(?:T.*)?$/);
+  if (!match) return value;
+  const [, year, month, day] = match;
+  return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
+    .format(new Date(Date.UTC(Number(year), Number(month) - 1, Number(day))));
 }
 
 function defaultClaimSpecs(activeBrief: Brief | null, options: BriefOption[]): AuditClaimSpec[] {
   const specs = briefClaimSpecs(activeBrief?.body ?? null);
   const optionSpecs = optionAuditSpecs(options, null).slice(0, specs.length > 0 ? 2 : 4);
   return uniqueSpecs([...specs, ...optionSpecs]);
+}
+
+function sourceFirstNflClaimSpecs(
+  activeBrief: Brief | null,
+  sources: BriefSource[],
+  focusRefs: Set<number> | null,
+): AuditClaimSpec[] | null {
+  const body = activeBrief?.body;
+  if (!body || body.kind !== 'data_analysis' || body.market_analysis || body.seller_move_analysis?.result) return null;
+  const hasCurrentNflSources = sources.some((source) => Boolean(currentNflEvidence(source)) || hasCurrentNflSourceFlag(source));
+  if (!hasCurrentNflSources) return null;
+
+  const citedRefs = extractBriefSourceRefs(body);
+  const eligibleRefs = focusRefs && focusRefs.size > 0
+    ? focusRefs
+    : citedRefs;
+  return sources.flatMap((source): AuditClaimSpec[] => {
+    if (!eligibleRefs.has(source.ref_index)) return [];
+    const sourceClass = classifyEvidenceSource(source);
+    return [{
+      key: `nfl-source:${source.ref_index}`,
+      type: 'claim',
+      title: sourceClass.title,
+      proof: sourceClass.proof,
+      refs: [source.ref_index],
+      icon: sourceClass.icon,
+    }];
+  });
+}
+
+function hasCurrentNflSourceFlag(source: BriefSource): boolean {
+  const data = source.data;
+  return Boolean(data && (
+    data.current_team_cap_summary === true
+    || data.current_team_cap_calculation === true
+    || data.current_league_cap === true
+    || data.current_team_contract === true
+    || data.current_team_roster === true
+    || data.current_team_depth === true
+    || data.current_team_role_history === true
+  ));
 }
 
 function focusedClaimSpecs(
@@ -243,6 +402,44 @@ function focusedClaimSpecs(
 function briefClaimSpecs(body: BriefBody | null): AuditClaimSpec[] {
   if (!body) return [];
   if (body.kind === 'data_analysis') {
+    if (body.seller_move_analysis?.result) {
+      const comparableRefs = body.seller_move_analysis.result.comparables.map((_, index) => index + 4);
+      return [
+        {
+          key: 'seller:contract',
+          type: 'claim' as const,
+          title: 'Contract and cap calculation',
+          proof: 'Checks the current-year cap space and dead-money figures against the loaded player contract.',
+          refs: [1],
+          icon: 'doc',
+        },
+        {
+          key: 'seller:rule',
+          type: 'claim' as const,
+          title: 'Trade cap accounting rule',
+          proof: 'Shows the rule basis and the checks that still remain before execution.',
+          refs: [3],
+          icon: 'shield',
+        },
+        {
+          key: 'seller:role',
+          type: 'claim' as const,
+          title: 'Current role and depth',
+          proof: 'Checks the stated role consequence against the public roster and role record.',
+          refs: [2],
+          icon: 'clipboard',
+        },
+        ...(comparableRefs.length ? [{
+          key: 'seller:comparables',
+          type: 'claim' as const,
+          title: 'Historical trade range',
+          proof: 'Checks the proposed pick against the closest same-position seller returns.',
+          refs: comparableRefs,
+          icon: 'search',
+        }] : []),
+      ];
+    }
+    if (body.market_analysis) return marketAuditSpecs(body.market_analysis);
     return [
       ...body.key_findings.map((finding, index) => ({
         key: `finding:${index}`,
@@ -420,13 +617,34 @@ function auditItemFromSpec(
     status: 'checked',
     title: compactAuditTitle(spec, rows),
     claim: fullClaimText(spec.title),
-    proof: spec.proof,
+    proof: evidenceContributionForItem(spec, rows),
     icon: spec.icon ?? groupIcon(role),
     refs,
     rows: sortRows(rows),
     meta: auditSupportMeta(rows),
     freshness: freshestLabel(rows.map((row) => row.freshness)),
   };
+}
+
+function evidenceContributionForItem(spec: AuditClaimSpec, rows: EvidenceCheckRow[]): string {
+  const sourceContributions = uniqueStrings(rows.map((row) => {
+    const value = row.source.data?.contribution;
+    return typeof value === 'string' ? value : null;
+  }));
+  const currentOrRuleEvidence = rows.some((row) => (
+    row.source.data?.current_team_cap_summary === true
+    || row.source.data?.current_team_contract === true
+    || row.source.data?.current_team_roster === true
+    || row.source.data?.current_team_depth === true
+    || row.source.data?.current_team_role_history === true
+    || row.source.data?.seller_move_contract === true
+    || row.source.data?.seller_move_role === true
+    || row.source.data?.seller_move_rule === true
+    || row.source.data?.seller_move_comparable === true
+    || row.source.kind === 'CBA'
+  ));
+  if (currentOrRuleEvidence && sourceContributions.length > 0) return sourceContributions.slice(0, 2).join(' ');
+  return spec.proof;
 }
 
 function buildBackgroundSourceGroups(sources: BriefSource[]): EvidencePackItem[] {
@@ -497,12 +715,23 @@ function groupKeyFor(source: BriefSource, groupRole: EvidenceRole, teamLabel: st
   if (groupRole === 'cba') return 'cba';
   if (groupRole === 'context') return `context:${teamLabel ?? source.ref_index}`;
   if (groupRole === 'supporting') return `supporting:${source.kind}:${source.source ?? 'unknown'}:${source.ref_index}`;
+  if (groupRole === 'market' && isTransactionHistorySource(source)) return 'market:transactions';
+  if (groupRole === 'market') return `market:${source.kind}:${source.source ?? source.ref_index}`;
   return `${groupRole}:${teamLabel ?? source.source ?? source.ref_index}`;
+}
+
+function isTransactionHistorySource(source: BriefSource): boolean {
+  if (source.data?.seller_move_comparable === true || Boolean(source.data?.transaction)) return true;
+  const text = `${source.source ?? ''} ${source.title}`.toLowerCase();
+  return /nflverse trades|transaction history|historical transaction/.test(text);
 }
 
 function groupTitle(classification: EvidenceSourceClassification): string {
   if (classification.groupRole === 'current_team_data') {
     return classification.teamLabel ? `${classification.teamLabel} current team data` : 'Current team data';
+  }
+  if (classification.groupRole === 'market' && classification.groupKey === 'market:transactions') {
+    return 'Additional market transactions';
   }
   return classification.title;
 }
@@ -516,7 +745,7 @@ function groupProof(role: EvidenceRole): string {
     case 'cba': return 'Flags transaction-rule constraints that affect execution.';
     case 'context': return 'Adds strategic posture, priorities, and team context.';
     case 'contract': return 'Shows salary structure, guarantees, and contract-specific constraints.';
-    case 'market': return 'Adds reporting, projection, or market context around the decision.';
+    case 'market': return 'Shows the public market material cited in this answer.';
     case 'supporting': return 'Supports the reasoning behind this answer.';
   }
 }
@@ -556,22 +785,21 @@ function evidenceRowForSource(source: BriefSource, classification: EvidenceSourc
 
 function sourceMeta(source: BriefSource): string {
   const rows = dataRows(source);
-  const dataset = rowValue(rows, 'Dataset');
   const sourceName = rowValue(rows, 'Source') ?? source.source;
   const team = rowValue(rows, 'Team') ?? rowValue(rows, 'Teams');
-  return [humanSource(sourceName), meaningful(dataset), meaningful(team)].filter(Boolean).join(' · ');
+  return [humanSource(sourceName), meaningful(team)].filter(Boolean).join(' · ');
 }
 
 function humanSource(value: string | null | undefined): string | null {
   const raw = meaningful(value);
   if (!raw) return null;
-  if (raw === 'GAMBIT_APP_DATA') return 'Gambit app data';
+  if (raw === 'GAMBIT_APP_DATA') return 'Public NFL data';
   if (raw === 'CBA REFERENCE') return 'CBA reference';
   return raw.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 function teamLabelForSource(source: BriefSource, rows: { k: string; v: string }[]): string | null {
-  const evidence = currentNbaEvidence(source);
+  const evidence = currentNflEvidence(source) ?? currentNbaEvidence(source);
   if (typeof evidence?.team_id === 'string') return evidence.team_id;
 
   const teamValue = rowValue(rows, 'Team') ?? rowValue(rows, 'Teams');
@@ -580,6 +808,13 @@ function teamLabelForSource(source: BriefSource, rows: { k: string; v: string }[
 
   const titleMatch = source.title.match(/\b[A-Z]{3}\b/);
   return titleMatch?.[0] ?? null;
+}
+
+function currentNflEvidence(source: BriefSource): Record<string, unknown> | null {
+  const data = source.data;
+  if (!data || typeof data !== 'object') return null;
+  const evidence = data.current_nfl_evidence;
+  return evidence && typeof evidence === 'object' ? evidence as Record<string, unknown> : null;
 }
 
 function currentNbaEvidence(source: BriefSource): Record<string, unknown> | null {
@@ -657,7 +892,7 @@ function auditProofForClaim(text: string): string {
     return 'Checks which future assets are movable.';
   }
   if (/\broster|player|usage|efficiency|stat|rotation\b/.test(body)) {
-    return 'Grounds the basketball baseline.';
+    return 'Grounds the football baseline.';
   }
   if (/\bcontext|priority|posture|contend|window\b/.test(body)) {
     return 'Adds team posture around the recommendation.';
@@ -714,10 +949,10 @@ function subtitleForModel(
   backgroundRefCount: number,
 ): string {
   if (hasFocus) {
-    const scope = selectedOptionRef !== null ? `option [${selectedOptionRef}]` : 'focused refs';
-    return `Audit: ${scope} · ${checkedCount} ${checkedCount === 1 ? 'check' : 'checks'}`;
+    const scope = selectedOptionRef !== null ? 'Selected option' : 'Selected citation';
+    return `${scope} · ${checkedCount} supporting ${checkedCount === 1 ? 'item' : 'items'}`;
   }
-  return `Audit: ${checkedCount} ${checkedCount === 1 ? 'claim' : 'claims'} checked · ${backgroundRefCount} background refs`;
+  return `${checkedCount} supporting ${checkedCount === 1 ? 'item' : 'items'}${backgroundRefCount ? ' · more sources available' : ''}`;
 }
 
 function dominantRole(rows: EvidenceCheckRow[]): EvidenceRole {
@@ -744,12 +979,49 @@ function uniqueSpecs(specs: AuditClaimSpec[]): AuditClaimSpec[] {
   const seen = new Set<string>();
   const result: AuditClaimSpec[] = [];
   for (const spec of specs) {
-    const key = `${spec.title.toLowerCase()}|${spec.refs.join(',')}`;
+    const key = spec.refs.length ? spec.refs.join(',') : `${spec.title.toLowerCase()}|none`;
     if (seen.has(key)) continue;
     seen.add(key);
     result.push({ ...spec, refs: uniqueSorted(spec.refs) });
   }
   return result.slice(0, 8);
+}
+
+function marketAuditSpecs(analysis: NonNullable<Extract<BriefBody, { kind: 'data_analysis' }>['market_analysis']>): AuditClaimSpec[] {
+  const sourceCount = analysis.source_refs.length;
+  const eventRows = [...analysis.comparables, ...analysis.influential_transactions]
+    .filter((row, index, all) => all.findIndex((candidate) => candidate.event_id === row.event_id) === index);
+  const preferred = [...analysis.influential_transactions, ...analysis.comparables]
+    .filter((row, index, all) => all.findIndex((candidate) => candidate.event_id === row.event_id) === index)
+    .slice(0, 4);
+  const marketDefinition: AuditClaimSpec = {
+    key: 'market:definition',
+    type: 'claim',
+    title: 'Historical market definition',
+    proof: `${analysis.coverage.event_count.toLocaleString()} material moves · ${analysis.query.position_groups.join(', ')} · ${analysis.query.transaction_types.map((value) => value.replaceAll('_', ' ')).join(', ')} · ${analysis.query.start_year}–${analysis.query.end_year}.`,
+    refs: analysis.source_refs.map((_, index) => index + 1),
+    icon: 'search',
+  };
+  const transactions = preferred.flatMap((row): AuditClaimSpec[] => {
+    const index = eventRows.findIndex((candidate) => candidate.event_id === row.event_id);
+    if (index < 0) return [];
+    return [{
+      key: `market:event:${row.event_id}`,
+      type: 'claim',
+      title: `${row.player_name} · ${row.event_year}`,
+      proof: row.compensation_summary
+        ? `${row.from_team_id ?? '—'} to ${row.to_team_id ?? '—'} · ${row.compensation_summary}`
+        : `${row.transaction_type.replaceAll('_', ' ')} used in the displayed market comparison.`,
+      refs: [sourceCount + index + 1],
+      icon: 'search',
+    }];
+  });
+  return [marketDefinition, ...transactions];
+}
+
+function sourceContribution(source: BriefSource, fallback: string): string {
+  const value = source.data?.contribution;
+  return typeof value === 'string' && value.trim() ? value.trim() : fallback;
 }
 
 function uniqueSorted(values: number[]): number[] {
@@ -794,6 +1066,25 @@ function freshestLabel(labels: (string | null)[]): string | null {
 
 function compactAuditTitle(spec: AuditClaimSpec, rows: EvidenceCheckRow[]): string {
   if (spec.type === 'option') return compactOptionTitle(spec.title, rows);
+  if (spec.key.startsWith('calculation:')) return clampHeadline(spec.title, 46);
+
+  if (rows.some((row) => row.source.data?.current_team_cap_summary === true)) return 'Giants 2026 cap position';
+  if (rows.some((row) => row.source.data?.current_team_cap_calculation === true)) return 'Giants 2026 cap accounting';
+  if (rows.some((row) => row.source.data?.current_league_cap === true)) return 'Official 2026 league salary cap';
+  const positionContractGroup = rows.find((row) => typeof row.source.data?.current_position_contract_group === 'string')
+    ?.source.data?.current_position_contract_group;
+  if (typeof positionContractGroup === 'string') return `Current Giants ${positionContractGroup} contracts`;
+  if (rows.some((row) => row.source.data?.current_team_contract === true)) return 'Largest Giants 2026 cap hits';
+  if (rows.some((row) => row.source.data?.current_team_roster === true || row.source.data?.current_team_depth === true)) return 'Current Giants cornerback roles';
+  if (rows.some((row) => row.source.data?.seller_move_contract === true)) return 'Contract and cap calculation';
+  if (rows.some((row) => row.source.data?.seller_move_role === true)) return 'Current role and depth';
+  if (rows.some((row) => row.source.data?.seller_move_rule === true)) return 'Trade cap accounting rule';
+  if (rows.some((row) => row.source.data?.seller_move_comparable === true)) return 'Historical trade range';
+  const targetSource = rows.find((row) => currentNflEvidence(row.source)?.dataset_id === 'nfl_trade_target_current');
+  if (targetSource) return targetSource.title;
+  if (rows.some((row) => Boolean(currentNflEvidence(row.source)))) return clampHeadline(spec.title, 46);
+  if (/^Historical market definition$/i.test(spec.title)) return spec.title;
+  if (rows.some((row) => Boolean(row.source.data?.transaction))) return spec.title;
 
   const body = `${cleanBodyText(spec.title)} ${cleanBodyText(spec.proof)}`.toLowerCase();
   const team = compactTeamPrefix(rows);

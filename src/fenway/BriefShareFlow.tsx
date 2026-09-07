@@ -72,6 +72,7 @@ export function BriefShareFlow({ briefId }: BriefShareFlowProps) {
       (member.email ?? '').toLowerCase().includes(normalized)
     ));
   }, [query, snapshot]);
+  const hasTeamDirectory = (snapshot?.team_members.length ?? 0) > 0;
 
   const addRecipient = async (member: TeamMember) => {
     if (!briefId || sharedByMember.has(member.id)) return;
@@ -186,17 +187,17 @@ export function BriefShareFlow({ briefId }: BriefShareFlowProps) {
       {open && briefId && (
         <div style={popoverStyle} onClick={(event) => event.stopPropagation()}>
           <SectionHeader icon="user-plus" label="People" />
-          <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Find a teammate..."
-            style={searchInputStyle}
-          />
+          {(loading || hasTeamDirectory) && <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Find a teammate..."
+              style={searchInputStyle}
+            />}
           <div style={{ display: 'flex', flexDirection: 'column', gap: SPACE.xs, minHeight: 92 }}>
             {loading && (
               <div style={emptyStyle}>Loading team...</div>
             )}
-            {!loading && members.map((member) => {
+            {!loading && hasTeamDirectory && members.map((member) => {
               const share = sharedByMember.get(member.id) ?? null;
               const busy = busyId === member.id || busyId === share?.id;
               return (
@@ -226,8 +227,11 @@ export function BriefShareFlow({ briefId }: BriefShareFlowProps) {
                 </div>
               );
             })}
-            {!loading && members.length === 0 && (
+            {!loading && hasTeamDirectory && members.length === 0 && (
               <div style={emptyStyle}>No teammates match that search.</div>
+            )}
+            {!loading && !hasTeamDirectory && (
+              <div style={emptyStyle}>The NYG team directory is not connected to this public demo. Use a review link or PDF export instead.</div>
             )}
           </div>
 

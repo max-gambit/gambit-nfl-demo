@@ -30,7 +30,9 @@ export function Cite({ n, label }: CiteProps) {
   const data = (source?.data && typeof source.data === 'object') ? source.data as Record<string, unknown> : {};
   const dataRows = (Array.isArray(data.rows) ? data.rows : []) as { k: string; v: string }[];
   const excerpt = typeof data.excerpt === 'string' ? data.excerpt : null;
-  const url = typeof data.url === 'string' ? data.url : null;
+  const url = typeof data.source_url === 'string'
+    ? data.source_url
+    : typeof data.url === 'string' ? data.url : null;
   const isCba = source?.kind === 'CBA';
   const cbaArticle = isCba && typeof data.article === 'string' ? data.article : null;
   const cbaSection = isCba && typeof data.section === 'string' ? data.section : null;
@@ -54,14 +56,16 @@ export function Cite({ n, label }: CiteProps) {
       window.open(url, '_blank', 'noopener,noreferrer');
       return;
     }
-    setSourceFilterRef(null);
+    setSourceFilterRef(refIndex);
     setHighlightedSourceRef(refIndex);
+    fire('v6d3cf:open-evidence', { ref: refIndex });
   };
 
   const onOpenInRail = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSourceFilterRef(refIndex);
     setHighlightedSourceRef(refIndex);
+    fire('v6d3cf:open-evidence', { ref: refIndex });
   };
 
   return (
@@ -166,7 +170,7 @@ export function Cite({ n, label }: CiteProps) {
               {dataRows.slice(0, 4).map((r, i) => (
                 <span key={i} style={{ display: 'contents' }}>
                   <span style={{ color: F.fgMuted }}>{r.k}</span>
-                  <span style={{ color: F.ink, fontWeight: 600 }}>{r.v}</span>
+                  <span style={{ color: F.ink, fontWeight: 600 }}>{citeRowValue(r.k, r.v)}</span>
                 </span>
               ))}
             </span>
@@ -180,7 +184,7 @@ export function Cite({ n, label }: CiteProps) {
               border: 'none', borderRadius: 5,
               fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 600,
               cursor: 'pointer',
-            }}>Open Evidence Pack →</button>
+            }}>Open evidence →</button>
             {url && (
               <span style={{
                 fontFamily: 'var(--font-mono)', fontSize: 9.5, color: F.fgFaint,
@@ -193,4 +197,13 @@ export function Cite({ n, label }: CiteProps) {
       )}
     </span>
   );
+}
+
+function citeRowValue(label: string, value: string): string {
+  if (!/(?:date|as of|retrieved)$/i.test(label)) return value;
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})(?:T.*)?$/);
+  if (!match) return value;
+  const [, year, month, day] = match;
+  return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
+    .format(new Date(Date.UTC(Number(year), Number(month) - 1, Number(day))));
 }

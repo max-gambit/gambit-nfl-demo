@@ -11,14 +11,30 @@ import type {
   CbaSearchResponse,
   CbaSection,
   CbaTocResponse,
+  NflCapRosterDecisionRequest,
+  NflCapRosterExplanationRequest,
+  CreateNflWorkspaceRequest,
+  NflReadinessPreflightCheck,
+  NflPositionMarketGroup,
+  NflSellerMoveRequest,
+  NflTransactionMarketRequest,
 } from '@shared/types';
 import {
   groupNflTeams,
   loadCurrentNflDataWithMode,
+  loadCurrentNflTeamDataWithMode,
   nflTeamDetail,
 } from '../nfl_data/seed.js';
 import { buildNflCoverageMatrix, buildNflCoverageTeam } from '../nfl_coverage/index.js';
+import { buildNflDataHealth } from '../nfl_coverage/data_health.js';
+import { buildCapRosterDecision } from '../nfl_decision/cap_roster.js';
+import { explainCapRosterDecision } from '../nfl_decision/explain.js';
 import { loadNflRulesCorpus, type NflRuleRow } from '../nfl_rules/seed.js';
+import { createNygWorkspace, listNygWorkspaces } from '../nfl_workspace/service.js';
+import { NYG_HERO_SEED_KEY } from '../nfl_workspace/seed.js';
+import { analyzeNflTransactionMarket } from '../nfl_transactions/analyze.js';
+import { loadCurrentNflTransactionMarketSnapshot } from '../nfl_transactions/seed.js';
+import { getNflSellerMoveOptions, modelNflSellerMove } from '../nfl_transactions/model_move.js';
 
 export const nflRoutes = new Hono();
 
@@ -43,8 +59,9 @@ nflRoutes.get('/cap-sheets/current', async (c) => {
 });
 
 nflRoutes.get('/cap-sheets/current/:teamId', async (c) => {
-  const { seed, source_mode, fallback_reason } = await loadCurrentNflDataWithMode();
-  const detail = nflTeamDetail(seed, c.req.param('teamId').toUpperCase());
+  const teamId = c.req.param('teamId').toUpperCase();
+  const { seed, source_mode, fallback_reason } = await loadCurrentNflTeamDataWithMode(teamId);
+  const detail = nflTeamDetail(seed, teamId);
   if (!detail) return c.json({ error: 'nfl_team_not_found' }, 404);
   return c.json({ ...detail, source_mode, fallback_reason });
 });
@@ -82,6 +99,173 @@ nflRoutes.get('/coverage/current/:teamId', async (c) => {
   const detail = await buildNflCoverageTeam(c.req.param('teamId').toUpperCase());
   if (!detail.team) return c.json({ error: 'nfl_team_not_found' }, 404);
   return c.json(detail);
+});
+
+nflRoutes.get('/data-health', async (c) => {
+  const teamId = (c.req.query('team_id') ?? 'NYG').toUpperCase();
+  try {
+    const health = await buildNflDataHealth(teamId);
+    if (health.datasets.find((dataset) => dataset.id === 'roster')?.row_count === 0) {
+      return c.json({ error: 'nfl_team_not_found' }, 404);
+    }
+    return c.json(health);
+  } catch (error) {
+    return c.json({ error: 'nfl_data_health_failed', detail: error instanceof Error ? error.message : String(error) }, 500);
+  }
+});
+
+nflRoutes.post('/transaction-market/analyze', async (c) => {
+  let body: NflTransactionMarketRequest;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: 'invalid_json' }, 400);
+  }
+  try {
+    return c.json(await analyzeNflTransactionMarket(body, {
+      loadSnapshot: loadCurrentNflTransactionMarketSnapshot,
+    }));
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    const unavailable = /snapshot|database|fetch failed|relation .* does not exist/i.test(detail);
+    return c.json({
+      error: unavailable ? 'nfl_transaction_market_unavailable' : 'invalid_transaction_market_request',
+      detail,
+    }, unavailable ? 503 : 400);
+  }
+});
+
+nflRoutes.get('/transaction-market/move-options', async (c) => {
+  const teamId = (c.req.query('team_id') ?? 'NYG').toUpperCase();
+  const positionGroups = (c.req.query('position_groups') ?? '')
+    .split(',')
+    .map((value) => value.trim().toUpperCase())
+    .filter(Boolean) as NflPositionMarketGroup[];
+  try {
+    return c.json(await getNflSellerMoveOptions(teamId, positionGroups));
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    const unavailable = /database|not available/i.test(detail);
+    return c.json({
+      error: unavailable ? 'nfl_seller_move_unavailable' : 'invalid_nfl_seller_move_options_request',
+      detail,
+    }, unavailable ? 503 : 400);
+  }
+});
+
+nflRoutes.post('/transaction-market/model-move', async (c) => {
+  let body: NflSellerMoveRequest;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: 'invalid_json' }, 400);
+  }
+  try {
+    return c.json(await modelNflSellerMove(body));
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    const unavailable = /database|not available|snapshot.*current/i.test(detail);
+    return c.json({
+      error: unavailable ? 'nfl_seller_move_unavailable' : 'invalid_nfl_seller_move_request',
+      detail,
+    }, unavailable ? 503 : 400);
+  }
+});
+
+nflRoutes.post('/decision-models/cap-roster', async (c) => {
+  let body: NflCapRosterDecisionRequest;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: 'invalid_json' }, 400);
+  }
+  try {
+    return c.json(await buildCapRosterDecision(body));
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    const status = /Unknown NFL team/.test(detail) ? 404 : 400;
+    return c.json({ error: status === 404 ? 'nfl_team_not_found' : 'invalid_cap_roster_request', detail }, status);
+  }
+});
+
+nflRoutes.post('/decision-models/cap-roster/explain', async (c) => {
+  let body: NflCapRosterExplanationRequest;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: 'invalid_json' }, 400);
+  }
+  if (!body.question?.trim()) return c.json({ error: 'question required' }, 400);
+  try {
+    return c.json(await explainCapRosterDecision(body));
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    const status = /Unknown NFL team/.test(detail) ? 404 : 400;
+    return c.json({ error: status === 404 ? 'nfl_team_not_found' : 'invalid_cap_roster_explanation_request', detail }, status);
+  }
+});
+
+nflRoutes.get('/readiness-preflight', async (c) => {
+  const teamId = (c.req.query('team_id') ?? 'NYG').toUpperCase();
+  if (teamId !== 'NYG') return c.json({ error: 'nfl_readiness_team_not_supported' }, 404);
+  try {
+    const [health, workspaces, decision] = await Promise.all([
+      buildNflDataHealth('NYG'),
+      listNygWorkspaces(),
+      buildCapRosterDecision({
+        team_id: 'NYG',
+        target_relief_dollars: 15_000_000,
+        protected_player_ids: [],
+        protected_position_groups: ['QB'],
+        allowed_levers: ['hold', 'restructure', 'extension', 'pre_june_cut', 'post_june_cut', 'trade'],
+      }),
+    ]);
+    const workspace = workspaces.find((candidate) => candidate.seeded) ?? null;
+    const checks: NflReadinessPreflightCheck[] = [
+      { id: 'data_health', status: health.meeting_ready ? 'ready' : 'blocked', detail: health.meeting_ready ? 'Current database-backed roster/cap and authoritative rule checks passed.' : health.blockers.join('; ') },
+      { id: 'supporting_workspace', status: workspace ? 'ready' : 'blocked', detail: workspace ? `Supporting workspace ${NYG_HERO_SEED_KEY} is available.` : `Supporting workspace ${NYG_HERO_SEED_KEY} is missing.` },
+      { id: 'deterministic_decision', status: decision.status === 'ready' && decision.recommended_branch_id ? 'ready' : 'blocked', detail: decision.deterministic_summary },
+      { id: 'public_demo_boundary', status: decision.public_demo_data ? 'ready' : 'blocked', detail: decision.public_demo_data ? 'Analysis is explicitly limited to public demo data.' : 'Public demo boundary is missing.' },
+    ];
+    const blockers = checks.filter((check) => check.status === 'blocked').map((check) => check.detail);
+    return c.json({
+      schema_version: 'nfl_readiness_preflight.v1',
+      generated_at: new Date().toISOString(),
+      team_id: 'NYG',
+      meeting_ready: blockers.length === 0,
+      health,
+      workspace,
+      checks,
+      blockers,
+    });
+  } catch (error) {
+    return c.json({ error: 'nfl_readiness_preflight_failed', detail: error instanceof Error ? error.message : String(error) }, 500);
+  }
+});
+
+nflRoutes.get('/workspaces', async (c) => {
+  const teamId = (c.req.query('team_id') ?? 'NYG').toUpperCase();
+  if (teamId !== 'NYG') return c.json({ error: 'nfl_workspace_team_not_supported' }, 404);
+  try {
+    return c.json({ workspaces: await listNygWorkspaces() });
+  } catch (error) {
+    return c.json({ error: 'load_nfl_workspaces_failed', detail: error instanceof Error ? error.message : String(error) }, 500);
+  }
+});
+
+nflRoutes.post('/workspaces', async (c) => {
+  let body: CreateNflWorkspaceRequest;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: 'invalid_json' }, 400);
+  }
+  try {
+    return c.json({ workspace: await createNygWorkspace(body.question) }, 201);
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    return c.json({ error: /question/.test(detail) ? 'invalid_workspace_question' : 'create_nfl_workspace_failed', detail }, /question/.test(detail) ? 400 : 500);
+  }
 });
 
 nflRoutes.get('/rules', async (c) => {
@@ -191,9 +375,9 @@ function nflRuleToSection(corpus: NflRulesCorpus, rule: NflRuleRow, index: numbe
     label: rule.title,
     body: nflRuleBody(rule),
     document_id: corpus.document_id,
-    article: 'NFL Rules',
-    section: rule.rule_family,
-    section_number: null,
+    article: rule.source_document,
+    section: rule.source_locator,
+    section_number: rule.source_locator,
     page_start: null,
     page_end: null,
     sort_key: index,
@@ -222,6 +406,10 @@ function nflRuleBody(rule: NflRuleRow): string {
     rule.summary,
     '',
     `Analysis use: ${rule.analysis_use}`,
+    `Authority: ${rule.source_document}`,
+    `Locator: ${rule.source_locator}`,
+    `Effective: ${rule.effective_date}`,
+    `Evidence boundary: ${rule.analysis_boundary}`,
     `Source note: ${rule.source_note}`,
   ].join('\n');
 }

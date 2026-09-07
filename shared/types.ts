@@ -6,6 +6,8 @@ export interface Session {
   id: string;
   user_id: string | null;
   label: string;
+  workspace_key?: string;
+  seed_key?: string | null;
   created_at: string;
   updated_at: string;
   archived_at: string | null;
@@ -56,6 +58,8 @@ export interface BriefProgressStreamEvent {
   progress: BriefProgress | null;
   updated_at: string;
   error: string | null;
+  /** Present when a deterministic artifact is ready before interpretation. */
+  body?: BriefBody | null;
 }
 
 export type BriefTemplateId =
@@ -191,6 +195,14 @@ export interface DataAnalysisBriefBody {
   calculations: DataAnalysisCalculation[];
   caveats: string[];
   followups: string[];
+  /** Server-attached deterministic artifact. The model never authors this payload. */
+  market_analysis?: NflTransactionMarketAnalysis;
+  /** Server-attached deterministic seller-side trade continuation. */
+  seller_move_analysis?: NflSellerMoveConversationArtifact;
+  /** The user asked for a market read and a seller check in the same turn. */
+  combined_market_seller_analysis?: boolean;
+  /** The sourced result renders first; the model-written football read follows. */
+  analysis_interpretation_status?: 'pending' | 'ready' | 'unavailable';
 }
 
 export type BriefBody = RecommendationBriefBody | DataAnalysisBriefBody;
@@ -455,6 +467,8 @@ export interface Project {
   id: string;
   user_id: string | null;
   title: string;
+  workspace_key?: string;
+  seed_key?: string | null;
   question: string;
   objective: string;
   workflow_type: ProjectWorkflowType;
@@ -1303,9 +1317,18 @@ export interface DataAnalystTraceDataset {
 
 export interface DataAnalystTrace {
   tool_use_id: string;
-  tool_name: 'list_available_datasets' | 'query_nba_data' | 'query_nfl_data' | 'query_brief_workspace';
+  tool_name:
+    | 'list_available_datasets'
+    | 'query_nba_data'
+    | 'query_nfl_data'
+    | 'query_brief_workspace'
+    | 'analyze_nfl_transaction_market'
+    | 'query_nfl_transaction_comparables';
+  input?: Record<string, unknown>;
   datasets: DataAnalystTraceDataset[];
   errors: { scope: string; error: string }[];
+  /** Deterministic server result used by Analysis. Never authored by the model. */
+  market_analysis?: NflTransactionMarketAnalysis;
 }
 
 export type ContextGraphWarRoomTier = 'hot' | 'warm' | 'watch';
@@ -1862,6 +1885,25 @@ export interface NflSourceRef {
   url: string;
 }
 
+export interface NflTeamCapSummary {
+  team_id: string;
+  season: string;
+  as_of_date: string;
+  current_cap_space_dollars: number;
+  effective_cap_space_dollars: number | null;
+  league_cap_dollars: number;
+  applied_team_cap_dollars: number;
+  carryover_dollars: number | null;
+  adjustments_dollars: number | null;
+  top_51_cap_spending_dollars: number;
+  dead_money_dollars: number;
+  accounting_basis: string;
+  accounting_note: string;
+  source_status: 'captured' | 'source-needed';
+  source_urls: string[];
+  source_content_sha256: Record<string, string>;
+}
+
 export interface NflDemoTotals {
   season: string;
   as_of_date: string;
@@ -1894,6 +1936,7 @@ export interface GetCurrentNflTeamResponse {
   roster_entries: NflRosterEntry[];
   cap_rows: NflCapRow[];
   player_metrics: NflPlayerMetricRow[];
+  team_cap_summary: NflTeamCapSummary | null;
   source_refs: NflSourceRef[];
   notes: string[];
   source_mode?: NflCoverageSourceMode;
@@ -2051,6 +2094,521 @@ export interface NflCoverageMatrixResponse {
 
 export interface GetCurrentNflCoverageTeamResponse extends NflCoverageMatrixResponse {
   team: NflCoverageTeamRow | null;
+}
+
+// ── NFL demo readiness and deterministic cap/roster modeling ───────────────
+export type NflDataHealthStatus = 'ready' | 'degraded' | 'blocked';
+export type NflDataHealthDatasetId = 'roster' | 'cap_contracts' | 'player_metrics' | 'rules' | 'transaction_market';
+
+export interface NflDataHealthGap {
+  code: string;
+  message: string;
+  affected_count?: number;
+}
+
+export interface NflDataHealthDataset {
+  id: NflDataHealthDatasetId;
+  label: string;
+  status: NflDataHealthStatus;
+  source_mode: NflCoverageSourceMode | 'authoritative_corpus' | 'public_release_snapshot';
+  source_name: string;
+  source_url: string | null;
+  as_of_date: string | null;
+  retrieved_at: string | null;
+  expected_cadence: string;
+  max_age_hours: number | null;
+  age_hours: number | null;
+  row_count: number;
+  captured_count: number;
+  derived_count: number;
+  source_needed_count: number;
+  gaps: NflDataHealthGap[];
+  blocker: string | null;
+  coverage?: Record<string, string | number | boolean | null>;
+}
+
+export interface NflRuleAuthorityHealth {
+  status: NflDataHealthStatus;
+  authoritative_url: string | null;
+  effective_date: string | null;
+  retrieved_at: string | null;
+  rules_with_locators: number;
+  total_rules: number;
+  gaps: NflDataHealthGap[];
+}
+
+export interface NflDataHealthResponse {
+  schema_version: 'nfl_data_health.v1';
+  generated_at: string;
+  team_id: string;
+  status: NflDataHealthStatus;
+  meeting_ready: boolean;
+  source_mode: NflCoverageSourceMode;
+  fallback_reason: string | null;
+  datasets: NflDataHealthDataset[];
+  rule_authority: NflRuleAuthorityHealth;
+  blockers: string[];
+  remediation: string[];
+}
+
+// ── NFL historical transaction-market analysis ────────────────────────────
+export type NflTransactionMarketStatus = 'supported' | 'directional' | 'insufficient_evidence';
+export type NflTransactionAnalysisMode = 'ten_year_trend' | 'period_comparison' | 'comparables' | 'recent_influence';
+export type NflTransactionDatePrecision = 'day' | 'year';
+export type NflTransactionType =
+  | 'trade'
+  | 'free_agent_signing'
+  | 're_signing'
+  | 'extension'
+  | 'tag'
+  | 'waiver_claim'
+  | 'release'
+  | 'other';
+export type NflPositionMarketGroup = 'QB' | 'RB' | 'WR' | 'TE' | 'OT' | 'IOL' | 'EDGE' | 'IDL' | 'LB' | 'CB' | 'S' | 'ST';
+export type NflTradeCompensationBand = 'round_1' | 'rounds_2_3' | 'rounds_4_7' | 'player_only' | 'unknown';
+export type NflMarketDirection = 'growing' | 'shrinking' | 'flat' | 'mixed' | 'insufficient_evidence';
+
+export interface NflTransactionMarketRequest {
+  analysis_mode: NflTransactionAnalysisMode;
+  start_year?: number;
+  end_year?: number;
+  comparison_year?: number;
+  team_ids?: string[];
+  position_groups?: NflPositionMarketGroup[];
+  transaction_types?: NflTransactionType[];
+  include_ytd?: boolean;
+  max_comparables?: number;
+}
+
+export interface NflTransactionMarketResolvedQuery {
+  analysis_mode: NflTransactionAnalysisMode;
+  start_year: number;
+  end_year: number;
+  baseline_years: [number, number];
+  recent_years: [number, number];
+  comparison_year: number | null;
+  team_ids: string[];
+  position_groups: NflPositionMarketGroup[];
+  transaction_types: NflTransactionType[];
+  include_ytd: boolean;
+  max_comparables: number;
+}
+
+export interface NflTransactionMarketCoverage {
+  event_count: number;
+  trade_count: number;
+  contract_count: number;
+  roster_player_seasons: number;
+  matched_position_count: number;
+  position_match_basis_points: number;
+  allocable_trade_count: number;
+  priced_contract_count: number;
+  latest_event_date: string | null;
+  type_coverage: Partial<Record<NflTransactionType, number>>;
+}
+
+export interface NflTransactionMarketYearPoint {
+  year: number;
+  position_group: NflPositionMarketGroup;
+  event_count: number;
+  roster_player_seasons: number;
+  mobility_per_100_basis_points: number | null;
+  transaction_share_basis_points: number | null;
+  trade_count: number;
+  median_contract_apy_cap_basis_points: number | null;
+}
+
+export interface NflTransactionMarketSignal {
+  status: NflTransactionMarketStatus;
+  direction: NflMarketDirection;
+  /** Full completed-year cohort value; comparison windows remain separate. */
+  overall_value: number | null;
+  baseline_value: number | null;
+  recent_value: number | null;
+  relative_change_basis_points: number | null;
+  sample_size: number;
+  unit: 'events_per_100_player_seasons' | 'transaction_share_basis_points' | 'apy_cap_basis_points' | 'compensation_band_mix';
+  explanation: string;
+}
+
+export interface NflPositionMarketTrend {
+  position_group: NflPositionMarketGroup;
+  status: NflTransactionMarketStatus;
+  direction: NflMarketDirection;
+  event_count: number;
+  mobility: NflTransactionMarketSignal;
+  transaction_share: NflTransactionMarketSignal;
+  contract_price: NflTransactionMarketSignal;
+  trade_compensation: NflTransactionMarketSignal;
+}
+
+export interface NflTransactionComparable {
+  event_id: string;
+  event_year: number;
+  event_date: string | null;
+  date_precision: NflTransactionDatePrecision;
+  transaction_type: NflTransactionType;
+  player_id: string | null;
+  player_name: string;
+  raw_position: string | null;
+  position_group: NflPositionMarketGroup | null;
+  normalization_basis: string | null;
+  from_team_id: string | null;
+  to_team_id: string | null;
+  contract_value_dollars: number | null;
+  contract_apy_dollars: number | null;
+  guaranteed_dollars: number | null;
+  apy_cap_basis_points: number | null;
+  compensation_band: NflTradeCompensationBand | null;
+  compensation_summary: string | null;
+  identity_confidence: 'matched' | 'directional' | 'unmatched';
+  influence_basis_points: number | null;
+  influence_explanation: string | null;
+  source_ref_ids: string[];
+}
+
+export interface NflTransactionMarketSourceRef {
+  id: string;
+  name: string;
+  url: string;
+  upstream_attribution: string;
+  retrieved_at: string;
+  as_of_date: string;
+  checksum_sha256: string;
+  coverage_note: string;
+  row_count?: number;
+  coverage_start_date?: string | null;
+  coverage_end_date?: string | null;
+}
+
+export interface NflTransactionMarketMethodology {
+  cohort: string;
+  mobility: string;
+  trade_price: string;
+  contract_price: string;
+  classification: string;
+  influence: string;
+  minimum_samples: string;
+}
+
+export interface NflTransactionMarketAnalysis {
+  schema_version: 'nfl_transaction_market.v1';
+  analysis_id: string;
+  generated_at: string;
+  snapshot_id: string;
+  status: NflTransactionMarketStatus;
+  query: NflTransactionMarketResolvedQuery;
+  coverage: NflTransactionMarketCoverage;
+  methodology: NflTransactionMarketMethodology;
+  yearly_series: NflTransactionMarketYearPoint[];
+  position_trends: NflPositionMarketTrend[];
+  comparables: NflTransactionComparable[];
+  influential_transactions: NflTransactionComparable[];
+  source_refs: NflTransactionMarketSourceRef[];
+  limitations: string[];
+}
+
+export interface NflSellerMovePlayerOption {
+  team_id: string;
+  player_id: string;
+  player_name: string;
+  listed_position: string | null;
+  position_group: NflPositionMarketGroup;
+  cap_year: number;
+  contract_as_of_date: string;
+  contract_source_url: string;
+}
+
+export interface NflSellerMovePositionOption {
+  position_group: NflPositionMarketGroup;
+  players: NflSellerMovePlayerOption[];
+}
+
+export interface NflSellerMoveOptionsResponse {
+  schema_version: 'nfl_seller_move_options.v1';
+  team_id: string;
+  current_year: number;
+  contract_as_of_date: string;
+  positions: NflSellerMovePositionOption[];
+}
+
+export interface NflSellerMoveRequest {
+  team_id: string;
+  player_id: string;
+  position_group: NflPositionMarketGroup;
+  pick_year: number;
+  pick_round: number;
+  market_scope: {
+    snapshot_id: string;
+    start_year: number;
+    end_year: number;
+    include_ytd: boolean;
+    team_ids: string[];
+  };
+}
+
+export interface NflSellerMoveComparable {
+  event_id: string;
+  event_date: string | null;
+  event_year: number;
+  player_name: string;
+  position_group: NflPositionMarketGroup;
+  from_team_id: string;
+  to_team_id: string;
+  pick_year: number;
+  pick_round: number;
+  pick_day: 1 | 2 | 3;
+  pick_delay_years: number;
+  compensation_summary: string;
+  comparison_to_proposal: 'stronger' | 'similar' | 'weaker';
+  source_name: string;
+  source_url: string;
+}
+
+export interface NflSellerMoveResponse {
+  schema_version: 'nfl_seller_move.v1';
+  generated_at: string;
+  status: 'supported' | 'insufficient_evidence';
+  proposal: {
+    source: 'user_entered';
+    pick_year: number;
+    pick_round: number;
+    pick_day: 1 | 2 | 3;
+    label: string;
+  };
+  player: {
+    team_id: string;
+    player_id: string;
+    player_name: string;
+    listed_position: string | null;
+    position_group: NflPositionMarketGroup;
+    contract_as_of_date: string;
+  };
+  market: {
+    range: 'above' | 'within' | 'below' | null;
+    range_label: string;
+    sample_size: number;
+    cohort_label: string;
+    middle_range: {
+      stronger_pick: string;
+      weaker_pick: string;
+    } | null;
+    timing_note: string;
+    method: string;
+  };
+  cap: {
+    accounting_timing: string;
+    current_year: number;
+    current_cap_number_dollars: number;
+    current_year_cap_space_created_dollars: number;
+    current_year_dead_money_dollars: number;
+    next_year: {
+      year: number;
+      scheduled_cap_dollars: number;
+      accelerated_dead_money_dollars: number;
+      cap_effect_dollars: number;
+    } | null;
+    contract_source_url: string;
+    calculation: string;
+  };
+  depth: {
+    consequence: 'major_role' | 'meaningful_role' | 'limited_role' | 'needs_review';
+    label: string;
+    basis: string;
+    source_url: string | null;
+  };
+  comparables: NflSellerMoveComparable[];
+  sources: NflTransactionMarketSourceRef[];
+  limitations: string[];
+}
+
+export interface NflSellerMoveScenarioState {
+  team_id: 'NYG';
+  player_id: string | null;
+  player_name: string | null;
+  player_query: string | null;
+  position_group: NflPositionMarketGroup | null;
+  pick_year: number | null;
+  pick_round: number | null;
+  market_scope: NflSellerMoveRequest['market_scope'];
+}
+
+export interface NflSellerMoveConversationArtifact {
+  schema_version: 'nfl_seller_move_conversation.v1';
+  status: 'answered' | 'clarification' | 'unavailable';
+  scenario: NflSellerMoveScenarioState;
+  result: NflSellerMoveResponse | null;
+  message: string | null;
+  show_comparables: boolean;
+}
+
+export type NflCapRosterLever =
+  | 'hold'
+  | 'restructure'
+  | 'extension'
+  | 'pre_june_cut'
+  | 'post_june_cut'
+  | 'trade';
+
+export interface NflUserEnteredAssumption {
+  key: string;
+  value: string | number | boolean;
+  label: string;
+  source: 'user_entered';
+}
+
+export interface NflCapRosterDecisionRequest {
+  team_id: string;
+  target_relief_dollars: number;
+  protected_player_ids: string[];
+  protected_position_groups: string[];
+  allowed_levers: NflCapRosterLever[];
+  assumptions?: NflUserEnteredAssumption[];
+}
+
+export interface NflDecisionRuleReference {
+  rule_id: string;
+  title: string;
+  locator: string;
+  authoritative_url: string;
+}
+
+export interface NflCapRosterAction {
+  player_id: string;
+  player_name: string;
+  position: string | null;
+  lever: Exclude<NflCapRosterLever, 'hold'>;
+  relief_dollars: number;
+  dead_money_dollars: number;
+  cap_number_dollars: number;
+  depth_effect: 'none' | 'low' | 'medium' | 'high' | 'unknown';
+  depth_evidence: {
+    source_status: 'captured' | 'source-needed';
+    as_of_season: string;
+    basis: string;
+    source_url: string | null;
+  };
+  confidence: 'captured' | 'derived' | 'estimated' | 'source-needed';
+  source_status: string;
+  source_url: string | null;
+  blockers: string[];
+  rule_references: NflDecisionRuleReference[];
+  next_actions: string[];
+}
+
+export type NflCapRosterBranchId = 'hold' | 'preserve_depth' | 'balanced' | 'maximize_relief';
+
+export interface NflCapRosterBranch {
+  id: NflCapRosterBranchId;
+  label: string;
+  thesis: string;
+  status: 'supported' | 'directional' | 'insufficient_evidence';
+  target_relief_dollars: number;
+  total_relief_dollars: number;
+  total_dead_money_dollars: number;
+  target_met: boolean;
+  actions: NflCapRosterAction[];
+  blockers: string[];
+  tradeoffs: string[];
+}
+
+export interface NflCapRosterDecisionResponse {
+  schema_version: 'nfl_cap_roster_decision.v1';
+  generated_at: string;
+  status: 'ready' | 'insufficient_evidence' | 'blocked';
+  team_id: string;
+  public_demo_data: true;
+  data_health: NflDataHealthResponse;
+  evidence: {
+    source_refs: NflSourceRef[];
+    exact_contract_rows: number;
+    captured_contract_rows: number;
+    derived_contract_rows: number;
+    directional_contract_rows: number;
+    source_needed_contract_rows: number;
+    rule_reference_count: number;
+  };
+  baseline: {
+    season: string;
+    as_of_date: string;
+    retrieved_at: string;
+    roster_count: number;
+    total_cap_commitments_dollars: number;
+    complete_cap_rows: number;
+    incomplete_cap_rows: number;
+  };
+  branches: NflCapRosterBranch[];
+  recommended_branch_id: NflCapRosterBranchId | null;
+  what_changes_the_call: Array<{
+    id: string;
+    trigger: string;
+    effect: string;
+    owner: string;
+  }>;
+  assumptions: NflUserEnteredAssumption[];
+  deterministic_summary: string;
+}
+
+export interface NflCapRosterExplanationRequest extends NflCapRosterDecisionRequest {
+  question: string;
+  use_live_model?: boolean;
+}
+
+export interface NflCapRosterExplanationResponse {
+  schema_version: 'nfl_cap_roster_explanation.v1';
+  generated_at: string;
+  status: 'model_validated' | 'deterministic_fallback';
+  branch_id: NflCapRosterBranchId | null;
+  summary: string;
+  rationale: string;
+  risks: string[];
+  next_actions: string[];
+  player_rows: Array<Pick<NflCapRosterAction, 'player_id' | 'player_name' | 'lever' | 'relief_dollars' | 'dead_money_dollars' | 'depth_effect' | 'depth_evidence' | 'confidence' | 'source_url' | 'rule_references'>>;
+  validation_issues: string[];
+}
+
+export type NflWorkspaceStage = 'question' | 'evidence' | 'scenarios' | 'decision' | 'action_plan';
+
+export interface NflWorkspaceSummary {
+  id: string;
+  session_id: string | null;
+  title: string;
+  question: string;
+  objective: string;
+  stage: NflWorkspaceStage;
+  team_id: string;
+  seeded: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ListNflWorkspacesResponse {
+  workspaces: NflWorkspaceSummary[];
+}
+
+export interface CreateNflWorkspaceRequest {
+  question: string;
+}
+
+export interface CreateNflWorkspaceResponse {
+  workspace: NflWorkspaceSummary;
+}
+
+export interface NflReadinessPreflightCheck {
+  id: 'data_health' | 'supporting_workspace' | 'deterministic_decision' | 'public_demo_boundary';
+  status: 'ready' | 'blocked';
+  detail: string;
+}
+
+export interface NflReadinessPreflightResponse {
+  schema_version: 'nfl_readiness_preflight.v1';
+  generated_at: string;
+  team_id: 'NYG';
+  meeting_ready: boolean;
+  health: NflDataHealthResponse;
+  workspace: NflWorkspaceSummary | null;
+  checks: NflReadinessPreflightCheck[];
+  blockers: string[];
 }
 
 // ── CBA reference corpus ────────────────────────────────────────────────────
@@ -2243,6 +2801,8 @@ export interface CreateBriefRequest {
   question: string;
   mode?: BriefMode;
   template?: BriefTemplateSelection | BriefTemplateId;
+  /** Prior brief whose executed transaction-market query should seed this question. */
+  inherited_market_brief_id?: string;
 }
 
 export interface CreateBriefResponse {
@@ -2261,6 +2821,8 @@ export interface CreateProjectRequest {
   title: string;
   question: string;
   objective: string;
+  workspace_key?: 'legacy' | 'nyg-demo';
+  seed_key?: string | null;
   workflow_type?: ProjectWorkflowType;
   subject_team_id?: string;
   counterparty_team_id?: string | null;

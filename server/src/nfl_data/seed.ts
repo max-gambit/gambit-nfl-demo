@@ -4,6 +4,9 @@ import { fileURLToPath } from 'node:url';
 export const DEFAULT_NFL_DEMO_SEED_PATH = fileURLToPath(
   new URL('../../../data/nfl-demo/current.json', import.meta.url),
 );
+export const DEFAULT_NFL_TEAM_CAP_SUMMARY_PATH = fileURLToPath(
+  new URL('../../../data/nfl-demo/team-cap-summaries.current.json', import.meta.url),
+);
 
 export type NflSourceStatus = 'captured' | 'estimated' | 'source-needed' | 'not-available';
 export type NflContractLedgerStatus = 'captured' | 'source-needed';
@@ -16,6 +19,11 @@ export interface NflCurrentDataLoadResult {
   source_mode: NflCurrentDataSourceMode;
   fallback_reason: string | null;
 }
+
+let currentDataCache: { expires_at: number; value: NflCurrentDataLoadResult } | null = null;
+let currentDataInFlight: Promise<NflCurrentDataLoadResult> | null = null;
+const currentTeamDataCache = new Map<string, { expires_at: number; value: NflCurrentDataLoadResult }>();
+const currentTeamDataInFlight = new Map<string, Promise<NflCurrentDataLoadResult>>();
 
 export interface NflDemoTeam {
   team_id: string;
@@ -122,6 +130,35 @@ export interface NflSourceRef {
   url: string;
 }
 
+export interface NflTeamCapSummary {
+  team_id: string;
+  season: string;
+  as_of_date: string;
+  current_cap_space_dollars: number;
+  effective_cap_space_dollars: number | null;
+  league_cap_dollars: number;
+  applied_team_cap_dollars: number;
+  carryover_dollars: number | null;
+  adjustments_dollars: number | null;
+  top_51_cap_spending_dollars: number;
+  dead_money_dollars: number;
+  accounting_basis: string;
+  accounting_note: string;
+  source_status: 'captured' | 'source-needed';
+  source_urls: string[];
+  source_content_sha256: Record<string, string>;
+}
+
+interface NflTeamCapSummarySnapshot {
+  schema_version: 1;
+  season: string;
+  as_of_date: string;
+  retrieved_at: string;
+  summaries: NflTeamCapSummary[];
+  source_refs: NflSourceRef[];
+  limitations: string[];
+}
+
 export interface NflDemoSeed {
   schema_version: 1;
   season: string;
@@ -135,6 +172,7 @@ export interface NflDemoSeed {
   cap_rows: NflCapRow[];
   player_metrics: NflPlayerMetricRow[];
   source_refs: NflSourceRef[];
+  team_cap_summaries?: NflTeamCapSummary[];
 }
 
 export interface NflDemoSummary {
@@ -150,7 +188,28 @@ export interface NflDemoSummary {
 
 export async function loadNflDemoSeed(path = DEFAULT_NFL_DEMO_SEED_PATH): Promise<NflDemoSeed> {
   const parsed = JSON.parse(await readFile(path, 'utf8')) as NflDemoSeed;
-  validateNflDemoSeed(parsed);
+  const teamCapSnapshot = path === DEFAULT_NFL_DEMO_SEED_PATH
+    ? await loadNflTeamCapSummarySnapshot()
+    : null;
+  const seed = teamCapSnapshot
+    ? {
+        ...parsed,
+        team_cap_summaries: teamCapSnapshot.summaries,
+        source_refs: mergeSourceRefs(parsed.source_refs, teamCapSnapshot.source_refs),
+      }
+    : parsed;
+  validateNflDemoSeed(seed);
+  return seed;
+}
+
+export async function loadNflTeamCapSummarySnapshot(
+  path = DEFAULT_NFL_TEAM_CAP_SUMMARY_PATH,
+): Promise<NflTeamCapSummarySnapshot> {
+  const parsed = JSON.parse(await readFile(path, 'utf8')) as NflTeamCapSummarySnapshot;
+  if (parsed.schema_version !== 1 || parsed.season !== '2026' || !parsed.as_of_date || !parsed.retrieved_at) {
+    throw new Error('NFL team cap summary snapshot metadata is incomplete');
+  }
+  for (const row of parsed.summaries) validateTeamCapSummary(row);
   return parsed;
 }
 
@@ -163,6 +222,19 @@ export async function loadCurrentNflData(): Promise<NflDemoSeed> {
 }
 
 export async function loadCurrentNflDataWithMode(): Promise<NflCurrentDataLoadResult> {
+  if (currentDataCache && currentDataCache.expires_at > Date.now()) return currentDataCache.value;
+  if (currentDataInFlight) return currentDataInFlight;
+  currentDataInFlight = loadCurrentNflDataUncached();
+  try {
+    const value = await currentDataInFlight;
+    currentDataCache = { expires_at: Date.now() + 30_000, value };
+    return value;
+  } finally {
+    currentDataInFlight = null;
+  }
+}
+
+async function loadCurrentNflDataUncached(): Promise<NflCurrentDataLoadResult> {
   if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return {
       seed: await loadNflDemoSeed(),
@@ -183,6 +255,38 @@ export async function loadCurrentNflDataWithMode(): Promise<NflCurrentDataLoadRe
       fallback_reason: error instanceof Error ? error.message : String(error),
     };
   }
+}
+
+export async function loadCurrentNflTeamDataWithMode(teamId: string): Promise<NflCurrentDataLoadResult> {
+  const normalized = teamId.toUpperCase();
+  const cached = currentTeamDataCache.get(normalized);
+  if (cached && cached.expires_at > Date.now()) return cached.value;
+  const inFlight = currentTeamDataInFlight.get(normalized);
+  if (inFlight) return inFlight;
+  const promise = loadCurrentNflTeamDataUncached(normalized);
+  currentTeamDataInFlight.set(normalized, promise);
+  try {
+    const value = await promise;
+    currentTeamDataCache.set(normalized, { expires_at: Date.now() + 30_000, value });
+    return value;
+  } finally {
+    currentTeamDataInFlight.delete(normalized);
+  }
+}
+
+async function loadCurrentNflTeamDataUncached(teamId: string): Promise<NflCurrentDataLoadResult> {
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return { seed: filterSeedToTeam(await loadNflDemoSeed(), teamId), source_mode: 'checked_in_snapshot', fallback_reason: null };
+  }
+  try {
+    return { seed: await loadCurrentNflTeamDataFromDb(teamId), source_mode: 'supabase_current_views', fallback_reason: null };
+  } catch (error) {
+    return { seed: filterSeedToTeam(await loadNflDemoSeed(), teamId), source_mode: 'checked_in_snapshot_fallback', fallback_reason: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+function filterSeedToTeam(seed: NflDemoSeed, teamId: string): NflDemoSeed {
+  return { ...seed, teams: seed.teams.filter((row) => row.team_id === teamId), roster_entries: seed.roster_entries.filter((row) => row.team_id === teamId), cap_rows: seed.cap_rows.filter((row) => row.team_id === teamId), player_metrics: seed.player_metrics.filter((row) => row.team_id === teamId), team_cap_summaries: seed.team_cap_summaries?.filter((row) => row.team_id === teamId) };
 }
 
 export function validateNflDemoSeed(seed: NflDemoSeed): NflDemoSummary {
@@ -279,6 +383,10 @@ export function validateNflDemoSeed(seed: NflDemoSeed): NflDemoSummary {
     if (metricCount !== rosterCount) {
       throw new Error(`NFL metric seed row parity failed for ${teamId}: roster=${rosterCount} metrics=${metricCount}`);
     }
+  }
+  for (const row of seed.team_cap_summaries ?? []) {
+    if (!teamIds.has(row.team_id)) throw new Error(`NFL team cap summary references unknown team ${row.team_id}`);
+    validateTeamCapSummary(row);
   }
   return summarizeNflDemoSeed(seed);
 }
@@ -439,6 +547,7 @@ export function nflTeamDetail(seed: NflDemoSeed, teamId: string) {
     roster_entries: seed.roster_entries.filter((row) => row.team_id === teamId).sort((a, b) => a.source_order - b.source_order),
     cap_rows: seed.cap_rows.filter((row) => row.team_id === teamId).sort((a, b) => (a.source_order ?? 9999) - (b.source_order ?? 9999)),
     player_metrics: seed.player_metrics.filter((row) => row.team_id === teamId),
+    team_cap_summary: seed.team_cap_summaries?.find((row) => row.team_id === teamId) ?? null,
     source_refs: seed.source_refs,
     notes: seed.notes,
   };
@@ -517,6 +626,7 @@ function teamCapSheetRows(seed: NflDemoSeed, snapshotId: string) {
   return seed.teams.map((team) => {
     const rosterRows = seed.roster_entries.filter((row) => row.team_id === team.team_id);
     const playerRows = seed.cap_rows.filter((row) => row.team_id === team.team_id && row.player_id);
+    const teamSummary = seed.team_cap_summaries?.find((row) => row.team_id === team.team_id) ?? null;
     const sourceNeededCount = playerRows.filter((row) => row.source_status === 'source-needed').length;
     const estimatedCount = playerRows.filter((row) => row.source_status === 'estimated').length;
     return {
@@ -528,9 +638,32 @@ function teamCapSheetRows(seed: NflDemoSeed, snapshotId: string) {
       total_cap_number_2026: sumNullable(playerRows.map((row) => row.cap_number_2026)),
       total_restructure_savings_2026: sumNullable(playerRows.map((row) => row.restructure_savings_estimate_2026)),
       total_cut_savings_2026: sumNullable(playerRows.map((row) => row.cut_savings_2026)),
+      current_cap_space_2026: teamSummary?.current_cap_space_dollars ?? null,
+      effective_cap_space_2026: teamSummary?.effective_cap_space_dollars ?? null,
+      league_cap_2026: teamSummary?.league_cap_dollars ?? null,
+      applied_team_cap_2026: teamSummary?.applied_team_cap_dollars ?? null,
+      carryover_2026: teamSummary?.carryover_dollars ?? null,
+      adjustments_2026: teamSummary?.adjustments_dollars ?? null,
+      top_51_cap_spending_2026: teamSummary?.top_51_cap_spending_dollars ?? null,
+      dead_money_2026: teamSummary?.dead_money_dollars ?? null,
+      cap_accounting_basis: teamSummary?.accounting_basis ?? null,
+      cap_summary_as_of_date: teamSummary?.as_of_date ?? null,
+      cap_summary_source_urls: teamSummary?.source_urls ?? [],
       source_status: sourceNeededCount === 0 && estimatedCount === 0 ? 'captured' : 'partial',
       source_refs: seed.source_refs,
-      source_meta: { roster_count: rosterRows.length, cap_row_count: playerRows.length, estimated_cap_row_count: estimatedCount },
+      source_meta: {
+        roster_count: rosterRows.length,
+        cap_row_count: playerRows.length,
+        estimated_cap_row_count: estimatedCount,
+        ...(teamSummary ? {
+          team_cap_summary: {
+            season: teamSummary.season,
+            accounting_note: teamSummary.accounting_note,
+            source_status: teamSummary.source_status,
+            source_content_sha256: teamSummary.source_content_sha256,
+          },
+        } : {}),
+      },
     };
   });
 }
@@ -620,7 +753,7 @@ function capSalaryCellsFromPlayerRows(
 }
 
 async function loadCurrentNflDataFromDb(): Promise<NflDemoSeed> {
-  const [teamRows, rosterRowsRaw, capRowsRaw, metricRowsRaw] = await Promise.all([
+  const [teamRows, rosterRowsRaw, capRowsRaw, metricRowsRaw, capSheetRowsRaw] = await Promise.all([
     fetchAllRows('nfl_teams', [{ column: 'team_id' }]),
     fetchAllRows('nfl_current_roster_entries', [{ column: 'team_id' }, { column: 'source_order' }], {
       selectColumns: NFL_CURRENT_ROSTER_ENTRY_SELECT,
@@ -631,12 +764,15 @@ async function loadCurrentNflDataFromDb(): Promise<NflDemoSeed> {
     fetchAllRows('nfl_current_player_metric_rows', [{ column: 'team_id' }, { column: 'player_name' }], {
       selectColumns: NFL_CURRENT_PLAYER_METRIC_SELECT,
     }),
+    fetchAllRows('nfl_current_cap_sheets', [{ column: 'team_id' }], {
+      selectColumns: NFL_CURRENT_CAP_SHEET_SELECT,
+    }),
   ]);
   const rosterRows = rosterRowsRaw as CurrentNflRosterEntryRow[];
   if (rosterRows.length === 0) throw new Error('no current NFL roster rows found in Supabase current views');
   const first = rosterRows[0];
   const sourceMeta = objectRecord(first.snapshot_source_meta);
-  return {
+  const seed: NflDemoSeed = {
     schema_version: 1,
     season: first.season,
     as_of_date: first.as_of_date,
@@ -649,13 +785,53 @@ async function loadCurrentNflDataFromDb(): Promise<NflDemoSeed> {
     cap_rows: (capRowsRaw as CurrentNflCapRow[]).map(dbCapRowToSeed),
     player_metrics: (metricRowsRaw as CurrentNflMetricRow[]).map(dbMetricRowToSeed),
     source_refs: Array.isArray(sourceMeta.source_refs) ? sourceMeta.source_refs as NflSourceRef[] : [],
+    team_cap_summaries: (capSheetRowsRaw as CurrentNflCapSheetRow[]).flatMap(dbCapSheetRowToSummary),
+  };
+  validateDbSnapshotCoherence(rosterRows, capRowsRaw as CurrentNflCapRow[], metricRowsRaw as CurrentNflMetricRow[]);
+  validateNflDemoSeed(seed);
+  return seed;
+}
+
+async function loadCurrentNflTeamDataFromDb(teamId: string): Promise<NflDemoSeed> {
+  const filter = [{ column: 'team_id', value: teamId }];
+  const [teamRows, rosterRowsRaw, capRowsRaw, metricRowsRaw, capSheetRowsRaw] = await Promise.all([
+    fetchAllRows('nfl_teams', [{ column: 'team_id' }], { filters: filter }),
+    fetchAllRows('nfl_current_roster_entries', [{ column: 'source_order' }], { selectColumns: NFL_CURRENT_ROSTER_ENTRY_SELECT, filters: filter }),
+    fetchAllRows('nfl_current_cap_sheet_player_rows', [{ column: 'source_order' }], { selectColumns: NFL_CURRENT_CAP_PLAYER_SELECT, filters: filter }),
+    fetchAllRows('nfl_current_player_metric_rows', [{ column: 'player_name' }], { selectColumns: NFL_CURRENT_PLAYER_METRIC_SELECT, filters: filter }),
+    fetchAllRows('nfl_current_cap_sheets', [{ column: 'team_id' }], { selectColumns: NFL_CURRENT_CAP_SHEET_SELECT, filters: filter }),
+  ]);
+  const rosterRows = rosterRowsRaw as CurrentNflRosterEntryRow[];
+  const capRows = capRowsRaw as CurrentNflCapRow[];
+  const metricRows = metricRowsRaw as CurrentNflMetricRow[];
+  const first = rosterRows[0];
+  if (!first || teamRows.length !== 1) throw new Error(`no current NFL rows found for ${teamId}`);
+  validateDbSnapshotCoherence(rosterRows, capRows, metricRows);
+  if (rosterRows.length !== capRows.length || rosterRows.length !== metricRows.length) {
+    throw new Error(`current NFL ${teamId} views fail roster/cap/metric parity`);
+  }
+  const sourceMeta = objectRecord(first.snapshot_source_meta);
+  return {
+    schema_version: 1,
+    season: first.season,
+    as_of_date: first.as_of_date,
+    source_name: first.source_name,
+    source_url: first.source_url,
+    retrieved_at: first.retrieved_at,
+    notes: splitNotes(first.snapshot_notes),
+    teams: teamRows as NflDemoTeam[],
+    roster_entries: rosterRows.map(dbRosterRowToSeed),
+    cap_rows: capRows.map(dbCapRowToSeed),
+    player_metrics: metricRows.map(dbMetricRowToSeed),
+    source_refs: Array.isArray(sourceMeta.source_refs) ? sourceMeta.source_refs as NflSourceRef[] : [],
+    team_cap_summaries: (capSheetRowsRaw as CurrentNflCapSheetRow[]).flatMap(dbCapSheetRowToSummary),
   };
 }
 
 async function fetchAllRows(
   table: string,
   orderBy: Array<{ column: string; ascending?: boolean }>,
-  options: { pageSize?: number; selectColumns?: string } = {},
+  options: { pageSize?: number; selectColumns?: string; filters?: Array<{ column: string; value: string }> } = {},
 ): Promise<unknown[]> {
   const { db } = await import('../db/client.js');
   const rows: unknown[] = [];
@@ -663,6 +839,7 @@ async function fetchAllRows(
   const selectColumns = options.selectColumns ?? '*';
   for (let offset = 0; ; offset += pageSize) {
     let query = db.from(table).select(selectColumns) as any;
+    for (const filter of options.filters ?? []) query = query.eq(filter.column, filter.value);
     for (const order of orderBy) {
       query = query.order(order.column, { ascending: order.ascending ?? true });
     }
@@ -754,6 +931,24 @@ const NFL_CURRENT_CAP_PLAYER_SELECT = [
   'contract_lever',
   'source_url',
   'source_status',
+  'source_data',
+].join(',');
+
+const NFL_CURRENT_CAP_SHEET_SELECT = [
+  'season',
+  'team_id',
+  'current_cap_space_2026',
+  'effective_cap_space_2026',
+  'league_cap_2026',
+  'applied_team_cap_2026',
+  'carryover_2026',
+  'adjustments_2026',
+  'top_51_cap_spending_2026',
+  'dead_money_2026',
+  'cap_accounting_basis',
+  'cap_summary_as_of_date',
+  'cap_summary_source_urls',
+  'source_meta',
 ].join(',');
 
 const NFL_CURRENT_PLAYER_METRIC_SELECT = [
@@ -805,6 +1000,23 @@ const NFL_CURRENT_PLAYER_METRIC_SELECT = [
   'position_metrics',
   'quality_flags',
 ].join(',');
+
+function validateDbSnapshotCoherence(
+  rosterRows: CurrentNflRosterEntryRow[],
+  capRows: CurrentNflCapRow[],
+  metricRows: CurrentNflMetricRow[],
+): void {
+  const first = rosterRows[0];
+  if (!first) throw new Error('no current NFL roster rows found in Supabase current views');
+  for (const [label, rows] of [['roster', rosterRows], ['cap', capRows], ['metrics', metricRows]] as const) {
+    if (rows.length === 0) throw new Error(`no current NFL ${label} rows found in Supabase current views`);
+    for (const row of rows) {
+      if (row.season !== first.season || row.as_of_date !== first.as_of_date || row.retrieved_at !== first.retrieved_at) {
+        throw new Error(`current NFL ${label} view is not coherent with the roster snapshot`);
+      }
+    }
+  }
+}
 
 function dbRosterRowToSeed(row: CurrentNflRosterEntryRow): NflRosterEntry {
   return {
@@ -906,6 +1118,42 @@ function dbMetricRowToSeed(row: CurrentNflMetricRow): NflPlayerMetricRow {
   };
 }
 
+function dbCapSheetRowToSummary(row: CurrentNflCapSheetRow): NflTeamCapSummary[] {
+  if (
+    row.current_cap_space_2026 == null
+    || row.league_cap_2026 == null
+    || row.applied_team_cap_2026 == null
+    || row.top_51_cap_spending_2026 == null
+    || row.dead_money_2026 == null
+    || !row.cap_summary_as_of_date
+    || !row.cap_accounting_basis
+  ) return [];
+  const meta = objectRecord(row.source_meta);
+  const summaryMeta = objectRecord(meta.team_cap_summary);
+  const summary: NflTeamCapSummary = {
+    team_id: row.team_id,
+    season: typeof summaryMeta.season === 'string'
+      ? summaryMeta.season
+      : row.season.match(/\b20\d{2}\b/)?.[0] ?? row.season,
+    as_of_date: row.cap_summary_as_of_date,
+    current_cap_space_dollars: row.current_cap_space_2026,
+    effective_cap_space_dollars: row.effective_cap_space_2026,
+    league_cap_dollars: row.league_cap_2026,
+    applied_team_cap_dollars: row.applied_team_cap_2026,
+    carryover_dollars: row.carryover_2026,
+    adjustments_dollars: row.adjustments_2026,
+    top_51_cap_spending_dollars: row.top_51_cap_spending_2026,
+    dead_money_dollars: row.dead_money_2026,
+    accounting_basis: row.cap_accounting_basis,
+    accounting_note: typeof summaryMeta.accounting_note === 'string' ? summaryMeta.accounting_note : '',
+    source_status: summaryMeta.source_status === 'captured' ? 'captured' : 'source-needed',
+    source_urls: arrayOfStrings(row.cap_summary_source_urls),
+    source_content_sha256: objectRecord(summaryMeta.source_content_sha256) as Record<string, string>,
+  };
+  validateTeamCapSummary(summary);
+  return [summary];
+}
+
 interface CurrentNflRosterEntryRow extends NflRosterEntry {
   season: string;
   as_of_date: string;
@@ -920,14 +1168,37 @@ interface CurrentNflRosterEntryRow extends NflRosterEntry {
 
 interface CurrentNflCapRow extends NflCapRow {
   source_order: number;
+  season: string;
+  as_of_date: string;
+  retrieved_at: string;
 }
 
 interface CurrentNflMetricRow extends Omit<NflPlayerMetricRow, 'source_data' | 'metric_families' | 'position_metrics' | 'quality_flags'> {
+  season: string;
+  as_of_date: string;
+  retrieved_at: string;
   source_status: 'captured' | 'roster-derived' | 'source-needed';
   metric_families: unknown;
   position_metrics: unknown;
   quality_flags: unknown;
   source_data: unknown;
+}
+
+interface CurrentNflCapSheetRow {
+  season: string;
+  team_id: string;
+  current_cap_space_2026: number | null;
+  effective_cap_space_2026: number | null;
+  league_cap_2026: number | null;
+  applied_team_cap_2026: number | null;
+  carryover_2026: number | null;
+  adjustments_2026: number | null;
+  top_51_cap_spending_2026: number | null;
+  dead_money_2026: number | null;
+  cap_accounting_basis: string | null;
+  cap_summary_as_of_date: string | null;
+  cap_summary_source_urls: unknown;
+  source_meta: unknown;
 }
 
 function arrayOfStrings(value: unknown): string[] {
@@ -984,4 +1255,37 @@ function objectRecord(value: unknown): Record<string, unknown> {
 
 function numberRecordValue(value: unknown): number | null {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+function mergeSourceRefs(left: NflSourceRef[], right: NflSourceRef[]): NflSourceRef[] {
+  const byId = new Map<string, NflSourceRef>();
+  for (const source of [...left, ...right]) byId.set(source.id, source);
+  return [...byId.values()];
+}
+
+function validateTeamCapSummary(row: NflTeamCapSummary): void {
+  if (!row.team_id || !row.season || !/^\d{4}-\d{2}-\d{2}$/.test(row.as_of_date)) {
+    throw new Error('NFL team cap summary metadata is incomplete');
+  }
+  const required = [
+    row.current_cap_space_dollars,
+    row.league_cap_dollars,
+    row.applied_team_cap_dollars,
+    row.top_51_cap_spending_dollars,
+    row.dead_money_dollars,
+  ];
+  if (required.some((value) => !Number.isSafeInteger(value) || value < 0)) {
+    throw new Error(`NFL team cap summary has invalid dollar values for ${row.team_id}`);
+  }
+  for (const value of [row.effective_cap_space_dollars, row.carryover_dollars, row.adjustments_dollars]) {
+    if (value != null && !Number.isSafeInteger(value)) {
+      throw new Error(`NFL team cap summary has invalid optional dollar values for ${row.team_id}`);
+    }
+  }
+  if (row.top_51_cap_spending_dollars + row.dead_money_dollars + row.current_cap_space_dollars !== row.applied_team_cap_dollars) {
+    throw new Error(`NFL team cap summary does not reconcile for ${row.team_id}`);
+  }
+  if (!row.accounting_basis || !row.accounting_note || row.source_urls.length < 2 || row.source_urls.some((url) => !/^https:\/\//.test(url))) {
+    throw new Error(`NFL team cap summary sources are incomplete for ${row.team_id}`);
+  }
 }

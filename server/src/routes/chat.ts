@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { streamSSE } from 'hono/streaming';
 import Anthropic from '@anthropic-ai/sdk';
-import { CHAT_MODEL } from '../claude/client.js';
+import { CHAT_MODEL, createClaudeMessage } from '../claude/client.js';
 import {
   buildContextGraphSystemBlock,
   contextGraphTracesToToolCalls,
@@ -9,8 +9,15 @@ import {
 import {
   DATA_ANALYST_CHAT_SYSTEM,
   dataAnalystTracesToToolCalls,
+  handleDataAnalystToolUse,
   streamMessageWithDataAnalystTools,
 } from '../claude/data_analyst.js';
+import {
+  buildNflTransactionMarketSystemBlock,
+  deterministicMarketChatAnswer,
+  deterministicMarketSourceRows,
+  evaluateNflTransactionMarketDraft,
+} from '../claude/nfl_transaction_market_guardrails.js';
 import { CHAT_SYSTEM, buildBriefContext } from '../claude/prompts.js';
 import { streamMessageWithGambitTools } from '../claude/tool_loop.js';
 import {
@@ -27,8 +34,9 @@ import {
   defaultNflEvidenceTeamId,
 } from '../claude/nfl_evidence.js';
 import { db } from '../db/client.js';
+import { transactionMarketRequestFromQuestion } from '../nfl_transactions/question.js';
 import type {
-  Brief, BriefSource, BriefOption, ChatStreamEvent, ChatTurn, ContextGraphTrace, DataAnalystTrace, ToolCall,
+  Brief, BriefSource, BriefOption, ChatStreamEvent, ChatTurn, ContextGraphTrace, DataAnalystTrace, NflTransactionMarketAnalysis, SubmitDataAnalysisInput, ToolCall,
 } from '@shared/types';
 
 export const chatRoutes = new Hono();
@@ -122,6 +130,36 @@ chatRoutes.post('/', async (c) => {
       turnCreated = true;
 
       if (brief.mode === 'data_analyst') {
+        const inheritedMarketAnalysis = marketAnalysisFromBrief(brief);
+        if (inheritedMarketAnalysis) {
+          const request = transactionMarketRequestFromQuestion(message, inheritedMarketAnalysis.query);
+          const toolName = request.analysis_mode === 'comparables' || request.analysis_mode === 'recent_influence'
+            ? 'query_nfl_transaction_comparables'
+            : 'analyze_nfl_transaction_market';
+          const toolUseId = `chat_nfl_transaction_market_${userTurnId}`;
+          const toolResult = await handleDataAnalystToolUse(toolName, request);
+          if (!toolResult.ok || !toolResult.market_analysis) {
+            throw new Error(toolResult.errors.map((error) => `${error.scope}: ${error.error}`).join('; ') || 'NFL transaction-market analysis unavailable.');
+          }
+          const trace: DataAnalystTrace = {
+            tool_use_id: toolUseId,
+            tool_name: toolName,
+            input: request as unknown as Record<string, unknown>,
+            datasets: toolResult.datasets,
+            errors: toolResult.errors,
+            market_analysis: toolResult.market_analysis,
+          };
+          assistantToolCalls = dataAnalystTracesToToolCalls([trace]);
+          await writeEvent({ type: 'tool_use', tool: assistantToolCalls[0] });
+          await writeEvent({ type: 'tool_result', tool_use_id: toolUseId, result: trace });
+          assistantText = await composeGuardedTransactionMarketFollowup({
+            message,
+            messages,
+            systemBlocks,
+            analysis: toolResult.market_analysis,
+          });
+          await writeEvent({ type: 'token', text: assistantText });
+        } else {
         const streamResult = await streamMessageWithDataAnalystTools({
           model: CHAT_MODEL,
           max_tokens: 16384,
@@ -150,6 +188,7 @@ chatRoutes.post('/', async (c) => {
         });
         assistantText = streamResult.text;
         assistantToolCalls = dataAnalystTracesToToolCalls(streamResult.traces);
+        }
       } else {
         const preload = await preloadCurrentAppEvidenceForChat(message, systemBlocks, userTurnId);
         if (preload.trace) {
@@ -268,6 +307,78 @@ chatRoutes.post('/', async (c) => {
     }
   });
 });
+
+function marketAnalysisFromBrief(brief: Brief): NflTransactionMarketAnalysis | null {
+  return brief.body?.kind === 'data_analysis' ? brief.body.market_analysis ?? null : null;
+}
+
+async function composeGuardedTransactionMarketFollowup(args: {
+  message: string;
+  messages: Anthropic.MessageParam[];
+  systemBlocks: Anthropic.TextBlockParam[];
+  analysis: NflTransactionMarketAnalysis;
+}): Promise<string> {
+  const deterministicFallback = deterministicMarketChatAnswer(args.analysis);
+  const sourceRows = deterministicMarketSourceRows(args.analysis, 1);
+  const makeDraft = (answer: string): SubmitDataAnalysisInput => ({
+    answer,
+    key_findings: [{ label: 'Live follow-up', body: answer, source_refs: [1] }],
+    tables: [],
+    calculations: [{
+      label: 'Mobility methodology',
+      formula: args.analysis.methodology.mobility,
+      value: `${args.analysis.coverage.event_count} material events`,
+      source_refs: [1],
+    }],
+    sources: sourceRows,
+    caveats: args.analysis.limitations.length ? args.analysis.limitations : ['No additional limitation returned by the deterministic engine.'],
+    followups: [],
+  });
+  const system = [
+    ...args.systemBlocks,
+    { type: 'text' as const, text: buildNflTransactionMarketSystemBlock(args.analysis) },
+    {
+      type: 'text' as const,
+      text: 'Answer this follow-up in concise front-office prose. State the executed scope, direct result, key supporting transactions when relevant, methodology, and material limitations. Do not add any number, transaction, citation, or causal claim outside the artifact.',
+    },
+  ];
+
+  try {
+    const first = await createClaudeMessage({
+      model: CHAT_MODEL,
+      max_tokens: 4096,
+      system,
+      messages: args.messages,
+    });
+    let text = textFromMessage(first);
+    let validation = evaluateNflTransactionMarketDraft(makeDraft(text), args.analysis);
+    if (validation.ok) return text;
+
+    const revised = await createClaudeMessage({
+      model: CHAT_MODEL,
+      max_tokens: 4096,
+      system,
+      messages: [
+        ...args.messages,
+        { role: 'assistant', content: text },
+        {
+          role: 'user',
+          content: `Revise once. Fix only these artifact-grounding failures:\n- ${validation.issues.join('\n- ')}\nReturn the corrected answer only.`,
+        },
+      ],
+    });
+    text = textFromMessage(revised);
+    validation = evaluateNflTransactionMarketDraft(makeDraft(text), args.analysis);
+    return validation.ok ? text : deterministicFallback;
+  } catch (error) {
+    console.warn('[chat] transaction-market composer unavailable; using deterministic fallback', error);
+    return deterministicFallback;
+  }
+}
+
+function textFromMessage(message: Anthropic.Message): string {
+  return message.content.flatMap((block) => block.type === 'text' ? [block.text] : []).join('\n').trim();
+}
 
 function extractExistingContextGraphTraces(
   toolCalls: ToolCall[],

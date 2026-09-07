@@ -298,9 +298,9 @@ export function Composer({
           />
           {(showBlinkingCursor || showStaticCursor) && (
             <div style={{
-              position: 'absolute', left: 0, top: 0,
+              position: 'absolute', left: 0, right: 0, top: 0,
               pointerEvents: 'none', display: 'flex', alignItems: 'center', gap: SPACE.sm,
-              height: COMPOSER_MIN_HEIGHT,
+              height: COMPOSER_MIN_HEIGHT, minWidth: 0, overflow: 'hidden',
             }}>
               <span style={{
                 display: 'inline-block', width: 7, height: 14,
@@ -309,6 +309,7 @@ export function Composer({
               }} />
               <span style={{
                 fontFamily: 'var(--font-mono)', fontSize: TYPE.body.md, color: F.fgFaint, fontStyle: 'normal',
+                minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               }}>{placeholder}</span>
             </div>
           )}

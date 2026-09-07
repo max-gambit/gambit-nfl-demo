@@ -27,7 +27,7 @@ export function FailedBriefCard({ briefId, question, errorMessage }: Props) {
       pushToast({
         tone: 'info',
         message: 'Retrying brief',
-        detail: 'Generation restarted. Sources, options, and reasoning will land in ~30–60s.',
+        detail: 'Generation restarted. You’ll get an answer or a clear retry state within 15 seconds.',
       });
     } catch (err) {
       pushToast({
@@ -84,10 +84,10 @@ export function FailedBriefCard({ briefId, question, errorMessage }: Props) {
           marginTop: 12, padding: '8px 12px',
           borderLeft: `3px solid ${F.red}`,
           background: 'rgba(184,59,46,0.08)',
-          fontFamily: 'var(--font-mono)', fontSize: 11.5, color: F.ink, lineHeight: 1.45,
+          fontFamily: 'var(--font-sans)', fontSize: 12.5, color: F.ink, lineHeight: 1.45,
           borderRadius: '0 6px 6px 0',
         }}>
-          {errorMessage}
+          {safeFailureMessage(errorMessage)}
         </div>
       )}
 
@@ -101,9 +101,16 @@ export function FailedBriefCard({ briefId, question, errorMessage }: Props) {
           cursor: retrying ? 'wait' : 'pointer',
           letterSpacing: '0.005em',
         }}>
-          {retrying ? 'Restarting…' : '↻ Regenerate brief'}
+          {retrying ? 'Restarting…' : 'Try again'}
         </button>
       </div>
     </div>
   );
+}
+
+export function safeFailureMessage(value: string): string {
+  if (/took too long|live interpretation is unavailable|required public data|could not be completed from the available sources/i.test(value)) {
+    return value;
+  }
+  return 'The answer could not be completed. Your question is saved; try again.';
 }

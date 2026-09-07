@@ -15,14 +15,20 @@ export type GambitEventMap = {
   'v6d3cf:submit-chat': { text: string };
   /** Submit `text` as a new data analyst brief in the active channel. */
   'v6d3cf:submit-data-brief': { text: string };
+  /** Submit `text` through the primary Analysis composer in the active channel. */
+  'v6d3cf:submit-brief': { text: string };
   /** Prefill the main Analyze composer without submitting. */
   'v6d3cf:prefill-composer': { text: string };
   /** Prefill the right-panel brief reply composer without submitting. */
   'v6d3cf:prefill-reply-composer': { text: string };
   /** Cite chip hover: ref is the source ref_index (or null on leave). LeftRail subscribes to glow the matching card. */
   'v6d3cf:cite-hover': { ref: number | null };
+  /** Open the responsive evidence drawer and focus the exact source card. */
+  'v6d3cf:open-evidence': { ref: number };
   /** Slash-command shortcut: regenerate the active brief. BriefActions listens. */
   'v6d3cf:slash-regenerate': void;
+  /** Open the NYG workspace view and refresh its server-backed list. */
+  'nyg:open-workspaces': { refresh: boolean };
 };
 
 export function fire<K extends keyof GambitEventMap>(

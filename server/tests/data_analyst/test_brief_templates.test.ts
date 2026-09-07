@@ -52,6 +52,12 @@ test('template inference maps Gambit question families to answer formats', () =>
   assert.equal(inferBriefTemplateFromQuestion('/data Which Wizards players have the weakest net rating?'), 'data_table');
 });
 
+test('novel NFL transaction-market questions enter live data analysis', () => {
+  assert.equal(inferBriefTemplateFromQuestion('Which position markets have grown or shrunk over the last 10 years?'), 'data_table');
+  assert.equal(inferBriefTemplateFromQuestion('Among trades since 2018, which positions most often returned day-one or day-two picks?'), 'data_table');
+  assert.equal(inferBriefTemplateFromQuestion('Compare safety and running-back material-move rates before and after 2020.'), 'data_table');
+});
+
 test('data table template forces data analyst mode without forcing compare/options templates', () => {
   assert.equal(briefModeForTemplate({ template_id: 'data_table' }), 'data_analyst');
   assert.equal(briefModeForTemplate({ template_id: 'comparison_matrix' }), null);

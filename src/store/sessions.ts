@@ -35,6 +35,7 @@ export const createSessionsSlice: StateCreator<SessionsSlice, [], [], SessionsSl
     const { data, error } = await supabase
       .from('sessions')
       .select('*, briefs(count)')
+      .eq('workspace_key', 'nyg-demo')
       .is('archived_at', null)
       .order('created_at', { ascending: true });
 
@@ -45,7 +46,7 @@ export const createSessionsSlice: StateCreator<SessionsSlice, [], [], SessionsSl
     }
 
     const sessions: Session[] = ((data ?? []) as Array<Session & { briefs?: { count: number }[] }>)
-      .map((s, i, all) => ({
+      .map((s) => ({
         id: s.id,
         user_id: s.user_id ?? null,
         label: s.label,
@@ -53,14 +54,13 @@ export const createSessionsSlice: StateCreator<SessionsSlice, [], [], SessionsSl
         updated_at: s.updated_at,
         archived_at: s.archived_at ?? null,
         count: s.briefs?.[0]?.count ?? 0,
-        // Default the first session to active until the user picks one.
-        active: i === all.length - 1 ? false : false,
+        active: false,
       }));
 
     set((s) => {
-      // Validate the persisted activeSessionId. A fresh themed demo should
-      // land on the first-question composer instead of auto-opening stale
-      // generated briefs from an older tenant.
+      // Validate only an in-memory choice made during this visit. A fresh
+      // launch always opens the clean Analysis composer even when prior
+      // channels remain available in the rail.
       const persistedId = s.activeSessionId;
       const stillValid = persistedId && sessions.some((sess) => sess.id === persistedId);
       const nextActiveId = stillValid ? persistedId : null;
