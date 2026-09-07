@@ -474,7 +474,12 @@ async function loadPublicMetricIndex(): Promise<PublicMetricIndex> {
     });
   } catch (error) {
     const existingFixture = await readExistingMetricFixture();
-    if (existingFixture) return existingFixture;
+    if (existingFixture) {
+      console.warn(
+        `[nfl-data] Live public metric refresh failed; reusing the reviewed fixture without changing metric values: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      return existingFixture;
+    }
     throw error;
   }
 }
@@ -1549,11 +1554,15 @@ export function summarizeContractLedger(rows: ParsedOtcYearRow[]): ContractLedge
 
 async function fetchText(url: string): Promise<string> {
   let lastError: unknown;
+  // The depth-chart release is a large full-history CSV. It regularly exceeds the
+  // default timeout even on a healthy connection, while the other reviewed feeds
+  // are small enough to fail fast.
+  const timeoutMs = url === NFLVERSE_DEPTH_CHARTS_2026_URL ? 120_000 : 30_000;
   for (let attempt = 1; attempt <= 3; attempt += 1) {
     try {
       const res = await fetch(url, {
         headers: { 'user-agent': 'gambit-nfl-demo-reviewed-snapshot/1.0' },
-        signal: AbortSignal.timeout(30_000),
+        signal: AbortSignal.timeout(timeoutMs),
       });
       if (!res.ok) throw new Error(`GET ${url} failed: ${res.status}`);
       if (url.endsWith('.gz')) {
@@ -1981,7 +1990,17 @@ function publicMetricFixture(aggregates: PublicMetricAggregate[]): Record<string
       defense_snap_game_count_2025: row.defense_snap_game_ids_2025.size,
       special_teams_snap_game_count_2025: row.special_teams_snap_game_ids_2025.size,
       near_full_snap_game_count_2025: row.near_full_snap_game_ids_2025.size,
+      snap_share_2025: average(row.snap_share_samples),
       games_2025: row.games_2025,
+      starts_2025: row.starts_2025,
+      passing_yards_2025: row.passing_yards_2025,
+      rushing_yards_2025: row.rushing_yards_2025,
+      receiving_yards_2025: row.receiving_yards_2025,
+      scrimmage_yards_2025: row.scrimmage_yards_2025,
+      tackles_2025: row.tackles_2025,
+      sacks_2025: row.sacks_2025,
+      interceptions_2025: row.interceptions_2025,
+      touchdowns_2025: row.touchdowns_2025,
       source_families: [...row.source_families].sort(),
       position_metrics: row.position_metrics,
       quality_flags: [...row.quality_flags].sort(),
@@ -1991,7 +2010,15 @@ function publicMetricFixture(aggregates: PublicMetricAggregate[]): Record<string
 
 async function readExistingMetricFixture(): Promise<PublicMetricIndex | null> {
   try {
-    const parsed = JSON.parse(await readFile(DEFAULT_NFL_PLAYER_METRICS_FIXTURE_PATH, 'utf8')) as {
+    const parsed = JSON.parse(await readFile(DEFAULT_NFL_PLAYER_METRICS_FIXTURE_PATH, 'utf8'));
+    return publicMetricIndexFromFixture(parsed);
+  } catch {
+    return null;
+  }
+}
+
+export function publicMetricIndexFromFixture(input: unknown): PublicMetricIndex {
+  const parsed = input as {
       rows?: Array<{
         player_name?: string;
         team_ids?: string[];
@@ -2004,45 +2031,62 @@ async function readExistingMetricFixture(): Promise<PublicMetricIndex | null> {
         defense_snap_game_count_2025?: number;
         special_teams_snap_game_count_2025?: number;
         near_full_snap_game_count_2025?: number;
+        snap_share_2025?: number | null;
         games_2025?: number | null;
+        starts_2025?: number | null;
+        passing_yards_2025?: number | null;
+        rushing_yards_2025?: number | null;
+        receiving_yards_2025?: number | null;
+        scrimmage_yards_2025?: number | null;
+        tackles_2025?: number | null;
+        sacks_2025?: number | null;
+        interceptions_2025?: number | null;
+        touchdowns_2025?: number | null;
         source_families?: string[];
         position_metrics?: Record<string, number>;
         quality_flags?: string[];
       }>;
     };
-    const aggregates = new Map<string, PublicMetricAggregate>();
-    const byTeamName = new Map<string, PublicMetricAggregate>();
-    const byName = new Map<string, PublicMetricAggregate[]>();
-    for (const row of parsed.rows ?? []) {
-      const playerName = row.player_name ?? '';
-      for (const teamId of row.team_ids ?? []) {
-        const aggregate = metricAggregate(aggregates, byTeamName, byName, teamId, playerName, row.position ?? null);
-        aggregate.offense_snaps_2025 = row.offense_snaps_2025 ?? 0;
-        aggregate.defense_snaps_2025 = row.defense_snaps_2025 ?? 0;
-        aggregate.special_teams_snaps_2025 = row.special_teams_snaps_2025 ?? 0;
-        hydrateCountSet(aggregate.snap_game_ids_2025, row.snap_game_count_2025);
-        hydrateCountSet(aggregate.offense_snap_game_ids_2025, row.offense_snap_game_count_2025);
-        hydrateCountSet(aggregate.defense_snap_game_ids_2025, row.defense_snap_game_count_2025);
-        hydrateCountSet(aggregate.special_teams_snap_game_ids_2025, row.special_teams_snap_game_count_2025);
-        hydrateCountSet(aggregate.near_full_snap_game_ids_2025, row.near_full_snap_game_count_2025);
-        aggregate.games_2025 = row.games_2025 ?? null;
-        for (const family of row.source_families ?? []) aggregate.source_families.add(family);
-        if (aggregate.source_families.has('nflverse_snap_counts')) aggregate.source_urls.add(NFLVERSE_SNAP_COUNTS_2025_URL);
-        if (aggregate.source_families.has('nflverse_stats_player')) aggregate.source_urls.add(NFLVERSE_STATS_PLAYER_2025_URL);
-        if (aggregate.source_families.has('nflverse_injuries')) aggregate.source_urls.add(NFLVERSE_INJURIES_2025_URL);
-        if (aggregate.source_families.has('nflverse_depth_charts')) aggregate.source_urls.add(NFLVERSE_DEPTH_CHARTS_2026_URL);
-        for (const [key, value] of Object.entries(row.position_metrics ?? {})) {
-          if (typeof value === 'number') aggregate.position_metrics[key] = value;
-        }
-        for (const flag of row.quality_flags ?? []) aggregate.quality_flags.add(flag);
-        if ([...aggregate.source_families].some((family) => family.startsWith('nflverse_pfr_advstats'))) aggregate.source_urls.add('https://github.com/nflverse/nflverse-data/releases/tag/pfr_advstats');
-        if ([...aggregate.source_families].some((family) => family.startsWith('nflverse_nextgen'))) aggregate.source_urls.add('https://github.com/nflverse/nflverse-data/releases/tag/nextgen_stats');
+  const aggregates = new Map<string, PublicMetricAggregate>();
+  const byTeamName = new Map<string, PublicMetricAggregate>();
+  const byName = new Map<string, PublicMetricAggregate[]>();
+  for (const row of parsed.rows ?? []) {
+    const playerName = row.player_name ?? '';
+    for (const teamId of row.team_ids ?? []) {
+      const aggregate = metricAggregate(aggregates, byTeamName, byName, teamId, playerName, row.position ?? null);
+      aggregate.offense_snaps_2025 = row.offense_snaps_2025 ?? 0;
+      aggregate.defense_snaps_2025 = row.defense_snaps_2025 ?? 0;
+      aggregate.special_teams_snaps_2025 = row.special_teams_snaps_2025 ?? 0;
+      hydrateCountSet(aggregate.snap_game_ids_2025, row.snap_game_count_2025);
+      hydrateCountSet(aggregate.offense_snap_game_ids_2025, row.offense_snap_game_count_2025);
+      hydrateCountSet(aggregate.defense_snap_game_ids_2025, row.defense_snap_game_count_2025);
+      hydrateCountSet(aggregate.special_teams_snap_game_ids_2025, row.special_teams_snap_game_count_2025);
+      hydrateCountSet(aggregate.near_full_snap_game_ids_2025, row.near_full_snap_game_count_2025);
+      aggregate.snap_share_samples = row.snap_share_2025 == null ? [] : [row.snap_share_2025];
+      aggregate.games_2025 = row.games_2025 ?? null;
+      aggregate.starts_2025 = row.starts_2025 ?? null;
+      aggregate.passing_yards_2025 = row.passing_yards_2025 ?? null;
+      aggregate.rushing_yards_2025 = row.rushing_yards_2025 ?? null;
+      aggregate.receiving_yards_2025 = row.receiving_yards_2025 ?? null;
+      aggregate.scrimmage_yards_2025 = row.scrimmage_yards_2025 ?? null;
+      aggregate.tackles_2025 = row.tackles_2025 ?? null;
+      aggregate.sacks_2025 = row.sacks_2025 ?? null;
+      aggregate.interceptions_2025 = row.interceptions_2025 ?? null;
+      aggregate.touchdowns_2025 = row.touchdowns_2025 ?? null;
+      for (const family of row.source_families ?? []) aggregate.source_families.add(family);
+      if (aggregate.source_families.has('nflverse_snap_counts')) aggregate.source_urls.add(NFLVERSE_SNAP_COUNTS_2025_URL);
+      if (aggregate.source_families.has('nflverse_stats_player')) aggregate.source_urls.add(NFLVERSE_STATS_PLAYER_2025_URL);
+      if (aggregate.source_families.has('nflverse_injuries')) aggregate.source_urls.add(NFLVERSE_INJURIES_2025_URL);
+      if (aggregate.source_families.has('nflverse_depth_charts')) aggregate.source_urls.add(NFLVERSE_DEPTH_CHARTS_2026_URL);
+      for (const [key, value] of Object.entries(row.position_metrics ?? {})) {
+        if (typeof value === 'number') aggregate.position_metrics[key] = value;
       }
+      for (const flag of row.quality_flags ?? []) aggregate.quality_flags.add(flag);
+      if ([...aggregate.source_families].some((family) => family.startsWith('nflverse_pfr_advstats'))) aggregate.source_urls.add('https://github.com/nflverse/nflverse-data/releases/tag/pfr_advstats');
+      if ([...aggregate.source_families].some((family) => family.startsWith('nflverse_nextgen'))) aggregate.source_urls.add('https://github.com/nflverse/nflverse-data/releases/tag/nextgen_stats');
     }
-    return { byTeamName, byName, fixture: parsed as Record<string, unknown> };
-  } catch {
-    return null;
   }
+  return { byTeamName, byName, fixture: parsed as Record<string, unknown> };
 }
 
 function hydrateCountSet(target: Set<string>, count: number | undefined) {

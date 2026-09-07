@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-09-04T23:46:21.899Z",
-  "as_of_date": "2026-09-04",
+  "generated_at": "2026-09-07T01:29:12.559Z",
+  "as_of_date": "2026-09-07",
   "totals": {
-    "source_needed": 42,
-    "estimated": 19,
+    "source_needed": 43,
+    "estimated": 20,
     "source_needed_above_5m": 0
   },
   "source_needed_rows": [
@@ -394,6 +394,17 @@
     },
     {
       "team_id": "SF",
+      "player_id": "nfl:SF:khalid-kareem",
+      "player_name": "Khalid Kareem",
+      "position": "DE",
+      "cap_number_2026": null,
+      "source_status": "source-needed",
+      "contract_ledger_confidence": "source-needed",
+      "source_note": "Roster player present on NFL.com; matching OverTheCap row not found in this snapshot.",
+      "source_url": "https://www.nfl.com/teams/san-francisco-49ers/roster"
+    },
+    {
+      "team_id": "SF",
       "player_id": "nfl:SF:ogbo-okoronkwo",
       "player_name": "Ogbo Okoronkwo",
       "position": "LB",
@@ -602,6 +613,17 @@
       "contract_ledger_confidence": "estimated",
       "source_note": "Estimated low-cap/offseason contract placeholder from NFL.com roster row because no matching OverTheCap row was found; use for coverage and directional cap math, not exact legal modeling.",
       "source_url": "https://www.nfl.com/teams/indianapolis-colts/roster"
+    },
+    {
+      "team_id": "KC",
+      "player_id": "nfl:KC:thomas-odukoya",
+      "player_name": "Thomas Odukoya",
+      "position": "TE",
+      "cap_number_2026": 1030000,
+      "source_status": "estimated",
+      "contract_ledger_confidence": "estimated",
+      "source_note": "Estimated low-cap/offseason contract placeholder from NFL.com roster row because no matching OverTheCap row was found; use for coverage and directional cap math, not exact legal modeling.",
+      "source_url": "https://www.nfl.com/teams/kansas-city-chiefs/roster"
     },
     {
       "team_id": "LAC",

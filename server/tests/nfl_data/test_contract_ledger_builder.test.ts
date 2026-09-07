@@ -4,6 +4,7 @@ import {
   buildPublicMetricIndex,
   parseOtcCapYearsFromHtml,
   parseOtcNonActiveCapChargesFromHtml,
+  publicMetricIndexFromFixture,
   summarizeContractLedger,
 } from '../../src/nfl_data/build_reviewed_snapshot.js';
 
@@ -171,6 +172,36 @@ test('public player metric parser joins snap counts and player production', () =
   assert.equal(row.touchdowns_2025, 1);
   assert.equal(row.source_families.has('nflverse_snap_counts'), true);
   assert.equal(row.source_families.has('nflverse_stats_player'), true);
+});
+
+test('reviewed metric fixture fallback preserves production and snap-share fields', () => {
+  const statsCsv = [
+    'player_id,player_name,player_display_name,position,season,season_type,recent_team,games,passing_yards,rushing_yards,receiving_yards,def_tackles_solo,def_tackles_with_assist,def_sacks,def_interceptions,passing_tds,rushing_tds,receiving_tds,def_tds',
+    '00-TEST,Sample Defender,Sample Defender,DT,2025,REG,NYG,17,0,0,0,12,21,6.5,1,0,0,0,1',
+  ].join('\n');
+  const snapsCsv = [
+    'game_id,pfr_game_id,season,game_type,week,player,pfr_player_id,position,team,opponent,offense_snaps,offense_pct,defense_snaps,defense_pct,st_snaps,st_pct',
+    '2025_01_NYG_DAL,202509010nyg,2025,REG,1,Sample Defender,TestSa00,DT,NYG,DAL,0,0%,44,73%,2,8%',
+    '2025_02_NYG_PHI,202509080nyg,2025,REG,2,Sample Defender,TestSa00,DT,NYG,PHI,0,0%,36,60%,1,4%',
+  ].join('\n');
+
+  const liveIndex = buildPublicMetricIndex(statsCsv, snapsCsv);
+  const fallbackIndex = publicMetricIndexFromFixture(liveIndex.fixture);
+  const live = liveIndex.byTeamName.get('NYG:sampledefender');
+  const fallback = fallbackIndex.byTeamName.get('NYG:sampledefender');
+
+  assert.ok(live);
+  assert.ok(fallback);
+  assert.equal(fallback.games_2025, live.games_2025);
+  assert.equal(fallback.tackles_2025, live.tackles_2025);
+  assert.equal(fallback.sacks_2025, live.sacks_2025);
+  assert.equal(fallback.interceptions_2025, live.interceptions_2025);
+  assert.equal(fallback.touchdowns_2025, live.touchdowns_2025);
+  assert.equal(fallback.snap_share_samples.length, 1);
+  assert.equal(
+    fallback.snap_share_samples[0],
+    live.snap_share_samples.reduce((sum, value) => sum + value, 0) / live.snap_share_samples.length,
+  );
 });
 
 test('public player metric parser attaches PFR and NGS position scorecard fields', () => {
