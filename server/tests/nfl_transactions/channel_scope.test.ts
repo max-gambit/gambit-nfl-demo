@@ -15,8 +15,10 @@ import {
   briefRoutes,
   briefProgressStreamPayload,
   marketArtifactBriefProgress,
+  nflAnalysisContextForSession,
   transactionMarketArtifactBody,
 } from '../../src/routes/briefs.js';
+import { classifyNflAnalysisTurn } from '../../src/nfl_transactions/intent.js';
 
 test('primary Analysis continuation selects the latest executed market scope', () => {
   const firstAnalysis = marketAnalysis('analysis-1', ['WR']);
@@ -55,7 +57,7 @@ test('primary composer sends only the current question and leaves context routin
   assert.match(source, /question:\s*q/);
 });
 
-test('market calculation is renderable while the football interpretation is pending', () => {
+test('market answer is complete without generated football interpretation', () => {
   const analysis = marketAnalysis('analysis-live', ['EDGE']);
   const body = transactionMarketArtifactBody(analysis);
   const progress = {
@@ -67,10 +69,11 @@ test('market calculation is renderable while the football interpretation is pend
     events: [],
   };
 
-  assert.equal(body.answer, '');
+  assert.match(body.answer, /20 matching player events/);
   assert.deepEqual(body.key_findings, []);
   assert.strictEqual(body.market_analysis, analysis);
-  assert.equal(body.analysis_interpretation_status, 'pending');
+  assert.equal(body.language_policy, 'facts_only_v1');
+  assert.equal(body.analysis_interpretation_status, undefined);
   assert.deepEqual(briefProgressStreamPayload({
     id: 'brief-live',
     status: 'generating',
@@ -126,9 +129,28 @@ test('seller proposal state remains inside its channel and is absent in a fresh 
 
 test('initial market response exposes the live result while AI reasoning continues', () => {
   const progress = marketArtifactBriefProgress();
-  assert.equal(progress.phase, 'drafting');
-  assert.equal(progress.pct, 60);
+  assert.equal(progress.phase, 'ready');
+  assert.equal(progress.pct, 100);
   assert.equal(progress.label, 'Live analysis ready');
+});
+
+test('server inheritance follows the immediate channel topic, including ready calculations with pending prose', () => {
+  const marketBrief = brief('market', marketAnalysis('edge-history', ['EDGE']));
+  const otherChannel = { ...brief('other', marketAnalysis('other-history', ['IOL'])), session_id: 'channel-b' };
+  const history = [otherChannel, marketBrief];
+  const context = nflAnalysisContextForSession(history, 'session-1');
+  assert.deepEqual(context.market?.query.position_groups, ['EDGE']);
+  assert.equal(classifyNflAnalysisTurn('Only include trades from 2020 through 2025.', {
+    market_query: context.market?.query ?? null, seller_scenario: context.seller_scenario,
+  }).kind, 'transaction_market');
+  assert.deepEqual(nflAnalysisContextForSession(history, 'new-channel'), { market: null, seller_scenario: null });
+
+  const unrelated = brief('new-topic', null);
+  assert.deepEqual(nflAnalysisContextForSession([unrelated, ...history], 'session-1'), {
+    market: null, seller_scenario: null,
+  });
+  const pendingTopic = { ...unrelated, body: null, status: 'generating' as const };
+  assert.equal(nflAnalysisContextForSession([pendingTopic, ...history], 'session-1').market, null);
 });
 
 test('EDGE and IOL comparison leads with a football conclusion while preserving signal boundaries', () => {
@@ -247,6 +269,9 @@ function marketAnalysis(
 ): NflTransactionMarketAnalysis {
   return {
     analysis_id: analysisId,
+    coverage: { event_count: 20 },
+    position_trends: [],
+    limitations: [],
     query: {
       analysis_mode: 'ten_year_trend',
       start_year: 2016,

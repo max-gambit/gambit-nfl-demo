@@ -1,3 +1,5 @@
+import { factualBody } from '@shared/nflFacts';
+import { buildNflFactualAnswer, unsupportedAnswer } from '../nfl_facts/answer.js';
 import { randomBytes } from 'node:crypto';
 import { Hono } from 'hono';
 import Anthropic from '@anthropic-ai/sdk';
@@ -8,6 +10,7 @@ import {
   buildMessagesWithDataAnalystLookups,
   dataAnalysisCbaCitationSources,
   dataAnalystTracesToBriefSources,
+  dataAnalystResultForModel,
   handleDataAnalystToolUse,
   isSubmitDataAnalysisInput,
   recommendationBriefCbaCitationSources,
@@ -68,7 +71,6 @@ import { buildSubmitBriefTool } from '../claude/tools.js';
 import { buildMessagesWithContextGraphLookups } from '../claude/tool_loop.js';
 import { inferBriefModeFromQuestion, stripBriefModePrefix } from '@shared/briefMode';
 import {
-  latestSellerMoveScenarioForSession,
   sellerMoveScenarioFromBrief,
   transactionMarketAnalysisFromBrief,
 } from '@shared/nflTransactionMarket';
@@ -142,6 +144,30 @@ function invalidateActiveBriefGeneration(briefId: string): void {
   activeBriefGenerations.delete(briefId);
 }
 
+export async function claimHistoricalBriefGeneration(
+  brief: Pick<Brief, 'id' | 'updated_at'>,
+  updatedAt: string,
+  persistence: Pick<typeof db, 'from'> = db,
+): Promise<ReturnType<typeof beginBriefGeneration> | null> {
+  const claimed = await persistence.from('briefs').update({ updated_at: updatedAt })
+    .eq('id', brief.id).eq('updated_at', brief.updated_at).select('updated_at').maybeSingle();
+  if (claimed.error) throw new Error(`market regeneration claim failed: ${claimed.error.message}`);
+  // A losing retry must leave the winning retry or existing prose task active.
+  return claimed.data ? beginBriefGeneration(brief.id) : null;
+}
+
+/** Newest-first channel history. A different topic ends implicit inheritance. */
+export function nflAnalysisContextForSession(
+  briefs: ReadonlyArray<Pick<Brief, 'body' | 'session_id'>>,
+  sessionId: string,
+) {
+  const latest = briefs.find((brief) => brief.session_id === sessionId);
+  return {
+    market: latest ? transactionMarketAnalysisFromBrief(latest) : null,
+    seller_scenario: latest ? sellerMoveScenarioFromBrief(latest) : null,
+  };
+}
+
 /**
  * POST /briefs
  *
@@ -198,10 +224,9 @@ briefRoutes.post('/', async (c) => {
     return c.json({ error: 'load_analysis_context_failed', detail: 'The prior conversation could not be loaded.' }, 500);
   }
   const contextBriefs = (contextRes.data ?? []) as BriefConversationRow[];
-  const latestMarketAnalysis = contextBriefs
-    .map((prior) => transactionMarketAnalysisFromBrief(prior))
-    .find((analysis): analysis is NflTransactionMarketAnalysis => Boolean(analysis)) ?? null;
-  const latestSellerMove = latestSellerMoveScenarioForSession(contextBriefs, session_id);
+  const channelContext = nflAnalysisContextForSession(contextBriefs, session_id);
+  const latestMarketAnalysis = channelContext.market;
+  const latestSellerMove = channelContext.seller_scenario;
   const intent = classifyNflAnalysisTurn(question, {
     market_query: latestMarketAnalysis?.query ?? null,
     seller_scenario: latestSellerMove,
@@ -222,6 +247,10 @@ briefRoutes.post('/', async (c) => {
   const currentNflConversationContext = intent.kind === 'general'
     ? buildCurrentNflConversationContext(question, contextBriefs)
     : null;
+  const previousFactualQuery = contextBriefs[0]?.body?.kind === 'data_analysis' ? contextBriefs[0].body.factual_query ?? null : null;
+  const preparedFactualAnswer = intent.kind === 'general'
+    ? await buildNflFactualAnswer(question, previousFactualQuery, latestMarketAnalysis).catch(() => unsupportedAnswer())
+    : null;
   const explicitMode = normalizeBriefMode(body.mode);
   const transactionMarketQuestion = intent.kind === 'transaction_market';
   const immediateClarification = intent.kind === 'seller_modifier_without_context';
@@ -229,7 +258,8 @@ briefRoutes.post('/', async (c) => {
     || transactionMarketQuestion
     || Boolean(preparedRuleAnswer)
     || intent.kind === 'current_team'
-    || immediateClarification;
+    || immediateClarification
+    || Boolean(preparedFactualAnswer);
   const currentNflContextActive = Boolean(currentNflConversationContext);
   const requestedMode = directDataAnswerActive || currentNflContextActive
     ? 'data_analyst'
@@ -249,11 +279,10 @@ briefRoutes.post('/', async (c) => {
 
   // Source-backed calculations are complete before insert so the POST response
   // is immediately renderable. Market and seller results then receive a
-  // separate, bounded model-written football interpretation.
+  // factual answer and its persisted source record.
   let preparedMarketBody: DataAnalysisBriefBody | null = null;
   let preparedProgress: BriefProgress | null = null;
   let preparedSources: Array<Omit<BriefSource, 'id' | 'brief_id'>> = [];
-  let preparedInterpretation: NflArtifactInterpretationContext | null = null;
   if (intent.kind === 'seller_move' && !preparedSellerTurn) {
     preparedMarketBody = unavailableSellerAnswerBody();
     preparedProgress = readyBriefProgress('Trade check unavailable', 'The public contract or transaction source could not be loaded.');
@@ -271,12 +300,6 @@ briefRoutes.post('/', async (c) => {
         ...deterministicMarketEvidenceRows(preparedSellerTurn.market, sellerSources.length + 1),
       ]
       : sellerSources;
-    if (preparedSellerMove.status === 'answered') {
-      preparedInterpretation = {
-        market: preparedSellerTurn.market,
-        seller_move: preparedSellerMove,
-      };
-    }
   } else if (immediateClarification) {
     preparedMarketBody = sellerModifierClarificationBody();
     preparedProgress = readyBriefProgress('Clarification ready', 'The proposed trade needs a player, draft year, and round.');
@@ -301,7 +324,6 @@ briefRoutes.post('/', async (c) => {
       preparedMarketBody = transactionMarketArtifactBody(analysis);
       preparedProgress = marketArtifactBriefProgress();
       preparedSources = deterministicMarketEvidenceRows(analysis, 1);
-      preparedInterpretation = { market: analysis, seller_move: null };
     } catch (error) {
       return c.json({
         error: 'transaction_market_analysis_failed',
@@ -310,13 +332,22 @@ briefRoutes.post('/', async (c) => {
     }
   }
 
-  if (preparedMarketBody && preparedInterpretation) {
-    preparedMarketBody = {
-      ...preparedMarketBody,
-      analysis_interpretation_status: 'pending',
-    };
-    preparedProgress = marketArtifactBriefProgress();
+  if (preparedFactualAnswer) {
+    preparedMarketBody = preparedFactualAnswer.body;
+    preparedSources = preparedFactualAnswer.sources;
+    if (preparedFactualAnswer.body.market_analysis) preparedSources = [
+      ...preparedSources,
+      ...deterministicMarketEvidenceRows(preparedFactualAnswer.body.market_analysis, preparedSources.length + 1),
+    ];
+    preparedProgress = readyBriefProgress('Records ready', 'The selected records and sources are ready.');
   }
+  // The presentation app renders recorded facts and arithmetic, with no
+  // asynchronous model-authored football interpretation.
+  if (!preparedMarketBody) {
+    preparedMarketBody = unsupportedAnswer().body;
+    preparedProgress = readyBriefProgress('Question not resolved', 'Specify a supported record or rule.');
+  }
+  preparedMarketBody = factualBody(preparedMarketBody);
 
   // Insert generating brief.
   const insert = await db
@@ -332,7 +363,7 @@ briefRoutes.post('/', async (c) => {
       thesis: preparedMarketBody?.answer || null,
       body: preparedMarketBody,
       progress: preparedProgress ?? initialBriefProgress(),
-      status: preparedInterpretation || !preparedMarketBody ? 'generating' : 'ready',
+      status: preparedMarketBody ? 'ready' : 'generating',
     })
     .select()
     .single();
@@ -360,42 +391,8 @@ briefRoutes.post('/', async (c) => {
     }
   }
 
-  if (preparedMarketBody && preparedInterpretation) {
-    void generateNflArtifactInterpretationWithDeadline(
-      brief,
-      preparedMarketBody,
-      preparedInterpretation,
-    );
-    const response: CreateBriefResponse = { brief };
-    return c.json(response, 201);
-  }
-
-  // Direct factual and clarification answers are complete before this response.
-  if (preparedMarketBody) {
-    const response: CreateBriefResponse = { brief };
-    return c.json(response, 201);
-  }
-
-  // Kick off generation in the background — the route returns immediately.
-  // Errors are caught and persisted as `status='failed'` rather than crashing.
-  void generateBriefWithDeadline(brief, null, null, currentNflConversationContext).catch(async (err) => {
-    console.error('[briefs] generate failed', brief.id, err);
-    const errorMessage = briefGenerationErrorMessage(err);
-    const progress = failedBriefProgress(err);
-    await db
-      .from('briefs')
-      .update({ status: 'failed', error: errorMessage, progress, updated_at: progress.updated_at })
-      .eq('id', brief.id)
-      .eq('status', 'generating');
-    publishBriefProgress(briefProgressStreamPayload({
-      id: brief.id,
-      status: 'failed',
-      error: errorMessage,
-      progress,
-      updated_at: progress.updated_at,
-    }));
-  });
-
+  // Every answer is prepared and source-persisted above. No route falls
+  // through to legacy model-authored football evaluation.
   const response: CreateBriefResponse = { brief };
   return c.json(response, 201);
 });
@@ -791,10 +788,9 @@ briefRoutes.post('/:id/regenerate', async (c) => {
 });
 
 /**
- * Resets a brief to status='generating', wipes its options/sources, and kicks
- * off the same Claude tool call as initial creation. Used by the route handler
- * and by the monitor scheduler for `rerun` monitors. Returns the fresh row, or
- * null when the brief id doesn't exist.
+ * Re-executes a saved factual query and replaces its answer/source record.
+ * Historical filters are preserved; seller scenarios continue as new turns.
+ * Used by the route handler and existing rerun monitors.
  */
 export async function regenerateBriefById(
   id: string,
@@ -836,64 +832,81 @@ export async function regenerateBriefById(
     ? existingBrief.mode
     : (briefModeForTemplate(templateParse.selection) ?? 'brief');
 
-  // A retry owns the brief from this point forward. Any older provider task
-  // may finish, but its generation guard will prevent or roll back child rows.
-  invalidateActiveBriefGeneration(id);
+  // Recompute the saved executed scope before replacing anything. A short
+  // follow-up cannot be reconstructed as a fresh, context-free question.
+  if (inheritedMarketQuery) {
+    const lookup = await ensureNflTransactionMarketLookup(
+      '', // Re-execute the saved filters; do not reapply relative follow-up wording.
+      { messages: [{ role: 'user', content: existingBrief.question }], traces: [] },
+      inheritedMarketQuery,
+    );
+    const market = latestNflTransactionMarketAnalysis(lookup.traces);
+    if (!market) throw new Error('Required NFL transaction-market analysis was not returned.');
+    const packageAnswer = /\b(?:parsons|chubb|multi[- ]player|excluded|whole package|both sides)\b/i.test(existingBrief.question)
+      ? await buildNflFactualAnswer(existingBrief.question, null, market)
+      : null;
+    const immediateBody = packageAnswer?.body ?? transactionMarketArtifactBody(market);
+    const progress = marketArtifactBriefProgress();
+    // Always advance the revision, even for two requests in one millisecond.
+    progress.updated_at = new Date(Math.max(Date.now(), Date.parse(existingBrief.updated_at) + 1)).toISOString();
+    const generation = await claimHistoricalBriefGeneration(existingBrief, progress.updated_at);
+    if (!generation) return null;
+    try {
+      // Claim the saved revision before touching its child rows. A newer
+      // regeneration or a completed interpretation keeps its own sources.
+      for (const table of ['brief_options', 'brief_sources'] as const) {
+        if (!generation.isActive()) return null;
+        const removed = await db.from(table).delete().eq('brief_id', id);
+        if (removed.error) throw new Error(`${table} regeneration cleanup failed: ${removed.error.message}`);
+      }
+      if (!generation.isActive()) return null;
+      const regeneratedSources = [...(packageAnswer?.sources ?? []), ...deterministicMarketEvidenceRows(market, (packageAnswer?.sources.length ?? 0) + 1)];
+      const sources = await insertMissingBriefSources(id,
+        regeneratedSources.map((source) => ({ ...source, brief_id: id })), generation);
+      if (!sources || !generation.isActive()) return null;
+      const reset = await db.from('briefs').update({
+        thesis: null,
+        body: immediateBody,
+        mode: 'data_analyst',
+        template_id: templateParse.selection.template_id,
+        template_base_id: templateParse.selection.base_template_id ?? null,
+        custom_template_id: templateParse.selection.custom_template_id ?? null,
+        template_instructions: templateParse.selection.instructions ?? null,
+        progress,
+        status: 'ready',
+        error: null,
+        duration_ms: null,
+        updated_at: progress.updated_at,
+      }).eq('id', id).eq('updated_at', progress.updated_at).select().maybeSingle();
+      if (reset.error) throw new Error(`market regeneration update failed: ${reset.error.message}`);
+      if (!reset.data || !generation.isActive()) return null;
+      const fresh = reset.data as Brief;
+      publishBriefProgress(briefProgressStreamPayload(fresh));
+      return fresh;
+    } finally {
+      generation.stop();
+    }
+  }
 
-  // Wipe prior options/sources so the regenerated brief doesn't accumulate
-  // duplicate ref_indexes; the foreign-key cascade isn't enough on its own.
-  await db.from('brief_options').delete().eq('brief_id', id);
-  await db.from('brief_sources').delete().eq('brief_id', id);
-
-  const reset = await db
-    .from('briefs')
-    .update({
-      thesis: null,
-      body: null,
-      mode,
-      template_id: templateParse.selection.template_id,
-      template_base_id: templateParse.selection.base_template_id ?? null,
-      custom_template_id: templateParse.selection.custom_template_id ?? null,
-      template_instructions: templateParse.selection.instructions ?? null,
-      progress: initialBriefProgress('Regeneration queued'),
-      status: 'generating',
-      error: null,
-      duration_ms: null,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', id)
-    .select()
-    .single();
-  if (reset.error || !reset.data) return null;
-  const fresh = reset.data as Brief;
-
-  void generateBriefWithDeadline(fresh, inheritedMarketQuery, null, currentNflConversationContext).catch(async (err) => {
-    console.error('[briefs] regenerate failed', fresh.id, err);
-    const errorMessage = briefGenerationErrorMessage(err);
-    const progress = failedBriefProgress(err);
-    await db
-      .from('briefs')
-      .update({ status: 'failed', error: errorMessage, progress, updated_at: progress.updated_at })
-      .eq('id', fresh.id)
-      .eq('status', 'generating');
-    publishBriefProgress(briefProgressStreamPayload({
-      id: fresh.id,
-      status: 'failed',
-      error: errorMessage,
-      progress,
-      updated_at: progress.updated_at,
-    }));
-  });
-
-  return fresh;
+  const previous = (priorContextRes.data ?? [])[0] as BriefConversationRow | undefined;
+  const priorQuery = previous?.body?.kind === 'data_analysis' ? previous.body.factual_query ?? null : null;
+  const intent = classifyNflAnalysisTurn(existingBrief.question, { market_query: null, seller_scenario: null });
+  const prepared = intent.kind === 'rules'
+    ? await buildNflRuleAnswer(existingBrief.question)
+    : await buildNflFactualAnswer(existingBrief.question, priorQuery);
+  return replaceWithFactualAnswer(existingBrief, prepared);
 }
 
 async function regenerateCurrentNflBrief(
   existingBrief: Brief,
   questionKind: NflCurrentQuestionKind,
 ): Promise<Brief | null> {
+  return replaceWithFactualAnswer(existingBrief, await buildNflCurrentAnswer(questionKind));
+}
+
+async function replaceWithFactualAnswer(existingBrief: Brief, prepared: Awaited<ReturnType<typeof buildNflFactualAnswer>>): Promise<Brief | null> {
   const startedAt = Date.now();
-  const prepared = await buildNflCurrentAnswer(questionKind);
+  prepared.body = factualBody(prepared.body);
   const progress = readyBriefProgress('Current Giants answer ready', 'The current public team data has been checked.');
 
   invalidateActiveBriefGeneration(existingBrief.id);
@@ -2112,6 +2125,7 @@ export async function composeNflArtifactInterpretation(
     seller_move: NflSellerMoveConversationArtifact | null;
   },
   callModel: typeof createClaudeMessage = createClaudeMessage,
+  requestOptions: Anthropic.RequestOptions = {},
 ): Promise<string> {
   const sellerResult = args.seller_move?.result ?? null;
   const formattedMarketFacts = buildDeterministicNflTransactionMarketFallback(args.market);
@@ -2171,44 +2185,44 @@ export async function composeNflArtifactInterpretation(
     content: `Question: ${args.question}\n\nWrite the grounded football interpretation now.`,
   }];
 
-  const first = await callModel({
-    model: BRIEF_MODEL,
-    max_tokens: 1200,
-    system,
-    messages,
-  });
-  let answer = nflArtifactInterpretationText(first);
-  let validation = evaluateNflArtifactInterpretation(answer, args.market, args.seller_move);
-  if (validation.ok) return answer;
-
-  const revised = await callModel({
-    model: BRIEF_MODEL,
-    max_tokens: 1200,
-    system,
-    messages: [
-      ...messages,
-      { role: 'assistant', content: answer },
-      {
-        role: 'user',
-        content: `Revise once using only the supplied facts. Correct these grounding problems:\n- ${validation.issues.join('\n- ')}\nReturn only the two corrected paragraphs.`,
-      },
-    ],
-  });
-  answer = nflArtifactInterpretationText(revised);
-  validation = evaluateNflArtifactInterpretation(answer, args.market, args.seller_move);
-  if (!validation.ok) {
-    throw new Error(`nfl_artifact_interpretation_rejected: ${validation.issues.join(' | ')}`);
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    if (requestOptions.signal?.aborted) throw new Error('nfl_artifact_interpretation_cancelled');
+    const response = await callModel({ model: BRIEF_MODEL, max_tokens: 1200, system, messages }, requestOptions);
+    if (requestOptions.signal?.aborted) throw new Error('nfl_artifact_interpretation_cancelled');
+    const answer = nflArtifactInterpretationText(response);
+    const validation = answer
+      ? evaluateNflArtifactInterpretation(answer, args.market, args.seller_move)
+      : { ok: false, issues: ['No plain-English interpretation was returned.'] };
+    if (response.stop_reason === 'max_tokens') {
+      validation.ok = false;
+      validation.issues.push('The response was truncated; shorten it to finish both paragraphs.');
+    }
+    if (validation.ok) return answer;
+    if (attempt === 1) throw new Error(`nfl_artifact_interpretation_rejected: ${validation.issues.join(' | ')}`);
+    if (answer) messages.push({ role: 'assistant', content: answer });
+    messages.push({
+      role: 'user',
+      content: `Revise once using only the supplied facts. Correct these grounding problems:\n- ${validation.issues.join('\n- ')}\nKeep each position and signal separate, preserve the executed filters and uncertainty, and omit unsupported claims. Return only the two corrected paragraphs.`,
+    });
   }
-  return answer;
+  throw new Error('nfl_artifact_interpretation_unavailable');
 }
 
-async function generateNflArtifactInterpretationWithDeadline(
+export async function generateNflArtifactInterpretationWithDeadline(
   brief: Brief,
   immediateBody: DataAnalysisBriefBody,
   context: NflArtifactInterpretationContext,
+  dependencies: {
+    callModel?: typeof createClaudeMessage;
+    persistence?: Pick<typeof db, 'from'>;
+    deadlineMs?: number;
+  } = {},
 ): Promise<void> {
   const startedAt = Date.now();
   const generation = beginBriefGeneration(brief.id);
+  const controller = new AbortController();
+  const persistence = dependencies.persistence ?? db;
+  const deadlineMs = dependencies.deadlineMs ?? NFL_ARTIFACT_INTERPRETATION_DEADLINE_MS;
   let timer: NodeJS.Timeout | null = null;
   try {
     const answer = await Promise.race([
@@ -2216,11 +2230,14 @@ async function generateNflArtifactInterpretationWithDeadline(
         question: brief.question,
         market: context.market,
         seller_move: context.seller_move,
-      }),
+      }, dependencies.callModel, { signal: controller.signal, timeout: deadlineMs }),
       new Promise<never>((_, reject) => {
         timer = setTimeout(
-          () => reject(new Error('nfl_artifact_interpretation_deadline_exceeded')),
-          NFL_ARTIFACT_INTERPRETATION_DEADLINE_MS,
+          () => {
+            controller.abort();
+            reject(new Error('nfl_artifact_interpretation_deadline_exceeded'));
+          },
+          deadlineMs,
         );
       }),
     ]);
@@ -2234,7 +2251,7 @@ async function generateNflArtifactInterpretationWithDeadline(
       'Analysis ready',
       'The live calculation, football interpretation, and source cards are ready.',
     );
-    const updated = await db
+    const updated = await persistence
       .from('briefs')
       .update({
         thesis: answer,
@@ -2246,11 +2263,12 @@ async function generateNflArtifactInterpretationWithDeadline(
         updated_at: progress.updated_at,
       })
       .eq('id', brief.id)
-      .eq('status', 'generating')
+      .eq('status', brief.status)
+      .eq('updated_at', brief.updated_at)
       .select('updated_at')
       .maybeSingle();
     if (updated.error) throw new Error(`NFL interpretation update failed: ${updated.error.message}`);
-    if (!updated.data) return;
+    if (!updated.data || !generation.isActive()) return;
     publishBriefProgress(briefProgressStreamPayload({
       id: brief.id,
       status: 'ready',
@@ -2270,9 +2288,10 @@ async function generateNflArtifactInterpretationWithDeadline(
       'Live analysis ready',
       'The sourced calculation is ready; the football interpretation is unavailable.',
     );
-    const updated = await db
+    const updated = await Promise.resolve(persistence
       .from('briefs')
       .update({
+        thesis: immediateBody.answer || null,
         body,
         status: 'ready',
         error: null,
@@ -2281,14 +2300,16 @@ async function generateNflArtifactInterpretationWithDeadline(
         updated_at: progress.updated_at,
       })
       .eq('id', brief.id)
-      .eq('status', 'generating')
+      .eq('status', brief.status)
+      .eq('updated_at', brief.updated_at)
       .select('updated_at')
-      .maybeSingle();
+      .maybeSingle())
+      .catch((settleError: unknown) => ({ data: null, error: settleError }));
     if (updated.error) {
       console.error('[briefs] failed to settle sourced NFL result', brief.id, updated.error);
       return;
     }
-    if (!updated.data) return;
+    if (!updated.data || !generation.isActive()) return;
     publishBriefProgress(briefProgressStreamPayload({
       id: brief.id,
       status: 'ready',
@@ -2299,6 +2320,7 @@ async function generateNflArtifactInterpretationWithDeadline(
     }));
   } finally {
     if (timer) clearTimeout(timer);
+    controller.abort();
     generation.stop();
   }
 }
@@ -2308,7 +2330,6 @@ function nflArtifactInterpretationText(response: Anthropic.Message): string {
     .flatMap((block) => block.type === 'text' ? [block.text] : [])
     .join('\n')
     .trim();
-  if (!text) throw new Error(`nfl_artifact_interpretation_missing_text: ${response.stop_reason ?? 'unknown'}`);
   return text;
 }
 
@@ -2634,7 +2655,7 @@ export async function ensureNflTransactionMarketLookup(
       },
       {
         role: 'user',
-        content: [{ type: 'tool_result', tool_use_id: toolUseId, content: JSON.stringify(result) }],
+        content: [{ type: 'tool_result', tool_use_id: toolUseId, content: JSON.stringify(dataAnalystResultForModel(result)) }],
       },
     ],
     traces: [...lookup.traces, trace],
@@ -2644,16 +2665,18 @@ export async function ensureNflTransactionMarketLookup(
 export function transactionMarketArtifactBody(
   analysis: NflTransactionMarketAnalysis,
 ): DataAnalysisBriefBody {
+  const rates = analysis.position_trends.filter(t => t.mobility.baseline_value != null && t.mobility.recent_value != null)
+    .slice(0, 3).map(t => `${t.position_group} player events per 100 roster player-seasons: ${(t.mobility.baseline_value! / 100).toFixed(2)} → ${(t.mobility.recent_value! / 100).toFixed(2)}.`).join(' ');
   return {
     kind: 'data_analysis',
-    answer: '',
+    language_policy: 'facts_only_v1',
+    answer: `${analysis.coverage.event_count.toLocaleString()} matching player events from ${analysis.query.start_year} through ${analysis.query.end_year}, covering ${analysis.query.position_groups.join(', ') || 'all positions'}. Comparing ${analysis.query.baseline_years.join('–')} with ${analysis.query.recent_years.join('–')}: ${rates || 'the requested period measures are available below; missing measures remain unreported.'}`,
     key_findings: [],
     tables: [],
     calculations: [],
-    caveats: [],
-    followups: [],
+    caveats: ['Player events are recorded player movements; one trade can contain multiple player events. Rates use the recorded roster player-season denominator. Historical transactions do not establish current availability or asking prices.', ...analysis.limitations],
+    followups: ['Only include trades from 2020 through 2025.', 'Show the complete trade packages.'],
     market_analysis: analysis,
-    analysis_interpretation_status: 'pending',
   };
 }
 
@@ -2702,7 +2725,8 @@ export function sellerMoveArtifactBody(
   const comparableRefs = result?.comparables.map((_, index) => index + 4) ?? [];
   return {
     kind: 'data_analysis',
-    answer: result ? '' : artifact.message ?? 'This trade cannot be calculated from the available public data.',
+    language_policy: 'facts_only_v1',
+    answer: result ? `Under the proposed ${result.proposal.pick_year} round ${result.proposal.pick_round} trade for ${result.player.player_name}, the recorded contract calculation is ${formatSellerMoveDollars(result.cap.current_year_cap_space_created_dollars)} of ${result.cap.current_year} cap space created and ${formatSellerMoveDollars(result.cap.current_year_dead_money_dollars)} of dead money. The proposed pick is an assumption, not an observed offer.` : artifact.message ?? 'This trade cannot be calculated from the available public data.',
     key_findings: result ? [
       {
         label: 'Historical return',
@@ -2720,8 +2744,8 @@ export function sellerMoveArtifactBody(
         source_refs: [3],
       },
       {
-        label: 'Depth consequence',
-        body: `${result.depth.label}. ${result.depth.basis}`,
+        label: 'Recorded 2025 usage',
+        body: result.depth.basis,
         source_refs: [2],
       },
     ] : [],
@@ -2740,7 +2764,7 @@ export function sellerMoveArtifactBody(
     ] : [],
     market_analysis: market,
     seller_move_analysis: artifact,
-    ...(result ? { analysis_interpretation_status: 'pending' as const } : {}),
+
     ...(showMarketAnalysis ? { combined_market_seller_analysis: true } : {}),
   };
 }
@@ -2776,23 +2800,23 @@ export async function deterministicSellerMoveEvidenceRows(
     ref_index: 2,
     kind: 'ANALYST_DATA',
     source: 'NFLVERSE',
-    title: `Current role · ${result.player.player_name}`,
-    updated_at: result.player.contract_as_of_date,
+    title: `Recorded 2025 usage · ${result.player.player_name}`,
+    updated_at: '2025 season',
     data: {
       ...(result.depth.source_url ? { source_url: result.depth.source_url } : {}),
       rows: [
         { k: 'Player', v: result.player.player_name },
         { k: 'Position', v: result.player.position_group },
-        { k: 'Depth consequence', v: result.depth.label },
-        { k: 'Role', v: result.depth.basis },
+        { k: 'Season', v: '2025' },
+        { k: 'Recorded usage', v: result.depth.basis },
       ],
-      authority_label: 'Public roster and role data',
-      contribution: 'Supports the current role and depth consequence shown for the proposed move.',
+      authority_label: 'Public 2025 usage data',
+      contribution: 'Records 2025 starts, games and snap share; no current role or replacement need is inferred.',
       seller_move_role: true,
       player_id: result.player.player_id,
     },
   };
-  const tradeRule = (await loadNflRulesCorpus()).rules.find((rule) => rule.rule_family === 'trades');
+  const tradeRule = (await loadNflRulesCorpus()).rules.find((rule) => rule.rule_family === 'post_june_1_accounting');
   const rule: Omit<BriefSource, 'id' | 'brief_id'> | null = tradeRule ? {
     ref_index: 3,
     kind: 'CBA',
@@ -2800,11 +2824,11 @@ export async function deterministicSellerMoveEvidenceRows(
     title: 'Trade cap accounting rule',
     updated_at: tradeRule.effective_date,
     data: {
-      source_url: tradeRule.source_url,
+      source_url: `${tradeRule.source_url.split('#')[0]}#page=127`,
       authority_label: 'Executed NFL-NFLPA collective bargaining agreement',
       contribution: 'Establishes the timing rule used for the assigning club’s signing-bonus treatment.',
       rows: [
-        { k: 'Rule', v: tradeRule.summary },
+        { k: 'Rule', v: 'For a trade actually completed after June 1, current-year bonus proration stays in that year and future-year unamortized bonus accelerates into the next League Year, subject to the final League Year exception.' },
         { k: 'Locator', v: tradeRule.source_locator },
       ],
       seller_move_rule: true,
@@ -2825,7 +2849,7 @@ export async function deterministicSellerMoveEvidenceRows(
         { k: 'Position', v: row.position_group },
         { k: 'Teams', v: `${row.from_team_id} → ${row.to_team_id}` },
         { k: 'Compensation', v: row.compensation_summary },
-        { k: 'Relevance', v: row.comparison_to_proposal },
+        { k: 'Draft timing', v: `${row.pick_year} round ${row.pick_round}; ${row.pick_delay_years} draft year(s) after the trade` },
       ],
       authority_label: 'Public historical transaction record',
       contribution: 'Provides a same-position seller return used to compare the proposed draft pick.',
@@ -3598,10 +3622,10 @@ function initialBriefProgress(label = 'Brief queued'): BriefProgress {
 
 export function marketArtifactBriefProgress(): BriefProgress {
   return briefProgressSnapshot({
-    phase: 'drafting',
-    pct: 60,
+    phase: 'ready',
+    pct: 100,
     label: 'Live analysis ready',
-    detail: 'The calculation and sources are ready; the football interpretation is being written.',
+    detail: 'The calculation and its sources are ready.',
     kind: 'data',
   });
 }

@@ -1,0 +1,31 @@
+{
+  "schema": "public_cap_observation.v1",
+  "team_id": "NYG",
+  "season": 2026,
+  "team": {
+    "url": "https://overthecap.com/salary-cap/new-york-giants",
+    "captured_at": "2026-09-07T21:27:25.522686+00:00",
+    "sha256": "09d46b8c81acf40ba72499d363693a7b68765d9abef2bb48e18a71abcc8fa844",
+    "label": "Giants team page",
+    "total_liabilities": 301375251,
+    "top_51": 261190088,
+    "cap_space": -1179917
+  },
+  "league": {
+    "url": "https://overthecap.com/salary-cap-space",
+    "captured_at": "2026-09-07T21:27:25.805180+00:00",
+    "sha256": "25d3af38b134bfb0bbf0d67db961d60dc803901b170e2fed14ce7ae08e9c88eb",
+    "label": "League cap-space page",
+    "cap_space": -1757717,
+    "contracts": 78,
+    "active_cap_spending": 273340506,
+    "dead_money": 28612545
+  },
+  "calculator": {
+    "url": "https://overthecap.com/calculator/new-york-giants",
+    "captured_at": "2026-09-07T21:27:26.768090+00:00",
+    "sha256": "9d2193a5263505f9359b9e99576dc27e3d1df51d71841fbeba22af08338ec4f3",
+    "label": "Giants cap calculator",
+    "applied_cap": 300195334
+  }
+}

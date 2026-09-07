@@ -5,8 +5,8 @@ import { buildNflRuleAnswer } from '../../src/nfl_rules/analysis.js';
 test('post-June trade question returns a plain-language answer with exact CBA location', async () => {
   const result = await buildNflRuleAnswer('What are post-June 1 trade rules?');
 
-  assert.match(result.body.answer, /trade completed after June 1/i);
-  assert.match(result.body.answer, /advance post-June 1 designation is a release mechanism/i);
+  assert.match(result.body.answer, /trade actually completed after June 1/i);
+  assert.match(result.body.answer, /designation does not apply to trades/i);
   assert.doesNotMatch(result.body.answer, /submit_brief|options|sources|required fields/i);
   assert.equal(result.sources[0]?.kind, 'CBA');
   assert.equal(result.sources.length, 1);

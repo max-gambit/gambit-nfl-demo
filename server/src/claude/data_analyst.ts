@@ -24,6 +24,7 @@ import { loadNflRulesCorpus } from '../nfl_rules/seed.js';
 import { buildNflCoverageMatrix } from '../nfl_coverage/index.js';
 import { analyzeNflTransactionMarket, type LoadNflTransactionMarketSnapshot } from '../nfl_transactions/analyze.js';
 import { loadCurrentNflTransactionMarketSnapshot } from '../nfl_transactions/seed.js';
+import { nflTransactionMarketModelContext } from '../nfl_transactions/model_context.js';
 
 const MAX_TOOL_ROUNDS = 6;
 const DEFAULT_LIMIT = 40;
@@ -415,10 +416,16 @@ export async function dataAnalystToolResultBlock(
     block: {
       type: 'tool_result',
       tool_use_id: toolUse.id,
-      content: JSON.stringify(result),
+      content: JSON.stringify(dataAnalystResultForModel(result)),
       is_error: !result.ok,
     },
   };
+}
+
+export function dataAnalystResultForModel(result: DataAnalystToolResult): DataAnalystToolResult {
+  if (!result.market_analysis) return result;
+  const context = nflTransactionMarketModelContext(result.market_analysis);
+  return { ...result, market_analysis: context, data: { ...result.data, market_analysis: context } };
 }
 
 export async function handleDataAnalystToolUse(

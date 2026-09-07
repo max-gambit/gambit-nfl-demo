@@ -457,22 +457,19 @@ function proposalTimingNote(
   pickYear: number,
   pickRound: number,
   currentYear: number,
-  range: NflSellerMoveResponse['market']['range'],
+  _range: NflSellerMoveResponse['market']['range'],
 ): string {
   const delay = pickYear - currentYear;
   const timing = delay === 1 ? 'the next draft' : `${delay} drafts away`;
-  const classification = range == null
-    ? 'The available trades do not support a firm range.'
-    : `It remains ${range} the middle historical range.`;
-  return `The proposed ${pickYear} round ${pickRound} pick is ${timing}. Within the same round, a later pick is treated as weaker. ${classification}`;
+  return `The proposed ${pickYear} round ${pickRound} pick is ${timing}. The comparison orders picks by round, then by draft delay. It does not convert all package assets into a single value.`;
 }
 
 function depthConsequence(value: ReturnType<typeof nflDepthEffect>): NflSellerMoveResponse['depth']['consequence'] {
   return value === 'high' ? 'major_role' : value === 'medium' ? 'meaningful_role' : value === 'low' ? 'limited_role' : 'needs_review';
 }
 
-function depthLabel(value: ReturnType<typeof nflDepthEffect>): string {
-  return value === 'high' ? 'Major role to replace' : value === 'medium' ? 'Meaningful role to replace' : value === 'low' ? 'Limited current role' : 'Role impact needs football review';
+function depthLabel(_value: ReturnType<typeof nflDepthEffect>): string {
+  return 'Recorded 2025 usage';
 }
 
 function requireDatabaseBackedContracts(sourceMode: string): void {
@@ -494,19 +491,12 @@ function capitalize(value: string): string {
 }
 
 function marketRangeLabel(
-  range: NflSellerMoveResponse['market']['range'],
+  _range: NflSellerMoveResponse['market']['range'],
   position: NflPositionMarketGroup,
-  proposal: Pick<HistoricalPickReturn, 'pick_round' | 'pick_delay_years'>,
-  strongerBoundary: HistoricalPickReturn | null,
-  weakerBoundary: HistoricalPickReturn | null,
+  _proposal: Pick<HistoricalPickReturn, 'pick_round' | 'pick_delay_years'>,
+  firstBoundary: HistoricalPickReturn | null,
+  lastBoundary: HistoricalPickReturn | null,
 ): string {
-  if (range == null) return 'Not enough comparable trades to set a historical range';
-  if (range === 'within') return `Within the typical historical range for ${position}`;
-  const boundary = range === 'above' ? strongerBoundary : weakerBoundary;
-  if (!boundary) return `${capitalize(range)} the typical historical range for ${position}`;
-  const roundGap = Math.abs(proposal.pick_round - boundary.pick_round);
-  const distance = roundGap > 0
-    ? `${roundGap} round${roundGap === 1 ? '' : 's'} ${range === 'above' ? 'stronger' : 'weaker'} than the edge of the middle range`
-    : `${Math.abs(proposal.pick_delay_years - boundary.pick_delay_years)} draft year${Math.abs(proposal.pick_delay_years - boundary.pick_delay_years) === 1 ? '' : 's'} ${range === 'above' ? 'sooner' : 'later'} than the edge of the middle range`;
-  return `${capitalize(range)} the typical historical range for ${position} · ${distance}`;
+  if (!firstBoundary || !lastBoundary) return 'No middle range calculated: insufficient matching records';
+  return `${position} single-player sample, middle 50%: round ${firstBoundary.pick_round} (${firstBoundary.pick_delay_years} draft year${firstBoundary.pick_delay_years === 1 ? '' : 's'} later) through round ${lastBoundary.pick_round} (${lastBoundary.pick_delay_years} draft year${lastBoundary.pick_delay_years === 1 ? '' : 's'} later). This is not a player valuation.`;
 }

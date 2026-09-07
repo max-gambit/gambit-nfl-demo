@@ -23,6 +23,7 @@ test('basic Giants cap and roster questions have a bounded deterministic route',
   assert.equal(classifyNflCurrentQuestion('List Giants wide receiver contracts over the last decade.'), null);
   assert.equal(classifyNflCurrentQuestion('Show Giants WR contract trends since 2018.'), null);
   assert.equal(classifyNflCurrentQuestion('How much cap space do the New York Jets have?'), null);
+  assert.equal(classifyNflCurrentQuestion('Reconcile the Jets Top 51 cap to their full roster.'), null);
   assert.equal(classifyNflCurrentQuestion('How does that affect our draft strategy?'), null);
   assert.equal(classifyNflCurrentQuestion('Which position markets have grown?'), null);
 });
@@ -33,7 +34,7 @@ test('current cap answer uses the captured team total and reconciles its compone
   const summary = seed.team_cap_summaries?.find((row) => row.team_id === 'NYG');
   assert.ok(summary);
 
-  assert.match(result.body.answer, /Giants currently have approximately \$10,392,701 in 2026 cap space/i);
+  assert.match(result.body.answer, /saved public cap table records \$10,392,701 in 2026 cap space/i);
   assert.match(result.body.answer, /Sep 3, 2026/);
   assert.equal(
     summary.top_51_cap_spending_dollars + summary.dead_money_dollars + summary.current_cap_space_dollars,
@@ -59,12 +60,13 @@ test('largest cap hits are sorted from current active-roster contract rows', asy
   assert.ok(result.sources.every((source) => source.data?.current_team_contract === true));
 });
 
-test('cornerback answer distinguishes explicit depth-chart evidence from inference', async () => {
+test('cornerback answer reports explicit markers and all active rows without inferred roles', async () => {
   const result = await buildNflCurrentAnswer('starting_cornerbacks', { loadTeam: currentLoader(await nygSeed()) });
 
-  assert.match(result.body.answer, /Paulson Adebo.*only corner.*explicitly listed first/i);
-  assert.match(result.body.answer, /inference/i);
-  assert.match(result.body.answer, /not current first-team designations/i);
+  assert.match(result.body.answer, /Paulson Adebo.*explicitly listed first/i);
+  assert.match(result.body.answer, /does not establish a complete current starting group/i);
+  const expected = (await nygSeed()).roster_entries.filter(r => r.roster_status === 'active' && ['CB', 'DB'].includes(r.position ?? '')).map(r => r.player_name).sort();
+  assert.deepEqual(result.body.tables[0].rows.map(r => r[0]), expected);
   assert.equal(result.sources.length, 3);
   assert.equal(result.sources[0]?.data?.current_team_roster, true);
   assert.equal(result.sources[1]?.data?.current_team_depth, true);

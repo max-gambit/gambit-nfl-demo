@@ -1,14 +1,15 @@
 import type { BriefSource, DataAnalysisBriefBody } from '@shared/types';
+import { loadCapObservationAnswer } from './cap_observation.js';
+import { teamIdsFromQuestion } from '../nfl_transactions/question.js';
 import {
   loadCurrentNflTeamDataWithMode,
   type NflCapRow,
   type NflCurrentDataLoadResult,
   type NflDemoSeed,
   type NflPlayerMetricRow,
-  type NflRosterEntry,
 } from '../nfl_data/seed.js';
 
-export type NflCurrentQuestionKind = 'cap_space' | 'starting_cornerbacks' | 'largest_cap_hits' | 'wide_receiver_contracts';
+export type NflCurrentQuestionKind = 'cap_space' | 'cap_reconciliation' | 'starting_cornerbacks' | 'largest_cap_hits' | 'wide_receiver_contracts';
 
 export interface PreparedNflCurrentAnswer {
   body: DataAnalysisBriefBody;
@@ -19,6 +20,8 @@ export type LoadCurrentNflTeam = (teamId: string) => Promise<NflCurrentDataLoadR
 
 export function classifyNflCurrentQuestion(question: string): NflCurrentQuestionKind | null {
   const value = question.trim();
+  if (teamIdsFromQuestion(value).some(id => id !== 'NYG')) return null;
+  if (/\b(?:top[- ]?51|full roster|reconcile|reconciliation)\b/i.test(value) && /\b(?:cap|accounting|figure|number|include|reconcile)\b/i.test(value)) return 'cap_reconciliation';
   if (!/\b(?:giants|nyg)\b/i.test(value)) return null;
   const conditionalMove = /\b(?:cut(?:s|ting)?|releas(?:e|ed|ing)|trad(?:e|ed|ing)|mov(?:e|ed|ing)|waiv(?:e|ed|ing)|restructur(?:e|ed|ing)|extend(?:ed|ing)?|sign(?:ed|ing)?)\b/i.test(value)
     && /\b(?:if|would|could|after|before|save|create|clear|gain|lose|change|increase|decrease)\b/i.test(value);
@@ -55,6 +58,10 @@ export async function buildNflCurrentAnswer(
   kind: NflCurrentQuestionKind,
   options: { loadTeam?: LoadCurrentNflTeam } = {},
 ): Promise<PreparedNflCurrentAnswer> {
+  if ((kind === 'cap_space' || kind === 'cap_reconciliation') && !options.loadTeam) {
+    const captured = await loadCapObservationAnswer();
+    if (captured) return captured;
+  }
   let loaded: NflCurrentDataLoadResult;
   try {
     loaded = await (options.loadTeam ?? loadCurrentNflTeamDataWithMode)('NYG');
@@ -69,10 +76,22 @@ export async function buildNflCurrentAnswer(
   }
   switch (kind) {
     case 'cap_space': return capSpaceAnswer(loaded.seed);
+    case 'cap_reconciliation': return capReconciliationAnswer(loaded.seed);
     case 'starting_cornerbacks': return startingCornerbacksAnswer(loaded.seed);
     case 'largest_cap_hits': return largestCapHitsAnswer(loaded.seed);
     case 'wide_receiver_contracts': return wideReceiverContractsAnswer(loaded.seed);
   }
+}
+
+function capReconciliationAnswer(seed: NflDemoSeed): PreparedNflCurrentAnswer {
+  const result = capSpaceAnswer(seed);
+  const summary = seed.team_cap_summaries?.find(row => row.team_id === 'NYG' && row.season === '2026');
+  result.body.answer = summary
+    ? `The saved ${readableDate(summary.as_of_date)} figure uses ${summary.accounting_basis}, not a reconciled in-season total for September 10. The loaded sources do not provide every active-roster, practice-squad, reserve-list and league adjustment needed to produce that total.`
+    : 'A reconciled in-season Giants cap total is not available in the loaded sources.';
+  result.body.key_findings.unshift({ label: 'Reconciliation status', body: 'Not reconciled. No current full-roster cap figure is being inferred from the offseason Top 51 total.', source_refs: result.sources.map(source => source.ref_index) });
+  result.body.caveats.unshift('The roster refresh date and the cap accounting date are separate. A later roster refresh does not update the cap total.');
+  return result;
 }
 
 function capSpaceAnswer(seed: NflDemoSeed): PreparedNflCurrentAnswer {
@@ -85,10 +104,10 @@ function capSpaceAnswer(seed: NflDemoSeed): PreparedNflCurrentAnswer {
   return {
     body: {
       kind: 'data_analysis',
-      answer: `The Giants currently have approximately ${money(summary.current_cap_space_dollars)} in 2026 cap space as of ${asOf}. Over The Cap applies a ${money(summary.applied_team_cap_dollars)} team salary cap, with ${money(summary.top_51_cap_spending_dollars)} in Top 51 active spending and ${money(summary.dead_money_dollars)} in dead money.`,
+      answer: `The saved public cap table records ${money(summary.current_cap_space_dollars)} in 2026 cap space as of ${asOf}, under offseason Top 51 accounting. Over The Cap applies a ${money(summary.applied_team_cap_dollars)} team salary cap, with ${money(summary.top_51_cap_spending_dollars)} in Top 51 active spending and ${money(summary.dead_money_dollars)} in dead money.`,
       key_findings: [
         {
-          label: 'Current 2026 room',
+          label: 'Recorded 2026 room',
           body: `${money(summary.current_cap_space_dollars)} under ${summary.accounting_basis.toLowerCase()} as of ${asOf}.`,
           source_refs: [1],
         },
@@ -105,7 +124,7 @@ function capSpaceAnswer(seed: NflDemoSeed): PreparedNflCurrentAnswer {
       ],
       tables: [],
       calculations: [{
-        label: 'Current cap space',
+        label: 'Recorded Top 51 cap space',
         formula: `${money(summary.applied_team_cap_dollars)} applied team cap − ${money(summary.top_51_cap_spending_dollars)} Top 51 spending − ${money(summary.dead_money_dollars)} dead money`,
         value: money(summary.current_cap_space_dollars),
         source_refs: [1, 2],
@@ -255,17 +274,15 @@ function startingCornerbacksAnswer(seed: NflDemoSeed): PreparedNflCurrentAnswer 
   if (activeCorners.length === 0) return unavailableCurrentAnswer('starting_cornerbacks');
   const metricsByPlayer = new Map(seed.player_metrics.map((row) => [row.player_id, row]));
   const explicit = activeCorners.filter((row) => isExplicitStartingCorner(metricsByPlayer.get(row.player_id)));
-  const inferred = inferCornerGroup(activeCorners, metricsByPlayer, new Set(explicit.map((row) => row.player_id)));
-  const workingGroup = [...explicit, ...inferred].slice(0, 3);
+  const workingGroup = [...activeCorners].sort((a, b) => a.player_name.localeCompare(b.player_name));
   const asOf = readableDate(seed.as_of_date);
   const explicitNames = explicit.map((row) => row.player_name);
-  const inferredNames = workingGroup.filter((row) => !explicit.some((candidate) => candidate.player_id === row.player_id)).map((row) => row.player_name);
   const nflSource = sourceRef(seed, 'nfl_official_rosters');
   const depthSource = sourceRef(seed, 'nflverse_depth_charts_2026');
   const statsSource = sourceRef(seed, 'nflverse_snap_counts_2025');
   const answer = explicitNames.length > 0
-    ? `${joinNames(explicitNames)} ${explicitNames.length === 1 ? 'is the only corner' : 'are the only corners'} explicitly listed first at a defensive corner spot in the loaded depth chart. The best-supported working group is ${joinNames(workingGroup.map((row) => row.player_name))}, but ${joinNames(inferredNames)} ${inferredNames.length === 1 ? 'is an inference' : 'are inferences'} from the current roster and recent role data—not current first-team designations.`
-    : `The loaded public data does not identify a current first-team Giants cornerback group. Based on the active roster and recent role data, the best-supported working group is ${joinNames(workingGroup.map((row) => row.player_name))}, but all three are inferences rather than current depth-chart designations.`;
+    ? `${joinNames(explicitNames)} ${explicitNames.length === 1 ? 'is' : 'are'} explicitly listed first at a defensive corner position in the loaded depth chart. The source does not establish a complete current starting group.`
+    : 'The loaded public depth chart does not identify a complete current first-team Giants cornerback group.';
   return {
     body: {
       kind: 'data_analysis',
@@ -279,24 +296,24 @@ function startingCornerbacksAnswer(seed: NflDemoSeed): PreparedNflCurrentAnswer 
         {
           label: 'Depth-chart certainty',
           body: explicitNames.length > 0
-            ? `${joinNames(explicitNames)} has an explicit first-at-position depth-chart marker; the other listed roles are inferred.`
+            ? `${joinNames(explicitNames)} has an explicit first-at-position depth-chart marker; no additional starters are inferred.`
             : 'The current depth-chart source does not provide a complete first-team cornerback group.',
           source_refs: [2],
         },
         {
-          label: 'Recent role support',
-          body: 'Recent public snap and start history supports the explicitly labeled working-role inferences.',
+          label: 'Recorded usage',
+          body: 'The table shows recorded 2025 snap and start history; it does not assign a current role.',
           source_refs: [3],
         },
       ],
       tables: [{
-        title: 'Current cornerback working group',
-        columns: ['Player', 'How the role is supported'],
-        rows: workingGroup.map((row) => [row.player_name, cornerRoleBasis(row, metricsByPlayer.get(row.player_id))]),
+        title: 'All loaded active cornerbacks, alphabetical',
+        columns: ['Player', 'Recorded 2025 usage'],
+        rows: workingGroup.map((row) => [row.player_name, roleSummary(metricsByPlayer.get(row.player_id))]),
         source_refs: [1, 2, 3],
       }],
       calculations: [],
-      caveats: ['A club-issued depth chart can change week to week. Where the public depth-chart feed does not explicitly name a starter, the answer labels the role as an inference.'],
+      caveats: ['A club-issued depth chart can change week to week. A starter is not inferred where the public depth chart lacks an explicit designation.'],
       followups: [],
     },
     sources: [
@@ -345,7 +362,7 @@ function startingCornerbacksAnswer(seed: NflDemoSeed): PreparedNflCurrentAnswer 
         data: {
           source_url: statsSource?.url,
           authority_label: 'Public snap and start data',
-          contribution: 'Supports the explicitly labeled working-role inferences where the current depth chart is incomplete.',
+          contribution: 'Records historical usage without assigning a current starting role.',
           current_team_role_history: true,
           rows: workingGroup.map((row) => {
             const metric = metricsByPlayer.get(row.player_id);
@@ -414,39 +431,6 @@ function isExplicitStartingCorner(metric: NflPlayerMetricRow | undefined): boole
   if (!metric || metric.source_status !== 'captured' || metric.position_metrics?.depth_chart_pos_rank !== 1) return false;
   const flags = new Set(metric.quality_flags ?? []);
   return [...flags].some((flag) => /^depth_chart_position_(?:lcb|rcb|nb|cb)$/.test(flag));
-}
-
-function inferCornerGroup(
-  rows: NflRosterEntry[],
-  metricsByPlayer: Map<string, NflPlayerMetricRow>,
-  exclude: Set<string>,
-): NflRosterEntry[] {
-  const boundary = rows.filter((row) => row.position === 'CB' && !exclude.has(row.player_id));
-  const nickel = rows.filter((row) => row.position === 'DB' && !exclude.has(row.player_id));
-  const sortedBoundary = sortByRoleSupport(boundary, metricsByPlayer);
-  const sortedNickel = sortByRoleSupport(nickel, metricsByPlayer);
-  const result: NflRosterEntry[] = [];
-  if (sortedBoundary[0]) result.push(sortedBoundary[0]);
-  if (sortedNickel[0]) result.push(sortedNickel[0]);
-  for (const row of sortedBoundary.slice(1)) if (result.length < 3) result.push(row);
-  return result;
-}
-
-function sortByRoleSupport(rows: NflRosterEntry[], metrics: Map<string, NflPlayerMetricRow>): NflRosterEntry[] {
-  return [...rows].sort((left, right) => roleScore(metrics.get(right.player_id)) - roleScore(metrics.get(left.player_id)) || left.player_name.localeCompare(right.player_name));
-}
-
-function roleScore(metric: NflPlayerMetricRow | undefined): number {
-  if (!metric) return -1;
-  const priorTeamPenalty = metric.quality_flags?.includes('prior_team_2025_sample') ? 200_000 : 0;
-  return (metric.starts_2025 ?? 0) * 10_000 + (metric.defense_snaps_2025 ?? 0) - priorTeamPenalty;
-}
-
-function cornerRoleBasis(row: NflRosterEntry, metric: NflPlayerMetricRow | undefined): string {
-  if (isExplicitStartingCorner(metric)) return 'Explicitly first at a defensive corner spot in the loaded depth chart';
-  const priorTeam = metric?.quality_flags?.includes('prior_team_2025_sample');
-  const summary = roleSummary(metric);
-  return `Inferred from active-roster status and ${summary}${priorTeam ? '; recent production came with a prior team' : ''}`;
 }
 
 function roleSummary(metric: NflPlayerMetricRow | undefined): string {

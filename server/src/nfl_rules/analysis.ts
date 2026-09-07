@@ -31,7 +31,7 @@ export async function buildNflRuleAnswer(question: string): Promise<PreparedNflR
 
   const primary = matches[0].rule;
   const answer = primary.rule_family === 'post_june_1_accounting'
-    ? 'For a trade completed after June 1, the original club generally carries the current-year bonus charge and moves acceleration tied to future years into the following league year. An advance post-June 1 designation is a release mechanism, not a way to designate a trade early. The exact cap result still depends on the player’s bonus schedule, guarantees, and the actual trade date.'
+    ? 'For a trade actually completed after June 1, unamortized signing-bonus amounts allocated to future years accelerate into the following league year; current-year proration remains in the current year. The final League Year has a separate exception. Up to two qualifying player contract terminations may receive an advance post-June 1 designation under Article 13, Section 6(b)(ii)(1); that designation does not apply to trades. The trade provision is Section 6(b)(ii)(2). The contract schedule, guarantees and actual transaction date determine the amounts.'
     : `${primary.summary} ${plainBoundary(primary)}`;
 
   const selected = [primary];
@@ -42,7 +42,7 @@ export async function buildNflRuleAnswer(question: string): Promise<PreparedNflR
     title: rule.title,
     updated_at: rule.effective_date,
     data: {
-      source_url: rule.source_url,
+      source_url: rule.rule_family === 'post_june_1_accounting' ? `${rule.source_url.split('#')[0]}#page=127` : rule.source_url,
       authority_label: 'Executed NFL-NFLPA collective bargaining agreement',
       contribution: `${rule.source_locator} supports the rule stated in this answer.`,
       rows: [

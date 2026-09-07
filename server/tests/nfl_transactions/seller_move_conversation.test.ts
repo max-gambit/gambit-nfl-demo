@@ -82,7 +82,8 @@ test('compound seller bodies request both live result surfaces', async () => {
   const body = sellerMoveArtifactBody(fixture.market, artifact, true);
 
   assert.equal(body.combined_market_seller_analysis, true);
-  assert.equal(body.analysis_interpretation_status, 'pending');
+  assert.equal(body.language_policy, 'facts_only_v1');
+  assert.equal(body.analysis_interpretation_status, undefined);
   assert.equal(body.market_analysis, fixture.market);
   assert.equal(body.seller_move_analysis, artifact);
 });
@@ -191,7 +192,7 @@ test('round-only continuation changes the proposal and market evidence but not p
   assert.notDeepEqual(updated.result!.comparables, initial.result!.comparables);
   assert.deepEqual(updated.result!.cap, initial.result!.cap);
   assert.deepEqual(updated.result!.depth, initial.result!.depth);
-  assert.notEqual(updated.result!.market.range_label, initial.result!.market.range_label);
+  assert.equal(updated.result!.market.range_label, initial.result!.market.range_label);
 });
 
 test('player-only continuation preserves the pick and updates contract and depth facts', async () => {
@@ -214,7 +215,7 @@ test('year-only continuation preserves the player and round', async () => {
   assert.equal(updated.result!.proposal.pick_year, 2028);
   assert.equal(updated.result!.proposal.pick_round, 2);
   assert.equal(updated.result!.player.player_id, initial.result!.player.player_id);
-  assert.match(updated.result!.market.timing_note, /later pick is treated as weaker/i);
+  assert.match(updated.result!.market.timing_note, /orders picks by round, then by draft delay/i);
   assert.doesNotMatch(updated.result!.market.middle_range?.stronger_pick ?? '', /^20\d{2}/);
   assert.doesNotMatch(updated.result!.market.middle_range?.weaker_pick ?? '', /^20\d{2}/);
 });

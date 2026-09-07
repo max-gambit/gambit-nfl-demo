@@ -5,14 +5,18 @@ import { F, RADIUS, SPACE, TRACKING, TYPE } from '../theme/fenway';
 
 export function NflSellerMoveAnalysis({
   artifact,
+  briefId,
+  onEvidence,
   followups = [],
 }: {
   artifact: NflSellerMoveConversationArtifact;
   followups?: string[];
+  briefId?: string;
+  onEvidence?: (ref: number) => void;
 }) {
   const { activeBriefId, sourcesByBrief } = useBriefs();
   const { setSelectedSourceRef, setSourceFilterRefs, setHighlightedSourceRef, setRailCollapsed } = useUi();
-  const sources = activeBriefId ? sourcesByBrief[activeBriefId] ?? [] : [];
+  const sources = (briefId ?? activeBriefId) ? sourcesByBrief[(briefId ?? activeBriefId)!] ?? [] : [];
   const contractRef = sources.find((source) => source.data?.seller_move_contract === true)?.ref_index;
   const roleRef = sources.find((source) => source.data?.seller_move_role === true)?.ref_index;
   const comparableRefs = new Map(
@@ -23,6 +27,7 @@ export function NflSellerMoveAnalysis({
   );
   const openEvidence = (ref: number | undefined) => {
     if (ref == null) return;
+    if (onEvidence) { onEvidence(ref); return; }
     setSourceFilterRefs([ref]);
     setHighlightedSourceRef(ref);
     setSelectedSourceRef(ref);
@@ -75,11 +80,11 @@ export function NflSellerMoveAnalysis({
         value={signedMoney(result.cap.next_year.cap_effect_dollars)}
         note={result.cap.next_year.cap_effect_dollars >= 0 ? 'additional cap space' : 'additional cap cost'}
       />}
-      <ResultMetric label="Depth consequence" value={result.depth.label} note={result.depth.basis} />
+      <ResultMetric label="Recorded usage" value="2025 season" note={result.depth.basis} />
     </section>
 
     {result.comparables.length > 0 && <section>
-      <span style={eyebrowStyle}>{artifact.show_comparables ? 'Trades behind this result' : 'Most relevant trades'}</span>
+      <span style={eyebrowStyle}>{artifact.show_comparables ? 'Trades behind this result' : 'Historical comparison sample'}</span>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: SPACE.sm, marginTop: SPACE.xs }}>
         {result.comparables.map((row) => {
           const ref = comparableRefs.get(row.event_id);
@@ -185,9 +190,9 @@ function signedMoney(value: number): string {
 }
 
 function comparableRelationshipLabel(value: 'stronger' | 'similar' | 'weaker'): string {
-  if (value === 'stronger') return 'Stronger return than your proposal';
-  if (value === 'weaker') return 'Weaker return than your proposal';
-  return 'Similar return to your proposal';
+  if (value === 'stronger') return 'Earlier round or earlier draft than proposal';
+  if (value === 'weaker') return 'Later round or later draft than proposal';
+  return 'Same recorded round and draft delay';
 }
 
 const eyebrowStyle: React.CSSProperties = {

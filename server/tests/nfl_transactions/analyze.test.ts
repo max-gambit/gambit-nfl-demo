@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
+import { gunzipSync } from 'node:zlib';
 import {
   analyzeNflTransactionMarket,
   analyzeNflTransactionMarketSnapshot,
   type NflTransactionMarketEvent,
   type NflTransactionMarketSnapshot,
+  type NflTransactionTradeAsset,
 } from '../../src/nfl_transactions/analyze.js';
 import type { NflPositionMarketGroup, NflTransactionMarketRequest } from '@shared/types';
 
@@ -394,6 +397,178 @@ test('snapshot loading is injectable and called once per analysis', async () => 
   assert.equal(calls, 1);
   assert.equal(result.snapshot_id, 'fixture-snapshot-v1');
 });
+
+test('public EDGE history persists every matching player event and whole deal beyond the comparable cap', async () => {
+  const manifestUrl = new URL('../../../data/nfl-transactions/manifest.json', import.meta.url);
+  const manifest = JSON.parse(await readFile(manifestUrl, 'utf8'));
+  const snapshot: NflTransactionMarketSnapshot = JSON.parse(gunzipSync(
+    await readFile(new URL(manifest.snapshot_file, manifestUrl)),
+  ).toString('utf8'));
+  const request: NflTransactionMarketRequest = {
+    analysis_mode: 'comparables', start_year: 2016, end_year: 2025,
+    position_groups: ['EDGE'], transaction_types: ['trade'], max_comparables: 12,
+  };
+  const result = analyzeNflTransactionMarketSnapshot(request, snapshot, { generatedAt: GENERATED_AT });
+  const expected = snapshot.events.filter((event) => event.position_group === 'EDGE'
+    && event.transaction_type === 'trade' && event.event_year >= request.start_year!
+    && event.event_year <= request.end_year!);
+  const expectedDeals = new Set(expected.map((event) => event.raw_source_record!.trade_id));
+  assert.ok(expected.length > result.query.max_comparables);
+  assert.ok(expectedDeals.size < expected.length, 'multi-player trades must not count as distinct deals per player');
+  assert.equal(result.coverage.event_count, expected.length);
+  assert.equal(result.coverage.trade_count, expected.length);
+  assert.equal(result.coverage.distinct_trade_count, expectedDeals.size);
+  assert.equal(result.coverage.unidentified_trade_event_count, 0);
+  assert.deepEqual(result.full_cohort!.map((row) => row.event_id).sort(), expected.map((row) => row.event_id).sort());
+  assert.deepEqual(result.comparables, result.full_cohort!.slice(0, result.query.max_comparables));
+  for (const row of result.full_cohort!) {
+    const assets = snapshot.trade_assets!.filter((asset) => asset.trade_id === row.trade_id)
+      .sort((a, b) => a.asset_id.localeCompare(b.asset_id));
+    assert.ok(assets.length > 0);
+    assert.deepEqual(row.trade_package?.assets, assets);
+    for (const asset of assets) {
+      assert.ok(row.source_ref_ids.includes(asset.source_ref_id));
+      assert.ok(result.source_refs.some((source) => source.id === asset.source_ref_id));
+    }
+  }
+  const burns = result.full_cohort!.find((row) => row.player_name === 'Brian Burns' && row.event_year === 2024)!;
+  assert.ok(burns.trade_package?.assets.some((asset) => asset.gave_team_id === 'CAR'
+    && asset.received_team_id === 'NYG' && asset.pick_season === 2024
+    && asset.pick_round === 5 && asset.pick_number === 166));
+  assert.ok(burns.trade_package?.assets.some((asset) => asset.gave_team_id === 'NYG'
+    && asset.received_team_id === 'CAR' && asset.pick_season === 2025 && asset.conditional === true));
+  assert.deepEqual(JSON.parse(JSON.stringify(result)).full_cohort, result.full_cohort);
+});
+
+test('cohort filtering retains multi-player packages, both directions, future picks and asset-only provenance', () => {
+  const snapshot = packageFixtureSnapshot();
+  const before = structuredClone(snapshot);
+  const result = analyzeNflTransactionMarketSnapshot({
+    ...defaultRequest(), position_groups: ['EDGE'], transaction_types: ['trade'], team_ids: ['AAA'], max_comparables: 1,
+  }, snapshot, { generatedAt: GENERATED_AT });
+  const expected = snapshot.events.filter((event) => event.position_group === 'EDGE'
+    && event.transaction_type === 'trade' && event.event_year >= 2016
+    && (event.from_team_id === 'AAA' || event.to_team_id === 'AAA'));
+  assert.equal(result.full_cohort?.length, expected.length);
+  assert.equal(result.comparables.length, 1);
+  assert.equal(result.coverage.trade_count, expected.length);
+  assert.equal(result.coverage.distinct_trade_count, 1);
+  assert.ok(result.full_cohort!.every((row) => row.compensation_band === null));
+  for (const row of result.full_cohort!) {
+    assert.deepEqual(row.trade_package?.assets, snapshot.trade_assets);
+    assert.ok(row.trade_package?.assets.some((asset) => asset.pfr_name === 'Other position player'));
+    assert.ok(row.trade_package?.assets.some((asset) => asset.pick_season === 2027));
+    assert.ok(row.source_ref_ids.includes('package-source'));
+    assert.match(row.compensation_summary!, /not allocated per player/);
+  }
+  assert.ok(result.source_refs.some((source) => source.id === 'package-source'));
+  assert.deepEqual(snapshot, before);
+
+  const largerSample = analyzeNflTransactionMarketSnapshot({
+    ...result.query, comparison_year: result.query.comparison_year ?? undefined, max_comparables: 50,
+  }, snapshot, { generatedAt: GENERATED_AT });
+  assert.deepEqual(result.full_cohort, largerSample.full_cohort);
+  assert.deepEqual(result.yearly_series, largerSample.yearly_series);
+  assert.deepEqual(result.position_trends, largerSample.position_trends);
+  assert.deepEqual(result.coverage, largerSample.coverage);
+  assert.deepEqual(result.comparables, largerSample.comparables.slice(0, result.query.max_comparables));
+  assert.deepEqual(result.influential_transactions, largerSample.influential_transactions.slice(0, result.query.max_comparables));
+});
+
+test('calculation-only snapshots retain unknown deal counts and missing packages instead of fabricating identities', () => {
+  const snapshot = fixtureSnapshot();
+  const result = analyzeNflTransactionMarketSnapshot(defaultRequest(), snapshot, { generatedAt: GENERATED_AT });
+  assert.equal(result.full_cohort?.length, snapshot.events.length);
+  assert.equal(result.coverage.distinct_trade_count, null);
+  assert.equal(result.coverage.unidentified_trade_event_count, result.coverage.trade_count);
+  assert.ok(result.full_cohort!.every((row) => row.trade_id === null && row.trade_package === null));
+
+  const identifiedWithoutAssets = packageFixtureSnapshot();
+  delete identifiedWithoutAssets.trade_assets;
+  const knownDeals = analyzeNflTransactionMarketSnapshot({
+    ...defaultRequest(), position_groups: ['EDGE'], transaction_types: ['trade'], team_ids: ['AAA'],
+  }, identifiedWithoutAssets);
+  assert.equal(knownDeals.coverage.distinct_trade_count, 1);
+  assert.ok(knownDeals.full_cohort!.every((row) => row.trade_id === 'whole-deal' && row.trade_package === null));
+
+  const nonTrade = analyzeNflTransactionMarketSnapshot({ ...defaultRequest(), transaction_types: ['free_agent_signing'] }, snapshot);
+  assert.equal(nonTrade.coverage.distinct_trade_count, 0);
+  assert.equal(nonTrade.coverage.trade_count, 0);
+  const empty = analyzeNflTransactionMarketSnapshot({ ...defaultRequest(), position_groups: ['QB'] }, snapshot);
+  assert.deepEqual(empty.full_cohort, []);
+  assert.equal(empty.coverage.distinct_trade_count, 0);
+});
+
+test('YTD events join the complete cohort without changing completed-year calculation windows', () => {
+  const snapshot = packageFixtureSnapshot();
+  const ytd = { ...snapshot.events[0], event_id: 'ytd-event', event_year: 2026, event_date: '2026-06-15', trade_id: 'ytd-deal' };
+  snapshot.events.push(ytd);
+  const request = { ...defaultRequest(), position_groups: ['EDGE'] as NflPositionMarketGroup[] };
+  const completed = analyzeNflTransactionMarketSnapshot(request, snapshot);
+  const withYtd = analyzeNflTransactionMarketSnapshot({ ...request, include_ytd: true }, snapshot);
+  assert.ok(!completed.full_cohort!.some((row) => row.event_id === ytd.event_id));
+  assert.ok(withYtd.full_cohort!.some((row) => row.event_id === ytd.event_id));
+  assert.equal(withYtd.coverage.event_count, completed.coverage.event_count + 1);
+  assert.deepEqual(
+    withYtd.position_trends.map(({ event_count, ...trend }) => trend),
+    completed.position_trends.map(({ event_count, ...trend }) => trend),
+  );
+});
+
+test('package corrections change artifact identity without changing player compensation calculations', () => {
+  const snapshot = packageFixtureSnapshot();
+  const before = analyzeNflTransactionMarketSnapshot(defaultRequest(), snapshot);
+  const reordered = structuredClone(snapshot);
+  reordered.trade_assets!.reverse();
+  assert.deepEqual(analyzeNflTransactionMarketSnapshot(defaultRequest(), reordered), before);
+  for (const change of [
+    (asset: NflTransactionTradeAsset) => { asset.pick_number = 167; },
+    (asset: NflTransactionTradeAsset) => { asset.conditional = true; },
+    (asset: NflTransactionTradeAsset) => { asset.gave_team_id = 'CCC'; },
+    (asset: NflTransactionTradeAsset) => { asset.raw_source_record = { conditional: 'revised condition' }; },
+  ]) {
+    const changed = structuredClone(snapshot);
+    change(changed.trade_assets!.at(-1)!);
+    const after = analyzeNflTransactionMarketSnapshot(defaultRequest(), changed);
+    assert.notEqual(after.analysis_id, before.analysis_id);
+    assert.deepEqual(after.position_trends, before.position_trends);
+    assert.deepEqual(after.yearly_series, before.yearly_series);
+  }
+  const invalid = structuredClone(snapshot);
+  invalid.trade_assets![0].source_ref_id = 'unregistered-source';
+  assert.throws(() => analyzeNflTransactionMarketSnapshot(defaultRequest(), invalid), /unknown source reference/);
+});
+
+function packageFixtureSnapshot(): NflTransactionMarketSnapshot {
+  const snapshot = fixtureSnapshot();
+  const player = baseEvent({ id: 'matching-edge', year: 2024, position: 'EDGE', type: 'trade', pickRounds: [2] });
+  player.raw_source_record = { trade_id: 'whole-deal' };
+  player.trade_player_asset_count = 3;
+  snapshot.events = [
+    player,
+    { ...player, event_id: 'other-edge', player_id: 'other-edge', player_name: 'Other EDGE' },
+    { ...player, event_id: 'other-position', position_group: 'CB', player_name: 'Other position player', from_team_id: 'BBB', to_team_id: 'AAA' },
+    { ...player, event_id: 'other-team', from_team_id: 'CCC', to_team_id: 'DDD', trade_id: 'other-deal' },
+    { ...player, event_id: 'outside-years', event_year: 2015, event_date: '2015-06-15', trade_id: 'older-deal' },
+    releaseEvent('non-trade', 2025, 'EDGE'),
+  ];
+  const asset = (asset_id: string, changes: Partial<NflTransactionTradeAsset>): NflTransactionTradeAsset => ({
+    asset_id, trade_id: 'whole-deal', event_year: 2024, trade_date: '2024-06-15',
+    gave_team_id: 'AAA', received_team_id: 'BBB', asset_type: 'player',
+    pfr_id: asset_id, pfr_name: 'Player', pick_season: null, pick_round: null,
+    pick_number: null, conditional: null, source_ref_id: 'trades', ...changes,
+  });
+  snapshot.trade_assets = [
+    asset('asset-1', { pfr_name: player.player_name }),
+    asset('asset-2', { pfr_name: 'Other EDGE' }),
+    asset('asset-3', { pfr_name: 'Other position player', gave_team_id: 'BBB', received_team_id: 'AAA' }),
+    asset('asset-4', { asset_type: 'draft_pick', pfr_id: null, pfr_name: null, gave_team_id: 'BBB', received_team_id: 'AAA',
+      pick_season: 2027, pick_round: 2, conditional: true, raw_source_record: { conditional: 'if playing-time threshold is met' }, source_ref_id: 'package-source' }),
+    asset('asset-5', { asset_type: 'draft_pick', pfr_id: null, pfr_name: null, pick_season: 2024, pick_round: 5, pick_number: 166, conditional: false }),
+  ];
+  snapshot.source_refs.push(sourceRef('package-source'));
+  return snapshot;
+}
 
 function defaultRequest(): NflTransactionMarketRequest {
   return {
