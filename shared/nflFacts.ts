@@ -1,5 +1,12 @@
 import type { DataAnalysisBriefBody, NflPositionMarketGroup } from './types';
 
+export type NflRosterNumericField = 'age' | 'cap_2026' | 'starts_2025' | 'snaps_2025' | 'games_2025';
+export interface NflRosterNumericFilter {
+  field: NflRosterNumericField;
+  operator: 'lt' | 'lte' | 'gt' | 'gte' | 'eq';
+  value: number;
+}
+
 export interface NflFactualQuery {
   kind: 'roster';
   team_ids: string[];
@@ -8,13 +15,18 @@ export interface NflFactualQuery {
   exclude_nyg: boolean;
   veterans_only: boolean;
   limit: number;
-  sort: 'name' | 'cap_asc' | 'cap_desc' | 'snaps_desc' | 'starts_desc';
+  sort: 'name' | 'cap_asc' | 'cap_desc' | 'snaps_desc' | 'snaps_asc' | 'starts_desc' | 'starts_asc' | 'games_desc' | 'games_asc' | 'age_asc' | 'age_desc';
   transaction: 'none' | 'release' | 'trade' | 'restructure';
   post_june: boolean;
   hypothetical_unavailable: boolean;
   hypothetical_player_names?: string[];
   max_cap: number | null;
   min_starts: number | null;
+  numeric_filters?: NflRosterNumericFilter[];
+  excluded_team_ids?: string[];
+  excluded_player_names?: string[];
+  roster_statuses?: string[];
+  unresolved_constraints?: string[];
 }
 
 export function factualBody(body: Omit<DataAnalysisBriefBody, 'kind' | 'language_policy'>): DataAnalysisBriefBody {

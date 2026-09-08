@@ -1,5 +1,5 @@
 import type { BriefSource, DataAnalysisBriefBody, NflHistoricalSelection, NflTransactionMarketAnalysis } from '@shared/types';
-import { factualBody, type NflFactualQuery } from '@shared/nflFacts';
+import { factualBody, type NflFactualQuery, type NflRosterNumericFilter, type NflRosterNumericField } from '@shared/nflFacts';
 import { factualPackageAnswer } from '@shared/nflAnswerDepth';
 import { nflTransactionTradePackageLines } from '@shared/nflTransactionMarket';
 import { loadCurrentNflDataWithMode, type NflCapRow, type NflDemoSeed, type NflPlayerMetricRow, type NflRosterEntry } from '../nfl_data/seed.js';
@@ -8,6 +8,8 @@ import { loadCurrentNflTransactionMarketSnapshot } from '../nfl_transactions/see
 import { analyzeNflTransactionMarket } from '../nfl_transactions/analyze.js';
 import { createClaudeMessage, BRIEF_MODEL } from '../claude/client.js';
 import { isHistoricalRecordQuestion, selectHistoricalRecords } from '../nfl_transactions/historical_selection.js';
+import { applyRosterConstraints, numericFilterLabel, numericMatches } from './constraints.js';
+import { SNAP_SOURCE } from '../nfl_data/starts.js';
 
 export interface FactualAnswer {
   body: DataAnalysisBriefBody;
@@ -48,11 +50,12 @@ function namedPlayers(question: string, rows: readonly { player_name: string }[]
 
 /** A bounded, visible selection. It never infers player quality or availability. */
 export function factualQueryFromQuestion(question: string, seed: NflDemoSeed, prior: NflFactualQuery | null = null): NflFactualQuery | null {
-  const names = namedPlayers(question, seed.roster_entries);
-  const groups = positionGroupsFromQuestion(question);
-  const teams = teamIdsFromQuestion(question);
-  const refinement = /^(?:only|filter|sort|order|now|instead|show (?:me )?(?:those|their)|what about|and |with |under |over |at least|make (?:that|it))\b/i.test(question);
-  const semantic = /\b(?:roster|players?|linemen|linebackers?|receivers?|cornerbacks?|safeties|quarterbacks?|running backs?|snaps?|starts?|cap|contracts?|salary|salaries|cash|veterans?|unavailable|injur(?:y|ed)|releas(?:e|ing)|restructure)\b/i.test(question);
+  const inclusion = question.replace(/\b(?:exclude|excluding|except(?: for)?|without)\s+.+?(?=\s+(?:with|under|over|at least|at most|sorted|sort|ordered|order)\b|[;.!?]|$)/gi, ' ');
+  const names = namedPlayers(inclusion, seed.roster_entries);
+  const groups = positionGroupsFromQuestion(inclusion);
+  const teams = teamIdsFromQuestion(inclusion);
+  const refinement = /^(?:only|filter|sort|order|now|instead|show (?:me )?(?:those|their)|what about|and|with|under|over|at least|at most|exclude|excluding|except|without|remove|drop|ignore|clear|make (?:that|it))\b/i.test(question);
+  const semantic = /\b(?:roster|players?|linemen|linebackers?|receivers?|cornerbacks?|safeties|quarterbacks?|running backs?|snaps?|starts?|games?|age|youngest|oldest|cap|contracts?|salary|salaries|cash|veterans?|unavailable|injur(?:y|ed)|releas(?:e|ing)|restructure)\b/i.test(question);
   if (!names.length && !groups.length && !semantic && !(prior && refinement)) return null;
   const query = prior && refinement ? structuredClone(prior) : baseQuery();
   if (names.length) { query.player_names = names; query.team_ids = []; query.exclude_nyg = false; }
@@ -61,7 +64,8 @@ export function factualQueryFromQuestion(question: string, seed: NflDemoSeed, pr
   if (/\b(?:acquire|add|acquisition|targets?|other teams|trade for|investigate)\b/i.test(question) && groups.length && !names.length) {
     query.team_ids = []; query.exclude_nyg = true;
   }
-  if (/\b(?:leaguewide|league-wide|across the (?:nfl|league)|all teams)\b/i.test(question)) { query.team_ids = []; query.exclude_nyg = false; }
+  if (/\b(?:other (?:nfl )?teams|outside (?:the )?(?:giants|nyg))\b/i.test(question)) { query.team_ids = []; query.exclude_nyg = true; }
+  if (/\b(?:leaguewide|league-wide|across (?:the )?(?:nfl|league)|all (?:nfl )?teams|all nfl players)\b/i.test(question)) { query.team_ids = []; query.exclude_nyg = false; }
   if (/\bveterans?\b/i.test(question)) query.veterans_only = true;
   if (/\b(?:unavailable|injur(?:y|ed)|missing time|limited|knee)\b/i.test(question) && /\b(?:if|hypothetical|assume|suppose)\b/i.test(question)) {
     query.hypothetical_unavailable = true;
@@ -79,19 +83,10 @@ export function factualQueryFromQuestion(question: string, seed: NflDemoSeed, pr
   if (/\btrad(?:e|ing)\b/i.test(question) && names.length && /\b(?:cap|money|save|savings)\b/i.test(question)) query.transaction = 'trade';
   if (/\b(?:before|pre[- ]?)\s*june\s*1\b/i.test(question)) query.post_june = false;
   if (/\b(?:after|post[- ]?)\s*june\s*1\b/i.test(question)) query.post_june = true;
-  if (/\b(?:lowest|smallest|ascending)\b.*\bcap\b|\bcap\b.*\b(?:lowest|ascending)\b/i.test(question)) query.sort = 'cap_asc';
-  if (/\b(?:highest|largest|biggest|most|descending)\b.*\bcap\b|\bcap\b.*\b(?:highest|descending)\b/i.test(question)) query.sort = 'cap_desc';
-  if (/\b(?:most|highest|sort|order)\b.*\bsnaps?\b/i.test(question)) query.sort = 'snaps_desc';
-  if (/\b(?:most|highest|sort|order)\b.*\bstarts?\b/i.test(question)) query.sort = 'starts_desc';
-  if (/\balphabetical\b/i.test(question)) query.sort = 'name';
   const limit = question.match(/\b(?:show|list|first|top|include|which)\s+(?:me\s+)?(\d{1,2}|three|five|ten)\b/i);
   if (limit) query.limit = Math.max(1, Math.min(50, Number(limit[1]) || ({ three: 3, five: 5, ten: 10 } as Record<string, number>)[limit[1].toLowerCase()] || 12));
   if (/\ball (?:matching |the )?(?:players|records|linemen|receivers)\b/i.test(question)) query.limit = 50;
-  const cap = question.match(/\b(?:under|below|less than|at most)\s*\$?([\d.]+)\s*(m(?:illion)?|k|thousand)?\b/i);
-  if (cap && /\bcap\b/i.test(question)) query.max_cap = Number(cap[1]) * (/^m/i.test(cap[2] ?? '') ? 1e6 : /^(k|thousand)/i.test(cap[2] ?? '') ? 1e3 : 1);
-  const starts = question.match(/\b(?:at least|minimum(?: of)?)\s+(\d{1,2})\s+starts?\b/i);
-  if (starts) query.min_starts = Number(starts[1]);
-  return query;
+  return applyRosterConstraints(question, query, seed);
 }
 
 /** The model may resolve a question to filters, but cannot author displayed prose. */
@@ -120,7 +115,7 @@ async function planUnrecognizedQuestion(question: string, prior: NflFactualQuery
     if (teams.some(id => !seed.teams.some(t => t.team_id === id))) return null;
     const positions = strings(input.positions);
     if (positions.some(p => !['QB','RB','WR','TE','OT','IOL','EDGE','IDL','LB','CB','S','ST'].includes(p))) return null;
-    return { ...baseQuery(), team_ids: teams, player_names: names, position_groups: positions as NflFactualQuery['position_groups'], exclude_nyg: input.exclude_nyg === true, veterans_only: input.veterans_only === true };
+    return applyRosterConstraints(question, { ...baseQuery(), team_ids: teams, player_names: names, position_groups: positions as NflFactualQuery['position_groups'], exclude_nyg: input.exclude_nyg === true, veterans_only: input.veterans_only === true }, seed);
   } catch { return null; }
 }
 
@@ -142,46 +137,70 @@ export async function buildNflFactualAnswer(question: string, prior: NflFactualQ
 }
 
 export function rosterFactsAnswer(query: NflFactualQuery, seed: NflDemoSeed): FactualAnswer {
+  if (query.unresolved_constraints?.length) return {
+    body: factualBody({
+      answer: `I can’t apply ${query.unresolved_constraints.map(value => `“${value}”`).join(', ')} from these records. Please restate or remove those conditions before I return a player list.`,
+      key_findings: [], tables: [], calculations: [], caveats: [], followups: [], factual_query: query,
+    }), sources: [],
+  };
   const caps = new Map(seed.cap_rows.filter(c => c.player_id).map(c => [`${c.team_id}:${c.player_id}`, c]));
   const metrics = new Map(seed.player_metrics.map(m => [`${m.team_id}:${m.player_id}`, m]));
+  const numericFilters: NflRosterNumericFilter[] = query.numeric_filters ?? [
+    ...(query.max_cap == null ? [] : [{ field: 'cap_2026', operator: 'lte', value: query.max_cap } as const]),
+    ...(query.min_starts == null ? [] : [{ field: 'starts_2025', operator: 'gte', value: query.min_starts } as const]),
+  ];
+  const recordedValue = (row: NflRosterEntry, field: NflRosterNumericField): number | null => {
+    if (field === 'age') return row.age;
+    const cap = caps.get(`${row.team_id}:${row.player_id}`);
+    if (field === 'cap_2026') return cap?.source_status === 'captured' ? cap.cap_number_2026 : null;
+    const metric = metrics.get(`${row.team_id}:${row.player_id}`);
+    if ((field === 'starts_2025' || field === 'games_2025') && metric?.source_data?.starts_2025_source) return metric[field] ?? null;
+    if (field === 'snaps_2025' && metric?.source_data?.snaps_2025_source) return metric.snaps_2025 ?? null;
+    return metric?.source_status === 'captured' ? metric[field] ?? null : null;
+  };
   const missingNames = query.player_names.filter(name => !seed.roster_entries.some(r => normalized(r.player_name) === normalized(name)));
   const candidates = seed.roster_entries.filter(r => {
     if (query.team_ids.length && !query.team_ids.includes(r.team_id)) return false;
     if (query.exclude_nyg && r.team_id === 'NYG') return false;
+    if (query.excluded_team_ids?.includes(r.team_id)) return false;
+    if (query.excluded_player_names?.some(name => normalized(name) === normalized(r.player_name))) return false;
+    if (query.roster_statuses?.length && !query.roster_statuses.includes(r.roster_status)) return false;
     if (query.player_names.length && !query.player_names.some(name => normalized(name) === normalized(r.player_name))) return false;
     if (query.position_groups.length && !query.position_groups.includes(factualPositionGroup(r.position) as NflFactualQuery['position_groups'][number])) return false;
     if (query.veterans_only && !(Number(r.experience) >= 1)) return false;
     return true;
   });
   const missingCap = candidates.filter(r => { const c = caps.get(`${r.team_id}:${r.player_id}`); return c?.source_status !== 'captured' || c.cap_number_2026 == null; }).length;
-  const missingStarts = candidates.filter(r => { const m = metrics.get(`${r.team_id}:${r.player_id}`); return m?.source_status !== 'captured' || m.starts_2025 == null; }).length;
-  const matched = candidates.filter(r => {
-    const cap = caps.get(`${r.team_id}:${r.player_id}`);
-    const metric = metrics.get(`${r.team_id}:${r.player_id}`);
-    if (query.max_cap != null && (cap?.source_status !== 'captured' || cap.cap_number_2026 == null || cap.cap_number_2026 > query.max_cap)) return false;
-    if (query.min_starts != null && (metric?.source_status !== 'captured' || metric.starts_2025 == null || metric.starts_2025 < query.min_starts)) return false;
-    return true;
-  });
-  const sortValue = (r: NflRosterEntry): number | null => {
-    const cap = caps.get(`${r.team_id}:${r.player_id}`); const metric = metrics.get(`${r.team_id}:${r.player_id}`);
-    if (query.sort.startsWith('cap')) return cap?.source_status === 'captured' ? cap.cap_number_2026 : null;
-    if (metric?.source_status !== 'captured') return null;
-    return query.sort === 'snaps_desc' ? metric.snaps_2025 : metric.starts_2025 ?? null;
-  };
+  const missingStarts = candidates.filter(r => recordedValue(r, 'starts_2025') == null).length;
+  const matched = candidates.filter(r => numericFilters.every(filter => numericMatches(recordedValue(r, filter.field), filter)));
+  const sortField: NflRosterNumericField | null = query.sort === 'name' ? null : query.sort.startsWith('age') ? 'age' : query.sort.startsWith('cap') ? 'cap_2026' : query.sort.startsWith('snaps') ? 'snaps_2025' : query.sort.startsWith('games') ? 'games_2025' : 'starts_2025';
+  const sortValue = (r: NflRosterEntry): number | null => sortField ? recordedValue(r, sortField) : null;
   matched.sort((a, b) => {
-    if (query.sort !== 'name') { const av = sortValue(a), bv = sortValue(b); if (av == null && bv != null) return 1; if (bv == null && av != null) return -1; if (av != null && bv != null && av !== bv) return query.sort === 'cap_asc' ? av - bv : bv - av; }
+    if (query.sort !== 'name') { const av = sortValue(a), bv = sortValue(b); if (av == null && bv != null) return 1; if (bv == null && av != null) return -1; if (av != null && bv != null && av !== bv) return query.sort.endsWith('_asc') ? av - bv : bv - av; }
     return a.player_name.localeCompare(b.player_name) || a.team_id.localeCompare(b.team_id);
   });
-  const rows = matched.slice(0, query.limit);
+  const requiredFields = [...new Set([...numericFilters.map(filter => filter.field), ...(sortField ? [sortField] : [])])];
+  const unavailableFields = candidates.length ? requiredFields.filter(field => candidates.every(row => recordedValue(row, field) == null)) : [];
+  const rows = unavailableFields.length ? [] : matched.slice(0, query.limit);
+  const includeAge = numericFilters.some(filter => filter.field === 'age') || query.sort.startsWith('age');
   const sources: FactualAnswer['sources'] = [];
   const addSource = (r: NflRosterEntry, cap: NflCapRow | undefined, metric: NflPlayerMetricRow | undefined) => {
     const ref = sources.length + 1;
+    const usageUrls = Array.isArray(metric?.source_data?.source_urls) ? metric.source_data.source_urls as string[] : [];
+    const snapSource = metric?.snaps_2025 != null ? usageUrls.find(url => /\/snap_counts\/snap_counts_2025\.csv$/.test(url)) ?? (metric.metric_families?.includes('nflverse_snap_counts') ? SNAP_SOURCE : null) : null;
     sources.push({ ref_index: ref, kind: 'ROSTER', source: 'Public roster and recorded contract / usage data', title: `${r.player_name} · ${r.team_id}`, updated_at: seed.as_of_date, data: {
       source_url: r.source_url ?? seed.source_url,
       contribution: 'Roster identity and status, contract figures and recorded 2025 usage; each source is linked separately.',
       rows: [ { k: 'Roster as of', v: seed.as_of_date }, { k: 'Roster source', v: r.source_url ?? 'Not recorded' },
-        { k: 'Contract source', v: cap?.source_url ?? 'Not recorded' }, { k: 'Usage source (2025 season)', v: metric?.source_url ?? 'Not recorded' },
+        { k: 'Contract source', v: cap?.source_url ?? 'Not recorded' }, { k: '2025 snap-count source', v: snapSource ?? 'Not recorded' },
+        ...(metric?.source_data?.starts_2025_source ? [
+          { k: 'Games and starts source (2025 regular season)', v: String((metric.source_data.starts_2025_source as { source_url: string }).source_url) },
+          { k: 'Game log captured', v: String((metric.source_data.starts_2025_source as { captured_at: string }).captured_at) },
+          { k: '2025 regular-season games / starts', v: `${metric.games_2025} / ${metric.starts_2025}` },
+        ] : []),
+        ...(!metric?.source_data?.starts_2025_source ? [{ k: 'Other 2025 usage sources', v: metric?.source_url ?? 'Not recorded' }] : []),
         { k: 'Roster status', v: r.roster_status }, { k: 'Contract source status', v: cap?.source_status ?? 'Not recorded' }, { k: 'Usage source status', v: metric?.source_status ?? 'Not recorded' } ],
+      ...(metric?.source_data?.starts_2025_source ? { regular_season_game_log: metric.source_data.starts_2025_source } : {}),
     } });
     return ref;
   };
@@ -190,22 +209,27 @@ export function rosterFactsAnswer(query: NflFactualQuery, seed: NflDemoSeed): Fa
     const cap = caps.get(`${r.team_id}:${r.player_id}`); const metric = metrics.get(`${r.team_id}:${r.player_id}`);
     refs.push(addSource(r, cap, metric));
     const c = cap?.source_status === 'captured' ? cap : undefined;
-    const m = metric?.source_status === 'captured' ? metric : undefined;
-    const base = [r.player_name, r.team_id, r.position ?? 'Not recorded', r.roster_status, dollars(c?.cap_number_2026), number(m?.starts_2025), number(m?.snaps_2025)];
+    const base = [r.player_name, r.team_id, r.position ?? 'Not recorded', r.roster_status, dollars(c?.cap_number_2026), number(recordedValue(r, 'starts_2025')), number(recordedValue(r, 'snaps_2025')), ...(includeAge ? [number(r.age)] : []), number(recordedValue(r, 'games_2025'))];
     if (query.transaction !== 'none') {
       const effect = transactionValues(c, query);
       base.push(dollars(effect.savings), dollars(effect.dead));
     }
     return base;
   });
-  const sortLabel = ({ name: 'player name (A–Z)', cap_asc: '2026 cap number, lowest first', cap_desc: '2026 cap number, highest first', snaps_desc: 'recorded 2025 snaps, highest first', starts_desc: 'recorded 2025 starts, highest first' } as const)[query.sort];
-  const scope = [query.team_ids.join(', ') || 'all loaded NFL teams', query.exclude_nyg ? 'excluding NYG' : '', query.position_groups.join(', '), query.veterans_only ? 'at least one recorded year of NFL experience' : '', query.max_cap == null ? '' : `2026 cap no more than ${dollars(query.max_cap)}`, query.min_starts == null ? '' : `at least ${query.min_starts} recorded 2025 starts`].filter(Boolean).join(' · ');
+  const sortLabel = ({ name: 'player name (A–Z)', cap_asc: '2026 cap number, lowest first', cap_desc: '2026 cap number, highest first', snaps_desc: 'recorded 2025 snaps, highest first', snaps_asc: 'recorded 2025 snaps, lowest first', starts_desc: 'recorded 2025 starts, highest first', starts_asc: 'recorded 2025 starts, lowest first', games_desc: 'recorded 2025 games, highest first', games_asc: 'recorded 2025 games, lowest first', age_asc: 'recorded age, youngest first', age_desc: 'recorded age, oldest first' } as const)[query.sort];
+  const scope = [query.team_ids.join(', ') || 'all loaded NFL teams', query.exclude_nyg ? 'excluding NYG' : '', query.position_groups.join(', '), query.veterans_only ? 'at least one recorded year of NFL experience' : '', ...numericFilters.map(numericFilterLabel), query.excluded_team_ids?.length ? `excluding ${query.excluded_team_ids.join(', ')}` : '', query.excluded_player_names?.length ? `excluding ${query.excluded_player_names.join(', ')}` : '', query.roster_statuses?.join(', ')].filter(Boolean).join(' · ');
   const caveats = [
     'Roster and contract records do not establish trade availability, asking prices, football fit or a recommended order of contact.',
     'Usage is recorded for the 2025 season. It is not a projection of 2026 role or health. Missing values are not zero.',
   ];
-  const coverageGaps = [query.max_cap != null && missingCap ? `${missingCap} of ${candidates.length} cohort records lack a captured 2026 cap number` : '', query.min_starts != null && missingStarts ? `${missingStarts} of ${candidates.length} cohort records lack recorded 2025 starts` : ''].filter(Boolean);
+  const fieldLabels = { age: 'recorded age', cap_2026: 'a captured 2026 cap number', starts_2025: 'recorded 2025 starts', snaps_2025: 'recorded 2025 snaps', games_2025: 'recorded 2025 games' };
+  const coverageGaps = [...new Set(numericFilters.map(filter => filter.field))].flatMap(field => {
+    const missing = candidates.filter(row => recordedValue(row, field) == null).length;
+    return missing ? [`${missing} of ${candidates.length} cohort records lack ${fieldLabels[field]}`] : [];
+  });
+  const missingSortValues = query.sort === 'name' ? 0 : matched.filter(row => sortValue(row) == null).length;
   if (coverageGaps.length) caveats.unshift(`${coverageGaps.join('; ')}. Those records cannot be tested against the requested numeric filters and are excluded from the result.`);
+  if (missingSortValues && rows.length) caveats.unshift(`${missingSortValues} of ${matched.length} matching players lack the field used for ordering; those players appear after the recorded values.`);
   if (!sources.length) sources.push({ ref_index: 1, kind: 'ROSTER', source: seed.source_name, title: 'Roster selection and data coverage', updated_at: seed.as_of_date, data: {
     source_url: seed.source_url, contribution: 'Defines the loaded roster cohort and the missing fields excluded by this selection.', rows: [
       { k: 'Cohort before numeric filters', v: String(candidates.length) }, { k: 'Missing captured cap number', v: String(missingCap) }, { k: 'Missing recorded 2025 starts', v: String(missingStarts) },
@@ -219,9 +243,11 @@ export function rosterFactsAnswer(query: NflFactualQuery, seed: NflDemoSeed): Fa
     : `Scenario: ${query.post_june ? 'actually processed after June 1' : 'processed before June 1'}. Figures are the recorded contract calculation, not a team cap-space reconciliation; replacement costs and later transactions are not included.`);
   if (missingNames.length) caveats.push(`No exact roster record was found for: ${missingNames.join(', ')}.`);
   return { body: factualBody({
-    answer: rows.length ? `${query.hypothetical_unavailable ? `If ${(query.hypothetical_player_names ?? []).join(', ') || 'the player'} is unavailable, current role assignments would be needed to assess coverage. ` : ''}${matched.length.toLocaleString()} players match${rows.length < matched.length ? `; showing ${rows.length}` : ''}, ordered by ${sortLabel}. Roster as of ${seed.as_of_date}; usage from 2025.` : `No matches in the ${seed.as_of_date} roster data.${coverageGaps.length ? ` ${coverageGaps.join('; ')}; players missing those figures could not be included.` : ''}`,
+    answer: unavailableFields.length
+      ? `I can’t apply ${[...numericFilters.filter(filter => unavailableFields.includes(filter.field)).map(numericFilterLabel), ...(sortField && unavailableFields.includes(sortField) ? [`ordering by ${sortLabel}`] : [])].join(' and ')}: none of the ${candidates.length} players in this group have ${unavailableFields.map(field => fieldLabels[field]).join(' or ')}. No player list was selected.`
+      : rows.length ? `${query.hypothetical_unavailable ? `If ${(query.hypothetical_player_names ?? []).join(', ') || 'the player'} is unavailable, current role assignments would be needed to assess coverage. ` : ''}${matched.length.toLocaleString()} players match${rows.length < matched.length ? `; showing ${rows.length}` : ''}, ordered by ${sortLabel}. Roster as of ${seed.as_of_date}; usage from 2025.` : `No matches in the ${seed.as_of_date} roster data.${coverageGaps.length ? ` ${coverageGaps.join('; ')}; players missing those figures could not be included.` : ''}`,
     key_findings: [{ label: 'Filters', body: scope, source_refs: refs }],
-    tables: records.length ? [{ title: query.transaction === 'none' ? 'Roster, contracts and usage' : `${query.transaction[0].toUpperCase()}${query.transaction.slice(1)} cap effect`, columns: ['Player','Team','Position','Status','2026 cap','2025 starts','2025 snaps', ...(query.transaction === 'none' ? [] : ['2026 savings','2026 dead money'])], rows: records, source_refs: refs }] : [],
+    tables: records.length ? [{ title: query.transaction === 'none' ? 'Roster, contracts and usage' : `${query.transaction[0].toUpperCase()}${query.transaction.slice(1)} cap effect`, columns: ['Player','Team','Position','Status','2026 cap','2025 starts','2025 snaps', ...(includeAge ? ['Age'] : []),'2025 games', ...(query.transaction === 'none' ? [] : ['2026 savings','2026 dead money'])], rows: records, source_refs: refs }] : [],
     calculations: [], caveats, followups: rows.length ? ['Sort by most 2025 starts.', 'Only include players with at least 10 starts.'] : [], factual_query: query,
   }), sources };
 }

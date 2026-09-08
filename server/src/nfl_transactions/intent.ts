@@ -32,6 +32,9 @@ export function classifyNflAnalysisTurn(
 ): NflAnalysisTurnIntent {
   const value = question.trim();
   const currentQuestion = classifyNflCurrentQuestion(value);
+  // Fixed-scope convenience answers cannot honor additional player filters.
+  if (currentQuestion === 'largest_cap_hits' || currentQuestion === 'wide_receiver_contracts') return { kind: 'general' };
+  if (currentQuestion === 'starting_cornerbacks' && !/^(?:(?:who are|show|list)(?: me)? (?:the )?)?(?:(?:new york )?giants['’]?|nyg) starting (?:cornerbacks|corners|cbs)(?: (?:right now|currently|today))?[.!?]*$/i.test(value)) return { kind: 'general' };
   // A named historical-package challenge needs the recorded assets, not a
   // fresh aggregate query or a replacement player in the current proposal.
   if (isHistoricalRecordQuestion(value, Boolean(context.market_query), context.historical_selection)) return { kind: 'general' };

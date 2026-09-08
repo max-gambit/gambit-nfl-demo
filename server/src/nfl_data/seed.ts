@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { withRecordedStarts } from './starts.js';
 
 export const DEFAULT_NFL_DEMO_SEED_PATH = fileURLToPath(
   new URL('../../../data/nfl-demo/current.json', import.meta.url),
@@ -199,7 +200,7 @@ export async function loadNflDemoSeed(path = DEFAULT_NFL_DEMO_SEED_PATH): Promis
       }
     : parsed;
   validateNflDemoSeed(seed);
-  return seed;
+  return withRecordedStarts(seed);
 }
 
 export async function loadNflTeamCapSummarySnapshot(
@@ -244,7 +245,7 @@ async function loadCurrentNflDataUncached(): Promise<NflCurrentDataLoadResult> {
   }
   try {
     return {
-      seed: await loadCurrentNflDataFromDb(),
+      seed: await withRecordedStarts(await loadCurrentNflDataFromDb()),
       source_mode: 'supabase_current_views',
       fallback_reason: null,
     };
@@ -279,7 +280,7 @@ async function loadCurrentNflTeamDataUncached(teamId: string): Promise<NflCurren
     return { seed: filterSeedToTeam(await loadNflDemoSeed(), teamId), source_mode: 'checked_in_snapshot', fallback_reason: null };
   }
   try {
-    return { seed: await loadCurrentNflTeamDataFromDb(teamId), source_mode: 'supabase_current_views', fallback_reason: null };
+    return { seed: await withRecordedStarts(await loadCurrentNflTeamDataFromDb(teamId)), source_mode: 'supabase_current_views', fallback_reason: null };
   } catch (error) {
     return { seed: filterSeedToTeam(await loadNflDemoSeed(), teamId), source_mode: 'checked_in_snapshot_fallback', fallback_reason: error instanceof Error ? error.message : String(error) };
   }
