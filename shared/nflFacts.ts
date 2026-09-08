@@ -35,5 +35,5 @@ export function factualBody(body: Omit<DataAnalysisBriefBody, 'kind' | 'language
 
 export function isFactualBody(body: unknown): body is DataAnalysisBriefBody {
   return Boolean(body && typeof body === 'object' && 'kind' in body && body.kind === 'data_analysis'
-    && 'language_policy' in body && body.language_policy === 'facts_only_v1');
+    && 'language_policy' in body && ['facts_only_v1', 'grounded_ai_v1'].includes(String(body.language_policy)));
 }

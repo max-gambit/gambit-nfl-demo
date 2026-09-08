@@ -200,8 +200,9 @@ export interface NflHistoricalSelection {
 
 export interface DataAnalysisBriefBody {
   kind: 'data_analysis';
-  /** Only server-rendered facts and calculations may use this policy marker. */
-  language_policy?: 'facts_only_v1';
+  /** Distinguishes preserved factual answers from AI synthesis of retrieved evidence. */
+  language_policy?: 'facts_only_v1' | 'grounded_ai_v1';
+  ai_analysis?: { model: string; elapsed_ms: number; tool_names: string[]; assumptions: string[]; evidence_validated?: boolean };
   /** Factual answer structure; the underlying recorded artifact remains authoritative. */
   answer_layout?: 'market_overview' | 'trade_scenario' | 'trade_packages';
   /** Executed factual selection, retained for follow-ups and saved briefs. */

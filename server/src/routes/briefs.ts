@@ -1,6 +1,7 @@
 import { factualMarketAnswer, factualSellerAnswer } from '@shared/nflAnswerDepth';
 import { factualBody } from '@shared/nflFacts';
 import { buildNflFactualAnswer, unsupportedAnswer } from '../nfl_facts/answer.js';
+import { buildNflAiAnswer } from '../nfl_facts/ai_answer.js';
 import { isHistoricalRecordQuestion } from '../nfl_transactions/historical_selection.js';
 import { randomBytes } from 'node:crypto';
 import { Hono } from 'hono';
@@ -253,8 +254,10 @@ briefRoutes.post('/', async (c) => {
     ? buildCurrentNflConversationContext(question, contextBriefs)
     : null;
   const previousFactualQuery = contextBriefs[0]?.body?.kind === 'data_analysis' ? contextBriefs[0].body.factual_query ?? null : null;
-  const preparedFactualAnswer = intent.kind === 'general'
-    ? await buildNflFactualAnswer(question, previousFactualQuery, latestMarketAnalysis, previousHistoricalSelection).catch(() => unsupportedAnswer())
+  // Historical package selection still supplies exact recorded assets. Open
+  // football questions go directly to the AI analyst, never the word parser.
+  const preparedFactualAnswer = intent.kind === 'general' && isHistoricalRecordQuestion(question, Boolean(latestMarketAnalysis), Boolean(previousHistoricalSelection))
+    ? await buildNflFactualAnswer(question, previousFactualQuery, latestMarketAnalysis, previousHistoricalSelection)
     : null;
   const explicitMode = normalizeBriefMode(body.mode);
   const transactionMarketQuestion = intent.kind === 'transaction_market';
@@ -346,13 +349,20 @@ briefRoutes.post('/', async (c) => {
     ];
     preparedProgress = readyBriefProgress('Records ready', 'The selected records and sources are ready.');
   }
-  // The presentation app renders recorded facts and arithmetic, with no
-  // asynchronous model-authored football interpretation.
-  if (!preparedMarketBody) {
-    preparedMarketBody = unsupportedAnswer().body;
-    preparedProgress = readyBriefProgress('Question not resolved', 'Specify a supported record or rule.');
+  // Calculation artifacts are evidence for the analyst. AI owns understanding,
+  // investigation and prose; the server still owns table cells and arithmetic.
+  try {
+    const analysis = await buildNflAiAnswer(question, {
+      history: [...contextBriefs].reverse().filter(row => row.status === 'ready').map(row => ({ question: row.question, body: row.body?.kind === 'data_analysis' ? row.body : null })),
+      initialEvidence: preparedMarketBody ? { body: preparedMarketBody, sources: preparedSources } : undefined,
+    });
+    preparedMarketBody = analysis.body;
+    preparedSources = analysis.sources;
+    preparedProgress = readyBriefProgress('Analysis ready', 'The answer and supporting sources are ready.');
+  } catch (error) {
+    console.error('[nfl analyst] Analysis failed:', error instanceof Error ? error.message : 'Unknown error');
+    return c.json({ error: 'analysis_unavailable', detail: 'The AI analysis could not finish. Please retry your question.' }, 503);
   }
-  preparedMarketBody = factualBody(preparedMarketBody);
 
   // Insert generating brief.
   const insert = await db
@@ -396,8 +406,7 @@ briefRoutes.post('/', async (c) => {
     }
   }
 
-  // Every answer is prepared and source-persisted above. No route falls
-  // through to legacy model-authored football evaluation.
+  // The AI answer and its exact source records are persisted together.
   const response: CreateBriefResponse = { brief };
   return c.json(response, 201);
 });
@@ -807,7 +816,8 @@ export async function regenerateBriefById(
   if (sellerMoveScenarioFromBrief(existingBrief)) return 'seller_move_regeneration_unsupported';
   const inheritedMarketQuery = transactionMarketAnalysisFromBrief(existingBrief)?.query ?? null;
   const currentQuestionKind = classifyNflCurrentQuestion(existingBrief.question);
-  if (currentQuestionKind) {
+  const aiAnswer = existingBrief.body?.kind === 'data_analysis' && existingBrief.body.language_policy === 'grounded_ai_v1';
+  if (currentQuestionKind && !aiAnswer) {
     return regenerateCurrentNflBrief(existingBrief, currentQuestionKind);
   }
   const priorContextRes = await db
@@ -836,6 +846,28 @@ export async function regenerateBriefById(
     : preservingTemplate
     ? existingBrief.mode
     : (briefModeForTemplate(templateParse.selection) ?? 'brief');
+
+  if (aiAnswer) {
+    // Keep the original conversational interpretation when regenerating an AI
+    // answer. Historical artifacts retain their executed scope as evidence.
+    let initialEvidence;
+    if (inheritedMarketQuery) {
+      const lookup = await ensureNflTransactionMarketLookup('', { messages: [{ role: 'user', content: existingBrief.question }], traces: [] }, inheritedMarketQuery);
+      const market = latestNflTransactionMarketAnalysis(lookup.traces);
+      if (!market) throw new Error('Required NFL transaction-market analysis was not returned.');
+      const selection = existingBrief.body?.kind === 'data_analysis' ? existingBrief.body.historical_selection : undefined;
+      const packages = selection ? await buildNflFactualAnswer(existingBrief.question, null, market, selection) : null;
+      initialEvidence = packages
+        ? { body: packages.body, sources: [...packages.sources, ...deterministicMarketEvidenceRows(market, packages.sources.length + 1)] }
+        : { body: transactionMarketArtifactBody(market), sources: deterministicMarketEvidenceRows(market, 1) };
+    } else if (currentQuestionKind) {
+      initialEvidence = await buildNflCurrentAnswer(currentQuestionKind);
+    }
+    return replaceWithFactualAnswer(existingBrief, await buildNflAiAnswer(existingBrief.question, {
+      history: [...(priorContextRes.data ?? [])].reverse().filter(row => row.status === 'ready').map(row => ({ question: row.question, body: row.body?.kind === 'data_analysis' ? row.body : null })),
+      initialEvidence,
+    }));
+  }
 
   // Recompute the saved executed scope before replacing anything. A short
   // follow-up cannot be reconstructed as a fresh, context-free question.
@@ -894,12 +926,12 @@ export async function regenerateBriefById(
     }
   }
 
-  const previous = (priorContextRes.data ?? [])[0] as BriefConversationRow | undefined;
-  const priorQuery = previous?.body?.kind === 'data_analysis' ? previous.body.factual_query ?? null : null;
   const intent = classifyNflAnalysisTurn(existingBrief.question, { market_query: null, seller_scenario: null });
-  const prepared = intent.kind === 'rules'
-    ? await buildNflRuleAnswer(existingBrief.question)
-    : await buildNflFactualAnswer(existingBrief.question, priorQuery);
+  const initialEvidence = intent.kind === 'rules' ? await buildNflRuleAnswer(existingBrief.question) : undefined;
+  const prepared = await buildNflAiAnswer(existingBrief.question, {
+    history: [...(priorContextRes.data ?? [])].reverse().map(row => ({ question: row.question, body: row.body?.kind === 'data_analysis' ? row.body : null })),
+    initialEvidence,
+  });
   return replaceWithFactualAnswer(existingBrief, prepared);
 }
 
@@ -907,67 +939,47 @@ async function regenerateCurrentNflBrief(
   existingBrief: Brief,
   questionKind: NflCurrentQuestionKind,
 ): Promise<Brief | null> {
-  return replaceWithFactualAnswer(existingBrief, await buildNflCurrentAnswer(questionKind));
+  return replaceWithFactualAnswer(existingBrief, await buildNflAiAnswer(existingBrief.question, { initialEvidence: await buildNflCurrentAnswer(questionKind) }));
 }
 
-async function replaceWithFactualAnswer(existingBrief: Brief, prepared: Awaited<ReturnType<typeof buildNflFactualAnswer>>): Promise<Brief | null> {
+export async function replaceWithFactualAnswer(existingBrief: Brief, prepared: Awaited<ReturnType<typeof buildNflFactualAnswer>>): Promise<Brief | null> {
   const startedAt = Date.now();
-  prepared.body = factualBody(prepared.body);
-  const progress = readyBriefProgress('Current Giants answer ready', 'The current public team data has been checked.');
-
-  invalidateActiveBriefGeneration(existingBrief.id);
-  await db.from('brief_options').delete().eq('brief_id', existingBrief.id);
-  await db.from('brief_sources').delete().eq('brief_id', existingBrief.id);
-
-  if (prepared.sources.length > 0) {
-    try {
-      await insertMissingBriefSources(
-        existingBrief.id,
-        prepared.sources.map((source) => ({ ...source, brief_id: existingBrief.id })),
-      );
-    } catch (error) {
-      const failedProgress = failedBriefProgress(error);
-      const detail = briefGenerationErrorMessage(error);
-      await db.from('briefs').update({
-        status: 'failed',
-        error: detail,
-        progress: failedProgress,
-        updated_at: failedProgress.updated_at,
-      }).eq('id', existingBrief.id);
-      throw error;
+  if (prepared.body.language_policy !== 'grounded_ai_v1') prepared.body = factualBody(prepared.body);
+  const progress = readyBriefProgress('Analysis ready', 'The answer and supporting sources are ready.');
+  progress.updated_at = new Date(Math.max(Date.now(), Date.parse(existingBrief.updated_at) + 1)).toISOString();
+  const generation = await claimHistoricalBriefGeneration(existingBrief, progress.updated_at);
+  if (!generation) return null;
+  try {
+    for (const table of ['brief_options', 'brief_sources'] as const) {
+      if (!generation.isActive()) return null;
+      const removed = await db.from(table).delete().eq('brief_id', existingBrief.id);
+      if (removed.error) throw new Error(`${table} regeneration cleanup failed: ${removed.error.message}`);
     }
+    if (!generation.isActive()) return null;
+    const sources = await insertMissingBriefSources(existingBrief.id,
+      prepared.sources.map(source => ({ ...source, brief_id: existingBrief.id })), generation);
+    if (!sources || !generation.isActive()) return null;
+    const reset = await db.from('briefs').update({
+      thesis: prepared.body.answer, body: prepared.body, mode: 'data_analyst', template_id: 'data_table',
+      template_base_id: null, custom_template_id: null, template_instructions: null,
+      progress, status: 'ready', error: null,
+      duration_ms: prepared.body.ai_analysis?.elapsed_ms ?? Date.now() - startedAt, updated_at: progress.updated_at,
+    }).eq('id', existingBrief.id).eq('updated_at', progress.updated_at).select().maybeSingle();
+    if (reset.error) throw new Error(`answer regeneration update failed: ${reset.error.message}`);
+    if (!reset.data || !generation.isActive()) return null;
+    const fresh = reset.data as Brief;
+    publishBriefProgress(briefProgressStreamPayload(fresh));
+    return fresh;
+  } catch (error) {
+    if (generation.isActive()) {
+      const failedProgress = failedBriefProgress(error);
+      await db.from('briefs').update({ status: 'failed', error: briefGenerationErrorMessage(error), progress: failedProgress, updated_at: failedProgress.updated_at })
+        .eq('id', existingBrief.id).eq('updated_at', progress.updated_at);
+    }
+    throw error;
+  } finally {
+    generation.stop();
   }
-
-  const reset = await db
-    .from('briefs')
-    .update({
-      thesis: prepared.body.answer,
-      body: prepared.body,
-      mode: 'data_analyst',
-      template_id: 'data_table',
-      template_base_id: null,
-      custom_template_id: null,
-      template_instructions: null,
-      progress,
-      status: 'ready',
-      error: null,
-      duration_ms: Date.now() - startedAt,
-      updated_at: progress.updated_at,
-    })
-    .eq('id', existingBrief.id)
-    .select()
-    .single();
-  if (reset.error || !reset.data) return null;
-  const fresh = reset.data as Brief;
-
-  publishBriefProgress(briefProgressStreamPayload({
-    id: fresh.id,
-    status: 'ready',
-    error: null,
-    progress,
-    updated_at: progress.updated_at,
-  }));
-  return fresh;
 }
 
 export async function generateBriefForMode(

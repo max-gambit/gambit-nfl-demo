@@ -134,7 +134,7 @@ export function NygChatWorkspace({ showLibrary = false, onOpenChat }: { showLibr
                 </>}
               </div>
             </article>)}
-            {pending && !turns.some(t => t.question === pending && t.id === turns.at(-1)?.id) && <article className="gc-turn"><div className="gc-user"><span className="gc-eyebrow">YOU</span><p>{pending}</p></div><p className="gc-thinking" role="status"><span /> Checking the requested records and source dates…</p></article>}
+            {pending && !turns.some(t => t.question === pending && t.id === turns.at(-1)?.id) && <article className="gc-turn"><div className="gc-user"><span className="gc-eyebrow">YOU</span><p>{pending}</p></div><p className="gc-thinking" role="status"><span /> Thinking through your question and checking the evidence…</p></article>}
           </div>}
           <div ref={bottomRef} />
         </div>
@@ -218,7 +218,7 @@ function downloadBrief(brief: Brief, sources: BriefSource[]) {
     table(seller ? 'Displayed historical comparison sample' : 'Matching historical transactions', ['Player', 'Date', 'Move', 'Recorded package / terms'], events.map(r => [r.player_name, r.event_date ?? r.event_year, `${r.from_team_id ?? '—'} → ${r.to_team_id ?? '—'}`, nflTransactionTradePackageLines(r).join('; ') || r.compensation_summary || 'Not recorded']));
     lines.push(cohort.summary, '');
   }
-  lines.push('## Assumptions and limitations', ...body.caveats.map(c => `- ${c}`), '', '## Sources');
+  lines.push('## Assumptions and limitations', ...[...new Set([...(body.ai_analysis?.assumptions ?? []), ...body.caveats])].map(c => `- ${c}`), '', '## Sources');
   for (const source of sources) {
     const data = source.data as Record<string, unknown> | null;
     lines.push(`### [${source.ref_index}] ${source.title ?? source.source}`, `${source.source} · ${source.updated_at}`);
