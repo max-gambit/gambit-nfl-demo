@@ -4,13 +4,30 @@ import type {
   NflTransactionMarketSignal,
 } from './types';
 import { factualBody } from './nflFacts';
-import { nflTransactionMarketCohortEvidence, nflTransactionTradePackageLines } from './nflTransactionMarket';
+import { nflTransactionMarketCohortEvidence, nflTransactionTradeAssetLabel, nflTransactionTradePackageLines } from './nflTransactionMarket';
 
 const money = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
 const period = (years: [number, number]) => years[0] === years[1] ? String(years[0]) : years.join('–');
 const inPeriod = (year: number, years: [number, number]) => year >= years[0] && year <= years[1];
 const number = (n: number) => n.toLocaleString('en-US');
 const valid = (n: number | null | undefined): n is number => typeof n === 'number' && Number.isFinite(n);
+const list = (items: string[]) => new Intl.ListFormat('en-US', { style: 'long', type: 'conjunction' }).format(items);
+const positionNames: Record<string, string> = {
+  QB: 'quarterbacks', RB: 'running backs', WR: 'wide receivers', TE: 'tight ends', OT: 'offensive tackles',
+  IOL: 'interior offensive linemen', EDGE: 'edge rushers', IDL: 'interior defensive linemen',
+  LB: 'linebackers', CB: 'cornerbacks', S: 'safeties', ST: 'special teams players',
+};
+const positionName = (position: string) => positionNames[position] ?? position;
+
+function tradePackageSentence(row: NflTransactionComparable): string {
+  const assets = row.trade_package?.assets ?? [];
+  const teams = [...new Set(assets.map(asset => asset.received_team_id))].sort();
+  return teams.map(team => `${team} received ${list(assets.filter(asset => asset.received_team_id === team).map(asset => {
+    const label = nflTransactionTradeAssetLabel(asset);
+    const round = asset.pick_round == null ? undefined : ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh'][asset.pick_round - 1];
+    return asset.asset_type === 'draft_pick' && round ? `a ${label.replace(`R${asset.pick_round}`, `${round}-round pick`)}` : label;
+  }))}`).join('; ') + (teams.length ? '.' : '');
+}
 
 function refs(analysis: NflTransactionMarketAnalysis, ids?: string[]): number[] {
   return analysis.source_refs.flatMap((source, index) => !ids || ids.includes(source.id) ? [index + 1] : []);
@@ -24,7 +41,7 @@ function signalComparison(signal: NflTransactionMarketSignal) {
   return {
     baseline: display(signal.baseline_value), recent: display(signal.recent_value),
     change: difference == null ? 'Comparison unavailable' : `${difference > 0 ? '+' : ''}${difference.toFixed(2)} ${rate ? 'per 100' : 'percentage points'}`,
-    comparable,
+    comparable, difference,
   };
 }
 
@@ -37,6 +54,7 @@ export function factualMarketAnswer(analysis: NflTransactionMarketAnalysis): Dat
   const evidence = nflTransactionMarketCohortEvidence(analysis);
   const trends = [...analysis.position_trends].sort((a, b) => a.position_group.localeCompare(b.position_group));
   const findings: DataAnalysisFinding[] = [];
+  const summaryGroups = new Map<string, string[]>();
   const comparisonRows: DataAnalysisTable['rows'] = [];
 
   for (const trend of trends) {
@@ -47,9 +65,11 @@ export function factualMarketAnswer(analysis: NflTransactionMarketAnalysis): Dat
     const denominator = (rows: typeof annual) => rows.reduce((sum, row) => sum + row.roster_player_seasons, 0);
     const movement = signalComparison(trend.mobility);
     if (movement.comparable && trends.indexOf(trend) < 3) {
+      const direction = movement.difference! > 0 ? 'rose' : movement.difference! < 0 ? 'fell' : 'was unchanged';
+      summaryGroups.set(direction, [...(summaryGroups.get(direction) ?? []), positionName(trend.position_group)]);
       findings.push({
         label: `${trend.position_group} · ${tradeOnly ? 'trade' : 'transaction'} frequency`,
-        body: `${baseline}: ${number(count(earlier))} player movements across ${number(denominator(earlier))} player-seasons (${movement.baseline} per 100). ${recent}: ${number(count(later))} across ${number(denominator(later))} (${movement.recent} per 100).`,
+        body: `There were ${number(count(later))} player movements across ${number(denominator(later))} player-seasons in ${recent}, compared with ${number(count(earlier))} across ${number(denominator(earlier))} in ${baseline}. ${movement.difference === 0 ? `The rate was ${movement.recent} movements per 100 player-seasons in both periods.` : `That brought the rate ${movement.difference! > 0 ? 'up' : 'down'} from ${movement.baseline} to ${movement.recent} movements per 100 player-seasons, ${Math.abs(movement.difference!).toFixed(2)} ${movement.difference! > 0 ? 'more' : 'fewer'} per 100.`}`,
         source_refs: refs(analysis),
       });
     }
@@ -68,15 +88,17 @@ export function factualMarketAnswer(analysis: NflTransactionMarketAnalysis): Dat
       const priced = (years: [number, number]) => rows.filter(row => inPeriod(row.event_year, years) && row.compensation_band != null && row.compensation_band !== 'unknown');
       const a = priced(query.baseline_years), b = priced(query.recent_years);
       const rounds123 = (rows: typeof a) => rows.filter(row => row.compensation_band === 'round_1' || row.compensation_band === 'rounds_2_3').length;
+      const compensation = signalComparison(trend.trade_compensation);
       findings.push({
         label: `${trend.position_group} · draft returns`,
-        body: `A round 1–3 pick was returned in ${rounds123(a)} of ${a.length} single-player trades in ${baseline}, and ${rounds123(b)} of ${b.length} in ${recent}.${trend.trade_compensation.status === 'insufficient_evidence' ? ' Too few usable trades to compare the periods.' : ''}`,
+        body: `In ${baseline}, ${rounds123(a)} of ${a.length} single-player trades returned a first-, second- or third-round pick. In ${recent}, ${rounds123(b)} of ${b.length} did so.${compensation.comparable ? compensation.difference === 0 ? ` The share stayed at ${compensation.recent}.` : ` The share ${compensation.difference! > 0 ? 'increased' : 'decreased'} from ${compensation.baseline} to ${compensation.recent}, a change of ${Math.abs(compensation.difference!).toFixed(2)} percentage points.` : ' There are too few usable trades to compare the periods.'}`,
         source_refs: refs(analysis, ['trades']),
       });
     }
   }
 
-  const lead = `${number(coverage.event_count)} ${scope} player movements${tradeOnly && coverage.distinct_trade_count != null ? ` across ${number(coverage.distinct_trade_count)} trades` : ''}, ${query.start_year}–${query.end_year}.`;
+  const summaries = [...summaryGroups].map(([direction, positions]) => `${tradeOnly ? 'Trade' : 'Transaction'} frequency ${direction} for ${list(positions)} in ${recent} compared with ${baseline}.`);
+  const lead = `${summaries.join(' ')}${summaries.length ? ' ' : ''}Across ${query.start_year}–${query.end_year}, there were ${number(coverage.event_count)} ${scope} player movements${tradeOnly && coverage.distinct_trade_count != null ? ` across ${number(coverage.distinct_trade_count)} trades` : ''}.`;
   const periodNote = `${query.team_ids.length ? `${query.team_ids.join(', ')} on either side of the transaction. ` : ''}${!tradeOnly ? `Includes ${query.transaction_types.map(type => type.replaceAll('_', ' ')).join(', ')}. ` : ''}${query.include_ytd ? `${query.end_year} is a partial year, excluded from the period comparison. ` : ''}${evidence.complete ? '' : 'Trade examples cover only the available sample.'}`.trim();
   return factualBody({
     answer_layout: 'market_overview', answer: [lead, periodNote].filter(Boolean).join('\n\n'),
@@ -106,7 +128,7 @@ export function marketExampleTrades(analysis: NflTransactionMarketAnalysis, year
   return {
     rows: selected.slice(0, 3),
     title: year != null ? `${year} trade packages` : firstRound.length ? 'First-round returns' : 'Recent trade packages',
-    selection: `${Math.min(3, selected.length)} most recent${evidence.complete ? '' : ' in the available sample'}.`,
+    selection: `${firstRound.length ? 'The most recent first-round returns involved' : 'The most recent trades involved'} ${list(selected.slice(0, 3).map(row => row.player_name))}${evidence.complete ? '' : ' in the available sample'}.`,
   };
 }
 
@@ -137,10 +159,10 @@ export function factualSellerAnswer(body: DataAnalysisBriefBody): DataAnalysisBr
   });
   return {
     ...body, answer_layout: 'trade_scenario',
-    answer: `Trading ${player.player_name} after June 1, ${cap.current_year} for an assumed ${proposal.pick_year} round ${proposal.pick_round} pick would create ${money(cap.current_year_cap_space_created_dollars)} in ${cap.current_year} cap space and leave ${money(cap.current_year_dead_money_dollars)} in dead money.${next ? ` The ${next.year} cap-space effect would be ${money(next.cap_effect_dollars)}, with ${money(next.accelerated_dead_money_dollars)} in dead money.` : ''}`,
+    answer: `Trading ${player.player_name} after June 1, ${cap.current_year} for an assumed ${proposal.pick_year} round ${proposal.pick_round} pick would ${cap.current_year_cap_space_created_dollars >= 0 ? `create ${money(cap.current_year_cap_space_created_dollars)} in` : `use ${money(-cap.current_year_cap_space_created_dollars)} of`} ${cap.current_year} cap space and leave ${money(cap.current_year_dead_money_dollars)} in dead money.${next ? `\n\nThe effect continues into ${next.year}: ${money(next.accelerated_dead_money_dollars)} in dead money would remain against a scheduled cap charge of ${money(next.scheduled_cap_dollars)}. That would ${next.cap_effect_dollars >= 0 ? `create ${money(next.cap_effect_dollars)} of` : `use ${money(-next.cap_effect_dollars)} of`} cap space in ${next.year}.` : ''}`,
     key_findings: [
-      { label: 'Contract', body: `As of ${player.contract_as_of_date}.`, source_refs: [1, 3] },
-      { label: 'Trade history', body: `${result.market.sample_size} single-player ${player.position_group} trades with draft-pick returns, ${history.start_year}–${history.end_year}${history.include_ytd ? ' (including the partial year)' : ''}.${result.market.middle_range ? ` The strongest pick in the middle 50% of returns ranged from ${result.market.middle_range.stronger_pick} to ${result.market.middle_range.weaker_pick}.` : ' Too few usable trades to calculate a middle range.'}`, source_refs: result.comparables.map((_, i) => i + 4) },
+      { label: 'Current-year cap effect', body: `${player.player_name} carries a scheduled ${cap.current_year} cap charge of ${money(cap.current_cap_number_dollars)}. The ${money(cap.current_year_dead_money_dollars)} in dead money would remain on the Giants’ cap, ${cap.current_year_cap_space_created_dollars >= 0 ? `freeing ${money(cap.current_year_cap_space_created_dollars)} after the trade` : `requiring another ${money(-cap.current_year_cap_space_created_dollars)} of cap space`}. Contract figures are as of ${player.contract_as_of_date}.`, source_refs: [1, 3] },
+      { label: 'Trade history', body: `There were ${result.market.sample_size} single-player ${player.position_group} trades with draft-pick returns from ${history.start_year}–${history.end_year}${history.include_ytd ? ', including the partial year' : ''}.${result.market.middle_range ? ` The middle 50% of those returns ranged from ${result.market.middle_range.stronger_pick} to ${result.market.middle_range.weaker_pick}, based on the strongest pick the selling team received.` : ' There are too few usable trades to calculate a middle range.'}`, source_refs: result.comparables.map((_, i) => i + 4) },
       { label: '2025 usage', body: result.depth.basis, source_refs: [2] },
     ],
     tables: [
@@ -153,7 +175,8 @@ export function factualSellerAnswer(body: DataAnalysisBriefBody): DataAnalysisBr
 /** Keep earlier package answers readable while preserving their executed selection. */
 export function factualPackageAnswer(body: DataAnalysisBriefBody): DataAnalysisBriefBody {
   const selection = body.historical_selection, market = body.market_analysis;
-  if (!selection || !market || !body.key_findings.length) return body;
+  if (!selection || !market) return body;
+  if (body.answer.startsWith('These trades cover ') || body.answer.startsWith('The current package selection covers ')) return body;
   if (selection.summary.startsWith('No selection executed:')) return {
     ...body, key_findings: [],
     answer: selection.summary.includes('requested subject')
@@ -162,12 +185,14 @@ export function factualPackageAnswer(body: DataAnalysisBriefBody): DataAnalysisB
   };
   const evidence = nflTransactionMarketCohortEvidence(market);
   const count = selection.event_ids.length;
+  const byId = new Map(evidence.rows.map(row => [row.event_id, row]));
+  const selectedRows = selection.event_ids.flatMap(id => byId.has(id) ? [byId.get(id)!] : []);
   const years = selection.years.length ? selection.years.join(', ') : `${market.query.start_year}–${market.query.end_year}`;
   const filters = [selection.player_names.join(', '), selection.pick_years?.length ? `${selection.pick_years.join(', ')} draft` : '', selection.pick_rounds.length ? `Round ${selection.pick_rounds.join(', ')} pick received by the player’s former team` : '', selection.team_ids.length ? `${selection.team_ids.join(', ')} on either side` : '', selection.multi_player_only ? 'Multiple players in the trade' : ''].filter(Boolean);
   return {
     ...body,
-    answer: `${count} ${market.query.position_groups.join(', ') || 'NFL'} ${evidence.unidentifiedTradeEventCount ? 'trade records (some deal IDs are missing)' : count === 1 ? 'trade' : 'trades'}, ${years}.${evidence.complete ? '' : ' This is a partial sample; the full count is unavailable.'}`,
-    key_findings: filters.length ? [{ label: 'Filters', body: filters.join(' · '), source_refs: body.key_findings[0].source_refs }] : [],
+    answer: `There ${count === 1 ? 'is' : 'are'} ${count} ${market.query.position_groups.join(', ') || 'NFL'} ${evidence.unidentifiedTradeEventCount ? 'trade records (some deal IDs are missing)' : count === 1 ? 'trade' : 'trades'} for ${years}${filters.length ? ' matching those conditions' : ''}.${evidence.complete ? '' : ' This is a partial sample; the full count is unavailable.'}${selectedRows.length === 1 ? `\n\n${tradePackageSentence(selectedRows[0])}` : selectedRows.length > 1 && selectedRows.length <= 6 ? ` The trades involved ${list(selectedRows.map(row => row.player_name))}.` : selectedRows.length > 6 ? ` The most recent was ${selectedRows[0].player_name}’s move from ${selectedRows[0].from_team_id} to ${selectedRows[0].to_team_id} ${selectedRows[0].event_date ? `on ${selectedRows[0].event_date}` : `in ${selectedRows[0].event_year}`}.\n\n${tradePackageSentence(selectedRows[0])}` : ''}`,
+    key_findings: filters.length ? [{ label: 'Filters', body: filters.join(' · '), source_refs: body.key_findings[0]?.source_refs ?? [] }] : [],
   };
 }
 

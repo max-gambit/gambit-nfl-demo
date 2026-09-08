@@ -13,7 +13,8 @@ const fixture = loadReviewedNflTransactionSnapshot().then(({ snapshot }) => anal
 test('market narrative, chart, percentages and whole-package examples reconcile to reviewed records', async () => {
   const market = await fixture, body = factualMarketAnswer(market);
   assert.match(body.answer, /72 EDGE player movements across 70 trades/);
-  assert.match(body.key_findings[0].body, /16 player movements across 701 player-seasons/);
+  assert.match(body.key_findings[0].body, /21 player movements across 741 player-seasons/);
+  assert.match(body.key_findings[0].body, /16 across 701/);
   assert.match(body.key_findings[1].body, /4 of 13/);
   assert.match(body.key_findings[1].body, /6 of 18/);
   assert.equal(marketAnnualRows(market).reduce((n, r) => n + r.events, 0), 72);

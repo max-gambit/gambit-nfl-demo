@@ -42,9 +42,11 @@ export function MarketAnswerEvidence({ analysis, sources, onEvidence }: {
 export function ScenarioChangeEvidence({ current, previous }: { current: NflSellerMoveResponse; previous: NflSellerMoveResponse | null }) {
   const changes = sellerScenarioChanges(current, previous);
   if (!changes.length) return null;
+  const changed = changes.filter(row => row.changed);
   const visible = changes.filter(row => row.changed || ['Cap space created', 'Dead money', 'Following-year cap effect'].includes(row.label));
   return <section className="gc-scenario-change" aria-label="Changes from the previous scenario">
     <h3>Scenario changes</h3>
+    {changed.length === 1 && changed[0].label === 'Proposed return' && <p className="gc-evidence-note">Changing the return from a {changed[0].before} pick to a {changed[0].after} pick changes the draft compensation. The cap-space and dead-money amounts stay the same.</p>}
     <div><table><thead><tr><th>Item</th><th>Previous</th><th>Revised</th></tr></thead><tbody>{visible.map(row => <tr key={row.label} className={row.changed ? 'changed' : ''}><th>{row.label}</th><td>{row.before}</td><td>{row.after}{!row.changed && <small> · unchanged</small>}</td></tr>)}</tbody></table></div>
   </section>;
 }
