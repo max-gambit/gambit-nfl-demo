@@ -69,7 +69,7 @@ test('market answer is complete without generated football interpretation', () =
     events: [],
   };
 
-  assert.match(body.answer, /20 EDGE player trade events/);
+  assert.match(body.answer, /20 EDGE player movements/);
   assert.deepEqual(body.key_findings, []);
   assert.strictEqual(body.market_analysis, analysis);
   assert.equal(body.language_policy, 'facts_only_v1');

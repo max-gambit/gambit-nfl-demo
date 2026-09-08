@@ -43,8 +43,8 @@ test('Nabers role-coverage question reports receiving records and labels missing
   assert.deepEqual(query.player_names, []);
   const answer = rosterFactsAnswer(query, seed);
   assert.ok(answer.body.tables[0].rows.length > 1);
-  assert.match(answer.body.answer, /Current role assignments are not available/);
-  assert.match(answer.body.answer, /user-supplied Malik Nabers unavailability scenario/);
+  assert.match(answer.body.answer, /current role assignments would be needed/);
+  assert.match(answer.body.answer, /If Malik Nabers is unavailable/);
   assert.ok(answer.body.tables[0].rows.every(r => r[2] === 'WR'));
 });
 

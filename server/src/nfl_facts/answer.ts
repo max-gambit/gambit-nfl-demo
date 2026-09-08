@@ -1,5 +1,6 @@
 import type { BriefSource, DataAnalysisBriefBody, NflHistoricalSelection, NflTransactionMarketAnalysis } from '@shared/types';
 import { factualBody, type NflFactualQuery } from '@shared/nflFacts';
+import { factualPackageAnswer } from '@shared/nflAnswerDepth';
 import { nflTransactionTradePackageLines } from '@shared/nflTransactionMarket';
 import { loadCurrentNflDataWithMode, type NflCapRow, type NflDemoSeed, type NflPlayerMetricRow, type NflRosterEntry } from '../nfl_data/seed.js';
 import { positionGroupsFromQuestion, teamIdsFromQuestion } from '../nfl_transactions/question.js';
@@ -125,7 +126,7 @@ async function planUnrecognizedQuestion(question: string, prior: NflFactualQuery
 
 export async function buildNflFactualAnswer(question: string, prior: NflFactualQuery | null = null, market: NflTransactionMarketAnalysis | null = null, historical: NflHistoricalSelection | null = null): Promise<FactualAnswer> {
   if (market && historical?.years.length === 1 && /\bsame (?:period|years|window)\b/i.test(question)) return {
-    body: factualBody({ answer: `The current package selection covers ${historical.years[0]} only. The period-comparison view requires at least two years, so it has not replaced that selection with a longer period.`, key_findings: [], tables: [], calculations: [], caveats: [historical.summary], followups: [`Compare ${positionGroupsFromQuestion(question).join(' with ') || 'EDGE with IOL'} from ${market.query.start_year} through ${market.query.end_year}.`], market_analysis: market, historical_selection: historical, answer_layout: 'trade_packages' }), sources: [],
+    body: factualBody({ answer: `These trades cover ${historical.years[0]} only. Choose at least two years to compare periods.`, key_findings: [], tables: [], calculations: [], caveats: [historical.summary], followups: [`Compare ${positionGroupsFromQuestion(question).join(' with ') || 'EDGE with IOL'} from ${market.query.start_year} through ${market.query.end_year}.`], market_analysis: market, historical_selection: historical, answer_layout: 'trade_packages' }), sources: [],
   };
   if (isHistoricalRecordQuestion(question, Boolean(market), Boolean(historical))) {
     const analysis = market ?? await analyzeNflTransactionMarket({ analysis_mode: 'comparables', start_year: 2016, end_year: 2025, position_groups: positionGroupsFromQuestion(question), transaction_types: ['trade'] }, { loadSnapshot: loadCurrentNflTransactionMarketSnapshot });
@@ -218,9 +219,9 @@ export function rosterFactsAnswer(query: NflFactualQuery, seed: NflDemoSeed): Fa
     : `Scenario: ${query.post_june ? 'actually processed after June 1' : 'processed before June 1'}. Figures are the recorded contract calculation, not a team cap-space reconciliation; replacement costs and later transactions are not included.`);
   if (missingNames.length) caveats.push(`No exact roster record was found for: ${missingNames.join(', ')}.`);
   return { body: factualBody({
-    answer: rows.length ? `${query.hypothetical_unavailable ? `Current role assignments are not available in these records. For the user-supplied ${(query.hypothetical_player_names ?? []).join(', ') || 'player'} unavailability scenario: ` : ''}${matched.length.toLocaleString()} matching player records. Showing ${rows.length}, ordered by ${sortLabel}. Roster snapshot: ${seed.as_of_date}; usage: 2025 season.` : `No player records satisfy these filters in the ${seed.as_of_date} snapshot.${coverageGaps.length ? ` ${coverageGaps.join('; ')}.` : ''} This does not establish that no such player exists.`,
-    key_findings: [{ label: 'Selection', body: scope, source_refs: refs }],
-    tables: records.length ? [{ title: query.transaction === 'none' ? 'Recorded roster, contract and usage' : `Recorded ${query.transaction} calculation`, columns: ['Player','Team','Position','Status','2026 cap','2025 starts','2025 snaps', ...(query.transaction === 'none' ? [] : ['2026 savings','2026 dead money'])], rows: records, source_refs: refs }] : [],
+    answer: rows.length ? `${query.hypothetical_unavailable ? `If ${(query.hypothetical_player_names ?? []).join(', ') || 'the player'} is unavailable, current role assignments would be needed to assess coverage. ` : ''}${matched.length.toLocaleString()} players match${rows.length < matched.length ? `; showing ${rows.length}` : ''}, ordered by ${sortLabel}. Roster as of ${seed.as_of_date}; usage from 2025.` : `No matches in the ${seed.as_of_date} roster data.${coverageGaps.length ? ` ${coverageGaps.join('; ')}; players missing those figures could not be included.` : ''}`,
+    key_findings: [{ label: 'Filters', body: scope, source_refs: refs }],
+    tables: records.length ? [{ title: query.transaction === 'none' ? 'Roster, contracts and usage' : `${query.transaction[0].toUpperCase()}${query.transaction.slice(1)} cap effect`, columns: ['Player','Team','Position','Status','2026 cap','2025 starts','2025 snaps', ...(query.transaction === 'none' ? [] : ['2026 savings','2026 dead money'])], rows: records, source_refs: refs }] : [],
     calculations: [], caveats, followups: rows.length ? ['Sort by most 2025 starts.', 'Only include players with at least 10 starts.'] : [], factual_query: query,
   }), sources };
 }
@@ -233,7 +234,7 @@ function transactionValues(cap: NflCapRow | undefined, query: NflFactualQuery) {
 }
 
 export function historicalPackageAnswer(question: string, market: NflTransactionMarketAnalysis, prior: NflHistoricalSelection | null = null): FactualAnswer {
-  const { rows, selection, evidence, unknownSubject, unsupportedFilter } = selectHistoricalRecords(question, market, prior);
+  const { rows, selection, evidence } = selectHistoricalRecords(question, market, prior);
   const sources = rows.map((row, index): FactualAnswer['sources'][number] => ({
     ref_index: index + 1, kind: 'TRANSACTION', source: 'Recorded NFL transaction package', title: `${row.player_name} · ${row.event_year}`, updated_at: row.event_date ?? `${row.event_year}-01-01`, data: {
       source_url: (market.source_refs.find(s => s.id === 'trades' && row.source_ref_ids.includes(s.id))
@@ -242,14 +243,14 @@ export function historicalPackageAnswer(question: string, market: NflTransaction
       rows: [{ k: 'Date', v: row.event_date ?? String(row.event_year) }, ...nflTransactionTradePackageLines(row).map(v => ({ k: 'Recorded asset', v }))],
     },
   }));
-  return { body: factualBody({
+  return { body: factualPackageAnswer(factualBody({
     answer_layout: 'trade_packages',
-    answer: unsupportedFilter ? 'That condition is not supported by the package filters. No broader or opposite selection has been substituted.' : unknownSubject ? `The requested subject could not be matched to a trade record in this cohort. No broader selection has been substituted.` : `${rows.length} matching ${evidence.unidentifiedTradeEventCount ? 'trade records (some deal IDs are missing)' : rows.length === 1 ? 'distinct trade' : 'distinct trades'} ${evidence.complete ? 'in' : 'in the stored sample from'} the ${market.query.start_year}–${market.query.end_year} ${market.query.position_groups.join(', ') || 'all-position'} cohort.${evidence.complete ? '' : ' The complete matching count is unavailable in this saved result.'} Each package below shows the recorded assets received by both teams, ordered by date (newest first).`,
+    answer: '',
     key_findings: [{ label: 'Selection', body: selection.summary, source_refs: rows.map((_, index) => index + 1) }],
     tables: [], calculations: [], caveats: [evidence.summary, 'Multi-player deals remain in the record but are excluded from per-player draft-return percentages because the compensation is not allocated to individual players. Historical packages do not establish a current asking price.'], followups: rows.length ? [selection.pick_rounds.length ? 'Show the complete trade packages.' : 'Only include trades returning a first-round pick.', selection.years.length ? `Compare ${market.query.position_groups[0] || 'EDGE'} with ${market.query.position_groups[0] === 'IOL' ? 'EDGE' : 'IOL'} over the same period.` : `Only ${market.query.end_year}.`] : ['Show the complete trade packages.'], market_analysis: market, historical_selection: selection,
-  }), sources };
+  })), sources };
 }
 
 export function unsupportedAnswer(): FactualAnswer {
-  return { body: factualBody({ answer: 'I could not resolve that question to a supported factual query. Specify a player, position, team, statistic or transaction rule to inspect.', key_findings: [], tables: [], calculations: [], caveats: ['Available records cover public roster and contract figures, recorded 2025 usage, historical transactions and cited NFL rules. Staff evaluations, medical records and current asking prices are not connected.'], followups: ['Show the Giants wide receiver contracts.', 'Show veteran interior offensive linemen on other teams.'] }), sources: [] };
+  return { body: factualBody({ answer: 'I don’t have enough information to answer that. Specify a player, position, team, statistic or transaction rule.', key_findings: [], tables: [], calculations: [], caveats: ['Available records cover public roster and contract figures, recorded 2025 usage, historical transactions and cited NFL rules. Staff evaluations, medical records and current asking prices are not connected.'], followups: ['Show the Giants wide receiver contracts.', 'Show veteran interior offensive linemen on other teams.'] }), sources: [] };
 }

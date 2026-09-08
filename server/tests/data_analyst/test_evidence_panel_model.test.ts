@@ -281,7 +281,8 @@ test('asset labels preserve unknown pick information and recorded conditional te
     conditional: true, source_ref_id: 'synthetic-source',
     raw_source_record: { conditional: 'if the player reaches the snap threshold' },
   };
-  assert.match(nflTransactionTradeAssetLabel(asset), /2027 R3 \(pick number not recorded\)/);
+  assert.match(nflTransactionTradeAssetLabel(asset), /^2027 R3/);
+  assert.doesNotMatch(nflTransactionTradeAssetLabel(asset), /No\. \d/);
   assert.match(nflTransactionTradeAssetLabel(asset), /conditional: if the player reaches the snap threshold/);
   assert.match(nflTransactionTradeAssetLabel({ ...asset, conditional: null, raw_source_record: null }), /condition not recorded/);
   assert.doesNotMatch(nflTransactionTradeAssetLabel({ ...asset, conditional: false, raw_source_record: null }), /conditional/);

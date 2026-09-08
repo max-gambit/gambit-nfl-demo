@@ -31,7 +31,7 @@ export function nflTransactionMarketCohortEvidence(analysis: NflTransactionMarke
 export function nflTransactionTradeAssetLabel(asset: NflTransactionTradeAsset): string {
   const name = asset.asset_type === 'player'
     ? asset.pfr_name ?? asset.pfr_id ?? 'Unidentified player'
-    : `${asset.pick_season ?? 'Season unknown'} ${asset.pick_round == null ? 'round unknown' : `R${asset.pick_round}`}${asset.pick_number == null ? ' (pick number not recorded)' : ` No. ${asset.pick_number}`}`;
+    : `${asset.pick_season ?? 'Season unknown'} ${asset.pick_round == null ? 'round unknown' : `R${asset.pick_round}`}${asset.pick_number == null ? '' : ` No. ${asset.pick_number}`}`;
   const rawCondition = asset.raw_source_record?.conditional;
   const conditionText = typeof rawCondition === 'string'
     && !['', '0', '1', 'true', 'false'].includes(rawCondition.trim().toLowerCase())

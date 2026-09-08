@@ -48,14 +48,14 @@ export function factualMarketAnswer(analysis: NflTransactionMarketAnalysis): Dat
     const movement = signalComparison(trend.mobility);
     if (movement.comparable && trends.indexOf(trend) < 3) {
       findings.push({
-        label: `${trend.position_group} · activity over the two periods`,
-        body: `${baseline} contains ${number(count(earlier))} player events across ${number(denominator(earlier))} roster player-seasons; ${recent} contains ${number(count(later))} across ${number(denominator(later))}. The rate is ${movement.baseline} → ${movement.recent} events per 100 roster player-seasons (${movement.change}). These are rates over the stated windows, not forecasts.`,
+        label: `${trend.position_group} · ${tradeOnly ? 'trade' : 'transaction'} frequency`,
+        body: `${baseline}: ${number(count(earlier))} player movements across ${number(denominator(earlier))} player-seasons (${movement.baseline} per 100). ${recent}: ${number(count(later))} across ${number(denominator(later))} (${movement.recent} per 100).`,
         source_refs: refs(analysis),
       });
     }
     const metrics: Array<[string, NflTransactionMarketSignal]> = [
-      ['Events per 100 roster player-seasons', trend.mobility],
-      ['Share of league transaction events', trend.transaction_share],
+      ['Movements per 100 player-seasons', trend.mobility],
+      ['Share of league movements', trend.transaction_share],
       ...(coverage.trade_count ? [['Single-player trades returning rounds 1–3', trend.trade_compensation] as [string, NflTransactionMarketSignal]] : []),
       ...(coverage.contract_count ? [['Median contract APY / league cap', trend.contract_price] as [string, NflTransactionMarketSignal]] : []),
     ];
@@ -69,22 +69,22 @@ export function factualMarketAnswer(analysis: NflTransactionMarketAnalysis): Dat
       const a = priced(query.baseline_years), b = priced(query.recent_years);
       const rounds123 = (rows: typeof a) => rows.filter(row => row.compensation_band === 'round_1' || row.compensation_band === 'rounds_2_3').length;
       findings.push({
-        label: `${trend.position_group} · what the draft-return percentages contain`,
-        body: `${baseline}: ${rounds123(a)} of ${a.length} trades with an allocable single-player return include a round 1–3 pick. ${recent}: ${rounds123(b)} of ${b.length}. Each trade is classified by its earliest returned round. Multi-player packages remain in the historical record but receive no per-player draft-return percentage.${trend.trade_compensation.status === 'insufficient_evidence' ? ' The comparison does not meet the saved analysis’s minimum evidence requirements.' : ''}`,
+        label: `${trend.position_group} · draft returns`,
+        body: `A round 1–3 pick was returned in ${rounds123(a)} of ${a.length} single-player trades in ${baseline}, and ${rounds123(b)} of ${b.length} in ${recent}.${trend.trade_compensation.status === 'insufficient_evidence' ? ' Too few usable trades to compare the periods.' : ''}`,
         source_refs: refs(analysis, ['trades']),
       });
     }
   }
 
-  const lead = `${query.start_year}–${query.end_year} contains ${number(coverage.event_count)} ${scope} player ${tradeOnly ? 'trade events' : 'movement events'}${coverage.distinct_trade_count != null && coverage.trade_count ? ` across ${number(coverage.distinct_trade_count)} distinct trades${tradeOnly ? '' : ', plus the other selected transaction types'}` : ''}. The comparison below separates transaction frequency, the position’s share of league activity${coverage.trade_count ? ', and the recorded draft returns' : ''}${coverage.contract_count ? ', and contract APY relative to the league cap' : ''}.`;
-  const periodNote = `Comparing ${baseline} with ${recent}. ${query.team_ids.length ? `Team filter: ${query.team_ids.join(', ')} (either side of a transaction). ` : ''}${query.include_ytd ? `${query.end_year} is a partial year and is shown separately from the completed-year period comparison. ` : ''}Every value uses the selected historical scope.`;
+  const lead = `${number(coverage.event_count)} ${scope} player movements${tradeOnly && coverage.distinct_trade_count != null ? ` across ${number(coverage.distinct_trade_count)} trades` : ''}, ${query.start_year}–${query.end_year}.`;
+  const periodNote = `${query.team_ids.length ? `${query.team_ids.join(', ')} on either side of the transaction. ` : ''}${!tradeOnly ? `Includes ${query.transaction_types.map(type => type.replaceAll('_', ' ')).join(', ')}. ` : ''}${query.include_ytd ? `${query.end_year} is a partial year, excluded from the period comparison. ` : ''}${evidence.complete ? '' : 'Trade examples cover only the available sample.'}`.trim();
   return factualBody({
-    answer_layout: 'market_overview', answer: `${lead}\n\n${periodNote}`,
+    answer_layout: 'market_overview', answer: [lead, periodNote].filter(Boolean).join('\n\n'),
     key_findings: findings,
     tables: [{ title: 'Period comparison', columns: ['Position', 'Measure', baseline, recent, 'Change'], rows: comparisonRows, source_refs: refs(analysis) }],
     calculations: [],
     caveats: [
-      'Player events count recorded player movements; one trade can contain multiple player events. Draft-return percentages describe only allocable single-player trades, not every recorded package or the value of a current player.',
+      'Player movements count each player separately; a trade can include multiple players. Draft-return percentages use single-player trades with usable compensation, classified by the earliest returned round. Multi-player packages are excluded from these percentages.',
       ...(evidence.complete ? [] : [evidence.summary]),
       'Historical transactions do not establish current availability, asking prices or a forecast. Missing inputs remain unreported.',
       ...analysis.limitations,
@@ -105,8 +105,8 @@ export function marketExampleTrades(analysis: NflTransactionMarketAnalysis, year
   const selected = [...new Map((firstRound.length ? firstRound : trades).map(row => [row.trade_id ?? row.event_id, row])).values()];
   return {
     rows: selected.slice(0, 3),
-    title: year != null ? `${year} recorded trade packages` : firstRound.length ? 'Recorded trades returning a first-round pick' : 'Recent recorded trade packages',
-    selection: `${Math.min(3, selected.length)} ${evidence.complete ? 'latest qualifying trades in this cohort' : 'examples from the saved sample'}, ordered by recorded date.${firstRound.length ? ' Each includes a first-round pick received by the player’s former team.' : ''} Whole packages are shown on both sides.`,
+    title: year != null ? `${year} trade packages` : firstRound.length ? 'First-round returns' : 'Recent trade packages',
+    selection: `${Math.min(3, selected.length)} most recent${evidence.complete ? '' : ' in the available sample'}.`,
   };
 }
 
@@ -129,6 +129,7 @@ export function factualSellerAnswer(body: DataAnalysisBriefBody): DataAnalysisBr
   const capRows: DataAnalysisTable['rows'] = [[cap.current_year, money(cap.current_cap_number_dollars), money(cap.current_year_dead_money_dollars), money(cap.current_year_cap_space_created_dollars)]];
   if (next) capRows.push([next.year, money(next.scheduled_cap_dollars), money(next.accelerated_dead_money_dollars), money(next.cap_effect_dollars)]);
   const market = body.market_analysis;
+  const history = body.seller_move_analysis!.scenario.market_scope;
   const cohort = market ? nflTransactionMarketCohortEvidence(market).rows : [];
   const returns = result.comparables.map(row => {
     const full = cohort.find(event => event.event_id === row.event_id);
@@ -136,16 +137,37 @@ export function factualSellerAnswer(body: DataAnalysisBriefBody): DataAnalysisBr
   });
   return {
     ...body, answer_layout: 'trade_scenario',
-    answer: `For a proposed ${proposal.pick_year} round ${proposal.pick_round} return for ${player.player_name}, the recorded ${cap.current_year} contract calculation is ${money(cap.current_cap_number_dollars)} of scheduled cap charge − ${money(cap.current_year_dead_money_dollars)} of dead money = ${money(cap.current_year_cap_space_created_dollars)} of cap space created.${next ? `\n\nThe ${next.year} schedule is ${money(next.scheduled_cap_dollars)}; ${money(next.accelerated_dead_money_dollars)} would remain as accelerated dead money, giving a ${money(next.cap_effect_dollars)} cap-space effect in that year.` : ''}`,
+    answer: `Trading ${player.player_name} after June 1, ${cap.current_year} for an assumed ${proposal.pick_year} round ${proposal.pick_round} pick would create ${money(cap.current_year_cap_space_created_dollars)} in ${cap.current_year} cap space and leave ${money(cap.current_year_dead_money_dollars)} in dead money.${next ? ` The ${next.year} cap-space effect would be ${money(next.cap_effect_dollars)}, with ${money(next.accelerated_dead_money_dollars)} in dead money.` : ''}`,
     key_findings: [
-      { label: 'Scenario and timing', body: `${cap.accounting_timing}. The ${proposal.pick_year} round ${proposal.pick_round} pick is a user-supplied assumption, not an observed offer. Contract record: ${player.contract_as_of_date}.`, source_refs: [1, 3] },
-      { label: 'Historical return sample', body: `${result.market.range_label} ${result.market.sample_size} usable trades in ${result.market.cohort_label}. ${result.market.timing_note}`, source_refs: result.comparables.map((_, i) => i + 4) },
-      { label: 'Recorded 2025 usage', body: `${result.depth.basis} These records do not establish the current assignment, replacement suitability or medical availability.`, source_refs: [2] },
+      { label: 'Contract', body: `As of ${player.contract_as_of_date}.`, source_refs: [1, 3] },
+      { label: 'Trade history', body: `${result.market.sample_size} single-player ${player.position_group} trades with draft-pick returns, ${history.start_year}–${history.end_year}${history.include_ytd ? ' (including the partial year)' : ''}.${result.market.middle_range ? ` The strongest pick in the middle 50% of returns ranged from ${result.market.middle_range.stronger_pick} to ${result.market.middle_range.weaker_pick}.` : ' Too few usable trades to calculate a middle range.'}`, source_refs: result.comparables.map((_, i) => i + 4) },
+      { label: '2025 usage', body: result.depth.basis, source_refs: [2] },
     ],
     tables: [
-      { title: 'Contract accounting by year', columns: ['Year', 'Scheduled cap charge', 'Dead money under scenario', 'Cap space created'], rows: capRows, source_refs: [1, 3] },
-      ...(returns.length ? [{ title: 'Recorded historical packages in the comparison sample', columns: ['Player', 'Date', 'Move', 'Recorded assets on both sides'], rows: returns, source_refs: result.comparables.map((_, i) => i + 4) }] : []),
+      { title: 'Cap effect by year', columns: ['Year', 'Scheduled cap charge', 'Dead money', 'Cap space created'], rows: capRows, source_refs: [1, 3] },
+      ...(returns.length ? [{ title: 'Historical trade packages', columns: ['Player', 'Date', 'Move', 'Each team received'], rows: returns, source_refs: result.comparables.map((_, i) => i + 4) }] : []),
     ],
+  };
+}
+
+/** Keep earlier package answers readable while preserving their executed selection. */
+export function factualPackageAnswer(body: DataAnalysisBriefBody): DataAnalysisBriefBody {
+  const selection = body.historical_selection, market = body.market_analysis;
+  if (!selection || !market || !body.key_findings.length) return body;
+  if (selection.summary.startsWith('No selection executed:')) return {
+    ...body, key_findings: [],
+    answer: selection.summary.includes('requested subject')
+      ? 'I couldn’t find a trade for that player or team in this history.'
+      : 'I can’t apply that condition. You can filter by player, team, trade year, draft round or draft year.',
+  };
+  const evidence = nflTransactionMarketCohortEvidence(market);
+  const count = selection.event_ids.length;
+  const years = selection.years.length ? selection.years.join(', ') : `${market.query.start_year}–${market.query.end_year}`;
+  const filters = [selection.player_names.join(', '), selection.pick_years?.length ? `${selection.pick_years.join(', ')} draft` : '', selection.pick_rounds.length ? `Round ${selection.pick_rounds.join(', ')} pick received by the player’s former team` : '', selection.team_ids.length ? `${selection.team_ids.join(', ')} on either side` : '', selection.multi_player_only ? 'Multiple players in the trade' : ''].filter(Boolean);
+  return {
+    ...body,
+    answer: `${count} ${market.query.position_groups.join(', ') || 'NFL'} ${evidence.unidentifiedTradeEventCount ? 'trade records (some deal IDs are missing)' : count === 1 ? 'trade' : 'trades'}, ${years}.${evidence.complete ? '' : ' This is a partial sample; the full count is unavailable.'}`,
+    key_findings: filters.length ? [{ label: 'Filters', body: filters.join(' · '), source_refs: body.key_findings[0].source_refs }] : [],
   };
 }
 
@@ -153,6 +175,7 @@ export function factualSellerAnswer(body: DataAnalysisBriefBody): DataAnalysisBr
 export function factualAnswerPresentation(body: DataAnalysisBriefBody): DataAnalysisBriefBody {
   if (body.language_policy !== 'facts_only_v1') return body;
   if (body.seller_move_analysis?.result) return factualSellerAnswer(body);
+  if (body.answer_layout === 'trade_packages') return factualPackageAnswer(body);
   const legacyOverview = !body.key_findings.length && !body.tables.length && /^[\d,]+ matching player events from /.test(body.answer);
   if (body.market_analysis && (body.answer_layout === 'market_overview' || legacyOverview)) return factualMarketAnswer(body.market_analysis);
   return body;

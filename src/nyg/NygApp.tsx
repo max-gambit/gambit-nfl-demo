@@ -123,7 +123,7 @@ export function NygApp() {
       <nav aria-label="Primary navigation">{NAV.map((item) => <button key={item.id} className={view === item.id ? 'active' : ''} onClick={() => setView(item.id)}>{item.label}</button>)}</nav>
       <div className="nyg-header-actions"><span className="public-badge">Powered by <strong>Gambit.</strong></span></div>
     </header>
-    <div className="nyg-statusbar"><StatusDot status={health?.meeting_ready ? 'ready' : health ? 'blocked' : 'loading'} /><span>{health?.meeting_ready ? `Roster snapshot ${sourceDate ? formatDate(sourceDate) : 'the latest public update'}` : health ? 'Public data needs attention' : 'Checking public data'}</span><span> · Contract and cap totals retain their own source dates</span></div>
+    <div className="nyg-statusbar"><StatusDot status={health?.meeting_ready ? 'ready' : health ? 'blocked' : 'loading'} /><span>{health?.meeting_ready ? `Roster as of ${sourceDate ? formatDate(sourceDate) : 'the latest public update'}` : health ? 'Public data needs attention' : 'Checking public data'}</span></div>
     {error && <div className="nyg-alert" role="alert"><strong>Couldn’t load current data.</strong> {error} <button onClick={() => window.location.reload()}>Retry loading</button></div>}
     <main className={`nyg-main ${(view === 'analysis' || view === 'briefing') ? 'nyg-main-analysis' : ''}`}>
       {(view === 'analysis' || view === 'briefing') && <NygChatWorkspace showLibrary={view === 'briefing'} onOpenChat={() => setView('analysis')} />}

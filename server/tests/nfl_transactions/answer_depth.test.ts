@@ -12,8 +12,8 @@ const fixture = loadReviewedNflTransactionSnapshot().then(({ snapshot }) => anal
 
 test('market narrative, chart, percentages and whole-package examples reconcile to reviewed records', async () => {
   const market = await fixture, body = factualMarketAnswer(market);
-  assert.match(body.answer, /72 EDGE player trade events across 70 distinct trades/);
-  assert.match(body.key_findings[0].body, /16 player events across 701 roster player-seasons/);
+  assert.match(body.answer, /72 EDGE player movements across 70 trades/);
+  assert.match(body.key_findings[0].body, /16 player movements across 701 player-seasons/);
   assert.match(body.key_findings[1].body, /4 of 13/);
   assert.match(body.key_findings[1].body, /6 of 18/);
   assert.equal(marketAnnualRows(market).reduce((n, r) => n + r.events, 0), 72);
@@ -43,12 +43,12 @@ test('package questions preserve record filters, count distinct deals and do not
   for (const question of ['Show trades involving Casper Unknown.', 'What did Dallas get for Casper Unknown?', 'Show the Amari Cooper trade.']) {
     const unknown = historicalPackageAnswer(question, market);
     assert.equal(unknown.sources.length, 0);
-    assert.match(unknown.body.answer, /could not be matched/);
+    assert.match(unknown.body.answer, /couldn’t find a trade/);
   }
   const pickYear = historicalPackageAnswer('Which trades returned a 2027 first-round pick?', market);
   assert.deepEqual(pickYear.sources.map(source => source.title), ['Micah Parsons · 2025']);
   assert.deepEqual(pickYear.body.historical_selection!.pick_years, [2027]);
-  assert.match(historicalPackageAnswer('Which trades did not return a first-round pick?', market).body.answer, /condition is not supported/);
+  assert.match(historicalPackageAnswer('Which trades did not return a first-round pick?', market).body.answer, /can’t apply that condition/);
   const after = historicalPackageAnswer('Only trades after 2020.', market, firsts.body.historical_selection);
   assert.deepEqual(after.sources.map(source => source.title), ['Micah Parsons · 2025', 'Bradley Chubb · 2022']);
   const single = await buildNflFactualAnswer('Compare EDGE with IOL over the same period.', null, market, year.body.historical_selection);
