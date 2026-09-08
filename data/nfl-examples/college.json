@@ -1,0 +1,88 @@
+{
+  "schema": "nfl_examples_college.v1",
+  "captured_at": "2026-09-08T19:05:57.948189Z",
+  "draft_class": 2025,
+  "stat_season": 2024,
+  "status": "historical_draft_class",
+  "measurement_basis": "Official 2024 college roster listings; not combine measurements or current body measurements.",
+  "sources": [
+    {
+      "id": "warren",
+      "source_url": "https://gopsusports.com/sports/football/roster/season/2024/player/tyler-warren",
+      "title": "Penn State: Tyler Warren 2024 roster and season biography",
+      "effective_date": "2024 season",
+      "captured_at": "2026-09-08T19:05:57.948189Z",
+      "sha256": "41984087f4e832aa3b9a3d593dc815b29b896fff17a4449a31fc103a16eea4bc",
+      "bytes": 672602,
+      "last_modified": null
+    },
+    {
+      "id": "loveland",
+      "source_url": "https://mgoblue.com/sports/football/roster/colston-loveland/25486",
+      "title": "Michigan: Colston Loveland 2024 roster and season biography",
+      "effective_date": "2024 season",
+      "captured_at": "2026-09-08T19:05:57.948189Z",
+      "sha256": "5d6d36c1f047daa4dfe56e0e3152c12361e3ca0fb8d8bd2587575f7e3e0bfad1",
+      "bytes": 2103500,
+      "last_modified": "Tue, 08 Sep 2026 19:05:59 GMT"
+    },
+    {
+      "id": "scouting",
+      "source_url": "https://www.neworleanssaints.com/news/2025-nfl-draft-tight-end-rankings-tyler-warren-colston-loveland-te-scouting-reports-top-10-tuesday",
+      "title": "Lance Zierlein NFL.com draft assessments reproduced by Saints.com",
+      "effective_date": "2025-04-22",
+      "captured_at": "2026-09-08T19:05:57.948189Z",
+      "sha256": "050e4b2b38046d2782fbfe5a033af5bac028a603f2500dbd1cc7e6319ac6d89e",
+      "bytes": 461084,
+      "last_modified": null
+    }
+  ],
+  "players": [
+    {
+      "name": "Tyler Warren",
+      "school": "Penn State",
+      "position": "TE",
+      "games": 16,
+      "receptions": 104,
+      "receiving_yards": 1233,
+      "receiving_touchdowns": 8,
+      "height_inches": 78,
+      "weight_pounds": 261,
+      "stats_source_id": "warren",
+      "measurement_source_id": "warren",
+      "stats_locator": "2024 season biography: Season: Started 16 games",
+      "measurement_locator": "2024 roster header: Height 6-6 Weight 261 lbs",
+      "assessment": {
+        "author": "Lance Zierlein, NFL.com (reproduced by Saints.com)",
+        "source_id": "scouting",
+        "published_on": "2025-04-22",
+        "original_url": "https://www.nfl.com/prospects/tyler-warren/32005741-5271-7637-9a66-3790edc85a60",
+        "receiving": "Alignment flexibility and contested-catch strength; better suited to short and intermediate work, with limited vertical separation.",
+        "movement_blocking": "Effective lead/move blocker and direct-snap runner; in-line block sustain and hand placement need work."
+      }
+    },
+    {
+      "name": "Colston Loveland",
+      "school": "Michigan",
+      "position": "TE",
+      "games": 10,
+      "receptions": 56,
+      "receiving_yards": 582,
+      "receiving_touchdowns": 5,
+      "height_inches": 77,
+      "weight_pounds": 245,
+      "stats_source_id": "loveland",
+      "measurement_source_id": "loveland",
+      "stats_locator": "Junior (2024) biography: Appeared in 10 games with seven starts",
+      "measurement_locator": "2024 roster header: Height 6-5 Weight 245",
+      "assessment": {
+        "author": "Lance Zierlein, NFL.com (reproduced by Saints.com)",
+        "source_id": "scouting",
+        "published_on": "2025-04-22",
+        "original_url": "https://www.nfl.com/prospects/colston-loveland/32004c4f-5645-6221-1f26-a303114b69f8",
+        "receiving": "Broad route repertoire and man-coverage separation; route detail and footwork still need refinement.",
+        "movement_blocking": "Projected blocking ceiling around average; point-of-attack strength was a concern."
+      }
+    }
+  ]
+}

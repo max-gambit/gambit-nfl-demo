@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "reports": [
+    {"player_name":"Courtland Sutton","author":"Sean Payton, quoted by Aric DiLalla","date":"2025-07-28","source_url":"https://www.denverbroncos.com/news/broncos-sign-wr-courtland-sutton-to-4-year-contract-extension","observation":"Payton described Sutton as a strong target, praised his intelligence and identified him as a team leader.","kind":"attributed public assessment","scope":"Denver coach assessment at contract extension; not a Giants grade or a current trade offer"},
+    {"player_name":"Jakobi Meyers","author":"Bucky Brooks","date":"2026-03-02","source_url":"https://www.jaguars.com/news/k000589-2026-offseason-a-look-at-jaguars-wide-receivers","observation":"Brooks credited Meyers with dependable hands and reliable work between the hashes that helped Lawrence in Coen's offense.","kind":"attributed public assessment","scope":"Retrospective review of Jacksonville's 2025 offense; not a measured separation statistic or a Giants grade"}
+  ]
+}

@@ -23,7 +23,8 @@
     "qa:adversarial": "npm --prefix qa-harness run adversarial",
     "qa:reliability:nfl": "npm --prefix qa-harness run test:terra-judge && npm --prefix qa-harness run reliability:nfl",
     "qa:reliability:nfl:live": "npm --prefix qa-harness run test:terra-judge && npm --prefix qa-harness run reliability:nfl:live",
-    "demo:verify:nfl": "npm --prefix server run verify:nfl"
+    "demo:verify:nfl": "npm --prefix server run verify:nfl",
+    "present:thursday": "node scripts/present-thursday.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",

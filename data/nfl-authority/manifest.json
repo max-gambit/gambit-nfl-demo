@@ -1,0 +1,95 @@
+{
+  "schema": "nfl_authority.v1",
+  "league": "NFL",
+  "captured_at": "2026-09-08T19:05:45Z",
+  "coverage": "Page-bound text retrieval, not comprehensive or automatically consolidated current NFL authority.",
+  "sources": [
+    {
+      "id": "nfl-cba-2020-executed",
+      "league": "NFL",
+      "domain": "cba",
+      "title": "2020 NFL–NFLPA Collective Bargaining Agreement (executed March 15, 2020)",
+      "url": "https://nflpaweb.blob.core.windows.net/website/PDFs/CBA/March-15-2020-NFL-NFLPA-Collective-Bargaining-Agreement-Final-Executed-Copy.pdf",
+      "captured_at": "2026-09-08T19:05:45Z",
+      "sha256": "3bc66c14952ac1af0ff491731e6ab8c21dd2b284b650b1f2a97d943a3850ebee",
+      "document_date": "2020-03-15",
+      "edition_year": 2020,
+      "effective_years": [
+        2020,
+        2030
+      ],
+      "authority_boundary": "Executed 2020 agreement, including its dated and conditional provisions. Later amendments, side letters, current league personnel policies, and individual contracts are not comprehensively captured. The agreement's Final League Year is distinct from the final year of a player's contract.",
+      "pdf_page_count": 456,
+      "unindexed_pdf_pages": [
+        269,
+        270,
+        271,
+        350,
+        364,
+        440,
+        453,
+        454
+      ]
+    },
+    {
+      "id": "nfl-playing-rules-2026",
+      "league": "NFL",
+      "domain": "playing_rules",
+      "title": "2026 Official Playing Rules of the National Football League",
+      "url": "https://static.www.nfl.com/image/upload/fl_attachment/league/tqivdkzt9mu6wdgsh1ku.pdf",
+      "captured_at": "2026-09-08T19:05:45Z",
+      "sha256": "144cec5bffd2725bb703a26523f5ccf0b16c59c2fe5c13f6e671f4bddaa87c55",
+      "landing_url": "https://operations.nfl.com/rules-officiating/2026-nfl-rulebook",
+      "landing_sha256": "63ce15e07ba0df4dc0ca6cac56c8b1a217fa3ff36200622d2122a35c016f4c89",
+      "document_date": null,
+      "edition_year": 2026,
+      "effective_years": [
+        2026,
+        2026
+      ],
+      "authority_boundary": "2026 playing rules only, Rules 1–19. Not personnel or salary-cap authority. Later amendments and official case interpretations require separate verification.",
+      "pdf_page_count": 91,
+      "unindexed_pdf_pages": []
+    },
+    {
+      "id": "nfl-league-dates-2026-2027",
+      "league": "NFL",
+      "domain": "league_dates",
+      "title": "NFL Football Operations important dates (2026–2027 captured calendar)",
+      "url": "https://operations.nfl.com/calendar-events/nfl-important-dates",
+      "captured_at": "2026-09-08T19:05:45Z",
+      "sha256": "63bedebcc0db096112e33b62333ea56442f0a0a1a8197f6cf23d6d822c8dda83",
+      "document_date": null,
+      "edition_year": 2026,
+      "effective_years": [
+        2026,
+        2027
+      ],
+      "authority_boundary": "Only the dated entries present in this captured rolling calendar. All times Eastern; all dates are subject to change. Missing prior or future deadlines are not inferred."
+    },
+    {
+      "id": "nfl-contract-guarantees-guide",
+      "league": "NFL",
+      "domain": "cba",
+      "title": "NFL Football Operations contract language: Guaranteed money",
+      "url": "https://operations.nfl.com/calendar-events/nfl-free-agency/contract-language",
+      "captured_at": "2026-09-08T19:05:45Z",
+      "sha256": "71ca401e336b469b8df34f6c3aa7a95e6f1422ad8985a8cededa5339076d134f",
+      "document_date": null,
+      "edition_year": null,
+      "effective_years": [
+        2020,
+        2030
+      ],
+      "authority_boundary": "Official league explanatory guide, limited to its Guaranteed Money section. This is not executed CBA text or an individual contract; guarantee triggers, offsets, vesting and voiding depend on applicable terms."
+    }
+  ],
+  "index_file": "authority.json.gz",
+  "index_sha256": "d147336e9b6e569cc0a25b77932ab00dc5e864046b7c15557309b0eff5ae961f",
+  "passage_count": 1750,
+  "passages_by_domain": {
+    "cba": 1141,
+    "playing_rules": 555,
+    "league_dates": 54
+  }
+}

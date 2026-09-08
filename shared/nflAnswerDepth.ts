@@ -198,7 +198,7 @@ export function factualPackageAnswer(body: DataAnalysisBriefBody): DataAnalysisB
 
 /** Enrich earlier factual answers from their own saved data without refreshing or replacing it. */
 export function factualAnswerPresentation(body: DataAnalysisBriefBody): DataAnalysisBriefBody {
-  if (body.language_policy !== 'facts_only_v1') return body;
+  if (body.ai_analysis || body.language_policy !== 'facts_only_v1') return body;
   if (body.seller_move_analysis?.result) return factualSellerAnswer(body);
   if (body.answer_layout === 'trade_packages') return factualPackageAnswer(body);
   const legacyOverview = !body.key_findings.length && !body.tables.length && /^[\d,]+ matching player events from /.test(body.answer);

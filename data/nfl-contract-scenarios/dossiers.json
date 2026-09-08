@@ -1,0 +1,3020 @@
+{
+  "schema_version": 1,
+  "snapshot_as_of": "2026-09-07",
+  "dossiers": [
+    {
+      "player_id": "nfl:NYG:brian-burns",
+      "player_name": "Brian Burns",
+      "team_id": "NYG",
+      "roster_status_as_of_snapshot": "active",
+      "source_status": "reported",
+      "source_url": "https://overthecap.com/player/brian-burns/7807",
+      "inspected_at": "2026-09-08T19:16:39.549830+00:00",
+      "source_sha256": "912d749547e22c02c1b4123040178e7b42370eb7d5b87f087dc56c771c96d04b",
+      "snapshot_as_of": "2026-09-07",
+      "snapshot_ledger": [
+        {
+          "season": "2026",
+          "cap_number": 21383333,
+          "cash_due": 2800000,
+          "guaranteed_salary": 0,
+          "dead_money_cut": 55750000,
+          "post_june_1_dead_money_cut": 18583333,
+          "cut_savings": -34366667,
+          "post_june_1_cut_savings": 2800000,
+          "trade_dead_money": 55750000,
+          "trade_savings": -34366667,
+          "post_june_1_trade_dead_money": 18583333,
+          "post_june_1_trade_savings": 2800000,
+          "restructure_savings": 333333,
+          "extension_savings": 400000,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/brian-burns/7807/"
+        },
+        {
+          "season": "2027",
+          "cap_number": 44083333,
+          "cash_due": 25500000,
+          "guaranteed_salary": 0,
+          "dead_money_cut": 37166667,
+          "post_june_1_dead_money_cut": 18583333,
+          "cut_savings": 6916666,
+          "post_june_1_cut_savings": 25500000,
+          "trade_dead_money": 37166667,
+          "trade_savings": 6916666,
+          "post_june_1_trade_dead_money": 18583333,
+          "post_june_1_trade_savings": 25500000,
+          "restructure_savings": 11577500,
+          "extension_savings": 18524000,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/brian-burns/7807/"
+        },
+        {
+          "season": "2028",
+          "cap_number": 44083334,
+          "cash_due": 25500000,
+          "guaranteed_salary": 0,
+          "dead_money_cut": 18583334,
+          "post_june_1_dead_money_cut": 18583334,
+          "cut_savings": 25500000,
+          "post_june_1_cut_savings": 25500000,
+          "trade_dead_money": 18583334,
+          "trade_savings": 25500000,
+          "post_june_1_trade_dead_money": 18583334,
+          "post_june_1_trade_savings": 25500000,
+          "restructure_savings": 0,
+          "extension_savings": 18488000,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/brian-burns/7807/"
+        }
+      ],
+      "reported_2026_cash_payout": 25550000,
+      "reported_years": [
+        {
+          "year": 2024,
+          "year_annotation": "2024",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 8000000,
+            "Prorated Signing Bonus": 7000000,
+            "Roster Bonus Regular": 0,
+            "Roster Bonus Per Game": 0,
+            "Workout Bonus": 500000,
+            "Guaranteed Salary": 8000000,
+            "Cap Number": 15500000
+          },
+          "reported_dead": {},
+          "reported_savings": {}
+        },
+        {
+          "year": 2025,
+          "year_annotation": "2025 \ud83d\udcdd March 17 : $11.5 million of 2026 salary is fully guaranteed",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 6250000,
+            "Prorated Signing Bonus": 11000000,
+            "Roster Bonus Regular": 0,
+            "Roster Bonus Per Game": 0,
+            "Workout Bonus": 500000,
+            "Guaranteed Salary": 6250000,
+            "Cap Number": 17750000
+          },
+          "reported_dead": {},
+          "reported_savings": {}
+        },
+        {
+          "year": 2026,
+          "year_annotation": "2026 \ud83d\udcdd March 15 : Roster bonus due",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 1300000,
+            "Prorated Signing Bonus": 18583333,
+            "Roster Bonus Regular": 0,
+            "Roster Bonus Per Game": 1000000,
+            "Workout Bonus": 500000,
+            "Guaranteed Salary": 0,
+            "Cap Number": 21383333
+          },
+          "reported_dead": {
+            "cut": 55750000,
+            "june_1_cut": 18583333,
+            "trade": 55750000,
+            "june_1_trade": 18583333,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": -34366667,
+            "june_1_cut": 2800000,
+            "trade": -34366667,
+            "june_1_trade": 2800000,
+            "restructure": 333333,
+            "extension": 400000
+          }
+        },
+        {
+          "year": 2027,
+          "year_annotation": "2027 \ud83d\udcdd March 17 : Roster bonus due",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 21500000,
+            "Prorated Signing Bonus": 18583333,
+            "Roster Bonus Regular": 2500000,
+            "Roster Bonus Per Game": 1000000,
+            "Workout Bonus": 500000,
+            "Guaranteed Salary": 0,
+            "Cap Number": 44083333
+          },
+          "reported_dead": {
+            "cut": 37166667,
+            "june_1_cut": 18583333,
+            "trade": 37166667,
+            "june_1_trade": 18583333,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": 6916666,
+            "june_1_cut": 25500000,
+            "trade": 6916666,
+            "june_1_trade": 25500000,
+            "restructure": 11577500,
+            "extension": 18524000
+          }
+        },
+        {
+          "year": 2028,
+          "year_annotation": "2028",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 21500000,
+            "Prorated Signing Bonus": 18583334,
+            "Roster Bonus Regular": 2500000,
+            "Roster Bonus Per Game": 1000000,
+            "Workout Bonus": 500000,
+            "Guaranteed Salary": 0,
+            "Cap Number": 44083334
+          },
+          "reported_dead": {
+            "cut": 18583334,
+            "june_1_cut": 18583334,
+            "trade": 18583334,
+            "june_1_trade": 18583334,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": 25500000,
+            "june_1_cut": 25500000,
+            "trade": 25500000,
+            "june_1_trade": 25500000,
+            "restructure": 0,
+            "extension": 18488000
+          }
+        }
+      ],
+      "conflicts": [],
+      "source_tables": [
+        {
+          "section": "(Franchise, signed 2024)",
+          "table_attributes": "class=\"contract current-contract player-new\"",
+          "rows": [
+            [
+              "Year",
+              "Age",
+              "Base Salary",
+              "Prorated Signing Bonus",
+              "Roster Bonus",
+              "Workout Bonus",
+              "",
+              "Guaranteed Salary",
+              "",
+              "Cap Number",
+              "Cap %",
+              "",
+              "Dead Money & Cap Savings Cut (pre-June 1) Cut (post-June 1) Trade (pre-June 1) Trade (post-June 1) Restructure Extension"
+            ],
+            [
+              "Regular",
+              "Per Game"
+            ],
+            [
+              "2024",
+              "26",
+              "$8,000,000",
+              "$7,000,000",
+              "$0",
+              "$0",
+              "$500,000",
+              "",
+              "$8,000,000",
+              "",
+              "$15,500,000",
+              "6.0%",
+              "",
+              "",
+              ""
+            ],
+            [
+              "2025 \ud83d\udcdd March 17 : $11.5 million of 2026 salary is fully guaranteed",
+              "27",
+              "$6,250,000",
+              "$11,000,000",
+              "$0",
+              "$0",
+              "$500,000",
+              "",
+              "$6,250,000",
+              "",
+              "$17,750,000",
+              "6.1%",
+              "",
+              "",
+              ""
+            ],
+            [
+              "2026 \ud83d\udcdd March 15 : Roster bonus due",
+              "28",
+              "$1,300,000",
+              "$18,583,333",
+              "$0",
+              "$1,000,000",
+              "$500,000",
+              "",
+              "$0",
+              "",
+              "$21,383,333",
+              "7.1%",
+              "",
+              "$55,750,000 $18,583,333 $55,750,000 $18,583,333 $0 $0",
+              "($34,366,667) $2,800,000 ($34,366,667) $2,800,000 $333,333 $400,000"
+            ],
+            [
+              "2027 \ud83d\udcdd March 17 : Roster bonus due",
+              "29",
+              "$21,500,000",
+              "$18,583,333",
+              "$2,500,000",
+              "$1,000,000",
+              "$500,000",
+              "",
+              "$0",
+              "",
+              "$44,083,333",
+              "13.5%",
+              "",
+              "$37,166,667 $18,583,333 $37,166,667 $18,583,333 $0 $0",
+              "$6,916,666 $25,500,000 $6,916,666 $25,500,000 $11,577,500 $18,524,000"
+            ],
+            [
+              "2028",
+              "30",
+              "$21,500,000",
+              "$18,583,334",
+              "$2,500,000",
+              "$1,000,000",
+              "$500,000",
+              "",
+              "$0",
+              "",
+              "$44,083,334",
+              "12.5%",
+              "",
+              "$18,583,334 $18,583,334 $18,583,334 $18,583,334 $0 $0",
+              "$25,500,000 $25,500,000 $25,500,000 $25,500,000 $0 $18,488,000"
+            ],
+            [
+              "Total",
+              "",
+              "$58,550,000",
+              "$73,750,000",
+              "$5,000,000",
+              "$3,000,000",
+              "$2,500,000",
+              "",
+              "$14,250,000",
+              "",
+              "$142,800,000",
+              "",
+              "",
+              ""
+            ]
+          ]
+        },
+        {
+          "section": "Cash Flows",
+          "table_attributes": "class=\"sortable cash-flow-table\"",
+          "rows": [
+            [
+              "",
+              "2024",
+              "2025",
+              "2026",
+              "2027",
+              "2028"
+            ],
+            [
+              "Cash Due",
+              "$43,500,000",
+              "$22,750,000",
+              "$23,750,000",
+              "$25,500,000",
+              "$25,500,000"
+            ],
+            [
+              "Running Cash",
+              "$43,500,000",
+              "$66,250,000",
+              "$90,000,000",
+              "$115,500,000",
+              "$141,000,000"
+            ]
+          ]
+        },
+        {
+          "section": "Contract History",
+          "table_attributes": "class=\"sortable\"",
+          "rows": [
+            [
+              "Team",
+              "Contract Type",
+              "Status",
+              "Year Signed",
+              "Yrs",
+              "Total",
+              "APY",
+              "Guarantees",
+              "Amount Earned",
+              "% Earned",
+              "Effective APY"
+            ],
+            [
+              "Panthers",
+              "Drafted",
+              "Expired",
+              "2019",
+              "4",
+              "$13,540,182",
+              "$3,385,046",
+              "$13,540,182",
+              "$29,552,182",
+              "218.3%",
+              "$5,910,436"
+            ],
+            [
+              "Panthers",
+              "Franchise",
+              "Traded",
+              "2024",
+              "1",
+              "$24,007,000",
+              "$24,007,000",
+              "$0",
+              "$0",
+              "0.0%",
+              "$0"
+            ],
+            [
+              "Giants",
+              "Franchise",
+              "Active",
+              "2024",
+              "5",
+              "$141,000,000",
+              "$28,200,000",
+              "$76,000,000",
+              "$68,050,000",
+              "48.3%",
+              "$34,025,000"
+            ]
+          ]
+        }
+      ],
+      "unknown_fields": [
+        "Executed contract and amendments",
+        "Paid versus unpaid compensation at the hypothetical transaction time",
+        "Guarantee conditions, offsets, injury protection and termination-pay eligibility",
+        "Option exercise/payment status and incentive classification at the transaction time",
+        "Club/player consent, trade availability and negotiated compensation"
+      ],
+      "availability": "not_established"
+    },
+    {
+      "player_id": "nfl:NYG:andrew-thomas",
+      "player_name": "Andrew Thomas",
+      "team_id": "NYG",
+      "roster_status_as_of_snapshot": "active",
+      "source_status": "reported",
+      "source_url": "https://overthecap.com/player/andrew-thomas/8744",
+      "inspected_at": "2026-09-08T19:16:39.753398+00:00",
+      "source_sha256": "b1e8935648af9ae8549ac5cfd69d3cd3444f4356d65769ba93df2abc6fd5fe40",
+      "snapshot_as_of": "2026-09-07",
+      "snapshot_ledger": [
+        {
+          "season": "2026",
+          "cap_number": 13031956,
+          "cash_due": 2715000,
+          "guaranteed_salary": 7825000,
+          "dead_money_cut": 43219000,
+          "post_june_1_dead_money_cut": 18387250,
+          "cut_savings": -30187044,
+          "post_june_1_cut_savings": -5355294,
+          "trade_dead_money": 35394000,
+          "trade_savings": -22362044,
+          "post_june_1_trade_dead_money": 10562250,
+          "post_june_1_trade_savings": 2469706,
+          "restructure_savings": 375000,
+          "extension_savings": 400000,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/andrew-thomas/8744/"
+        },
+        {
+          "season": "2027",
+          "cap_number": 29952250,
+          "cash_due": 19400000,
+          "guaranteed_salary": 0,
+          "dead_money_cut": 24831750,
+          "post_june_1_dead_money_cut": 10562250,
+          "cut_savings": 5120500,
+          "post_june_1_cut_savings": 19390000,
+          "trade_dead_money": 24831750,
+          "trade_savings": 5120500,
+          "post_june_1_trade_dead_money": 10562250,
+          "post_june_1_trade_savings": 19390000,
+          "restructure_savings": 11426667,
+          "extension_savings": 13712000,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/andrew-thomas/8744/"
+        },
+        {
+          "season": "2028",
+          "cap_number": 29952250,
+          "cash_due": 22400000,
+          "guaranteed_salary": 0,
+          "dead_money_cut": 14269500,
+          "post_june_1_dead_money_cut": 7552250,
+          "cut_savings": 15682750,
+          "post_june_1_cut_savings": 22400000,
+          "trade_dead_money": 14269500,
+          "trade_savings": 15682750,
+          "post_june_1_trade_dead_money": 7552250,
+          "post_june_1_trade_savings": 22400000,
+          "restructure_savings": 10047500,
+          "extension_savings": 16076000,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/andrew-thomas/8744/"
+        },
+        {
+          "season": "2029",
+          "cap_number": 29617250,
+          "cash_due": 22900000,
+          "guaranteed_salary": 0,
+          "dead_money_cut": 6717250,
+          "post_june_1_dead_money_cut": 6717250,
+          "cut_savings": 22900000,
+          "post_june_1_cut_savings": 22900000,
+          "trade_dead_money": 6717250,
+          "trade_savings": 22900000,
+          "post_june_1_trade_dead_money": 6717250,
+          "post_june_1_trade_savings": 22900000,
+          "restructure_savings": 0,
+          "extension_savings": 16440000,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/andrew-thomas/8744/"
+        }
+      ],
+      "reported_2026_cash_payout": 17400000,
+      "reported_years": [
+        {
+          "year": 2023,
+          "year_annotation": "2023",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 1020762,
+            "Prorated Signing Bonus": 8271016,
+            "Roster Bonus Regular": 0,
+            "Roster Bonus Per Game": 0,
+            "Workout Bonus": 0,
+            "Guaranteed Salary": 1020762,
+            "Cap Number": 9291778
+          },
+          "reported_dead": {},
+          "reported_savings": {}
+        },
+        {
+          "year": 2024,
+          "year_annotation": "2024",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 10000000,
+            "Prorated Signing Bonus": 3835000,
+            "Roster Bonus Regular": 5000000,
+            "Roster Bonus Per Game": 1000000,
+            "Workout Bonus": 500000,
+            "Guaranteed Salary": 15000000,
+            "Cap Number": 19923235
+          },
+          "reported_dead": {},
+          "reported_savings": {}
+        },
+        {
+          "year": 2025,
+          "year_annotation": "2025",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 1170000,
+            "Prorated Signing Bonus": 6881000,
+            "Roster Bonus Regular": 0,
+            "Roster Bonus Per Game": 1000000,
+            "Workout Bonus": 500000,
+            "Guaranteed Salary": 1170000,
+            "Cap Number": 9315706
+          },
+          "reported_dead": {},
+          "reported_savings": {}
+        },
+        {
+          "year": 2026,
+          "year_annotation": "2026",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 1215000,
+            "Prorated Signing Bonus": 10562250,
+            "Roster Bonus Regular": 0,
+            "Roster Bonus Per Game": 1000000,
+            "Workout Bonus": 500000,
+            "Guaranteed Salary": 7825000,
+            "Cap Number": 13031956
+          },
+          "reported_dead": {
+            "cut": 43219000,
+            "june_1_cut": 18387250,
+            "trade": 35394000,
+            "june_1_trade": 10562250,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": -30187044,
+            "june_1_cut": -5355294,
+            "trade": -22362044,
+            "june_1_trade": 2469706,
+            "restructure": 375000,
+            "extension": 400000
+          }
+        },
+        {
+          "year": 2027,
+          "year_annotation": "2027 \ud83d\udcdd March 19 : Roster bonus due",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 15400000,
+            "Prorated Signing Bonus": 10562250,
+            "Roster Bonus Regular": 2500000,
+            "Roster Bonus Per Game": 1000000,
+            "Workout Bonus": 500000,
+            "Guaranteed Salary": 0,
+            "Cap Number": 29952250
+          },
+          "reported_dead": {
+            "cut": 24831750,
+            "june_1_cut": 10562250,
+            "trade": 24831750,
+            "june_1_trade": 10562250,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": 5120500,
+            "june_1_cut": 19390000,
+            "trade": 5120500,
+            "june_1_trade": 19390000,
+            "restructure": 11426667,
+            "extension": 13712000
+          }
+        },
+        {
+          "year": 2028,
+          "year_annotation": "2028 \ud83d\udcdd March 19 : Roster bonus due",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 18400000,
+            "Prorated Signing Bonus": 7552250,
+            "Roster Bonus Regular": 2500000,
+            "Roster Bonus Per Game": 1000000,
+            "Workout Bonus": 500000,
+            "Guaranteed Salary": 0,
+            "Cap Number": 29952250
+          },
+          "reported_dead": {
+            "cut": 14269500,
+            "june_1_cut": 7552250,
+            "trade": 14269500,
+            "june_1_trade": 7552250,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": 15682750,
+            "june_1_cut": 22400000,
+            "trade": 15682750,
+            "june_1_trade": 22400000,
+            "restructure": 10047500,
+            "extension": 16076000
+          }
+        },
+        {
+          "year": 2029,
+          "year_annotation": "2029 \ud83d\udcdd March 19 : Roster bonus due",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 18900000,
+            "Prorated Signing Bonus": 6717250,
+            "Roster Bonus Regular": 2500000,
+            "Roster Bonus Per Game": 1000000,
+            "Workout Bonus": 500000,
+            "Guaranteed Salary": 0,
+            "Cap Number": 29617250
+          },
+          "reported_dead": {
+            "cut": 6717250,
+            "june_1_cut": 6717250,
+            "trade": 6717250,
+            "june_1_trade": 6717250,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": 22900000,
+            "june_1_cut": 22900000,
+            "trade": 22900000,
+            "june_1_trade": 22900000,
+            "restructure": 0,
+            "extension": 16440000
+          }
+        }
+      ],
+      "conflicts": [],
+      "source_tables": [
+        {
+          "section": "(Extension, signed 2023)",
+          "table_attributes": "class=\"contract current-contract player-new\"",
+          "rows": [
+            [
+              "Year",
+              "Age",
+              "Base Salary",
+              "Prorated Signing Bonus",
+              "Roster Bonus",
+              "Workout Bonus",
+              "",
+              "Guaranteed Salary",
+              "",
+              "Cap Number",
+              "Cap %",
+              "",
+              "Dead Money & Cap Savings Cut (pre-June 1) Cut (post-June 1) Trade (pre-June 1) Trade (post-June 1) Restructure Extension"
+            ],
+            [
+              "Regular",
+              "Per Game"
+            ],
+            [
+              "2023",
+              "24",
+              "$1,020,762",
+              "$8,271,016",
+              "$0",
+              "$0",
+              "$0",
+              "",
+              "$1,020,762",
+              "",
+              "$9,291,778",
+              "4.1%",
+              "",
+              "",
+              ""
+            ],
+            [
+              "2024",
+              "25",
+              "$10,000,000",
+              "$3,835,000",
+              "$5,000,000",
+              "$1,000,000",
+              "$500,000",
+              "",
+              "$15,000,000",
+              "",
+              "$19,923,235",
+              "7.7%",
+              "",
+              "",
+              ""
+            ],
+            [
+              "2025",
+              "26",
+              "$1,170,000",
+              "$6,881,000",
+              "$0",
+              "$1,000,000",
+              "$500,000",
+              "",
+              "$1,170,000",
+              "",
+              "$9,315,706",
+              "3.2%",
+              "",
+              "",
+              ""
+            ],
+            [
+              "2026",
+              "27",
+              "$1,215,000",
+              "$10,562,250",
+              "$0",
+              "$1,000,000",
+              "$500,000",
+              "",
+              "$7,825,000",
+              "",
+              "$13,031,956",
+              "4.3%",
+              "",
+              "$43,219,000 $18,387,250 $35,394,000 $10,562,250 $0 $0",
+              "($30,187,044) ($5,355,294) ($22,362,044) $2,469,706 $375,000 $400,000"
+            ],
+            [
+              "2027 \ud83d\udcdd March 19 : Roster bonus due",
+              "28",
+              "$15,400,000",
+              "$10,562,250",
+              "$2,500,000",
+              "$1,000,000",
+              "$500,000",
+              "",
+              "$0",
+              "",
+              "$29,952,250",
+              "9.2%",
+              "",
+              "$24,831,750 $10,562,250 $24,831,750 $10,562,250 $0 $0",
+              "$5,120,500 $19,390,000 $5,120,500 $19,390,000 $11,426,667 $13,712,000"
+            ],
+            [
+              "2028 \ud83d\udcdd March 19 : Roster bonus due",
+              "29",
+              "$18,400,000",
+              "$7,552,250",
+              "$2,500,000",
+              "$1,000,000",
+              "$500,000",
+              "",
+              "$0",
+              "",
+              "$29,952,250",
+              "8.5%",
+              "",
+              "$14,269,500 $7,552,250 $14,269,500 $7,552,250 $0 $0",
+              "$15,682,750 $22,400,000 $15,682,750 $22,400,000 $10,047,500 $16,076,000"
+            ],
+            [
+              "2029 \ud83d\udcdd March 19 : Roster bonus due",
+              "30",
+              "$18,900,000",
+              "$6,717,250",
+              "$2,500,000",
+              "$1,000,000",
+              "$500,000",
+              "",
+              "$0",
+              "",
+              "$29,617,250",
+              "--",
+              "",
+              "$6,717,250 $6,717,250 $6,717,250 $6,717,250 $0 $0",
+              "$22,900,000 $22,900,000 $22,900,000 $22,900,000 $0 $16,440,000"
+            ],
+            [
+              "Total",
+              "",
+              "$66,105,762",
+              "$54,381,016",
+              "$12,500,000",
+              "$6,000,000",
+              "$3,000,000",
+              "",
+              "$25,015,762",
+              "",
+              "$141,084,425",
+              "",
+              "",
+              ""
+            ]
+          ]
+        },
+        {
+          "section": "Cash Flows",
+          "table_attributes": "class=\"sortable cash-flow-table\"",
+          "rows": [
+            [
+              "",
+              "2023",
+              "2024",
+              "2025",
+              "2026",
+              "2027",
+              "2028",
+              "2029"
+            ],
+            [
+              "Cash Due",
+              "$11,000,000",
+              "$6,500,000",
+              "$17,900,000",
+              "$17,400,000",
+              "$19,400,000",
+              "$22,400,000",
+              "$22,900,000"
+            ],
+            [
+              "Running Cash",
+              "$11,000,000",
+              "$17,500,000",
+              "$35,400,000",
+              "$52,800,000",
+              "$72,200,000",
+              "$94,600,000",
+              "$117,500,000"
+            ]
+          ]
+        },
+        {
+          "section": "Contract History",
+          "table_attributes": "class=\"sortable\"",
+          "rows": [
+            [
+              "Team",
+              "Contract Type",
+              "Status",
+              "Year Signed",
+              "Yrs",
+              "Total",
+              "APY",
+              "Guarantees",
+              "Amount Earned",
+              "% Earned",
+              "Effective APY"
+            ],
+            [
+              "Giants",
+              "Drafted",
+              "Extended",
+              "2020",
+              "4",
+              "$32,345,588",
+              "$8,086,397",
+              "$32,345,588",
+              "$27,324,826",
+              "84.5%",
+              "$9,108,275"
+            ],
+            [
+              "Giants",
+              "Extension",
+              "Active",
+              "2023",
+              "5",
+              "$117,500,000",
+              "$23,500,000",
+              "$67,000,000",
+              "$53,948,703",
+              "45.9%",
+              "$17,982,901"
+            ]
+          ]
+        }
+      ],
+      "unknown_fields": [
+        "Executed contract and amendments",
+        "Paid versus unpaid compensation at the hypothetical transaction time",
+        "Guarantee conditions, offsets, injury protection and termination-pay eligibility",
+        "Option exercise/payment status and incentive classification at the transaction time",
+        "Club/player consent, trade availability and negotiated compensation"
+      ],
+      "availability": "not_established"
+    },
+    {
+      "player_id": "nfl:NYG:paulson-adebo",
+      "player_name": "Paulson Adebo",
+      "team_id": "NYG",
+      "roster_status_as_of_snapshot": "active",
+      "source_status": "reported",
+      "source_url": "https://overthecap.com/player/paulson-adebo/9540",
+      "inspected_at": "2026-09-08T19:16:40.045360+00:00",
+      "source_sha256": "6ba4d6a6b6c011a49da574056f676d0991fa6bd3fc59bbe1e2ae2a58f2db04c0",
+      "snapshot_as_of": "2026-09-07",
+      "snapshot_ledger": [
+        {
+          "season": "2026",
+          "cap_number": 24199390,
+          "cash_due": 18000000,
+          "guaranteed_salary": 17250000,
+          "dead_money_cut": 29884074,
+          "post_june_1_dead_money_cut": 23567037,
+          "cut_savings": -5684684,
+          "post_june_1_cut_savings": 632353,
+          "trade_dead_money": 12634074,
+          "trade_savings": 11565316,
+          "post_june_1_trade_dead_money": 6317037,
+          "post_june_1_trade_savings": 17882353,
+          "restructure_savings": 8142500,
+          "extension_savings": 13028000,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/paulson-adebo/9540/"
+        },
+        {
+          "season": "2027",
+          "cap_number": 20317037,
+          "cash_due": 14000000,
+          "guaranteed_salary": 0,
+          "dead_money_cut": 6317037,
+          "post_june_1_dead_money_cut": 6317037,
+          "cut_savings": 14000000,
+          "post_june_1_cut_savings": 14000000,
+          "trade_dead_money": 6317037,
+          "trade_savings": 14000000,
+          "post_june_1_trade_dead_money": 6317037,
+          "post_june_1_trade_savings": 14000000,
+          "restructure_savings": 0,
+          "extension_savings": 9792000,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/paulson-adebo/9540/"
+        }
+      ],
+      "reported_2026_cash_payout": 17750000,
+      "reported_years": [
+        {
+          "year": 2025,
+          "year_annotation": "2025",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 2863333,
+            "Prorated Signing Bonus": 6317037,
+            "Roster Bonus Regular": 0,
+            "Roster Bonus Per Game": 500000,
+            "Workout Bonus": 250000,
+            "Guaranteed Salary": 2863333,
+            "Cap Number": 9248379
+          },
+          "reported_dead": {},
+          "reported_savings": {}
+        },
+        {
+          "year": 2026,
+          "year_annotation": "2026 \ud83d\udcdd March 15 : $3.75M is guaranteed",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 17250000,
+            "Prorated Signing Bonus": 6317037,
+            "Roster Bonus Regular": 0,
+            "Roster Bonus Per Game": 500000,
+            "Workout Bonus": 250000,
+            "Guaranteed Salary": 17250000,
+            "Cap Number": 24199390
+          },
+          "reported_dead": {
+            "cut": 29884074,
+            "june_1_cut": 23567037,
+            "trade": 12634074,
+            "june_1_trade": 6317037,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": -5684684,
+            "june_1_cut": 632353,
+            "trade": 11565316,
+            "june_1_trade": 17882353,
+            "restructure": 8142500,
+            "extension": 13028000
+          }
+        },
+        {
+          "year": 2027,
+          "year_annotation": "2027 \ud83d\udcdd March 17 : Roster bonus due",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 10250000,
+            "Prorated Signing Bonus": 6317037,
+            "Roster Bonus Regular": 3000000,
+            "Roster Bonus Per Game": 500000,
+            "Workout Bonus": 250000,
+            "Guaranteed Salary": 0,
+            "Cap Number": 20317037
+          },
+          "reported_dead": {
+            "cut": 6317037,
+            "june_1_cut": 6317037,
+            "trade": 6317037,
+            "june_1_trade": 6317037,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": 14000000,
+            "june_1_cut": 14000000,
+            "trade": 14000000,
+            "june_1_trade": 14000000,
+            "restructure": 0,
+            "extension": 9792000
+          }
+        }
+      ],
+      "conflicts": [],
+      "source_tables": [
+        {
+          "section": "(UFA, signed 2025)",
+          "table_attributes": "class=\"contract current-contract player-new\"",
+          "rows": [
+            [
+              "Year",
+              "Age",
+              "Base Salary",
+              "Prorated Signing Bonus",
+              "Roster Bonus",
+              "Workout Bonus",
+              "",
+              "Guaranteed Salary",
+              "",
+              "Cap Number",
+              "Cap %",
+              "",
+              "Dead Money & Cap Savings Cut (pre-June 1) Cut (post-June 1) Trade (pre-June 1) Trade (post-June 1) Restructure Extension"
+            ],
+            [
+              "Regular",
+              "Per Game"
+            ],
+            [
+              "2025",
+              "26",
+              "$2,863,333",
+              "$6,317,037",
+              "$0",
+              "$500,000",
+              "$250,000",
+              "",
+              "$2,863,333",
+              "",
+              "$9,248,379",
+              "3.2%",
+              "",
+              "",
+              ""
+            ],
+            [
+              "2026 \ud83d\udcdd March 15 : $3.75M is guaranteed",
+              "27",
+              "$17,250,000",
+              "$6,317,037",
+              "$0",
+              "$500,000",
+              "$250,000",
+              "",
+              "$17,250,000",
+              "",
+              "$24,199,390",
+              "8.1%",
+              "",
+              "$29,884,074 $23,567,037 $12,634,074 $6,317,037 $0 $0",
+              "($5,684,684) $632,353 $11,565,316 $17,882,353 $8,142,500 $13,028,000"
+            ],
+            [
+              "2027 \ud83d\udcdd March 17 : Roster bonus due",
+              "28",
+              "$10,250,000",
+              "$6,317,037",
+              "$3,000,000",
+              "$500,000",
+              "$250,000",
+              "",
+              "$0",
+              "",
+              "$20,317,037",
+              "6.2%",
+              "",
+              "$6,317,037 $6,317,037 $6,317,037 $6,317,037 $0 $0",
+              "$14,000,000 $14,000,000 $14,000,000 $14,000,000 $0 $9,792,000"
+            ],
+            [
+              "Total",
+              "",
+              "$30,363,333",
+              "$18,951,111",
+              "$3,000,000",
+              "$1,500,000",
+              "$750,000",
+              "",
+              "$20,113,333",
+              "",
+              "$53,764,806",
+              "",
+              "",
+              ""
+            ]
+          ]
+        },
+        {
+          "section": "Cash Flows",
+          "table_attributes": "class=\"sortable cash-flow-table\"",
+          "rows": [
+            [
+              "",
+              "2025",
+              "2026",
+              "2027"
+            ],
+            [
+              "Cash Due",
+              "$22,000,000",
+              "$18,000,000",
+              "$14,000,000"
+            ],
+            [
+              "Running Cash",
+              "$22,000,000",
+              "$40,000,000",
+              "$54,000,000"
+            ]
+          ]
+        },
+        {
+          "section": "Contract History",
+          "table_attributes": "class=\"sortable\"",
+          "rows": [
+            [
+              "Team",
+              "Contract Type",
+              "Status",
+              "Year Signed",
+              "Yrs",
+              "Total",
+              "APY",
+              "Guarantees",
+              "Amount Earned",
+              "% Earned",
+              "Effective APY"
+            ],
+            [
+              "Saints",
+              "Drafted",
+              "Expired",
+              "2021",
+              "4",
+              "$5,045,010",
+              "$1,261,250",
+              "$1,029,096",
+              "$7,063,053",
+              "140.0%",
+              "$1,765,763"
+            ],
+            [
+              "Giants",
+              "UFA",
+              "Active",
+              "2025",
+              "3",
+              "$54,000,000",
+              "$18,000,000",
+              "$34,750,000",
+              "$21,882,353",
+              "40.5%",
+              "$21,882,353"
+            ]
+          ]
+        }
+      ],
+      "unknown_fields": [
+        "Executed contract and amendments",
+        "Paid versus unpaid compensation at the hypothetical transaction time",
+        "Guarantee conditions, offsets, injury protection and termination-pay eligibility",
+        "Option exercise/payment status and incentive classification at the transaction time",
+        "Club/player consent, trade availability and negotiated compensation"
+      ],
+      "availability": "not_established"
+    },
+    {
+      "player_id": "nfl:NYG:jon-runyan-2",
+      "player_name": "Jon Runyan",
+      "team_id": "NYG",
+      "roster_status_as_of_snapshot": "active",
+      "source_status": "reported",
+      "source_url": "https://overthecap.com/player/jon-runyan-jr/8932",
+      "inspected_at": "2026-09-08T19:16:40.227216+00:00",
+      "source_sha256": "11f1a4905cf7605e772b43819501fa1d5f529d57d7b00abaa31c1287938564a7",
+      "snapshot_as_of": "2026-09-07",
+      "snapshot_ledger": [
+        {
+          "season": "2026",
+          "cap_number": 11750000,
+          "cash_due": 9250000,
+          "guaranteed_salary": 0,
+          "dead_money_cut": 2500000,
+          "post_june_1_dead_money_cut": 2500000,
+          "cut_savings": 9250000,
+          "post_june_1_cut_savings": 9250000,
+          "trade_dead_money": 2500000,
+          "trade_savings": 9250000,
+          "post_june_1_trade_dead_money": 2500000,
+          "post_june_1_trade_savings": 9250000,
+          "restructure_savings": 0,
+          "extension_savings": 6428000,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/jon-runyan-jr/8932/"
+        }
+      ],
+      "reported_2026_cash_payout": 9000000,
+      "reported_years": [
+        {
+          "year": 2024,
+          "year_annotation": "2024",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 3750000,
+            "Prorated Signing Bonus": 2500000,
+            "Workout Bonus": 250000,
+            "Guaranteed Salary": 3750000,
+            "Cap Number": 6500000
+          },
+          "reported_dead": {},
+          "reported_savings": {}
+        },
+        {
+          "year": 2025,
+          "year_annotation": "2025",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 9000000,
+            "Prorated Signing Bonus": 2500000,
+            "Workout Bonus": 250000,
+            "Guaranteed Salary": 5750000,
+            "Cap Number": 11750000
+          },
+          "reported_dead": {},
+          "reported_savings": {}
+        },
+        {
+          "year": 2026,
+          "year_annotation": "2026",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 9000000,
+            "Prorated Signing Bonus": 2500000,
+            "Workout Bonus": 250000,
+            "Guaranteed Salary": 0,
+            "Cap Number": 11750000
+          },
+          "reported_dead": {
+            "cut": 2500000,
+            "june_1_cut": 2500000,
+            "trade": 2500000,
+            "june_1_trade": 2500000,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": 9250000,
+            "june_1_cut": 9250000,
+            "trade": 9250000,
+            "june_1_trade": 9250000,
+            "restructure": 0,
+            "extension": 6428000
+          }
+        }
+      ],
+      "conflicts": [],
+      "source_tables": [
+        {
+          "section": "(UFA, signed 2024)",
+          "table_attributes": "class=\"contract current-contract player-new\"",
+          "rows": [
+            [
+              "Year",
+              "Age",
+              "Base Salary",
+              "Prorated Signing Bonus",
+              "Workout Bonus",
+              "",
+              "Guaranteed Salary",
+              "",
+              "Cap Number",
+              "Cap %",
+              "",
+              "Dead Money & Cap Savings Cut (pre-June 1) Cut (post-June 1) Trade (pre-June 1) Trade (post-June 1) Restructure Extension"
+            ],
+            [],
+            [
+              "2024",
+              "27",
+              "$3,750,000",
+              "$2,500,000",
+              "$250,000",
+              "",
+              "$3,750,000",
+              "",
+              "$6,500,000",
+              "2.5%",
+              "",
+              "",
+              ""
+            ],
+            [
+              "2025",
+              "28",
+              "$9,000,000",
+              "$2,500,000",
+              "$250,000",
+              "",
+              "$5,750,000",
+              "",
+              "$11,750,000",
+              "4.1%",
+              "",
+              "",
+              ""
+            ],
+            [
+              "2026",
+              "29",
+              "$9,000,000",
+              "$2,500,000",
+              "$250,000",
+              "",
+              "$0",
+              "",
+              "$11,750,000",
+              "3.9%",
+              "",
+              "$2,500,000 $2,500,000 $2,500,000 $2,500,000 $0 $0",
+              "$9,250,000 $9,250,000 $9,250,000 $9,250,000 $0 $6,428,000"
+            ],
+            [
+              "Total",
+              "",
+              "$21,750,000",
+              "$7,500,000",
+              "$750,000",
+              "",
+              "$9,500,000",
+              "",
+              "$30,000,000",
+              "",
+              "",
+              ""
+            ]
+          ]
+        },
+        {
+          "section": "Cash Flows",
+          "table_attributes": "class=\"sortable cash-flow-table\"",
+          "rows": [
+            [
+              "",
+              "2024",
+              "2025",
+              "2026"
+            ],
+            [
+              "Cash Due",
+              "$11,500,000",
+              "$9,250,000",
+              "$9,250,000"
+            ],
+            [
+              "Running Cash",
+              "$11,500,000",
+              "$20,750,000",
+              "$30,000,000"
+            ]
+          ]
+        },
+        {
+          "section": "Contract History",
+          "table_attributes": "class=\"sortable\"",
+          "rows": [
+            [
+              "Team",
+              "Contract Type",
+              "Status",
+              "Year Signed",
+              "Yrs",
+              "Total",
+              "APY",
+              "Guarantees",
+              "Amount Earned",
+              "% Earned",
+              "Effective APY"
+            ],
+            [
+              "Packers",
+              "Drafted",
+              "Expired",
+              "2020",
+              "4",
+              "$3,469,680",
+              "$867,420",
+              "$174,680",
+              "$5,202,680",
+              "149.9%",
+              "$1,300,670"
+            ],
+            [
+              "Giants",
+              "UFA",
+              "Active",
+              "2024",
+              "3",
+              "$30,000,000",
+              "$10,000,000",
+              "$17,000,000",
+              "$20,750,000",
+              "69.2%",
+              "$10,375,000"
+            ]
+          ]
+        }
+      ],
+      "unknown_fields": [
+        "Executed contract and amendments",
+        "Paid versus unpaid compensation at the hypothetical transaction time",
+        "Guarantee conditions, offsets, injury protection and termination-pay eligibility",
+        "Option exercise/payment status and incentive classification at the transaction time",
+        "Club/player consent, trade availability and negotiated compensation"
+      ],
+      "availability": "not_established"
+    },
+    {
+      "player_id": "nfl:NYG:darius-slayton",
+      "player_name": "Darius Slayton",
+      "team_id": "NYG",
+      "roster_status_as_of_snapshot": "active",
+      "source_status": "source_conflict",
+      "source_url": "https://overthecap.com/player/darius-slayton/7962",
+      "inspected_at": "2026-09-08T19:16:51.493008+00:00",
+      "source_sha256": "45c3c8c5001c9e3e74084aaa19bafbba5ab55d97ff0d08c25692d40d2644f950",
+      "snapshot_as_of": "2026-09-07",
+      "snapshot_ledger": [
+        {
+          "season": "2026",
+          "cap_number": 15911770,
+          "cash_due": 13000005,
+          "guaranteed_salary": 9749995,
+          "dead_money_cut": 15749995,
+          "post_june_1_dead_money_cut": 12749995,
+          "cut_savings": 161775,
+          "post_june_1_cut_savings": 3161775,
+          "trade_dead_money": 6000000,
+          "trade_savings": 9911770,
+          "post_june_1_trade_dead_money": 3000000,
+          "post_june_1_trade_savings": 12911770,
+          "restructure_savings": 5600003,
+          "extension_savings": 8960004,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/darius-slayton/7962/"
+        },
+        {
+          "season": "2027",
+          "cap_number": 12999990,
+          "cash_due": 9729990,
+          "guaranteed_salary": 0,
+          "dead_money_cut": 3000000,
+          "post_june_1_dead_money_cut": 3000000,
+          "cut_savings": 9999990,
+          "post_june_1_cut_savings": 9999990,
+          "trade_dead_money": 3000000,
+          "trade_savings": 9999990,
+          "post_june_1_trade_dead_money": 3000000,
+          "post_june_1_trade_savings": 9999990,
+          "restructure_savings": 0,
+          "extension_savings": 6307992,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/darius-slayton/7962/"
+        }
+      ],
+      "reported_2026_cash_payout": null,
+      "reported_years": [],
+      "conflicts": [
+        "No current-contract table for 2026 on the inspected player page; the saved roster ledger describes an active deal."
+      ],
+      "source_tables": [
+        {
+          "section": "Contract History",
+          "table_attributes": "class=\"sortable\"",
+          "rows": [
+            [
+              "Team",
+              "Contract Type",
+              "Status",
+              "Year Signed",
+              "Yrs",
+              "Total",
+              "APY",
+              "Guarantees",
+              "Amount Earned",
+              "% Earned",
+              "Effective APY"
+            ],
+            [
+              "Giants",
+              "Drafted",
+              "Renegotiated",
+              "2019",
+              "4",
+              "$2,754,876",
+              "$688,719",
+              "$234,884",
+              "$2,254,884",
+              "81.9%",
+              "$751,628"
+            ],
+            [
+              "Giants",
+              "Other",
+              "Expired",
+              "2022",
+              "1",
+              "$965,000",
+              "$965,000",
+              "$0",
+              "$965,000",
+              "100.0%",
+              "$965,000"
+            ],
+            [
+              "Giants",
+              "UFA",
+              "Renegotiated",
+              "2023",
+              "2",
+              "$12,000,000",
+              "$6,000,000",
+              "$4,900,000",
+              "$6,200,000",
+              "51.7%",
+              "$6,200,000"
+            ],
+            [
+              "Giants",
+              "Other",
+              "Expired",
+              "2024",
+              "1",
+              "$6,200,000",
+              "$6,200,000",
+              "$0",
+              "$5,805,882",
+              "93.6%",
+              "$5,805,882"
+            ],
+            [
+              "Giants",
+              "UFA",
+              "Terminated",
+              "2025",
+              "3",
+              "$36,000,000",
+              "$12,000,000",
+              "$22,000,000",
+              "$12,911,770",
+              "35.9%",
+              "$12,911,770"
+            ]
+          ]
+        },
+        {
+          "section": "Dead Money History",
+          "table_attributes": "class=\"sortable\"",
+          "rows": [
+            [
+              "Team",
+              "Year",
+              "Cap Charge",
+              "Cash Paid"
+            ],
+            [
+              "Giants",
+              "2026",
+              "$12,999,995",
+              "$9,999,995"
+            ],
+            [
+              "Giants",
+              "2027",
+              "$3,000,000",
+              "$0"
+            ]
+          ]
+        }
+      ],
+      "unknown_fields": [
+        "Executed contract and amendments",
+        "Paid versus unpaid compensation at the hypothetical transaction time",
+        "Guarantee conditions, offsets, injury protection and termination-pay eligibility",
+        "Option exercise/payment status and incentive classification at the transaction time",
+        "Club/player consent, trade availability and negotiated compensation"
+      ],
+      "availability": "not_established"
+    },
+    {
+      "player_id": "nfl:DEN:courtland-sutton",
+      "player_name": "Courtland Sutton",
+      "team_id": "DEN",
+      "roster_status_as_of_snapshot": "active",
+      "source_status": "reported",
+      "source_url": "https://overthecap.com/player/courtland-sutton/6925",
+      "inspected_at": "2026-09-08T19:16:51.728730+00:00",
+      "source_sha256": "a71d300e89f3716b451077ac2272cc75c53940264c03b249785d23f97966eb07",
+      "snapshot_as_of": "2026-09-07",
+      "snapshot_ledger": [
+        {
+          "season": "2026",
+          "cap_number": 13975000,
+          "cash_due": 5500000,
+          "guaranteed_salary": 17500000,
+          "dead_money_cut": 39425000,
+          "post_june_1_dead_money_cut": 23575000,
+          "cut_savings": -25450000,
+          "post_june_1_cut_savings": -9600000,
+          "trade_dead_money": 21925000,
+          "trade_savings": -7950000,
+          "post_june_1_trade_dead_money": 6075000,
+          "post_june_1_trade_savings": 7900000,
+          "restructure_savings": 2748000,
+          "extension_savings": 2748000,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/courtland-sutton/6925/"
+        },
+        {
+          "season": "2027",
+          "cap_number": 28475000,
+          "cash_due": 20000000,
+          "guaranteed_salary": 0,
+          "dead_money_cut": 15850000,
+          "post_june_1_dead_money_cut": 6075000,
+          "cut_savings": 12625000,
+          "post_june_1_cut_savings": 22400000,
+          "trade_dead_money": 15850000,
+          "trade_savings": 12625000,
+          "post_june_1_trade_dead_money": 6075000,
+          "post_june_1_trade_savings": 22400000,
+          "restructure_savings": 14312000,
+          "extension_savings": 14312000,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/courtland-sutton/6925/"
+        },
+        {
+          "season": "2028",
+          "cap_number": 29975000,
+          "cash_due": 21500000,
+          "guaranteed_salary": 0,
+          "dead_money_cut": 9775000,
+          "post_june_1_dead_money_cut": 6075000,
+          "cut_savings": 20200000,
+          "post_june_1_cut_savings": 23900000,
+          "trade_dead_money": 9775000,
+          "trade_savings": 20200000,
+          "post_june_1_trade_dead_money": 6075000,
+          "post_june_1_trade_savings": 23900000,
+          "restructure_savings": 14508750,
+          "extension_savings": 15476000,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/courtland-sutton/6925/"
+        },
+        {
+          "season": "2029",
+          "cap_number": 30600000,
+          "cash_due": 24500000,
+          "guaranteed_salary": 0,
+          "dead_money_cut": 3700000,
+          "post_june_1_dead_money_cut": 3700000,
+          "cut_savings": 26900000,
+          "post_june_1_cut_savings": 26900000,
+          "trade_dead_money": 3700000,
+          "trade_savings": 26900000,
+          "post_june_1_trade_dead_money": 3700000,
+          "post_june_1_trade_savings": 26900000,
+          "restructure_savings": 14866667,
+          "extension_savings": 17840000,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/courtland-sutton/6925/"
+        },
+        {
+          "season": "2030",
+          "cap_number": 2400000,
+          "cash_due": 0,
+          "guaranteed_salary": 0,
+          "dead_money_cut": 0,
+          "post_june_1_dead_money_cut": 0,
+          "cut_savings": 2400000,
+          "post_june_1_cut_savings": 2400000,
+          "trade_dead_money": 0,
+          "trade_savings": 2400000,
+          "post_june_1_trade_dead_money": 0,
+          "post_june_1_trade_savings": 2400000,
+          "restructure_savings": -740000,
+          "extension_savings": -1184000,
+          "void_year_candidate": true,
+          "source_url": "https://overthecap.com/player/courtland-sutton/6925/"
+        },
+        {
+          "season": "2031",
+          "cap_number": 0,
+          "cash_due": 0,
+          "guaranteed_salary": 0,
+          "dead_money_cut": 0,
+          "post_june_1_dead_money_cut": 0,
+          "cut_savings": 0,
+          "post_june_1_cut_savings": 0,
+          "trade_dead_money": 0,
+          "trade_savings": 0,
+          "post_june_1_trade_dead_money": 0,
+          "post_june_1_trade_savings": 0,
+          "restructure_savings": 0,
+          "extension_savings": 0,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/courtland-sutton/6925/"
+        }
+      ],
+      "reported_2026_cash_payout": 17500000,
+      "reported_years": [
+        {
+          "year": 2025,
+          "year_annotation": "2025",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 4000000,
+            "Prorated Bonus Signing": 9900000,
+            "Prorated Bonus Option": 0,
+            "Per Game Roster Bonus": 0,
+            "Guaranteed Salary": 4000000,
+            "Cap Number": 13900000
+          },
+          "reported_dead": {},
+          "reported_savings": {}
+        },
+        {
+          "year": 2026,
+          "year_annotation": "2026 \ud83d\udcdd September 1 : Option due before two days prior to first regular season game",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 4735000,
+            "Prorated Bonus Signing": 6075000,
+            "Prorated Bonus Option": 2400000,
+            "Per Game Roster Bonus": 765000,
+            "Guaranteed Salary": 17500000,
+            "Cap Number": 13975000
+          },
+          "reported_dead": {
+            "cut": 39425000,
+            "june_1_cut": 23575000,
+            "trade": 21925000,
+            "june_1_trade": 6075000,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": -25450000,
+            "june_1_cut": -9600000,
+            "trade": -7950000,
+            "june_1_trade": 7900000,
+            "restructure": 2748000,
+            "extension": 2748000
+          }
+        },
+        {
+          "year": 2027,
+          "year_annotation": "2027 \ud83d\udcdd March 17 : $10.0 million salary becomes guaranteed",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 19235000,
+            "Prorated Bonus Signing": 6075000,
+            "Prorated Bonus Option": 2400000,
+            "Per Game Roster Bonus": 765000,
+            "Guaranteed Salary": 0,
+            "Cap Number": 28475000
+          },
+          "reported_dead": {
+            "cut": 15850000,
+            "june_1_cut": 6075000,
+            "trade": 15850000,
+            "june_1_trade": 6075000,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": 12625000,
+            "june_1_cut": 22400000,
+            "trade": 12625000,
+            "june_1_trade": 22400000,
+            "restructure": 14312000,
+            "extension": 14312000
+          }
+        },
+        {
+          "year": 2028,
+          "year_annotation": "2028",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 20735000,
+            "Prorated Bonus Signing": 6075000,
+            "Prorated Bonus Option": 2400000,
+            "Per Game Roster Bonus": 765000,
+            "Guaranteed Salary": 0,
+            "Cap Number": 29975000
+          },
+          "reported_dead": {
+            "cut": 9775000,
+            "june_1_cut": 6075000,
+            "trade": 9775000,
+            "june_1_trade": 6075000,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": 20200000,
+            "june_1_cut": 23900000,
+            "trade": 20200000,
+            "june_1_trade": 23900000,
+            "restructure": 14508750,
+            "extension": 15476000
+          }
+        },
+        {
+          "year": 2029,
+          "year_annotation": "2029",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 23735000,
+            "Prorated Bonus Signing": 3700000,
+            "Prorated Bonus Option": 2400000,
+            "Per Game Roster Bonus": 765000,
+            "Guaranteed Salary": 0,
+            "Cap Number": 30600000
+          },
+          "reported_dead": {
+            "cut": 3700000,
+            "june_1_cut": 3700000,
+            "trade": 3700000,
+            "june_1_trade": 3700000,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": 26900000,
+            "june_1_cut": 26900000,
+            "trade": 26900000,
+            "june_1_trade": 26900000,
+            "restructure": 14866667,
+            "extension": 17840000
+          }
+        },
+        {
+          "year": 2030,
+          "year_annotation": "2030 \ud83d\udcdd March 5 : Contract voids",
+          "is_void": true,
+          "fields": {
+            "Base Salary": null,
+            "Prorated Bonus Signing": 0,
+            "Prorated Bonus Option": 2400000,
+            "Per Game Roster Bonus": null,
+            "Guaranteed Salary": null,
+            "Cap Number": 2400000
+          },
+          "reported_dead": {
+            "cut": 0,
+            "june_1_cut": 0,
+            "trade": 0,
+            "june_1_trade": 0,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": 2400000,
+            "june_1_cut": 2400000,
+            "trade": 2400000,
+            "june_1_trade": 2400000,
+            "restructure": -740000,
+            "extension": -1184000
+          }
+        },
+        {
+          "year": 2031,
+          "year_annotation": "2031",
+          "is_void": true,
+          "fields": {
+            "Base Salary": null,
+            "Prorated Bonus Signing": 0,
+            "Prorated Bonus Option": 0,
+            "Per Game Roster Bonus": null,
+            "Guaranteed Salary": null,
+            "Cap Number": 0
+          },
+          "reported_dead": {
+            "cut": 0,
+            "june_1_cut": 0,
+            "trade": 0,
+            "june_1_trade": 0,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": 0,
+            "june_1_cut": 0,
+            "trade": 0,
+            "june_1_trade": 0,
+            "restructure": 0,
+            "extension": 0
+          }
+        }
+      ],
+      "conflicts": [],
+      "source_tables": [
+        {
+          "section": "(Extension, signed 2025)",
+          "table_attributes": "class=\"contract current-contract player-new\"",
+          "rows": [
+            [
+              "Year",
+              "Age",
+              "Base Salary",
+              "Prorated Bonus",
+              "Per Game Roster Bonus",
+              "",
+              "Guaranteed Salary",
+              "",
+              "Cap Number",
+              "Cap %",
+              "",
+              "Dead Money & Cap Savings Cut (pre-June 1) Cut (post-June 1) Trade (pre-June 1) Trade (post-June 1) Restructure Extension"
+            ],
+            [
+              "Signing",
+              "Option"
+            ],
+            [
+              "2025",
+              "30",
+              "$4,000,000",
+              "$9,900,000",
+              "$0",
+              "$0",
+              "",
+              "$4,000,000",
+              "",
+              "$13,900,000",
+              "5.0%",
+              "",
+              "",
+              ""
+            ],
+            [
+              "2026 \ud83d\udcdd September 1 : Option due before two days prior to first regular season game",
+              "31",
+              "$4,735,000",
+              "$6,075,000",
+              "$2,400,000",
+              "$765,000",
+              "",
+              "$17,500,000",
+              "",
+              "$13,975,000",
+              "4.6%",
+              "",
+              "$39,425,000 $23,575,000 $21,925,000 $6,075,000 $0 $0",
+              "($25,450,000) ($9,600,000) ($7,950,000) $7,900,000 $2,748,000 $2,748,000"
+            ],
+            [
+              "2027 \ud83d\udcdd March 17 : $10.0 million salary becomes guaranteed",
+              "32",
+              "$19,235,000",
+              "$6,075,000",
+              "$2,400,000",
+              "$765,000",
+              "",
+              "$0",
+              "",
+              "$28,475,000",
+              "8.7%",
+              "",
+              "$15,850,000 $6,075,000 $15,850,000 $6,075,000 $0 $0",
+              "$12,625,000 $22,400,000 $12,625,000 $22,400,000 $14,312,000 $14,312,000"
+            ],
+            [
+              "2028",
+              "33",
+              "$20,735,000",
+              "$6,075,000",
+              "$2,400,000",
+              "$765,000",
+              "",
+              "$0",
+              "",
+              "$29,975,000",
+              "8.5%",
+              "",
+              "$9,775,000 $6,075,000 $9,775,000 $6,075,000 $0 $0",
+              "$20,200,000 $23,900,000 $20,200,000 $23,900,000 $14,508,750 $15,476,000"
+            ],
+            [
+              "2029",
+              "34",
+              "$23,735,000",
+              "$3,700,000",
+              "$2,400,000",
+              "$765,000",
+              "",
+              "$0",
+              "",
+              "$30,600,000",
+              "--",
+              "",
+              "$3,700,000 $3,700,000 $3,700,000 $3,700,000 $0 $0",
+              "$26,900,000 $26,900,000 $26,900,000 $26,900,000 $14,866,667 $17,840,000"
+            ],
+            [
+              "2030 \ud83d\udcdd March 5 : Contract voids",
+              "35",
+              "Void",
+              "$0",
+              "$2,400,000",
+              "Void",
+              "",
+              "Void",
+              "",
+              "$2,400,000",
+              "--",
+              "",
+              "$0 $0 $0 $0 $0 $0",
+              "$2,400,000 $2,400,000 $2,400,000 $2,400,000 ($740,000) ($1,184,000)"
+            ],
+            [
+              "2031",
+              "36",
+              "Void",
+              "$0",
+              "$0",
+              "Void",
+              "",
+              "Void",
+              "",
+              "$0",
+              "--",
+              "",
+              "$0 $0 $0 $0 $0 $0",
+              "$0 $0 $0 $0 $0 $0"
+            ],
+            [
+              "Total",
+              "",
+              "$72,440,000",
+              "$31,825,000",
+              "$12,000,000",
+              "$3,060,000",
+              "",
+              "$21,500,000",
+              "",
+              "$119,325,000",
+              "",
+              "",
+              ""
+            ]
+          ]
+        },
+        {
+          "section": "Cash Flows",
+          "table_attributes": "class=\"sortable cash-flow-table\"",
+          "rows": [
+            [
+              "",
+              "2025",
+              "2026",
+              "2027",
+              "2028",
+              "2029"
+            ],
+            [
+              "Cash Due",
+              "$8,500,000",
+              "$17,500,000",
+              "$20,000,000",
+              "$21,500,000",
+              "$24,500,000"
+            ],
+            [
+              "Running Cash",
+              "$8,500,000",
+              "$26,000,000",
+              "$46,000,000",
+              "$67,500,000",
+              "$92,000,000"
+            ]
+          ]
+        },
+        {
+          "section": "Contract History",
+          "table_attributes": "class=\"sortable\"",
+          "rows": [
+            [
+              "Team",
+              "Contract Type",
+              "Status",
+              "Year Signed",
+              "Yrs",
+              "Total",
+              "APY",
+              "Guarantees",
+              "Amount Earned",
+              "% Earned",
+              "Effective APY"
+            ],
+            [
+              "Broncos",
+              "Drafted",
+              "Extended",
+              "2018",
+              "4",
+              "$6,841,930",
+              "$1,710,483",
+              "$4,326,945",
+              "$5,428,939",
+              "79.3%",
+              "$1,809,646"
+            ],
+            [
+              "Broncos",
+              "Extension",
+              "Renegotiated",
+              "2021",
+              "4",
+              "$60,000,000",
+              "$15,000,000",
+              "$18,848,944",
+              "$34,753,588",
+              "57.9%",
+              "$11,584,529"
+            ],
+            [
+              "Broncos",
+              "Other",
+              "Extended",
+              "2024",
+              "2",
+              "$27,500,000",
+              "$13,750,000",
+              "$0",
+              "$15,000,000",
+              "54.5%",
+              "$15,000,000"
+            ],
+            [
+              "Broncos",
+              "Extension",
+              "Active",
+              "2025",
+              "4",
+              "$92,000,000",
+              "$23,000,000",
+              "$40,000,000",
+              "$22,500,000",
+              "24.5%",
+              "$22,500,000"
+            ]
+          ]
+        }
+      ],
+      "unknown_fields": [
+        "Executed contract and amendments",
+        "Paid versus unpaid compensation at the hypothetical transaction time",
+        "Guarantee conditions, offsets, injury protection and termination-pay eligibility",
+        "Option exercise/payment status and incentive classification at the transaction time",
+        "Club/player consent, trade availability and negotiated compensation"
+      ],
+      "availability": "not_established"
+    },
+    {
+      "player_id": "nfl:JAX:jakobi-meyers",
+      "player_name": "Jakobi Meyers",
+      "team_id": "JAX",
+      "roster_status_as_of_snapshot": "active",
+      "source_status": "reported",
+      "source_url": "https://overthecap.com/player/jakobi-meyers/8083",
+      "inspected_at": "2026-09-08T19:17:03.015434+00:00",
+      "source_sha256": "1904ad2a869f8a58a6e38e466f02a4a7d853be5187ec4d8c3c0a1ac402c34fbd",
+      "snapshot_as_of": "2026-09-07",
+      "snapshot_ledger": [
+        {
+          "season": "2026",
+          "cap_number": 6210588,
+          "cash_due": 1900000,
+          "guaranteed_salary": 1300000,
+          "dead_money_cut": 28405000,
+          "post_june_1_dead_money_cut": 12445000,
+          "cut_savings": -22194412,
+          "post_june_1_cut_savings": -6234412,
+          "trade_dead_money": 20300000,
+          "trade_savings": -14089412,
+          "post_june_1_trade_dead_money": 4340000,
+          "post_june_1_trade_savings": 1870588,
+          "restructure_savings": 80000,
+          "extension_savings": 80000,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/jakobi-meyers/8083/"
+        },
+        {
+          "season": "2027",
+          "cap_number": 22295000,
+          "cash_due": 17955000,
+          "guaranteed_salary": 6805000,
+          "dead_money_cut": 22765000,
+          "post_june_1_dead_money_cut": 11145000,
+          "cut_savings": -470000,
+          "post_june_1_cut_savings": 11150000,
+          "trade_dead_money": 15960000,
+          "trade_savings": 6335000,
+          "post_june_1_trade_dead_money": 4340000,
+          "post_june_1_trade_savings": 17955000,
+          "restructure_savings": 12082500,
+          "extension_savings": 12888000,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/jakobi-meyers/8083/"
+        },
+        {
+          "season": "2028",
+          "cap_number": 24340000,
+          "cash_due": 20000000,
+          "guaranteed_salary": 0,
+          "dead_money_cut": 11620000,
+          "post_june_1_dead_money_cut": 4340000,
+          "cut_savings": 12720000,
+          "post_june_1_cut_savings": 20000000,
+          "trade_dead_money": 11620000,
+          "trade_savings": 12720000,
+          "post_june_1_trade_dead_money": 4340000,
+          "post_june_1_trade_savings": 20000000,
+          "restructure_savings": 12073333,
+          "extension_savings": 14488000,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/jakobi-meyers/8083/"
+        },
+        {
+          "season": "2029",
+          "cap_number": 7280000,
+          "cash_due": 0,
+          "guaranteed_salary": 0,
+          "dead_money_cut": 7280000,
+          "post_june_1_dead_money_cut": 4340000,
+          "cut_savings": 0,
+          "post_june_1_cut_savings": 2940000,
+          "trade_dead_money": 7280000,
+          "trade_savings": 0,
+          "post_june_1_trade_dead_money": 4340000,
+          "post_june_1_trade_savings": 2940000,
+          "restructure_savings": -717500,
+          "extension_savings": -1148000,
+          "void_year_candidate": true,
+          "source_url": "https://overthecap.com/player/jakobi-meyers/8083/"
+        },
+        {
+          "season": "2030",
+          "cap_number": 0,
+          "cash_due": 0,
+          "guaranteed_salary": 0,
+          "dead_money_cut": 2940000,
+          "post_june_1_dead_money_cut": 2940000,
+          "cut_savings": -2940000,
+          "post_june_1_cut_savings": -2940000,
+          "trade_dead_money": 2940000,
+          "trade_savings": -2940000,
+          "post_june_1_trade_dead_money": 2940000,
+          "post_june_1_trade_savings": -2940000,
+          "restructure_savings": 0,
+          "extension_savings": -1184000,
+          "void_year_candidate": false,
+          "source_url": "https://overthecap.com/player/jakobi-meyers/8083/"
+        }
+      ],
+      "reported_2026_cash_payout": 16600000,
+      "reported_years": [
+        {
+          "year": 2025,
+          "year_annotation": "2025",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 3695000,
+            "Prorated Bonus Signing": 1400000,
+            "Prorated Bonus Option": 0,
+            "Per Game Roster Bonus": 255000,
+            "Workout Bonus": 0,
+            "Guaranteed Salary": 195000,
+            "Cap Number": 5215000
+          },
+          "reported_dead": {},
+          "reported_savings": {}
+        },
+        {
+          "year": 2026,
+          "year_annotation": "2026 \ud83d\udcdd March 20 : Option due",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 1300000,
+            "Prorated Bonus Signing": 2340000,
+            "Prorated Bonus Option": 2000000,
+            "Per Game Roster Bonus": 500000,
+            "Workout Bonus": 100000,
+            "Guaranteed Salary": 1300000,
+            "Cap Number": 6210588
+          },
+          "reported_dead": {
+            "cut": 28405000,
+            "june_1_cut": 12445000,
+            "trade": 20300000,
+            "june_1_trade": 4340000,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": -22194412,
+            "june_1_cut": -6234412,
+            "trade": -14089412,
+            "june_1_trade": 1870588,
+            "restructure": 80000,
+            "extension": 80000
+          }
+        },
+        {
+          "year": 2027,
+          "year_annotation": "2027 \ud83d\udcdd March 15 : Remaining $5.0 million of 2027 injury protection becomes guaranteed.",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 17355000,
+            "Prorated Bonus Signing": 2340000,
+            "Prorated Bonus Option": 2000000,
+            "Per Game Roster Bonus": 500000,
+            "Workout Bonus": 100000,
+            "Guaranteed Salary": 6805000,
+            "Cap Number": 22295000
+          },
+          "reported_dead": {
+            "cut": 22765000,
+            "june_1_cut": 11145000,
+            "trade": 15960000,
+            "june_1_trade": 4340000,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": -470000,
+            "june_1_cut": 11150000,
+            "trade": 6335000,
+            "june_1_trade": 17955000,
+            "restructure": 12082500,
+            "extension": 12888000
+          }
+        },
+        {
+          "year": 2028,
+          "year_annotation": "2028",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 19400000,
+            "Prorated Bonus Signing": 2340000,
+            "Prorated Bonus Option": 2000000,
+            "Per Game Roster Bonus": 500000,
+            "Workout Bonus": 100000,
+            "Guaranteed Salary": 0,
+            "Cap Number": 24340000
+          },
+          "reported_dead": {
+            "cut": 11620000,
+            "june_1_cut": 4340000,
+            "trade": 11620000,
+            "june_1_trade": 4340000,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": 12720000,
+            "june_1_cut": 20000000,
+            "trade": 12720000,
+            "june_1_trade": 20000000,
+            "restructure": 12073333,
+            "extension": 14488000
+          }
+        },
+        {
+          "year": 2029,
+          "year_annotation": "2029 \ud83d\udcdd February 15 : Contract voids",
+          "is_void": true,
+          "fields": {
+            "Base Salary": null,
+            "Prorated Bonus Signing": 2340000,
+            "Prorated Bonus Option": 2000000,
+            "Per Game Roster Bonus": null,
+            "Workout Bonus": null,
+            "Guaranteed Salary": null,
+            "Cap Number": 7280000
+          },
+          "reported_dead": {
+            "cut": 7280000,
+            "june_1_cut": 4340000,
+            "trade": 7280000,
+            "june_1_trade": 4340000,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": 0,
+            "june_1_cut": 2940000,
+            "trade": 0,
+            "june_1_trade": 2940000,
+            "restructure": -717500,
+            "extension": -1148000
+          }
+        },
+        {
+          "year": 2030,
+          "year_annotation": "2030",
+          "is_void": true,
+          "fields": {
+            "Base Salary": null,
+            "Prorated Bonus Signing": 940000,
+            "Prorated Bonus Option": 2000000,
+            "Per Game Roster Bonus": null,
+            "Workout Bonus": null,
+            "Guaranteed Salary": null,
+            "Cap Number": 0
+          },
+          "reported_dead": {
+            "cut": 2940000,
+            "june_1_cut": 2940000,
+            "trade": 2940000,
+            "june_1_trade": 2940000,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": -2940000,
+            "june_1_cut": -2940000,
+            "trade": -2940000,
+            "june_1_trade": -2940000,
+            "restructure": 0,
+            "extension": -1184000
+          }
+        }
+      ],
+      "conflicts": [],
+      "source_tables": [
+        {
+          "section": "(Extension, signed 2025)",
+          "table_attributes": "class=\"contract current-contract player-new\"",
+          "rows": [
+            [
+              "Year",
+              "Age",
+              "Base Salary",
+              "Prorated Bonus",
+              "Per Game Roster Bonus",
+              "Workout Bonus",
+              "",
+              "Guaranteed Salary",
+              "",
+              "Cap Number",
+              "Cap %",
+              "",
+              "Dead Money & Cap Savings Cut (pre-June 1) Cut (post-June 1) Trade (pre-June 1) Trade (post-June 1) Restructure Extension"
+            ],
+            [
+              "Signing",
+              "Option"
+            ],
+            [
+              "2025",
+              "29",
+              "$3,695,000",
+              "$1,400,000",
+              "$0",
+              "$255,000",
+              "$0",
+              "",
+              "$195,000",
+              "",
+              "$5,215,000",
+              "1.8%",
+              "",
+              "",
+              ""
+            ],
+            [
+              "2026 \ud83d\udcdd March 20 : Option due",
+              "30",
+              "$1,300,000",
+              "$2,340,000",
+              "$2,000,000",
+              "$500,000",
+              "$100,000",
+              "",
+              "$1,300,000",
+              "",
+              "$6,210,588",
+              "2.0%",
+              "",
+              "$28,405,000 $12,445,000 $20,300,000 $4,340,000 $0 $0",
+              "($22,194,412) ($6,234,412) ($14,089,412) $1,870,588 $80,000 $80,000"
+            ],
+            [
+              "2027 \ud83d\udcdd March 15 : Remaining $5.0 million of 2027 injury protection becomes guaranteed.",
+              "31",
+              "$17,355,000",
+              "$2,340,000",
+              "$2,000,000",
+              "$500,000",
+              "$100,000",
+              "",
+              "$6,805,000",
+              "",
+              "$22,295,000",
+              "6.8%",
+              "",
+              "$22,765,000 $11,145,000 $15,960,000 $4,340,000 $0 $0",
+              "($470,000) $11,150,000 $6,335,000 $17,955,000 $12,082,500 $12,888,000"
+            ],
+            [
+              "2028",
+              "32",
+              "$19,400,000",
+              "$2,340,000",
+              "$2,000,000",
+              "$500,000",
+              "$100,000",
+              "",
+              "$0",
+              "",
+              "$24,340,000",
+              "6.9%",
+              "",
+              "$11,620,000 $4,340,000 $11,620,000 $4,340,000 $0 $0",
+              "$12,720,000 $20,000,000 $12,720,000 $20,000,000 $12,073,333 $14,488,000"
+            ],
+            [
+              "2029 \ud83d\udcdd February 15 : Contract voids",
+              "33",
+              "Void",
+              "$2,340,000",
+              "$2,000,000",
+              "Void",
+              "Void",
+              "",
+              "Void",
+              "",
+              "$7,280,000",
+              "--",
+              "",
+              "$7,280,000 $4,340,000 $7,280,000 $4,340,000 $0 $0",
+              "$0 $2,940,000 $0 $2,940,000 ($717,500) ($1,148,000)"
+            ],
+            [
+              "2030",
+              "34",
+              "Void",
+              "$940,000",
+              "$2,000,000",
+              "Void",
+              "Void",
+              "",
+              "Void",
+              "",
+              "$0",
+              "--",
+              "",
+              "$2,940,000 $2,940,000 $2,940,000 $2,940,000 $0 $0",
+              "($2,940,000) ($2,940,000) ($2,940,000) ($2,940,000) $0 ($1,184,000)"
+            ],
+            [
+              "Total",
+              "",
+              "$41,750,000",
+              "$11,700,000",
+              "$10,000,000",
+              "$1,755,000",
+              "$300,000",
+              "",
+              "$8,300,000",
+              "",
+              "$65,340,588",
+              "",
+              "",
+              ""
+            ]
+          ]
+        },
+        {
+          "section": "Cash Flows",
+          "table_attributes": "class=\"sortable cash-flow-table\"",
+          "rows": [
+            [
+              "",
+              "2025",
+              "2026",
+              "2027",
+              "2028"
+            ],
+            [
+              "Cash Due",
+              "$5,445,000",
+              "$16,600,000",
+              "$17,955,000",
+              "$20,000,000"
+            ],
+            [
+              "Running Cash",
+              "$5,445,000",
+              "$22,045,000",
+              "$40,000,000",
+              "$60,000,000"
+            ]
+          ]
+        },
+        {
+          "section": "Contract History",
+          "table_attributes": "class=\"sortable\"",
+          "rows": [
+            [
+              "Team",
+              "Contract Type",
+              "Status",
+              "Year Signed",
+              "Yrs",
+              "Total",
+              "APY",
+              "Guarantees",
+              "Amount Earned",
+              "% Earned",
+              "Effective APY"
+            ],
+            [
+              "Patriots",
+              "UDFA",
+              "Expired",
+              "2019",
+              "3",
+              "$1,765,000",
+              "$588,333",
+              "$70,000",
+              "$2,030,000",
+              "115.0%",
+              "$676,667"
+            ],
+            [
+              "Patriots",
+              "RFA",
+              "Expired",
+              "2022",
+              "1",
+              "$3,986,000",
+              "$3,986,000",
+              "$0",
+              "$3,986,000",
+              "100.0%",
+              "$3,986,000"
+            ],
+            [
+              "Raiders",
+              "UFA",
+              "Traded",
+              "2023",
+              "3",
+              "$33,000,000",
+              "$11,000,000",
+              "$16,000,000",
+              "$21,925,000",
+              "66.4%",
+              "$10,962,500"
+            ],
+            [
+              "Jaguars",
+              "UFA",
+              "Extended",
+              "2023",
+              "3",
+              "$33,000,000",
+              "$11,000,000",
+              "$16,000,000",
+              "$0",
+              "0.0%",
+              "$0"
+            ],
+            [
+              "Jaguars",
+              "Extension",
+              "Active",
+              "2025",
+              "3",
+              "$60,000,000",
+              "$20,000,000",
+              "$30,000,000",
+              "$10,800,000",
+              "18.0%",
+              "$10,800,000"
+            ]
+          ]
+        },
+        {
+          "section": "Dead Money History",
+          "table_attributes": "class=\"sortable\"",
+          "rows": [
+            [
+              "Team",
+              "Year",
+              "Cap Charge",
+              "Cash Paid"
+            ],
+            [
+              "Raiders",
+              "2025",
+              "$9,347,334",
+              "$5,355,000"
+            ],
+            [
+              "Raiders",
+              "2026",
+              "$4,318,000",
+              "$0"
+            ]
+          ]
+        }
+      ],
+      "unknown_fields": [
+        "Executed contract and amendments",
+        "Paid versus unpaid compensation at the hypothetical transaction time",
+        "Guarantee conditions, offsets, injury protection and termination-pay eligibility",
+        "Option exercise/payment status and incentive classification at the transaction time",
+        "Club/player consent, trade availability and negotiated compensation"
+      ],
+      "availability": "not_established"
+    },
+    {
+      "player_id": "nfl:SF:christian-kirk",
+      "player_name": "Christian Kirk",
+      "team_id": "SF",
+      "roster_status_as_of_snapshot": "rsr",
+      "source_status": "reported",
+      "source_url": "https://overthecap.com/player/christian-kirk/6932",
+      "inspected_at": "2026-09-08T19:17:03.236263+00:00",
+      "source_sha256": "9e9f383e461b4c6d98528984c006406e9a300d49b1f369a6fc65af8268a4ecc5",
+      "snapshot_as_of": "2026-09-07",
+      "snapshot_ledger": [
+        {
+          "season": "2026",
+          "cap_number": 2960000,
+          "cash_due": null,
+          "guaranteed_salary": null,
+          "void_year_candidate": false,
+          "source_status": "captured_non_active_cap_charge"
+        }
+      ],
+      "reported_2026_cash_payout": 3000000,
+      "reported_years": [
+        {
+          "year": 2026,
+          "year_annotation": "2026",
+          "is_void": false,
+          "fields": {
+            "Base Salary": 1610000,
+            "Prorated Signing Bonus": 1170000,
+            "Per Game Roster Bonus": 170000,
+            "Workout Bonus": 50000,
+            "Guaranteed Salary": 1610000,
+            "Cap Number": 2960000
+          },
+          "reported_dead": {
+            "cut": 2780000,
+            "june_1_cut": 2780000,
+            "trade": 1170000,
+            "june_1_trade": 1170000,
+            "restructure": 0,
+            "extension": 0
+          },
+          "reported_savings": {
+            "cut": 180000,
+            "june_1_cut": 180000,
+            "trade": 1790000,
+            "june_1_trade": 1790000,
+            "restructure": 0,
+            "extension": 288000
+          }
+        }
+      ],
+      "conflicts": [],
+      "source_tables": [
+        {
+          "section": "(UFA, signed 2026)",
+          "table_attributes": "class=\"contract current-contract player-new\"",
+          "rows": [
+            [
+              "Year",
+              "Age",
+              "Base Salary",
+              "Prorated Signing Bonus",
+              "Per Game Roster Bonus",
+              "Workout Bonus",
+              "",
+              "Guaranteed Salary",
+              "",
+              "Cap Number",
+              "Cap %",
+              "",
+              "Dead Money & Cap Savings Cut (pre-June 1) Cut (post-June 1) Trade (pre-June 1) Trade (post-June 1) Restructure Extension"
+            ],
+            [],
+            [
+              "2026",
+              "30",
+              "$1,610,000",
+              "$1,170,000",
+              "$170,000",
+              "$50,000",
+              "",
+              "$1,610,000",
+              "",
+              "$2,960,000",
+              "0.9%",
+              "",
+              "$2,780,000 $2,780,000 $1,170,000 $1,170,000 $0 $0",
+              "$180,000 $180,000 $1,790,000 $1,790,000 $0 $288,000"
+            ],
+            [
+              "Total",
+              "",
+              "$1,610,000",
+              "$1,170,000",
+              "$170,000",
+              "$50,000",
+              "",
+              "$1,610,000",
+              "",
+              "$2,960,000",
+              "",
+              "",
+              ""
+            ]
+          ]
+        },
+        {
+          "section": "Cash Flows",
+          "table_attributes": "class=\"sortable cash-flow-table\"",
+          "rows": [
+            [
+              "",
+              "2026"
+            ],
+            [
+              "Cash Due",
+              "$3,000,000"
+            ],
+            [
+              "Running Cash",
+              "$3,000,000"
+            ]
+          ]
+        },
+        {
+          "section": "Contract History",
+          "table_attributes": "class=\"sortable\"",
+          "rows": [
+            [
+              "Team",
+              "Contract Type",
+              "Status",
+              "Year Signed",
+              "Yrs",
+              "Total",
+              "APY",
+              "Guarantees",
+              "Amount Earned",
+              "% Earned",
+              "Effective APY"
+            ],
+            [
+              "Cardinals",
+              "Drafted",
+              "Expired",
+              "2018",
+              "4",
+              "$5,894,874",
+              "$1,473,719",
+              "$3,595,129",
+              "$7,044,027",
+              "119.5%",
+              "$1,761,007"
+            ],
+            [
+              "Jaguars",
+              "UFA",
+              "Terminated",
+              "2022",
+              "4",
+              "$72,000,000",
+              "$18,000,000",
+              "$37,000,000",
+              "$56,588,235",
+              "78.6%",
+              "$18,862,745"
+            ],
+            [
+              "Texans",
+              "UFA",
+              "Expired",
+              "2022",
+              "4",
+              "$72,000,000",
+              "$18,000,000",
+              "$37,000,000",
+              "$16,382,353",
+              "22.8%",
+              "$16,382,353"
+            ],
+            [
+              "49ers",
+              "UFA",
+              "Active",
+              "2026",
+              "1",
+              "$3,000,000",
+              "$3,000,000",
+              "$2,780,000",
+              "$1,170,000",
+              "39.0%",
+              "$0"
+            ]
+          ]
+        },
+        {
+          "section": "Dead Money History",
+          "table_attributes": "class=\"sortable\"",
+          "rows": [
+            [
+              "Team",
+              "Year",
+              "Cap Charge",
+              "Cash Paid"
+            ],
+            [
+              "Jaguars",
+              "2025",
+              "$13,652,000",
+              "$0"
+            ],
+            [
+              "Texans",
+              "2026",
+              "$11,396,000",
+              "$0"
+            ]
+          ]
+        }
+      ],
+      "unknown_fields": [
+        "Executed contract and amendments",
+        "Paid versus unpaid compensation at the hypothetical transaction time",
+        "Guarantee conditions, offsets, injury protection and termination-pay eligibility",
+        "Option exercise/payment status and incentive classification at the transaction time",
+        "Club/player consent, trade availability and negotiated compensation"
+      ],
+      "availability": "not_established"
+    }
+  ]
+}

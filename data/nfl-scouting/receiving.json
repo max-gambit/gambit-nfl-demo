@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "player_name": "Courtland Sutton",
+      "source_url": "https://www.denverbroncos.com/team/players-roster/courtland-sutton/career",
+      "captured_at": "2026-09-08T19:15:33.885072+00:00",
+      "source_sha256": "44b27a52a36fb12ceb2d61e2e1a073f89376c226da44e8ab865c5478736e9317",
+      "season": 2025,
+      "season_type": "regular",
+      "table": {
+        "columns": [
+          "YEAR",
+          "TEAM",
+          "G",
+          "REC",
+          "YDS",
+          "AVG",
+          "LNG",
+          "TD",
+          "1st",
+          "1st%",
+          "20+",
+          "40+"
+        ],
+        "rows": [
+          [
+            "2025",
+            "Denver Broncos",
+            "17",
+            "74",
+            "1017",
+            "13.7",
+            "52",
+            "7",
+            "52",
+            "70.3",
+            "17",
+            "2"
+          ]
+        ]
+      }
+    },
+    {
+      "player_name": "Jakobi Meyers",
+      "source_url": "https://www.jaguars.com/team/players-roster/jakobi-meyers/career",
+      "captured_at": "2026-09-08T19:15:33.843185+00:00",
+      "source_sha256": "3da4724df55609b59cc5d4de8a55ad653ec7b619c0916062d5d1afb7764e556f",
+      "season": 2025,
+      "season_type": "regular",
+      "table": {
+        "columns": [
+          "YEAR",
+          "TEAM",
+          "G",
+          "REC",
+          "YDS",
+          "AVG",
+          "LNG",
+          "TD",
+          "1st",
+          "1st%",
+          "20+",
+          "40+"
+        ],
+        "rows": [
+          [
+            "2025",
+            "Jacksonville Jaguars",
+            "9",
+            "42",
+            "483",
+            "11.5",
+            "50",
+            "3",
+            "28",
+            "66.7",
+            "5",
+            "1"
+          ],
+          [
+            "2025",
+            "Las Vegas Raiders",
+            "7",
+            "33",
+            "352",
+            "10.7",
+            "45",
+            "0",
+            "15",
+            "45.4",
+            "5",
+            "1"
+          ]
+        ]
+      }
+    },
+    {
+      "player_name": "Christian Kirk",
+      "source_url": "https://www.49ers.com/team/players-roster/christian-kirk/career",
+      "captured_at": "2026-09-08T19:15:33.823517+00:00",
+      "source_sha256": "9f34686ea7c1d9edcb6ff0f0e86e724bc9a9ffed07b775f43c026229ab3bab5c",
+      "season": 2025,
+      "season_type": "regular",
+      "table": {
+        "columns": [
+          "YEAR",
+          "TEAM",
+          "G",
+          "REC",
+          "YDS",
+          "AVG",
+          "LNG",
+          "TD",
+          "1st",
+          "1st%",
+          "20+",
+          "40+"
+        ],
+        "rows": [
+          [
+            "2025",
+            "Houston Texans",
+            "13",
+            "28",
+            "239",
+            "8.5",
+            "47",
+            "1",
+            "12",
+            "42.9",
+            "3",
+            "1"
+          ]
+        ]
+      }
+    },
+    {
+      "player_name": "Darnell Mooney",
+      "source_url": "https://www.giants.com/team/players-roster/darnell-mooney/career",
+      "captured_at": "2026-09-08T19:15:33.667164+00:00",
+      "source_sha256": "e131a83cb2992a0a28d9c3aa6cc6dc813b1cec309c5b84fbf3295a1874222fd4",
+      "season": 2025,
+      "season_type": "regular",
+      "table": {
+        "columns": [
+          "YEAR",
+          "TEAM",
+          "G",
+          "REC",
+          "YDS",
+          "AVG",
+          "LNG",
+          "TD",
+          "1st",
+          "1st%",
+          "20+",
+          "40+"
+        ],
+        "rows": [
+          [
+            "2025",
+            "Atlanta Falcons",
+            "15",
+            "32",
+            "443",
+            "13.8",
+            "49",
+            "1",
+            "25",
+            "78.1",
+            "5",
+            "1"
+          ]
+        ]
+      }
+    },
+    {
+      "player_name": "Malik Nabers",
+      "source_url": "https://www.giants.com/team/players-roster/malik-nabers/career",
+      "captured_at": "2026-09-08T19:15:35.259780+00:00",
+      "source_sha256": "e345b018aea866d8148b1d5f17c2e98641f94abde3a4c63846960ae1b767e4cd",
+      "season": 2025,
+      "season_type": "regular",
+      "table": {
+        "columns": [
+          "YEAR",
+          "TEAM",
+          "G",
+          "REC",
+          "YDS",
+          "AVG",
+          "LNG",
+          "TD",
+          "1st",
+          "1st%",
+          "20+",
+          "40+"
+        ],
+        "rows": [
+          [
+            "2025",
+            "New York Giants",
+            "4",
+            "18",
+            "271",
+            "15.1",
+            "48",
+            "2",
+            "11",
+            "61.1",
+            "5",
+            "1"
+          ]
+        ]
+      }
+    }
+  ]
+}

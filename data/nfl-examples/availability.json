@@ -1,0 +1,378 @@
+{
+  "schema": "nfl_examples_availability.v1",
+  "captured_at": "2026-09-08T19:05:57.948189Z",
+  "team_id": "NYG",
+  "opponent": "KC",
+  "game_date": "2025-09-21",
+  "season": 2025,
+  "week": 3,
+  "sources": [
+    {
+      "id": "injuries",
+      "source_url": "https://www.giants.com/news/week-3-nfl-injury-report-new-york-giants-vs-kansas-city-chiefs",
+      "title": "Giants official Week 3 practice and game-status report",
+      "effective_date": "2025-09-17 through 2025-09-21",
+      "captured_at": "2026-09-08T19:05:57.948189Z",
+      "sha256": "f68f3eaf0138cff0332e6ee4668f81aa6ae89a1ffb555a124cda5035e19d0fff",
+      "bytes": 868039,
+      "last_modified": null
+    },
+    {
+      "id": "inactives",
+      "source_url": "https://www.giants.com/news/andrew-thomas-active-snf-chiefs-inactive-list-xavier-worthy-injury-status",
+      "title": "Giants official Week 3 active/inactive report",
+      "effective_date": "2025-09-21",
+      "captured_at": "2026-09-08T19:05:57.948189Z",
+      "sha256": "c278f12e952998f7087053431ac90abcb610379807716c26f92bf2ff99158244",
+      "bytes": 314093,
+      "last_modified": null
+    },
+    {
+      "id": "snaps",
+      "source_url": "https://www.giants.com/news/snap-counts-week-3-kansas-city-chiefs-cam-skattebo-jaxson-dart-abdul-carter-andrew-thomas-marcus-mbow",
+      "title": "Giants official Week 3 observed snap counts, Matt Citak",
+      "effective_date": "2025-09-21 game; published 2025-09-22",
+      "captured_at": "2026-09-08T19:05:57.948189Z",
+      "sha256": "432f4720a7ff0dbb5e315b100211f7b0c881431902a6f5c70805e4a0c416d9ae",
+      "bytes": 757423,
+      "last_modified": null
+    },
+    {
+      "id": "schedule",
+      "source_url": "https://nflreadr.nflverse.com/articles/nflverse_data_schedule.html",
+      "title": "nflverse data update and availability schedule",
+      "effective_date": "documentation at capture",
+      "captured_at": "2026-09-08T19:05:57.948189Z",
+      "sha256": "f59c125c418dbc44f77b58e0fe401e0b8014b174a219387aa14173b417ca0cad",
+      "bytes": 22664,
+      "last_modified": "Mon, 07 Sep 2026 17:13:17 GMT"
+    }
+  ],
+  "players": [
+    {
+      "name": "Demetrius Flannigan-Fowles",
+      "position": "LB",
+      "reported_injury": "Calf",
+      "practice": [
+        {
+          "date": "2025-09-17",
+          "status": "DNP"
+        },
+        {
+          "date": "2025-09-18",
+          "status": "LP"
+        },
+        {
+          "date": "2025-09-19",
+          "status": "LP"
+        }
+      ],
+      "game_status": "Doubtful",
+      "gameday": "Inactive",
+      "offensive_snaps": 0,
+      "reported_offensive_snap_percent": 0,
+      "offense_team_snaps": null
+    },
+    {
+      "name": "Chauncey Golston",
+      "position": "DL",
+      "reported_injury": "Ankle",
+      "practice": [
+        {
+          "date": "2025-09-17",
+          "status": "DNP"
+        },
+        {
+          "date": "2025-09-18",
+          "status": "DNP"
+        },
+        {
+          "date": "2025-09-19",
+          "status": "DNP"
+        }
+      ],
+      "game_status": "Questionable",
+      "gameday": "Inactive",
+      "offensive_snaps": 0,
+      "reported_offensive_snap_percent": 0,
+      "offense_team_snaps": null
+    },
+    {
+      "name": "Darius Muasau",
+      "position": "LB",
+      "reported_injury": "Concussion/Eye",
+      "practice": [
+        {
+          "date": "2025-09-17",
+          "status": "DNP"
+        },
+        {
+          "date": "2025-09-18",
+          "status": "DNP"
+        },
+        {
+          "date": "2025-09-19",
+          "status": "DNP"
+        }
+      ],
+      "game_status": "Out",
+      "gameday": "Inactive",
+      "offensive_snaps": 0,
+      "reported_offensive_snap_percent": 0,
+      "offense_team_snaps": null
+    },
+    {
+      "name": "Rakeem Nunez-Roches",
+      "position": "DL",
+      "reported_injury": "Foot",
+      "practice": [
+        {
+          "date": "2025-09-17",
+          "status": "LP"
+        },
+        {
+          "date": "2025-09-18",
+          "status": "LP"
+        },
+        {
+          "date": "2025-09-19",
+          "status": "DNP"
+        }
+      ],
+      "game_status": "Doubtful",
+      "gameday": "Inactive",
+      "offensive_snaps": 0,
+      "reported_offensive_snap_percent": 0,
+      "offense_team_snaps": null
+    },
+    {
+      "name": "Gunner Olszewski",
+      "position": "WR",
+      "reported_injury": "Back",
+      "practice": [
+        {
+          "date": "2025-09-17",
+          "status": "LP"
+        },
+        {
+          "date": "2025-09-18",
+          "status": "LP"
+        },
+        {
+          "date": "2025-09-19",
+          "status": "DNP"
+        }
+      ],
+      "game_status": "Questionable",
+      "gameday": "Observed offensive participation",
+      "offensive_snaps": 1,
+      "reported_offensive_snap_percent": 1.5,
+      "offense_team_snaps": 66
+    },
+    {
+      "name": "Wan'Dale Robinson",
+      "position": "WR",
+      "reported_injury": "Foot",
+      "practice": [
+        {
+          "date": "2025-09-17",
+          "status": "LP"
+        },
+        {
+          "date": "2025-09-18",
+          "status": "LP"
+        },
+        {
+          "date": "2025-09-19",
+          "status": "LP"
+        }
+      ],
+      "game_status": "No game designation",
+      "gameday": "Observed offensive participation",
+      "offensive_snaps": 51,
+      "reported_offensive_snap_percent": 77.3,
+      "offense_team_snaps": 66
+    },
+    {
+      "name": "Jon Runyan",
+      "position": "G",
+      "reported_injury": "Back",
+      "practice": [
+        {
+          "date": "2025-09-17",
+          "status": "LP"
+        },
+        {
+          "date": "2025-09-18",
+          "status": "LP"
+        },
+        {
+          "date": "2025-09-19",
+          "status": "LP"
+        }
+      ],
+      "game_status": "No game designation",
+      "gameday": "Observed offensive participation",
+      "offensive_snaps": 66,
+      "reported_offensive_snap_percent": 100.0,
+      "offense_team_snaps": 66
+    },
+    {
+      "name": "John Michael Schmitz",
+      "position": "C",
+      "reported_injury": "Toe",
+      "practice": [
+        {
+          "date": "2025-09-17",
+          "status": "LP"
+        },
+        {
+          "date": "2025-09-18",
+          "status": "LP"
+        },
+        {
+          "date": "2025-09-19",
+          "status": "LP"
+        }
+      ],
+      "game_status": "No game designation",
+      "gameday": "Observed offensive participation",
+      "offensive_snaps": 66,
+      "reported_offensive_snap_percent": 100.0,
+      "offense_team_snaps": 66
+    },
+    {
+      "name": "Darius Slayton",
+      "position": "WR",
+      "reported_injury": "Groin/Calf",
+      "practice": [
+        {
+          "date": "2025-09-17",
+          "status": "LP"
+        },
+        {
+          "date": "2025-09-18",
+          "status": "LP"
+        },
+        {
+          "date": "2025-09-19",
+          "status": "LP"
+        }
+      ],
+      "game_status": "No game designation",
+      "gameday": "Observed offensive participation",
+      "offensive_snaps": 50,
+      "reported_offensive_snap_percent": 75.8,
+      "offense_team_snaps": 66
+    },
+    {
+      "name": "Andrew Thomas",
+      "position": "T",
+      "reported_injury": "Foot",
+      "practice": [
+        {
+          "date": "2025-09-17",
+          "status": "LP"
+        },
+        {
+          "date": "2025-09-18",
+          "status": "LP"
+        },
+        {
+          "date": "2025-09-19",
+          "status": "LP"
+        }
+      ],
+      "game_status": "Questionable",
+      "gameday": "Observed offensive participation",
+      "offensive_snaps": 28,
+      "reported_offensive_snap_percent": 42.4,
+      "offense_team_snaps": 66
+    },
+    {
+      "name": "Tyrone Tracy Jr.",
+      "position": "RB",
+      "reported_injury": "Calf",
+      "practice": [
+        {
+          "date": "2025-09-17",
+          "status": "LP"
+        },
+        {
+          "date": "2025-09-18",
+          "status": "LP"
+        },
+        {
+          "date": "2025-09-19",
+          "status": "LP"
+        }
+      ],
+      "game_status": "No game designation",
+      "gameday": "Observed offensive participation",
+      "offensive_snaps": 11,
+      "reported_offensive_snap_percent": 16.7,
+      "offense_team_snaps": 66
+    },
+    {
+      "name": "Roy Robertson-Harris",
+      "position": "DL",
+      "reported_injury": "Knee",
+      "practice": [
+        {
+          "date": "2025-09-17",
+          "status": "FP"
+        },
+        {
+          "date": "2025-09-18",
+          "status": "FP"
+        },
+        {
+          "date": "2025-09-19",
+          "status": "FP"
+        }
+      ],
+      "game_status": "No game designation",
+      "gameday": "Not captured",
+      "offensive_snaps": null,
+      "reported_offensive_snap_percent": null,
+      "offense_team_snaps": null
+    },
+    {
+      "name": "Cam Skattebo",
+      "position": "RB",
+      "reported_injury": "Ankle",
+      "practice": [
+        {
+          "date": "2025-09-17",
+          "status": "FP"
+        },
+        {
+          "date": "2025-09-18",
+          "status": "FP"
+        },
+        {
+          "date": "2025-09-19",
+          "status": "FP"
+        }
+      ],
+      "game_status": "No game designation",
+      "gameday": "Observed offensive participation",
+      "offensive_snaps": 39,
+      "reported_offensive_snap_percent": 59.1,
+      "offense_team_snaps": 66
+    }
+  ],
+  "observed_offensive_usage": [
+    {
+      "name": "Andrew Thomas",
+      "snaps": 28,
+      "team_snaps": 66
+    },
+    {
+      "name": "Marcus Mbow",
+      "snaps": 38,
+      "team_snaps": 66
+    }
+  ],
+  "role_observation": "Giants.com reported that Marcus Mbow replaced Andrew Thomas during this game. This is a historical observation, not a current assignment."
+}

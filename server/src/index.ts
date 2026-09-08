@@ -59,6 +59,8 @@ const port = Number(process.env.PORT ?? 8787);
 
 serve({ fetch: app.fetch, port }, (info) => {
   console.log(`▶ gambit server listening on http://localhost:${info.port}`);
-  startMonitorScheduler();
-  console.log('▶ monitor scheduler running (1 min tick)');
+  if (process.env.DISABLE_MONITOR_SCHEDULER !== 'true') {
+    startMonitorScheduler();
+    console.log('▶ monitor scheduler running (1 min tick)');
+  }
 });
