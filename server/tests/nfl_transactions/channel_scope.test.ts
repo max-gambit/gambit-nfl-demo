@@ -69,7 +69,7 @@ test('market answer is complete without generated football interpretation', () =
     events: [],
   };
 
-  assert.match(body.answer, /20 matching player events/);
+  assert.match(body.answer, /20 EDGE player trade events/);
   assert.deepEqual(body.key_findings, []);
   assert.strictEqual(body.market_analysis, analysis);
   assert.equal(body.language_policy, 'facts_only_v1');
@@ -271,6 +271,10 @@ function marketAnalysis(
     analysis_id: analysisId,
     coverage: { event_count: 20 },
     position_trends: [],
+    yearly_series: [],
+    comparables: [],
+    influential_transactions: [],
+    source_refs: [],
     limitations: [],
     query: {
       analysis_mode: 'ten_year_trend',

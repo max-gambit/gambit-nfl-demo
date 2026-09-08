@@ -1,11 +1,12 @@
-import type { BriefSource, DataAnalysisBriefBody, NflTransactionMarketAnalysis } from '@shared/types';
+import type { BriefSource, DataAnalysisBriefBody, NflHistoricalSelection, NflTransactionMarketAnalysis } from '@shared/types';
 import { factualBody, type NflFactualQuery } from '@shared/nflFacts';
-import { nflTransactionMarketCohortEvidence, nflTransactionTradePackageLines } from '@shared/nflTransactionMarket';
+import { nflTransactionTradePackageLines } from '@shared/nflTransactionMarket';
 import { loadCurrentNflDataWithMode, type NflCapRow, type NflDemoSeed, type NflPlayerMetricRow, type NflRosterEntry } from '../nfl_data/seed.js';
 import { positionGroupsFromQuestion, teamIdsFromQuestion } from '../nfl_transactions/question.js';
 import { loadCurrentNflTransactionMarketSnapshot } from '../nfl_transactions/seed.js';
 import { analyzeNflTransactionMarket } from '../nfl_transactions/analyze.js';
 import { createClaudeMessage, BRIEF_MODEL } from '../claude/client.js';
+import { isHistoricalRecordQuestion, selectHistoricalRecords } from '../nfl_transactions/historical_selection.js';
 
 export interface FactualAnswer {
   body: DataAnalysisBriefBody;
@@ -122,12 +123,13 @@ async function planUnrecognizedQuestion(question: string, prior: NflFactualQuery
   } catch { return null; }
 }
 
-export async function buildNflFactualAnswer(question: string, prior: NflFactualQuery | null = null, market: NflTransactionMarketAnalysis | null = null): Promise<FactualAnswer> {
-  if (/\b(?:parsons|chubb|excluded|multi[- ]player|whole package|both sides)\b/i.test(question) && /\b(?:trades?|deals?|packages?|exclud(?:e|ed)|included|prices?|compensation|assets?)\b/i.test(question)) {
-    const analysis = market ?? await analyzeNflTransactionMarket({ analysis_mode: 'comparables', start_year: 2016, end_year: 2025, position_groups: ['EDGE'], transaction_types: ['trade'] }, { loadSnapshot: loadCurrentNflTransactionMarketSnapshot });
-    const found = historicalPackageAnswer(question, analysis);
-    if (found) return found;
-    return { body: factualBody({ answer: `No matching named trade record was found in the ${analysis.query.start_year}–${analysis.query.end_year} ${analysis.query.position_groups.join(', ')} cohort. The question has not been converted to current roster records.`, key_findings: [], tables: [], calculations: [], caveats: ['The executed historical scope may exclude a requested player or transaction. Change the period or position filter to widen it.'], followups: [], market_analysis: analysis }), sources: [] };
+export async function buildNflFactualAnswer(question: string, prior: NflFactualQuery | null = null, market: NflTransactionMarketAnalysis | null = null, historical: NflHistoricalSelection | null = null): Promise<FactualAnswer> {
+  if (market && historical?.years.length === 1 && /\bsame (?:period|years|window)\b/i.test(question)) return {
+    body: factualBody({ answer: `The current package selection covers ${historical.years[0]} only. The period-comparison view requires at least two years, so it has not replaced that selection with a longer period.`, key_findings: [], tables: [], calculations: [], caveats: [historical.summary], followups: [`Compare ${positionGroupsFromQuestion(question).join(' with ') || 'EDGE with IOL'} from ${market.query.start_year} through ${market.query.end_year}.`], market_analysis: market, historical_selection: historical, answer_layout: 'trade_packages' }), sources: [],
+  };
+  if (isHistoricalRecordQuestion(question, Boolean(market), Boolean(historical))) {
+    const analysis = market ?? await analyzeNflTransactionMarket({ analysis_mode: 'comparables', start_year: 2016, end_year: 2025, position_groups: positionGroupsFromQuestion(question), transaction_types: ['trade'] }, { loadSnapshot: loadCurrentNflTransactionMarketSnapshot });
+    return historicalPackageAnswer(question, analysis, historical);
   }
   const loaded = await loadCurrentNflDataWithMode();
   const query = factualQueryFromQuestion(question, loaded.seed, prior)
@@ -230,11 +232,8 @@ function transactionValues(cap: NflCapRow | undefined, query: NflFactualQuery) {
   return query.post_june ? { savings: cap.post_june_1_cut_savings_2026, dead: cap.post_june_1_dead_money_2026 } : { savings: cap.cut_savings_2026, dead: cap.dead_money_if_cut_2026 };
 }
 
-export function historicalPackageAnswer(question: string, market: NflTransactionMarketAnalysis): FactualAnswer | null {
-  const evidence = nflTransactionMarketCohortEvidence(market);
-  const names = namedPlayers(question, evidence.rows);
-  const rows = names.length ? evidence.rows.filter(r => names.includes(r.player_name)) : evidence.rows.filter(r => (r.trade_package?.assets.filter(a => a.asset_type === 'player').length ?? 0) > 1);
-  if (!rows.length) return null;
+export function historicalPackageAnswer(question: string, market: NflTransactionMarketAnalysis, prior: NflHistoricalSelection | null = null): FactualAnswer {
+  const { rows, selection, evidence, unknownSubject, unsupportedFilter } = selectHistoricalRecords(question, market, prior);
   const sources = rows.map((row, index): FactualAnswer['sources'][number] => ({
     ref_index: index + 1, kind: 'TRANSACTION', source: 'Recorded NFL transaction package', title: `${row.player_name} · ${row.event_year}`, updated_at: row.event_date ?? `${row.event_year}-01-01`, data: {
       source_url: (market.source_refs.find(s => s.id === 'trades' && row.source_ref_ids.includes(s.id))
@@ -244,9 +243,10 @@ export function historicalPackageAnswer(question: string, market: NflTransaction
     },
   }));
   return { body: factualBody({
-    answer: `${rows.length} matching player trade records in the ${market.query.start_year}–${market.query.end_year} cohort. Multi-player deals are excluded from the per-player pick-price calculation because their compensation is not allocated to individual players. They remain part of the historical record.`,
-    key_findings: rows.map((row, index) => ({ label: `${row.player_name} · ${row.event_year}`, body: nflTransactionTradePackageLines(row).join('; ') || row.compensation_summary || 'Package detail is not recorded.', source_refs: [index + 1] })),
-    tables: [], calculations: [], caveats: ['The single-player sample does not establish a ceiling, a player valuation, or a current asking price. Removing multi-player transactions changes the sample composition.', evidence.summary], followups: [], market_analysis: market,
+    answer_layout: 'trade_packages',
+    answer: unsupportedFilter ? 'That condition is not supported by the package filters. No broader or opposite selection has been substituted.' : unknownSubject ? `The requested subject could not be matched to a trade record in this cohort. No broader selection has been substituted.` : `${rows.length} matching ${evidence.unidentifiedTradeEventCount ? 'trade records (some deal IDs are missing)' : rows.length === 1 ? 'distinct trade' : 'distinct trades'} ${evidence.complete ? 'in' : 'in the stored sample from'} the ${market.query.start_year}–${market.query.end_year} ${market.query.position_groups.join(', ') || 'all-position'} cohort.${evidence.complete ? '' : ' The complete matching count is unavailable in this saved result.'} Each package below shows the recorded assets received by both teams, ordered by date (newest first).`,
+    key_findings: [{ label: 'Selection', body: selection.summary, source_refs: rows.map((_, index) => index + 1) }],
+    tables: [], calculations: [], caveats: [evidence.summary, 'Multi-player deals remain in the record but are excluded from per-player draft-return percentages because the compensation is not allocated to individual players. Historical packages do not establish a current asking price.'], followups: rows.length ? [selection.pick_rounds.length ? 'Show the complete trade packages.' : 'Only include trades returning a first-round pick.', selection.years.length ? `Compare ${market.query.position_groups[0] || 'EDGE'} with ${market.query.position_groups[0] === 'IOL' ? 'EDGE' : 'IOL'} over the same period.` : `Only ${market.query.end_year}.`] : ['Show the complete trade packages.'], market_analysis: market, historical_selection: selection,
   }), sources };
 }
 

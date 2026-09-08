@@ -66,9 +66,52 @@
 .gc-fact-table { margin: 20px 0; }
 .gc-fact-table h3 { font-size: 11px; font-weight: 500; color: #4c5868; margin: 0 0 10px; }
 .gc-fact-table > div { overflow-x: auto; border: 1px solid var(--gc-line); border-radius: 5px; }
-.gc-fact-table table { border-collapse: collapse; width: 100%; font-size: 12px; white-space: nowrap; }
+.gc-fact-table table { border-collapse: collapse; width: 100%; font-size: 12px; }
 .gc-fact-table th { background: #f3f5f7; font-weight: 500; color: #4c5868; text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--gc-line); }
 .gc-fact-table td { padding: 10px 12px; color: #33424a; border-bottom: 1px solid #f0f3f7; font-variant-numeric: tabular-nums; }
+.gc-fact-table td { line-height: 1.55; }
+.gc-package-table td:last-child { min-width: 330px; white-space: pre-line; }
+.gc-fact-table h3, .gc-evidence-heading h3, .gc-scenario-change h3, .gc-visible-calculations h3 { font-size: 13px; font-weight: 650; color: #26364c; }
+.gc-evidence-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.gc-evidence-heading h3 { margin: 0; }
+.gc-evidence-note { font-size: 12px; color: #626b77; line-height: 1.6; margin: 8px 0 12px; }
+.gc-market-depth { display: grid; gap: 26px; margin: 24px 0; }
+.gc-annual { border: 1px solid var(--gc-line); border-radius: 4px; padding: 16px; }
+.gc-measure-toggle { display: flex; gap: 2px; padding: 2px; background: #f0f3f7; border-radius: 4px; }
+.gc-measure-toggle button { border: 0; background: transparent; padding: 6px 8px; color: #526071; font-size: 11px; border-radius: 3px; }
+.gc-measure-toggle button[aria-pressed=true] { background: white; color: #18365c; box-shadow: 0 0 0 1px #d6dce5; }
+.gc-annual-bars { display: grid; gap: 8px; overflow-x: auto; padding: 4px 0; }
+.gc-annual-bars > button { padding: 6px 4px; border: 1px solid transparent; border-radius: 3px; background: transparent; color: #526071; }
+.gc-annual-bars > button.selected { background: #edf3fa; border-color: #9db2cc; }
+.gc-annual-bars > button:hover { background: #f3f6fa; }
+.gc-annual-bars strong { display: block; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.gc-annual-bars small { display: block; font-size: 11px; margin-top: 6px; }
+.gc-bar-track { height: 88px; display: flex; align-items: flex-end; justify-content: center; border-bottom: 1px solid #cbd3df; margin-top: 6px; }
+.gc-bar-track > span { display: block; width: 62%; background: #45678f; min-height: 0; }
+.gc-annual-bars .selected .gc-bar-track > span { background: #18365c; }
+.gc-text-button { border: 0; background: transparent; color: #31547f; font-size: 12px; padding: 4px 0; }
+.gc-package-list { display: grid; gap: 12px; }
+.gc-package-list article { border: 1px solid var(--gc-line); border-radius: 4px; padding: 14px 16px; }
+.gc-package-list article > header { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding-bottom: 11px; border-bottom: 1px solid var(--gc-line); }
+.gc-package-list article > header strong { font-size: 14px; }
+.gc-package-list article > header span { font-size: 12px; color: #626b77; }
+.gc-package-list article > header button { margin-left: auto; border: 0; background: transparent; color: #31547f; font-size: 12px; padding: 0; }
+.gc-package-sides { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 20px; }
+.gc-package-sides h4 { font-size: 12px; margin: 12px 0 6px; color: #526071; }
+.gc-package-sides ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.65; }
+.gc-package-list article > .gc-evidence-note { margin-bottom: 0; }
+.gc-scenario-change { border: 1px solid #c7d3e2; border-radius: 4px; margin: 20px 0; padding: 14px; }
+.gc-scenario-change h3 { margin: 0 0 12px; }
+.gc-scenario-change > div { overflow-x: auto; }
+.gc-scenario-change table { width: 100%; border-collapse: collapse; font-size: 12px; line-height: 1.5; text-align: left; }
+.gc-scenario-change th, .gc-scenario-change td { padding: 8px; border-top: 1px solid var(--gc-line); font-weight: 400; }
+.gc-scenario-change thead th { border: 0; font-size: 11px; color: #626b77; }
+.gc-scenario-change .changed { background: #edf3fa; }
+.gc-scenario-change .changed th, .gc-scenario-change .changed td:last-child { font-weight: 600; }
+.gc-scenario-change small { color: #626b77; white-space: nowrap; }
+.gc-visible-calculations { padding: 14px 16px; border: 1px solid var(--gc-line); border-radius: 4px; margin: 18px 0; }
+.gc-visible-calculations h3 { margin: 0 0 12px; }
+.gc-visible-calculations .gc-formula { padding: 0; margin: 12px 0 0; }
 .gc-fact-table tr:last-child td { border: 0; }
 .gc-calculation-details { border: 1px solid var(--gc-line); border-radius: 5px; margin: 18px 0; background: #ffffff; min-width: 0; }
 .gc-calculation-details > summary { padding: 13px 15px; font-size: 11px; color: #364355; cursor: pointer; }

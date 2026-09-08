@@ -1,5 +1,7 @@
+import { factualMarketAnswer, factualSellerAnswer } from '@shared/nflAnswerDepth';
 import { factualBody } from '@shared/nflFacts';
 import { buildNflFactualAnswer, unsupportedAnswer } from '../nfl_facts/answer.js';
+import { isHistoricalRecordQuestion } from '../nfl_transactions/historical_selection.js';
 import { randomBytes } from 'node:crypto';
 import { Hono } from 'hono';
 import Anthropic from '@anthropic-ai/sdk';
@@ -227,9 +229,12 @@ briefRoutes.post('/', async (c) => {
   const channelContext = nflAnalysisContextForSession(contextBriefs, session_id);
   const latestMarketAnalysis = channelContext.market;
   const latestSellerMove = channelContext.seller_scenario;
+  const previousHistoricalSelection = contextBriefs[0]?.body?.kind === 'data_analysis' ? contextBriefs[0].body.historical_selection ?? null : null;
   const intent = classifyNflAnalysisTurn(question, {
     market_query: latestMarketAnalysis?.query ?? null,
     seller_scenario: latestSellerMove,
+    historical_selection: Boolean(previousHistoricalSelection),
+    historical_years: previousHistoricalSelection?.years,
   });
   const preparedSellerTurn = intent.kind === 'seller_move'
     ? await runNflSellerMoveConversationTurn(question, latestMarketAnalysis, latestSellerMove).catch(() => null)
@@ -249,7 +254,7 @@ briefRoutes.post('/', async (c) => {
     : null;
   const previousFactualQuery = contextBriefs[0]?.body?.kind === 'data_analysis' ? contextBriefs[0].body.factual_query ?? null : null;
   const preparedFactualAnswer = intent.kind === 'general'
-    ? await buildNflFactualAnswer(question, previousFactualQuery, latestMarketAnalysis).catch(() => unsupportedAnswer())
+    ? await buildNflFactualAnswer(question, previousFactualQuery, latestMarketAnalysis, previousHistoricalSelection).catch(() => unsupportedAnswer())
     : null;
   const explicitMode = normalizeBriefMode(body.mode);
   const transactionMarketQuestion = intent.kind === 'transaction_market';
@@ -842,8 +847,9 @@ export async function regenerateBriefById(
     );
     const market = latestNflTransactionMarketAnalysis(lookup.traces);
     if (!market) throw new Error('Required NFL transaction-market analysis was not returned.');
-    const packageAnswer = /\b(?:parsons|chubb|multi[- ]player|excluded|whole package|both sides)\b/i.test(existingBrief.question)
-      ? await buildNflFactualAnswer(existingBrief.question, null, market)
+    const savedSelection = existingBrief.body?.kind === 'data_analysis' ? existingBrief.body.historical_selection ?? null : null;
+    const packageAnswer = Boolean(savedSelection) || isHistoricalRecordQuestion(existingBrief.question, true, false)
+      ? await buildNflFactualAnswer(existingBrief.question, null, market, savedSelection)
       : null;
     const immediateBody = packageAnswer?.body ?? transactionMarketArtifactBody(market);
     const progress = marketArtifactBriefProgress();
@@ -2665,19 +2671,7 @@ export async function ensureNflTransactionMarketLookup(
 export function transactionMarketArtifactBody(
   analysis: NflTransactionMarketAnalysis,
 ): DataAnalysisBriefBody {
-  const rates = analysis.position_trends.filter(t => t.mobility.baseline_value != null && t.mobility.recent_value != null)
-    .slice(0, 3).map(t => `${t.position_group} player events per 100 roster player-seasons: ${(t.mobility.baseline_value! / 100).toFixed(2)} → ${(t.mobility.recent_value! / 100).toFixed(2)}.`).join(' ');
-  return {
-    kind: 'data_analysis',
-    language_policy: 'facts_only_v1',
-    answer: `${analysis.coverage.event_count.toLocaleString()} matching player events from ${analysis.query.start_year} through ${analysis.query.end_year}, covering ${analysis.query.position_groups.join(', ') || 'all positions'}. Comparing ${analysis.query.baseline_years.join('–')} with ${analysis.query.recent_years.join('–')}: ${rates || 'the requested period measures are available below; missing measures remain unreported.'}`,
-    key_findings: [],
-    tables: [],
-    calculations: [],
-    caveats: ['Player events are recorded player movements; one trade can contain multiple player events. Rates use the recorded roster player-season denominator. Historical transactions do not establish current availability or asking prices.', ...analysis.limitations],
-    followups: ['Only include trades from 2020 through 2025.', 'Show the complete trade packages.'],
-    market_analysis: analysis,
-  };
+  return factualMarketAnswer(analysis);
 }
 
 function sellerModifierClarificationBody(): DataAnalysisBriefBody {
@@ -2723,7 +2717,7 @@ export function sellerMoveArtifactBody(
 ): DataAnalysisBriefBody {
   const result = artifact.result;
   const comparableRefs = result?.comparables.map((_, index) => index + 4) ?? [];
-  return {
+  return factualSellerAnswer({
     kind: 'data_analysis',
     language_policy: 'facts_only_v1',
     answer: result ? `Under the proposed ${result.proposal.pick_year} round ${result.proposal.pick_round} trade for ${result.player.player_name}, the recorded contract calculation is ${formatSellerMoveDollars(result.cap.current_year_cap_space_created_dollars)} of ${result.cap.current_year} cap space created and ${formatSellerMoveDollars(result.cap.current_year_dead_money_dollars)} of dead money. The proposed pick is an assumption, not an observed offer.` : artifact.message ?? 'This trade cannot be calculated from the available public data.',
@@ -2766,7 +2760,7 @@ export function sellerMoveArtifactBody(
     seller_move_analysis: artifact,
 
     ...(showMarketAnalysis ? { combined_market_seller_analysis: true } : {}),
-  };
+  });
 }
 
 export async function deterministicSellerMoveEvidenceRows(

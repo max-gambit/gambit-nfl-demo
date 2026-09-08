@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Brief, BriefSource, DataAnalysisBriefBody } from '@shared/types';
 import { isFactualBody } from '@shared/nflFacts';
+import { factualAnswerPresentation, marketAnnualRows } from '@shared/nflAnswerDepth';
+import { HistoricalPackageEvidence, MarketAnswerEvidence, ScenarioChangeEvidence } from './NygAnswerEvidence';
 import { nflTransactionMarketCohortEvidence, nflTransactionTradePackageLines } from '@shared/nflTransactionMarket';
 import { createBrief, createBriefWithSession, getBrief } from '../api/briefs';
 import { useBookmarks, useBriefs, useSessions, useUi } from '../store';
@@ -31,6 +33,7 @@ export function NygChatWorkspace({ showLibrary = false, onOpenChat }: { showLibr
   const [savedFeedback, setSavedFeedback] = useState<string | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const latestTurnRef = useRef<HTMLElement>(null);
   const inFlight = useRef(false);
   const initialized = useRef(false);
   const turns = useMemo(() => briefs.filter(b => b.session_id === activeSessionId).sort((a, b) => a.created_at.localeCompare(b.created_at)), [briefs, activeSessionId]);
@@ -62,8 +65,9 @@ export function NygChatWorkspace({ showLibrary = false, onOpenChat }: { showLibr
     if (turns.length) setActiveBrief(turns.at(-1)!.id);
   }, [activeSessionId, turns.length, setActiveBrief]);
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ block: 'end', behavior: 'smooth' });
-  }, [turns.length, pending]);
+    if (pending) bottomRef.current?.scrollIntoView({ block: 'end', behavior: 'smooth' });
+    else latestTurnRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }, [activeSessionId, turns.length, pending]);
   useEffect(() => onEvt('v6d3cf:prefill-composer', ({ text }) => { setDraft(text); inputRef.current?.focus(); }), []);
   useEffect(() => onEvt('v6d3cf:focus-composer', () => inputRef.current?.focus()), []);
   useEffect(() => onEvt('v6d3cf:open-evidence', () => { if (activeBriefId) { setEvidenceId(activeBriefId); void loadBriefData(activeBriefId); } }), [activeBriefId, loadBriefData]);
@@ -120,11 +124,11 @@ export function NygChatWorkspace({ showLibrary = false, onOpenChat }: { showLibr
         <header className="gc-conversation-header"><div><h1>{activeSession?.label ?? 'Chat'}</h1></div><span className="gc-save-state">{pending ? 'Checking sources…' : turns.length ? 'Conversation saved' : 'New conversation'}</span></header>
         <div className="gc-scroll" aria-label="Conversation">
           {!sessionsLoaded || !briefsLoaded ? <p className="gc-empty-note" role="status">Loading conversations…</p> : turns.length === 0 && !pending ? <section className="gc-welcome"><h2>New conversation</h2><p>Ask about player records, historical transactions, contract calculations or the rule behind a move.</p><div className="gc-starters">{STARTERS.map(starter => <button key={starter.label} onClick={() => { setDraft(starter.question); inputRef.current?.focus(); }}><div><strong>{starter.label}</strong><small>{starter.detail}</small></div><b>↗</b></button>)}</div></section> : <div className="gc-turns">
-            {turns.map(answer => <article key={answer.id} className="gc-turn" data-brief-id={answer.id}>
+            {turns.map((answer, index) => <article key={answer.id} ref={index === turns.length - 1 ? latestTurnRef : undefined} className="gc-turn" data-brief-id={answer.id}>
               <div className="gc-user"><span className="gc-eyebrow">YOU</span><p>{answer.question}</p></div>
               <div className="gc-assistant"><div className="gc-answer-mark"><small>Gambit</small></div>
                 {answer.status === 'generating' ? <p role="status">Checking the requested records…</p> : !isFactualBody(answer.body) ? <div className="gc-legacy"><p>{answer.status === 'failed' ? 'This earlier question did not complete.' : 'This earlier answer includes analysis outside the current factual format.'}</p><button disabled={Boolean(pending)} onClick={() => void submit(answer.question)}>Ask again with current facts →</button></div> : <>
-                  <FactualAnswer body={answer.body} briefId={answer.id} onEvidence={ref => openEvidence(answer.id, ref)} />
+                  <FactualAnswer body={answer.body} previous={isFactualBody(turns[index - 1]?.body) ? turns[index - 1].body as DataAnalysisBriefBody : null} briefId={answer.id} onEvidence={ref => openEvidence(answer.id, ref)} />
                   <div className="gc-answer-actions"><button onClick={() => openEvidence(answer.id)}>Sources & limits <span>{sourcesByBrief[answer.id]?.length ?? '…'}</span></button><button onClick={() => void saveBrief(answer)}>{bookmarkedBriefIds.has(answer.id) ? 'Open saved brief' : 'Save as brief'}</button></div>
                   {answer.id === turns.at(-1)?.id && answer.body.followups.length > 0 && <div className="gc-followups">{answer.body.followups.slice(0, 3).map(text => <button key={text} disabled={Boolean(pending)} onClick={() => void submit(text)}>{text} <span>↗</span></button>)}</div>}
                 </>}
@@ -143,19 +147,26 @@ export function NygChatWorkspace({ showLibrary = false, onOpenChat }: { showLibr
   </div>;
 }
 
-function FactualAnswer({ body, briefId, onEvidence, expanded = false }: { body: DataAnalysisBriefBody; briefId: string; onEvidence: (ref?: number) => void; expanded?: boolean }) {
-  const { setActiveBrief } = useBriefs();
-  const [detailsOpen, setDetailsOpen] = useState(expanded);
+function FactualAnswer({ body: savedBody, previous = null, briefId, onEvidence, expanded = false }: { body: DataAnalysisBriefBody; previous?: DataAnalysisBriefBody | null; briefId: string; onEvidence: (ref?: number) => void; expanded?: boolean }) {
+  const { setActiveBrief, sourcesByBrief } = useBriefs();
+  const [detailsOpen, setDetailsOpen] = useState(expanded && savedBody.answer_layout !== 'trade_packages');
+  const body = factualAnswerPresentation(savedBody);
   const result = body.seller_move_analysis?.result;
-  const primaryMarket = body.market_analysis && !body.seller_move_analysis;
+  const primaryMarket = body.market_analysis && !body.seller_move_analysis && body.answer_layout !== 'trade_packages';
+  const cite = (refs: number[]) => refs.length ? <button className="gc-cite" onClick={() => onEvidence(refs[0])}>[{refs.slice(0, 4).join(', ')}{refs.length > 4 ? '…' : ''}]</button> : null;
   return <div className="gc-factual-answer" onFocus={() => setActiveBrief(briefId)} onMouseDown={() => setActiveBrief(briefId)}>
     <p className="gc-answer-lead">{body.answer}</p>
     {result && <div className="gc-fact-strip"><div><small>{result.cap.current_year} CAP SPACE CREATED</small><strong>{money(result.cap.current_year_cap_space_created_dollars)}</strong></div><div><small>{result.cap.current_year} DEAD MONEY</small><strong>{money(result.cap.current_year_dead_money_dollars)}</strong></div><div><small>PROPOSED RETURN</small><strong>{result.proposal.pick_year} · Round {result.proposal.pick_round}</strong></div></div>}
+    {result && previous?.seller_move_analysis?.result && <ScenarioChangeEvidence current={result} previous={previous.seller_move_analysis.result} />}
     {primaryMarket && <div className="gc-fact-strip"><div><small>PLAYER EVENTS</small><strong>{body.market_analysis!.coverage.event_count}</strong></div><div><small>DISTINCT TRADES</small><strong>{body.market_analysis!.coverage.distinct_trade_count ?? 'Not recorded'}</strong></div><div><small>HISTORICAL PERIOD</small><strong>{body.market_analysis!.query.start_year}–{body.market_analysis!.query.end_year}</strong></div></div>}
-    {!body.seller_move_analysis && body.key_findings.map((finding, i) => <div className="gc-finding" key={i}><strong>{finding.label}</strong><p>{finding.body} {finding.source_refs.length > 0 && <button className="gc-cite" onClick={() => onEvidence(finding.source_refs[0])}>[{finding.source_refs.slice(0, 4).join(', ')}{finding.source_refs.length > 4 ? '…' : ''}]</button>}</p></div>)}
-    {body.tables.map((table, i) => <div className="gc-fact-table" key={i}><h3>{table.title}</h3><div><table><thead><tr>{table.columns.map((column, j) => <th key={j}>{column}</th>)}</tr></thead><tbody>{table.rows.map((row, j) => <tr key={j}>{row.map((cell, k) => <td key={k}>{String(cell ?? 'Not recorded')}</td>)}</tr>)}</tbody></table></div></div>)}
-    {body.market_analysis && <details className="gc-calculation-details" open={detailsOpen} onToggle={e => setDetailsOpen(e.currentTarget.open)}><summary>{body.seller_move_analysis ? 'Contract calculation & historical comparisons' : 'Explore periods, measures & all matching transactions'}</summary><div className="gc-details-body">{body.seller_move_analysis ? <NflSellerMoveAnalysis artifact={body.seller_move_analysis} briefId={briefId} onEvidence={onEvidence} /> : <NflTransactionMarketAnalysisView analysis={body.market_analysis} briefId={briefId} onEvidence={onEvidence} />}{body.seller_move_analysis && body.key_findings.length > 0 && body.key_findings.map((f, i) => <div className="gc-finding" key={i}><strong>{f.label}</strong><p>{f.body}</p></div>)}</div></details>}
-    {!body.market_analysis && body.calculations.length > 0 && <details className="gc-calculation-details" open={expanded}><summary>Calculation</summary>{body.calculations.map((calc, i) => <p className="gc-formula" key={i}><strong>{calc.label}</strong><br />{calc.formula} = {calc.value}</p>)}</details>}
+    {body.key_findings.map((finding, i) => <div className="gc-finding" key={i}><strong>{finding.label}</strong><p>{finding.body} {cite(finding.source_refs)}</p></div>)}
+    {body.tables.map((table, i) => <div className={`gc-fact-table${table.title.includes('packages') ? ' gc-package-table' : ''}`} key={i}>
+      <h3>{table.title} {cite(table.source_refs)}</h3><div><table><thead><tr>{table.columns.map((column, j) => <th key={j}>{column}</th>)}</tr></thead><tbody>{table.rows.map((row, j) => <tr key={j}>{row.map((cell, k) => <td key={k}>{String(cell ?? 'Not recorded')}</td>)}</tr>)}</tbody></table></div>
+    </div>)}
+    {body.historical_selection && body.market_analysis && <HistoricalPackageEvidence analysis={body.market_analysis} selection={body.historical_selection} sources={sourcesByBrief[briefId] ?? []} onEvidence={onEvidence} />}
+    {body.answer_layout === 'market_overview' && body.market_analysis && <MarketAnswerEvidence analysis={body.market_analysis} sources={sourcesByBrief[briefId] ?? []} onEvidence={onEvidence} />}
+    {body.market_analysis && <details className="gc-calculation-details" open={detailsOpen} onToggle={e => setDetailsOpen(e.currentTarget.open)}><summary>{body.seller_move_analysis ? 'Full contract and comparison evidence' : body.historical_selection ? `Original ${body.market_analysis.query.start_year}–${body.market_analysis.query.end_year} cohort and methodology` : 'All matching transactions, additional measures & methodology'}</summary><div className="gc-details-body">{body.seller_move_analysis ? <NflSellerMoveAnalysis artifact={body.seller_move_analysis} briefId={briefId} onEvidence={onEvidence} /> : <NflTransactionMarketAnalysisView analysis={body.market_analysis} briefId={briefId} onEvidence={onEvidence} />}</div></details>}
+    {!body.market_analysis && body.calculations.length > 0 && <div className="gc-visible-calculations"><h3>Calculation</h3>{body.calculations.map((calc, i) => <p className="gc-formula" key={i}><strong>{calc.label}</strong><br />{calc.formula} = {calc.value} {cite(calc.source_refs)}</p>)}</div>}
     {body.caveats.length > 0 && <div className="gc-answer-limit"><strong>Sources & assumptions</strong><p>{body.caveats[0]}</p>{body.caveats.length > 1 && <button onClick={() => onEvidence()}>View all {body.caveats.length} limitations →</button>}</div>}
   </div>;
 }
@@ -175,12 +186,14 @@ function SourceList({ sources, selectedRef }: { sources?: BriefSource[]; selecte
   })}</div>;
 }
 function briefTitle(brief: Brief): string {
+  const selection = isFactualBody(brief.body) ? brief.body.historical_selection : null;
+  if (selection && isFactualBody(brief.body)) return [selection.player_names.join(', ') || `${brief.body.market_analysis?.query.position_groups.join(', ') || 'NFL'} trade packages`, selection.years.join(', '), selection.pick_rounds.length ? `Round ${selection.pick_rounds.join(', ')} returns` : ''].filter(Boolean).join(' · ');
   const result = isFactualBody(brief.body) ? brief.body.seller_move_analysis?.result : null;
   return result ? `${result.player.player_name} · ${result.proposal.pick_year} round ${result.proposal.pick_round} trade scenario` : brief.question;
 }
 function downloadBrief(brief: Brief, sources: BriefSource[]) {
   if (!isFactualBody(brief.body)) return;
-  const body = brief.body;
+  const body = factualAnswerPresentation(brief.body);
   const cell = (value: unknown) => String(value ?? 'Not recorded').replaceAll('|', '\\|').replaceAll('\n', ' ');
   const lines = [`# ${briefTitle(brief)}`, `New York Giants · saved ${brief.created_at}`, '', `Question: ${brief.question}`, '', body.answer, ''];
   const table = (title: string, columns: string[], rows: unknown[][]) => {
@@ -197,10 +210,11 @@ function downloadBrief(brief: Brief, sources: BriefSource[]) {
   }
   if (body.market_analysis) {
     const market = body.market_analysis;
-    lines.push('## Historical scope', `${market.query.start_year}–${market.query.end_year}; ${market.query.position_groups.join(', ') || 'all positions'}; ${market.query.transaction_types.join(', ')}; ${market.query.team_ids.join(', ') || 'leaguewide'}.`, `${market.coverage.event_count} player events; ${market.coverage.distinct_trade_count ?? 'unrecorded'} distinct trades.`, '');
-    if (!seller) table(`Period measures: ${market.query.baseline_years.join('–')} → ${market.query.recent_years.join('–')}`, ['Position', 'Player events', 'Events per 100 player-seasons'], market.position_trends.map(t => [t.position_group, t.event_count, `${t.mobility.baseline_value == null ? 'Not recorded' : (t.mobility.baseline_value / 100).toFixed(2)} → ${t.mobility.recent_value == null ? 'Not recorded' : (t.mobility.recent_value / 100).toFixed(2)}`]));
+    if (!seller && !body.historical_selection) table('Annual recorded player events', ['Year', 'Player events', 'Roster player-seasons'], marketAnnualRows(market).map(p => [p.partial ? `${p.year} (partial)` : p.year, p.events, p.rosterPlayerSeasons]));
+    lines.push(body.historical_selection ? '## Original historical cohort' : '## Historical scope', `${market.query.start_year}–${market.query.end_year}; ${market.query.position_groups.join(', ') || 'all positions'}; ${market.query.transaction_types.join(', ')}; ${market.query.team_ids.join(', ') || 'leaguewide'}.`, `${market.coverage.event_count} player events; ${market.coverage.distinct_trade_count ?? 'unrecorded'} distinct trades.`, '');
+    if (!seller && !body.historical_selection) table(`Period measures: ${market.query.baseline_years.join('–')} → ${market.query.recent_years.join('–')}`, ['Position', 'Player events', 'Events per 100 player-seasons'], market.position_trends.map(t => [t.position_group, t.event_count, `${t.mobility.baseline_value == null ? 'Not recorded' : (t.mobility.baseline_value / 100).toFixed(2)} → ${t.mobility.recent_value == null ? 'Not recorded' : (t.mobility.recent_value / 100).toFixed(2)}`]));
     const cohort = nflTransactionMarketCohortEvidence(market);
-    const events = seller ? cohort.rows.filter(r => seller.comparables.some(c => c.event_id === r.event_id)) : cohort.rows;
+    const events = seller ? cohort.rows.filter(r => seller.comparables.some(c => c.event_id === r.event_id)) : body.historical_selection ? body.historical_selection.event_ids.flatMap(id => { const row = cohort.rows.find(r => r.event_id === id); return row ? [row] : []; }) : cohort.rows;
     table(seller ? 'Displayed historical comparison sample' : 'Matching historical transactions', ['Player', 'Date', 'Move', 'Recorded package / terms'], events.map(r => [r.player_name, r.event_date ?? r.event_year, `${r.from_team_id ?? '—'} → ${r.to_team_id ?? '—'}`, nflTransactionTradePackageLines(r).join('; ') || r.compensation_summary || 'Not recorded']));
     lines.push(cohort.summary, '');
   }

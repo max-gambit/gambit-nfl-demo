@@ -5,6 +5,7 @@ import type {
 import { isNflTransactionMarketQuestion, isNflTransactionMarketRefinement } from './question.js';
 import { parseNflSellerMoveTurn } from './seller_move_conversation.js';
 import { classifyNflCurrentQuestion, type NflCurrentQuestionKind } from '../nfl_current/analysis.js';
+import { isHistoricalRecordQuestion } from './historical_selection.js';
 
 export type NflAnalysisTurnIntent =
   | { kind: 'rules' }
@@ -17,6 +18,8 @@ export type NflAnalysisTurnIntent =
 export interface NflAnalysisTurnContext {
   market_query: NflTransactionMarketResolvedQuery | null;
   seller_scenario: NflSellerMoveScenarioState | null;
+  historical_selection?: boolean;
+  historical_years?: number[];
 }
 
 /**
@@ -31,11 +34,15 @@ export function classifyNflAnalysisTurn(
   const currentQuestion = classifyNflCurrentQuestion(value);
   // A named historical-package challenge needs the recorded assets, not a
   // fresh aggregate query or a replacement player in the current proposal.
-  if (/\b(?:parsons|chubb|multi[- ]player|excluded|whole package|both sides)\b/i.test(value)
-    && /\b(?:trades?|deals?|packages?|exclud(?:e|ed)|included|prices?|compensation|assets?)\b/i.test(value)) return { kind: 'general' };
+  if (isHistoricalRecordQuestion(value, Boolean(context.market_query), context.historical_selection)) return { kind: 'general' };
   // Market filters such as "what about EDGE instead" must not be consumed
   // as a replacement player in an older seller scenario.
   if (!currentQuestion && context.market_query && isNflTransactionMarketRefinement(value)) {
+    const selectedYears = context.historical_years ?? [];
+    if (selectedYears.length && /\bsame (?:period|years|window)\b/i.test(value)) {
+      if (selectedYears.length === 1) return { kind: 'general' };
+      return { kind: 'transaction_market', inherited_query: { ...context.market_query, start_year: Math.min(...selectedYears), end_year: Math.max(...selectedYears) } };
+    }
     return { kind: 'transaction_market', inherited_query: context.market_query };
   }
   // Explicit requested calculations win over a rule word that may merely

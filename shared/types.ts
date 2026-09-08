@@ -187,12 +187,26 @@ export interface DataAnalysisCalculation {
   source_refs: number[];
 }
 
+export interface NflHistoricalSelection {
+  player_names: string[];
+  years: number[];
+  pick_rounds: number[];
+  pick_years?: number[];
+  team_ids: string[];
+  multi_player_only: boolean;
+  event_ids: string[];
+  summary: string;
+}
+
 export interface DataAnalysisBriefBody {
   kind: 'data_analysis';
   /** Only server-rendered facts and calculations may use this policy marker. */
   language_policy?: 'facts_only_v1';
+  /** Factual answer structure; the underlying recorded artifact remains authoritative. */
+  answer_layout?: 'market_overview' | 'trade_scenario' | 'trade_packages';
   /** Executed factual selection, retained for follow-ups and saved briefs. */
   factual_query?: import('./nflFacts').NflFactualQuery;
+  historical_selection?: NflHistoricalSelection;
   answer: string;
   key_findings: DataAnalysisFinding[];
   tables: DataAnalysisTable[];

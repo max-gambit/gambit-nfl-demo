@@ -56,6 +56,7 @@ export function isNflTransactionMarketRefinement(question: string): boolean {
     || /^(?:from|between|since|through|until|after|before)\s+20\d{2}\b/i.test(value)
     || /^20\d{2}\s*(?:through|to|[-–—])\s*20\d{2}$/i.test(value);
   if (!hasCue) return false;
+  value = value.replace(/\b(?:over|for|during) (?:the )?same (?:period|years|window)\b/gi, '');
   value = value.replace(lead, '');
   let facets = 0;
   const consume = (pattern: RegExp) => {
