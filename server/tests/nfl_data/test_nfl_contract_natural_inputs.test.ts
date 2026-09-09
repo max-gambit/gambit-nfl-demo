@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { NflContractScenarioArgs, NflIllustrativeContractYear } from '../../src/nfl_contracts/types.js';
 import { extractBudget, validateNflScenarioInputProvenance } from '../../src/nfl_contracts/input_provenance.js';
-import { executeContractComparison } from '../../src/nfl_conversation/contract_tools.js';
+import { executeContractComparison, executeCapStrategy } from '../../src/nfl_conversation/contract_tools.js';
 import { updateNflConversationState } from '../../src/nfl_conversation/state.js';
 
 const EXACT_LIVE_PROMPT = 'For a clearly hypothetical price test, acquire Jakobi Meyers for NYG after June 1 in 2026 with a new signing bonus of $2 million, active years 2026 and 2027 only, base salary $2 million in 2026 and $4.5 million in 2027. Outstanding guaranteed salary is $2 million for 2026 and $0 for 2027. All other compensation, guarantees, incentives, prior-team payments and prior-team obligations are zero; no void years or options. This is the complete illustrative compensation schedule, not his actual contract or an asking price. Use a $5 million available cap budget and $1 million reserve. Protect Burns and Thomas. Compare no acquisition, acquisition alone, and acquisition funded by converting $6 million of Paulson Adebo’s 2026 salary. Show both years, annual cash, whether funding is necessary, and the CBA mechanism.';
@@ -14,6 +14,36 @@ const fixture = (question = EXACT_LIVE_PROMPT): NflContractScenarioArgs => ({
     { player_id: 'Jakobi Meyers', action: 'acquire', illustrative_terms: { basis: 'user_supplied_illustrative', label: 'Complete illustrative schedule', user_input: question, terms_complete: true, signing_bonus: 2_000_000, years: [year(2026, 2_000_000, 2_000_000), year(2027, 4_500_000, 0)], prior_team_obligations: [], guarantee_note: 'The explicitly supplied outstanding guarantees.' } },
     { player_id: 'Paulson Adebo', action: 'restructure', conversion_amount: 6_000_000 },
   ],
+});
+
+test('the failed live wording and budget-only follow-ups retain field identity and recompute funding', async () => {
+  const question='“Let’s explore Meyers using the saved hypothetical contract. We have $5 million of available cap budget and want to retain a $1 million reserve. Protect Burns and Thomas. Compare doing nothing, acquiring him without restructuring anyone, and using the minimum funding needed. Show this year’s and next year’s cap and cash.”';
+  const state=updateNflConversationState({objective:'contract',budget:{type:'cap',amount:5e6,reserve:1e6}},undefined,question);
+  const first=await executeCapStrategy({},fixture(),undefined,state.active,question);
+  assert.equal((first.body.cap_strategy as any).decision.kind,'no_funding');
+  assert.deepEqual((first.body.contract_scenario!.args as NflContractScenarioArgs).protected_player_ids,['Brian Burns','Andrew Thomas']);
+  const secondQuestion='Actually, we only have $3 million available. Keep everything else unchanged. What is the smallest salary conversion that makes this work, and what does it cost us next year?';
+  const second=await executeCapStrategy({},first.body.contract_scenario!.args as NflContractScenarioArgs,first.body.cap_strategy,state.active,secondQuestion);
+  assert.equal((second.body.cap_strategy as any).decision.selected.conversion,2e6);
+  const thirdQuestion='What if I find another $1 million? Do we still need the restructure?';
+  const secondArgs=second.body.contract_scenario!.args as NflContractScenarioArgs;
+  const thirdState=updateNflConversationState({objective:'contract',budget:{type:'cap',amount:4e6,reserve:1e6}}, {...state,active:{...state.active,budget:secondArgs.budget!}},thirdQuestion);
+  const third=await executeCapStrategy({},secondArgs,second.body.cap_strategy,thirdState.active,thirdQuestion,[],secondArgs.budget);
+  assert.equal((third.body.cap_strategy as any).decision.kind,'no_funding');
+  assert.equal((third.body.contract_scenario!.args as NflContractScenarioArgs).budget!.amount,4e6);
+  const initialTerms=(first.body.contract_scenario!.args as NflContractScenarioArgs).moves[0].illustrative_terms;
+  for(const answer of [second,third])assert.deepEqual((answer.body.contract_scenario!.args as NflContractScenarioArgs).moves[0].illustrative_terms,initialTerms);
+  assert.deepEqual(initialTerms!.years,fixture().moves[0].illustrative_terms!.years);
+  assert.equal(initialTerms!.user_input,EXACT_LIVE_PROMPT);
+  assert.deepEqual(extractBudget(thirdQuestion,'cap'),[]);
+  assert.deepEqual(extractBudget(thirdQuestion,'cash',secondArgs.budget),[]);
+  assert.deepEqual(extractBudget('Meyers has $3 million available.','cap',secondArgs.budget),[]);
+  for(const qualifier of ['in cash','next year','for his signing bonus'])assert.deepEqual(extractBudget(`We have $3 million available ${qualifier}. Keep the cap budget unchanged.`,'cap',secondArgs.budget),[]);
+  const cashMention=await executeCapStrategy({},secondArgs,second.body.cap_strategy,{...state.active,budget:secondArgs.budget!},'We have $9 million available in cash. Keep the cap budget unchanged.');
+  assert.deepEqual((cashMention.body.contract_scenario!.args as NflContractScenarioArgs).budget,secondArgs.budget);
+  assert.deepEqual(extractBudget('Add another $1 million to Meyers’s signing bonus.','cap',secondArgs.budget),[]);
+  assert.deepEqual(extractBudget('We have $5 million of available cash budget and keep $1 million in reserve.','cap'),[]);
+  assert.throws(()=>updateNflConversationState({objective:'contract',budget:{type:'cap',amount:1e6,reserve:5e6}},undefined,question),/separately/);
 });
 
 test('the verbatim compound live prompt binds terms, funding, budget and protections together', async () => {

@@ -45,18 +45,22 @@ export function explicitPlayerProtections(currentQuestion:string, previous:strin
   return {names:[...protectedNames],removed:[...removed]};
 }
 
-export function bindContractScenario(input:unknown, userText:string, prior:NflContractScenarioArgs|undefined, state:NflScenarioState|undefined,currentQuestion=userText,additionalPlayerNames:string[]=[]):NflContractScenarioArgs {
+export function bindContractScenario(input:unknown, userText:string, prior:NflContractScenarioArgs|undefined, state:NflScenarioState|undefined,currentQuestion=userText,additionalPlayerNames:string[]=[],budgetBeforeTurn?:NflContractScenarioArgs['budget']):NflContractScenarioArgs {
   const raw=structuredClone(input) as NflContractScenarioArgs;
   // Attribution is copied by the server, not transcribed by the model. Amounts
   // are independently checked against the actual current message below.
   for(const move of raw.moves??[]){
     move.player_id=getNflContractDossier(move.player_id)?.player_name??move.player_id;
     const previous=prior?.moves.find(m=>normalize(getNflContractDossier(m.player_id)?.player_name??m.player_id)===normalize(move.player_id)&&m.action===move.action);
+    // Naming the same acquisition again retains its exact saved compensation.
+    // A model need not transcribe the schedule when it supplies only a move ID.
+    if(move.action==='acquire'&&!Object.hasOwn(move,'illustrative_terms')&&previous?.illustrative_terms)move.illustrative_terms=structuredClone(previous.illustrative_terms);
     if(move.illustrative_terms){move.illustrative_terms.user_input=previous?.illustrative_terms?.user_input??currentQuestion;move.illustrative_terms.guarantee_note='Outstanding guarantees use the supplied annual amounts; the original user terms and this turn retain changes.';}
   }
+  const previousBudget=state?.budget??prior?.budget??undefined;
+  const budgetBaseline=budgetBeforeTurn??previousBudget;
   if(!raw.budget){
-    const cap=extractBudget(currentQuestion,'cap'),cash=extractBudget(currentQuestion,'cash'),reserve=extractBudget(currentQuestion,'reserve');
-    const previousBudget=state?.budget??prior?.budget;
+    const cap=extractBudget(currentQuestion,'cap',budgetBaseline),cash=extractBudget(currentQuestion,'cash',budgetBaseline),reserve=extractBudget(currentQuestion,'reserve');
     if(cap.length||cash.length||reserve.length){
       if(cap.length&&cash.length)throw new Error('Choose cap or cash for this budget.');
       const type=cap.length?'cap':cash.length?'cash':previousBudget?.type;
@@ -67,24 +71,25 @@ export function bindContractScenario(input:unknown, userText:string, prior:NflCo
     }else if(previousBudget)raw.budget=structuredClone(previousBudget);
   }
   const args=validateNflContractScenarioArgs(raw);
-  const priorForValidation=prior?structuredClone(prior):state?.budget?{...args,moves:[],budget:structuredClone(state.budget)}:undefined;
+  const priorForValidation=prior?structuredClone(prior):previousBudget?{...args,moves:[]}:undefined;
+  if(priorForValidation&&previousBudget)priorForValidation.budget=structuredClone(previousBudget);
   if(priorForValidation)priorForValidation.moves=priorForValidation.moves.map(m=>({...m,player_id:getNflContractDossier(m.player_id)?.player_name??m.player_id}));
-  const validation=validateNflScenarioInputProvenance(args,{current_question:currentQuestion,prior_args:priorForValidation,additional_player_names:additionalPlayerNames});
+  const validation=validateNflScenarioInputProvenance(args,{current_question:currentQuestion,prior_args:priorForValidation,budget_before_turn:budgetBaseline,additional_player_names:additionalPlayerNames});
   if(!validation.ok)throw new Error('Use explicit user inputs for these fields: '+validation.gaps.map(g=>g.path+': '+g.message).join(' | '));
   const protections=explicitPlayerProtections(currentQuestion,state?.protected_player_names??prior?.protected_player_ids??[],args.protected_player_ids);
   args.protected_player_ids=protections.names;
   return args;
 }
-export async function executeContractScenario(input:unknown,userText:string,prior:NflContractScenarioArgs|undefined,state:NflScenarioState|undefined,currentQuestion=userText,observations:NflFundingObservationSnapshot[]=[]):Promise<FactualAnswer>{
-  const args=bindContractScenario(input,userText,prior,state,currentQuestion);
+export async function executeContractScenario(input:unknown,userText:string,prior:NflContractScenarioArgs|undefined,state:NflScenarioState|undefined,currentQuestion=userText,observations:NflFundingObservationSnapshot[]=[],budgetBeforeTurn?:NflContractScenarioArgs['budget']):Promise<FactualAnswer>{
+  const args=bindContractScenario(input,userText,prior,state,currentQuestion,[],budgetBeforeTurn);
   const retained=applyRetainedFundingObservations(args,observations);
   const result=await buildNflContractScenario(args);
   result.body.funding_observations=retained;
   result.body.contract_scenario={args:result.scenario_args,result:result.scenario_result,tables:structuredClone(result.body.tables),calculations:structuredClone(result.body.calculations)};
   return result;
 }
-export async function executeContractComparison(input:unknown,userText:string,prior:NflContractScenarioArgs|undefined,state:NflScenarioState|undefined,currentQuestion=userText,observations:NflFundingObservationSnapshot[]=[]):Promise<NflContractComparisonAnswer>{
-  const args=bindContractScenario(input,userText,prior,state,currentQuestion);
+export async function executeContractComparison(input:unknown,userText:string,prior:NflContractScenarioArgs|undefined,state:NflScenarioState|undefined,currentQuestion=userText,observations:NflFundingObservationSnapshot[]=[],budgetBeforeTurn?:NflContractScenarioArgs['budget']):Promise<NflContractComparisonAnswer>{
+  const args=bindContractScenario(input,userText,prior,state,currentQuestion,[],budgetBeforeTurn);
   const retained=applyRetainedFundingObservations(args,observations);
   const answer=await buildNflContractComparison(args);
   answer.body.funding_observations=retained;
@@ -105,7 +110,7 @@ function mergeScenarioFields(nested:Record<string,unknown>,flat:Record<string,un
   return merged;
 }
 
-export async function executeCapStrategy(input:unknown, prior:NflContractScenarioArgs|undefined, previousStrategy:Record<string,unknown>|undefined, state:NflScenarioState|undefined, question:string,snapshots:NflFundingObservationSnapshot[]=[]):Promise<FactualAnswer>{
+export async function executeCapStrategy(input:unknown, prior:NflContractScenarioArgs|undefined, previousStrategy:Record<string,unknown>|undefined, state:NflScenarioState|undefined, question:string,snapshots:NflFundingObservationSnapshot[]=[],budgetBeforeTurn?:NflContractScenarioArgs['budget']):Promise<FactualAnswer>{
   if(!input||typeof input!=='object'||Array.isArray(input))throw new Error('Funding discovery arguments must be an object.');
   const {funding_observations:observationInput,...request}=input as Record<string,unknown>;
   const allowed=new Set(['scenario',...Object.keys(NFL_CONTRACT_SCENARIO_TOOL_SCHEMA.properties)]);
@@ -131,7 +136,7 @@ export async function executeCapStrategy(input:unknown, prior:NflContractScenari
     const observation=funding.find(v=>normalize(v.player_id)===normalize(getNflContractDossier(move.player_id)?.player_name??move.player_id));
     for(const field of ['unpaid_salary_available','credited_seasons'] as const)if(observation?.[field]!=null)move[field]=observation[field];
   }
-  const bound=bindContractScenario(proposed,question,previous,state,question,funding.map(v=>v.player_id));
+  const bound=bindContractScenario(proposed,question,previous,state,question,funding.map(v=>v.player_id),budgetBeforeTurn);
   return buildCapStrategy(bound,funding);
 }
 export function contractDossiersEvidence(playerNames?:string[]):FactualAnswer {

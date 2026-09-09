@@ -8,7 +8,7 @@ const list = (v: unknown): string[] => {
 export function userMoneyAmounts(question: string): number[] {
   return [...question.matchAll(/(?:\$\s*([\d,.]+)\s*(million|billion|[mk])?\b|\b([\d,.]+)\s*(million|billion|[mk]|dollars)\b)/gi)].map(m=>Number((m[1]??m[3]).replaceAll(',',''))*(/^(million|m)$/i.test(m[2]??m[4]??'')?1e6:/^billion$/i.test(m[2]??m[4]??'')?1e9:/^k$/i.test(m[2]??m[4]??'')?1e3:1));
 }
-export function updateNflConversationState(input: unknown, previous: NflConversationState | undefined, question: string): NflConversationState {
+export function updateNflConversationState(input: unknown, previous: NflConversationState | undefined, question: string, budgetBeforeTurn?: NflScenarioState['budget']): NflConversationState {
   if (!input || typeof input !== 'object') throw new Error('Scenario must be an object.');
   const a = input as Record<string, unknown>;
   if (a.operation === 'restore') {
@@ -51,7 +51,7 @@ export function updateNflConversationState(input: unknown, previous: NflConversa
     else {
       const b = a.budget as { type: 'cap'|'cash'; amount: number; reserve: number };
       if (!['cap','cash'].includes(b.type) || ![b.amount,b.reserve].every(x => Number.isFinite(x) && x >= 0)) throw new Error('Invalid budget; label cap versus cash explicitly.');
-      const amounts=extractBudget(question,b.type);const reserves=extractBudget(question,'reserve');
+      const amounts=extractBudget(question,b.type,budgetBeforeTurn??previous?.active.budget??undefined);const reserves=extractBudget(question,'reserve');
       for(const [field,candidates]of [['amount',amounts],['reserve',reserves]] as const){
         const old=previous?.active.budget;
         if(new Set(candidates).size>1||candidates.length&&candidates.some(n=>n!==b[field]))throw new Error('Budget and reserve must match the separately supplied amounts.');

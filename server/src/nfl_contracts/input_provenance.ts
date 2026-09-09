@@ -5,6 +5,7 @@ export interface NflScenarioInputProvenanceContext {
   current_question: string;
   /** Previously executed, server-retained arguments; never model-supplied state. */
   prior_args?: NflContractScenarioArgs;
+  budget_before_turn?: NflContractScenarioArgs['budget'];
   additional_player_names?: string[];
 }
 export interface NflScenarioInputProvenanceGap { path: string; code: string; message: string }
@@ -172,12 +173,24 @@ function buildEvidence(question: string, args: NflContractScenarioArgs, prior?: 
   return { output, scopingErrors };
 }
 
-export function extractBudget(question: string, kind: 'cap' | 'cash' | 'reserve'): number[] {
+export function extractBudget(question: string, kind: 'cap' | 'cash' | 'reserve', previous?: NflContractScenarioArgs['budget']): number[] {
   const text = normalize(question);
   const label = kind === 'reserve' ? 'reserve' : `(?:available\\s+)?${kind}\\s+budget`;
   const values: number[] = [];
   for (const m of text.matchAll(new RegExp(`\\b${label}\\s*(?:is|of|to|:|=)?\\s*(${MONEY})`, 'g'))) values.push(moneyValue(m[1]));
-  for (const m of text.matchAll(new RegExp(`(${MONEY})\\s+${label}\\b`, 'g'))) values.push(moneyValue(m[1]));
+  // Natural connectors do not change the field: "$5m of available cap
+  // budget" and "$1m in reserve" remain separately bound amounts.
+  for (const m of text.matchAll(new RegExp(`(${MONEY})\\s+(?:(?:of|in|for)\\s+)?(?:a\\s+|the\\s+)?${label}\\b`, 'g'))) values.push(moneyValue(m[1]));
+  if (previous && kind === previous.type) {
+    // A follow-up may omit the already established cap/cash basis. Require
+    // explicit budget/available-funds wording, never any amount in the turn.
+    for (const m of text.matchAll(new RegExp(`\\b(?:the|our|available) budget\\s*(?:is|of|to|:|=)?\\s*(${MONEY})`, 'g'))) values.push(moneyValue(m[1]));
+    for (const m of text.matchAll(new RegExp(`\\b(?:we|i) (?:only )?have (?:only )?(${MONEY}) available(?=\\s*(?:[.!?]|$))`, 'g'))) values.push(moneyValue(m[1]));
+    // This narrow continuation authorizes an arithmetic change to the prior
+    // available budget, not a new price, reserve or conversion amount.
+    const delta = text.match(new RegExp(`^[“"']?(?:what if )?(?:we|i) (?:find|have|get) (?:another|an extra) (${MONEY})[?!.]?(?:\\s+(?:do we still need (?:the |a )?restructure|keep everything else unchanged)[?!.]?)?[”"']?$`));
+    if (delta) values.push(previous.amount + moneyValue(delta[1]));
+  }
   return values;
 }
 
@@ -249,7 +262,7 @@ export function validateNflScenarioInputProvenance(input: NflContractScenarioArg
   }
   if (args.budget) {
     const old = prior?.budget;
-    bind('budget.amount', args.budget.amount, old?.type === args.budget.type ? old.amount : undefined, extractBudget(context.current_question, args.budget.type));
+    bind('budget.amount', args.budget.amount, old?.type === args.budget.type ? old.amount : undefined, extractBudget(context.current_question, args.budget.type, context.budget_before_turn??old));
     bind('budget.reserve', args.budget.reserve, old?.reserve, extractBudget(context.current_question, 'reserve'));
     const otherType = args.budget.type === 'cap' ? 'cash' : 'cap';
     if (extractBudget(context.current_question, otherType).length) gap('budget.type', 'BUDGET_TYPE_MISMATCH', `The user supplied a ${otherType} budget; it cannot silently become a ${args.budget.type} budget.`);
@@ -279,7 +292,7 @@ export function bindFundingObservationInputs(question:string,args:NflContractSce
       const literals=[...new Set(evidence.get(name(player))?.amounts.get(key(field))??[])];
       const value=submitted[0]?.[field];
       if(literals.length>1)throw new Error('Conflicting '+field+' observations for '+player+'.');
-      if(value!=null&&(literals.length?value!==literals[0]:value!==priorValue?.[field]))throw new Error('Use an explicit player-bound '+field+' observation for '+player+'.');
+      if(value!=null&&(literals.length?value!==literals[0]:value!==priorValue?.[field]))throw new Error('Use an explicit player-bound '+field+' observation for '+player+'. Omit this field when it was not supplied; unknown does not mean zero. For a budget/reserve-only follow-up, call find_minimum_cap_funding with {} to retain validated terms and observations.');
       const next=literals[0]??value;
       if(next!=null){if(!Number.isSafeInteger(next)||next<0||next>(field==='credited_seasons'?25:1_000_000_000))throw new Error('Invalid '+field+' observation.');updated[field]=next;touched=true;}
     }
