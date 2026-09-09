@@ -47,7 +47,7 @@ test('numerical draft failures trigger one targeted repair without silently dele
   let calls=0;
   const result=await buildNflAiAnswer('Compare the recorded receiver.',{loadData:async()=>({seed:await seed,source_mode:'supabase_current_views',fallback_reason:null}),initialEvidence:evidence,reviewDraft:async()=>[],callModel:async params=>{
     calls++;
-    if(calls===2)assert.match(JSON.stringify(params.messages.at(-1)),/Unsupported quantity/);
+    if(calls===2)assert.match(JSON.stringify(params.messages),/Unsupported quantity/);
     return response('finish_analysis',{answer_paragraphs:[{text:calls===1?'Jakobi Meyers recorded 999 receiving yards in 2025.':'Jakobi Meyers recorded 835 receiving yards in 2025. Treat that production as a reason to investigate fit, conditional on the incoming terms.',source_refs:[1]}],evidence_id:'lookup_1',continuation_query_id:'lookup_1'});
   }});
   assert.equal(calls,2);assert.equal(result.body.ai_analysis?.outcome,'complete');assert.equal(result.body.ai_analysis?.repair_count,1);assert.match(result.body.answer,/835/);assert.ok(result.body.answer_paragraphs?.[0].fact_ids?.length);
@@ -59,4 +59,33 @@ test('repeated unsupported quantity returns incomplete evidence and never a muti
 test('semantic checks reject unsupported best-producer and separation claims',()=>{
   const prose={answer:'Meyers has the best recorded receiving production and is a clear separator.',findings:[],caveats:[],assumptions:[],followups:[]};
   assert.equal(categoricalGroundingIssues(prose,[evidence]).length,2);
+});
+
+test('a cited number cannot move between two named players in one sentence',()=>{
+  const second={...evidence,id:'lookup_2',sources:evidence.sources.map(s=>({...s,ref_index:2,title:'Sutton record'})),body:{...evidence.body,tables:[{...evidence.body.tables[0],rows:[['Courtland Sutton',1017,74,'$13,975,000']],source_refs:[2]}]}};
+  const catalog=collectEvidenceFacts([evidence,second]);
+  const check=(text:string)=>validateSourcedParagraphs([{text,source_refs:[1,2]}],catalog,new Set([1,2]));
+  assert.ok(check('Meyers recorded 835 receiving yards, while Sutton recorded 1,017 receiving yards in 2025.'));
+  assert.ok(check('Meyers and Sutton each cleared 800 receiving yards in 2025.'));
+  assert.throws(()=>check('Meyers and Sutton each cleared 900 receiving yards in 2025.'),/Unsupported quantity/);
+  assert.throws(()=>check('Meyers recorded 1,017 receiving yards, while Sutton recorded 835 receiving yards in 2025.'),/Unsupported quantity/);
+  assert.equal(numericMentions('The dated Sept 17–19, 2025 report and 2025-09-21 game are separate observations.').length,0);
+});
+
+test('accepted compensation and active constraints survive beyond the prose history window',async()=>{
+  const {executeCapStrategy}=await import('../../src/nfl_conversation/contract_tools.js');
+  const {updateNflConversationState}=await import('../../src/nfl_conversation/state.js');
+  const year=(year:number,salary:number)=>({year,kind:'active' as const,base_salary:salary,guaranteed_salary:0,other_cash:0,guaranteed_other_cash:0,incentives_cap_charge:0,incentives_cash:0,salary_paid_by_prior_team:0,other_cash_paid_by_prior_team:0});
+  const prior={schema_version:1 as const,team_id:'NYG',season:2026,timing:'post_june_1' as const,budget:{type:'cap' as const,amount:3e6,reserve:1e6},protected_player_ids:['Brian Burns'],moves:[{player_id:'Jakobi Meyers',action:'acquire' as const,illustrative_terms:{basis:'user_supplied_illustrative' as const,label:'Continuity test',user_input:'Original accepted illustration',terms_complete:true as const,signing_bonus:2e6,years:[year(2026,2e6),year(2027,4.5e6)],prior_team_obligations:[],guarantee_note:'Explicit zero guarantees'}}]};
+  const first=await executeCapStrategy({},prior,undefined,undefined,'Continue the exact prior funding scenario.');
+  const state=updateNflConversationState({objective:'contract',budget:prior.budget,protected_player_names:['Brian Burns']},undefined,'Use a $3 million cap budget and $1 million reserve. Protect Brian Burns.');
+  const history=[{question:'Original accepted illustration',body:{...first.body,conversation_state:state}},...Array.from({length:10},(_,i)=>({question:'Continue discussion '+i,body:{...evidence.body,conversation_state:structuredClone(state)}}))];
+  let round=0;
+  const result=await buildNflAiAnswer('Keep the same terms, budget, reserve and protected player. Recalculate minimum funding.',{history,loadData:async()=>({seed:await seed,source_mode:'supabase_current_views',fallback_reason:null}),reviewDraft:async()=>[],callModel:async params=>{
+    if(round++===0){const context=JSON.parse(String(params.messages[0].content));assert.equal(context.conversation.length,8);assert.equal(context.previous_contract_scenario.moves[0].illustrative_terms.years[1].base_salary,4.5e6);assert.equal(context.scenario_state.active.budget.reserve,1e6);return response('find_minimum_cap_funding',{});}
+    return response('finish_analysis',{answer_paragraphs:[{text:'The calculation retains the accepted compensation and current funding constraints. The protected player remains excluded.',source_refs:[1]}],evidence_id:'lookup_1',continuation_query_id:'lookup_1'});
+  }});
+  assert.equal(result.body.ai_analysis?.outcome,'complete');
+  const args=result.body.contract_scenario!.args as typeof prior;
+  assert.deepEqual(args.budget,prior.budget);assert.deepEqual(args.protected_player_ids,['Brian Burns']);assert.deepEqual(args.moves[0].illustrative_terms.years,prior.moves[0].illustrative_terms.years);
 });

@@ -5,6 +5,7 @@ export interface NflScenarioInputProvenanceContext {
   current_question: string;
   /** Previously executed, server-retained arguments; never model-supplied state. */
   prior_args?: NflContractScenarioArgs;
+  budget_before_turn?: NflContractScenarioArgs['budget'];
   additional_player_names?: string[];
 }
 export interface NflScenarioInputProvenanceGap { path: string; code: string; message: string }
@@ -40,7 +41,7 @@ const markers: Marker[] = [
   { field: 'base_salary', expression: /\bbase salary\b/g, annual: true },
   { field: 'other_cash', expression: /\bother (?:compensation|cash)\b/g, annual: true },
   { field: 'signing_bonus', expression: /\b(?:new )?signing bonus\b/g, annual: false },
-  { field: 'unpaid_salary_available', expression: /\bunpaid (?:base )?salary(?: available)?\b/g, annual: false },
+  { field: 'unpaid_salary_available', expression: /\bunpaid (?:(?:20\d{2}) )?(?:base )?salary(?: available)?\b/g, annual: false },
   { field: 'credited_seasons', expression: /\bcredited seasons?\b/g, annual: false },
   { field: 'conversion_amount', expression: /\b(?:salary conversion|conversion|convert(?:ing)?|restructure)\b/g, annual: false },
 ];
@@ -60,11 +61,13 @@ function record(e: Evidence, field: Field, value: number, year?: number) {
   const k = key(field, year); e.amounts.set(k, [...(e.amounts.get(k) ?? []), value]);
 }
 
-function extractAmounts(sentence: string, player: string, evidence: Evidence) {
+function extractAmounts(sentence: string, player: string, evidence: Evidence, season: number) {
   const found = markers.flatMap(m => [...sentence.matchAll(m.expression)].map(match => ({ ...m, start: match.index!, end: match.index! + match[0].length })))
     .sort((a, b) => a.start - b.start || b.end - a.end);
   const nonoverlapping = found.filter((m, i) => !found.slice(0, i).some(other => other.start <= m.start && other.end > m.start));
   for (const [i, marker] of nonoverlapping.entries()) {
+    const fieldYear=sentence.slice(marker.start,marker.end).match(/\b(20\d{2})\b/)?.[1];
+    if(marker.field==='unpaid_salary_available'&&fieldYear&&Number(fieldYear)!==season)continue;
     const after = sentence.slice(marker.end, nonoverlapping[i + 1]?.start ?? sentence.length);
     const before = sentence.slice(nonoverlapping[i - 1]?.end ?? 0, marker.start);
     if (marker.annual) {
@@ -82,7 +85,7 @@ function extractAmounts(sentence: string, player: string, evidence: Evidence) {
     } else {
       let leading = after.match(new RegExp(`^\\s*(?:is|of|to|by|at|:|=)?\\s*(${MONEY})`));
       if (!leading && marker.field === 'conversion_amount') leading = after.match(new RegExp(`^\\s+${escape(player)}(?:s)?\\s+(?:by|to|of|for)\\s*(${MONEY})`));
-      const trailing = before.match(new RegExp(`(${MONEY})\\s*$`));
+      const trailing = before.match(new RegExp(`(${MONEY})\\s*${marker.field==='unpaid_salary_available'?'(?:of\\s*)?':''}$`));
       if (leading) record(evidence, marker.field, moneyValue(leading[1]));
       if (trailing) record(evidence, marker.field, moneyValue(trailing[1]));
     }
@@ -115,7 +118,7 @@ function explicitActors(text: string): string[] {
   const conversions = [...text.matchAll(new RegExp(`\\bconvert(?:ing)?\\s+(?:${MONEY})\\s+(?:of|from)\\s+([a-z][a-z ]{0,65})`, 'g'))].map(m => m[1]);
   return [...direct, ...conversions].flatMap(actor => {
     const candidate = actor.split(/\s+(?:for|to|in|on|by|with|after|before|at|from|and|or|salary|base|contract|cap|cash)\b/)[0].trim();
-    if (/^(?:the|a|an|this|that|these|those|each|every|all|any|of|with|vs|versus|and|or|unchanged)\b/.test(candidate) || /^[a-z]{2,3}$/.test(candidate)) return [];
+    if (/^(?:the|a|an|this|that|these|those|each|every|all|any|of|with|vs|versus|and|or|unchanged|conversion|funding)\b/.test(candidate) || /^[a-z]{2,3}$/.test(candidate)) return [];
     return [candidate];
   });
 }
@@ -164,7 +167,7 @@ function buildEvidence(question: string, args: NflContractScenarioArgs, prior?: 
     if (financial && /\b(?:not|dont|never)\b/.test(sentence)) { scopingErrors.push('Negated financial wording is outside this bounded parser. Restate the desired field and amount positively.'); continue; }
     const e = output.get(current)!;
     e.text.push(sentence);
-    extractAmounts(sentence, current, e);
+    extractAmounts(sentence, current, e, args.season);
     extractZeroClauses(sentence, e);
     for (const m of sentence.matchAll(/\b(active|void) years?\s*(?:are|:|=)?\s*((?:20\d{2})(?:\s*(?:,|and|through|to|-)\s*20\d{2})*)/g)) e[m[1] === 'active' ? 'activeYears' : 'voidYears'].push(yearList(m[2]));
     if (/\b(?:no|without) void years?\b/.test(sentence)) e.voidYears.push([]);
@@ -172,12 +175,24 @@ function buildEvidence(question: string, args: NflContractScenarioArgs, prior?: 
   return { output, scopingErrors };
 }
 
-export function extractBudget(question: string, kind: 'cap' | 'cash' | 'reserve'): number[] {
+export function extractBudget(question: string, kind: 'cap' | 'cash' | 'reserve', previous?: NflContractScenarioArgs['budget']): number[] {
   const text = normalize(question);
   const label = kind === 'reserve' ? 'reserve' : `(?:available\\s+)?${kind}\\s+budget`;
   const values: number[] = [];
   for (const m of text.matchAll(new RegExp(`\\b${label}\\s*(?:is|of|to|:|=)?\\s*(${MONEY})`, 'g'))) values.push(moneyValue(m[1]));
-  for (const m of text.matchAll(new RegExp(`(${MONEY})\\s+${label}\\b`, 'g'))) values.push(moneyValue(m[1]));
+  // Natural connectors do not change the field: "$5m of available cap
+  // budget" and "$1m in reserve" remain separately bound amounts.
+  for (const m of text.matchAll(new RegExp(`(${MONEY})\\s+(?:(?:of|in|for)\\s+)?(?:a\\s+|the\\s+)?${label}\\b`, 'g'))) values.push(moneyValue(m[1]));
+  if (previous && kind === previous.type) {
+    // A follow-up may omit the already established cap/cash basis. Require
+    // explicit budget/available-funds wording, never any amount in the turn.
+    for (const m of text.matchAll(new RegExp(`\\b(?:the|our|available) budget\\s*(?:is|of|to|:|=)?\\s*(${MONEY})`, 'g'))) values.push(moneyValue(m[1]));
+    for (const m of text.matchAll(new RegExp(`\\b(?:we|i) (?:only )?have (?:only )?(${MONEY}) available(?=\\s*(?:[.!?]|$))`, 'g'))) values.push(moneyValue(m[1]));
+    // This narrow continuation authorizes an arithmetic change to the prior
+    // available budget, not a new price, reserve or conversion amount.
+    const delta = text.match(new RegExp(`^[“"']?(?:what if )?(?:we|i) (?:find|have|get) (?:another|an extra) (${MONEY})[?!.]?(?:\\s+(?:do we still need (?:the |a )?restructure|keep everything else unchanged)[?!.]?)?[”"']?$`));
+    if (delta) values.push(previous.amount + moneyValue(delta[1]));
+  }
   return values;
 }
 
@@ -249,7 +264,7 @@ export function validateNflScenarioInputProvenance(input: NflContractScenarioArg
   }
   if (args.budget) {
     const old = prior?.budget;
-    bind('budget.amount', args.budget.amount, old?.type === args.budget.type ? old.amount : undefined, extractBudget(context.current_question, args.budget.type));
+    bind('budget.amount', args.budget.amount, old?.type === args.budget.type ? old.amount : undefined, extractBudget(context.current_question, args.budget.type, context.budget_before_turn??old));
     bind('budget.reserve', args.budget.reserve, old?.reserve, extractBudget(context.current_question, 'reserve'));
     const otherType = args.budget.type === 'cap' ? 'cash' : 'cap';
     if (extractBudget(context.current_question, otherType).length) gap('budget.type', 'BUDGET_TYPE_MISMATCH', `The user supplied a ${otherType} budget; it cannot silently become a ${args.budget.type} budget.`);
@@ -279,7 +294,7 @@ export function bindFundingObservationInputs(question:string,args:NflContractSce
       const literals=[...new Set(evidence.get(name(player))?.amounts.get(key(field))??[])];
       const value=submitted[0]?.[field];
       if(literals.length>1)throw new Error('Conflicting '+field+' observations for '+player+'.');
-      if(value!=null&&(literals.length?value!==literals[0]:value!==priorValue?.[field]))throw new Error('Use an explicit player-bound '+field+' observation for '+player+'.');
+      if(value!=null&&(literals.length?value!==literals[0]:value!==priorValue?.[field]))throw new Error('Use an explicit player-bound '+field+' observation for '+player+'. Omit this field when it was not supplied; unknown does not mean zero. For a budget/reserve-only follow-up, call find_minimum_cap_funding with {} to retain validated terms and observations.');
       const next=literals[0]??value;
       if(next!=null){if(!Number.isSafeInteger(next)||next<0||next>(field==='credited_seasons'?25:1_000_000_000))throw new Error('Invalid '+field+' observation.');updated[field]=next;touched=true;}
     }

@@ -10,9 +10,10 @@ interface Props {
 }
 
 export function DataAnalysisCardBody({ body }: Props) {
+  const sourced=body.answer_paragraphs?.length ? <div style={{display:'grid',gap:SPACE.md}}>{body.answer_paragraphs.map((p,i)=><p key={i} style={{whiteSpace:'pre-line',margin:0,lineHeight:1.65}}>{p.text} {renderRefs(p.source_refs)}</p>)}</div> : null;
   if (body.combined_market_seller_analysis && body.market_analysis && body.seller_move_analysis) {
     return <div style={{ display: 'grid', gap: SPACE['2xl'] }}>
-      <NflAnalysisInterpretation interpretation={body.answer} status={body.analysis_interpretation_status} />
+      {sourced ?? <NflAnalysisInterpretation interpretation={body.answer} status={body.analysis_interpretation_status} />}
       <NflSellerMoveAnalysis artifact={body.seller_move_analysis} followups={body.followups} />
       <div style={{ borderTop: `1px solid ${F.borderStrong}`, paddingTop: SPACE['2xl'] }}>
         <NflTransactionMarketAnalysisView analysis={body.market_analysis} />
@@ -21,24 +22,24 @@ export function DataAnalysisCardBody({ body }: Props) {
   }
   if (body.seller_move_analysis) {
     return <div style={{ display: 'grid', gap: SPACE['2xl'] }}>
-      <NflAnalysisInterpretation interpretation={body.answer} status={body.analysis_interpretation_status} />
+      {sourced ?? <NflAnalysisInterpretation interpretation={body.answer} status={body.analysis_interpretation_status} />}
       <NflSellerMoveAnalysis artifact={body.seller_move_analysis} followups={body.followups} />
     </div>;
   }
   if (body.market_analysis) {
     return (
-      <NflTransactionMarketAnalysisView
+      <div style={{display:'grid',gap:SPACE.lg}}>{sourced}<NflTransactionMarketAnalysisView
         analysis={body.market_analysis}
-        interpretation={body.answer}
+        interpretation={sourced ? undefined : body.answer}
         interpretationStatus={body.analysis_interpretation_status}
         followups={body.followups}
-      />
+      /></div>
     );
   }
 
   return (
     <div style={{ display: 'grid', gap: SPACE.lg }}>
-      {body.answer_paragraphs?.map((p,i)=><p key={i} style={{whiteSpace:'pre-line'}}>{p.text} {p.source_refs.map(ref=>renderRefs([ref]))}</p>)}
+      {sourced}
       {body.key_findings.length > 0 && (
         <section>
           <SectionLabel>Key findings</SectionLabel>

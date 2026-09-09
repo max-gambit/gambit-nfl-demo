@@ -181,6 +181,7 @@ function FactualAnswer({ body: savedBody, previous = null, briefId, onEvidence }
 
 function safeUrl(value: unknown): string | null {
   if (typeof value !== 'string') return null;
+  if (/^\/\?conversation=[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)) return new URL(value, window.location.origin).href;
   try { const url = new URL(value); return ['https:', 'http:'].includes(url.protocol) ? url.href : null; } catch { return null; }
 }
 function SourceList({ sources, selectedRef }: { sources?: BriefSource[]; selectedRef?: number | null }) {

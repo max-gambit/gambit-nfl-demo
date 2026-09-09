@@ -202,7 +202,7 @@ export interface DataAnalysisBriefBody {
   kind: 'data_analysis';
   /** Distinguishes preserved factual answers from AI synthesis of retrieved evidence. */
   language_policy?: 'facts_only_v1' | 'grounded_ai_v1';
-  ai_analysis?: { model: string; elapsed_ms: number; tool_names: string[]; assumptions: string[]; evidence_validated?: boolean; grounding_checked?: boolean; withheld_numeric_sentences?: number; outcome?: 'complete' | 'evidence_only' | 'unavailable'; pipeline_version?: 'analyst_v1' | 'analyst_v2'; stage_ms?: { retrieval: number; generation: number; review: number; repair: number }; repair_count?: number; validation_outcome?: 'passed' | 'incomplete' | 'needs_input'; evidence_hash?: string };
+  ai_analysis?: { model: string; elapsed_ms: number; tool_names: string[]; assumptions: string[]; evidence_validated?: boolean; grounding_checked?: boolean; withheld_numeric_sentences?: number; outcome?: 'complete' | 'evidence_only' | 'unavailable' | 'needs_input'; pipeline_version?: 'analyst_v1' | 'analyst_v2'; stage_ms?: { retrieval: number; generation: number; review: number; repair: number }; repair_count?: number; validation_outcome?: 'passed' | 'incomplete' | 'needs_input'; evidence_hash?: string };
   /** Source-bound paragraphs are authoritative in v2; answer is their text projection. */
   answer_paragraphs?: Array<{ text: string; source_refs: number[]; fact_ids?: string[] }>;
   /** Executed population, before the display limit. Never a claim of availability. */
@@ -212,6 +212,9 @@ export interface DataAnalysisBriefBody {
   supporting_details?: DataAnalysisFinding[];
   conversation_state?: import('./nflConversation').NflConversationState;
   contract_scenario?: { args: unknown; result: unknown; tables?: DataAnalysisTable[]; calculations?: DataAnalysisCalculation[] };
+  /** Database record used to retrieve illustrative compensation, not a public contract. */
+  saved_contract_reference?: { brief_id: string; session_id: string; saved_at: string; player_name: string; selection_basis: 'current_conversation' | 'latest_saved_for_player' | 'explicit_brief' };
+  saved_contract_lookup?: { status: 'found' | 'not_found'; player_name: string; scenario_args?: unknown };
   /** Server-derived funding decisions, separate from literal compensation inputs. */
   cap_strategy?: Record<string, unknown>;
   funding_observations?: {team_id:string;season:number;observations:Array<{player_id:string;unpaid_salary_available?:number;credited_seasons?:number}>};

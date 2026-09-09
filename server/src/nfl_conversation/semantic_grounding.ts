@@ -17,7 +17,7 @@ export interface AnalystAuthoredProse {
 export function categoricalGroundingIssues(prose: AnalystAuthoredProse, evidence: Array<{ body: DataAnalysisBriefBody; sources?: Array<{data?:unknown}> }>): string[] {
   const text = [prose.answer, ...prose.findings.map(f => f.body)].join(' ');
   const issues: string[] = [];
-  if (/best recorded (?:receiving )?production|highest[- ]production|best (?:recorded )?producer/i.test(text) && !/highest.{0,20}(?:yards|receptions|touchdowns)/i.test(text)) issues.push('Specify the observed metric behind a production comparison; do not collapse different receiving metrics into an unsupported best-producer claim.');
+  if (/best recorded (?:receiving )?production|highest[- ]production|best (?:recorded )?producer/i.test(text)) issues.push('Specify the observed metric behind a production comparison; do not collapse different receiving metrics into an unsupported best-producer claim.');
   if (/\b(?:clear|genuine|proven|elite) separator\b/i.test(text) && !evidence.some(e=>e.sources?.some(s=>/separat/i.test(JSON.stringify(s.data))))) issues.push('No retrieved scouting assessment establishes separation skill. Use the attributed observation actually supplied or frame the role as an unverified hypothesis.');
   if (/budget.{0,100}(?:I can|we can|can then).{0,50}price (?:the )?actual incoming/i.test(text)) issues.push('A budget does not supply actual incoming compensation. Request or retrieve the actual/saved illustrative terms before promising an exact calculation.');
   const availability = evidence.filter(e => e.body.example_query?.domain === 'availability');
@@ -49,7 +49,7 @@ export function categoricalGroundingIssues(prose: AnalystAuthoredProse, evidence
     if (/no future obligations|no (?:remaining |future )?guarantees|clean exit|shorter guaranteed tail|(?:less|lower|more|higher) guaranteed (?:liability|exposure)/i.test(text)) {
       issues.push('The receiver comparison records active contract horizon, not complete transferred guarantee liability. Remove the unsupported financial conclusion.');
     }
-    if (text.split(/(?<=[.!?])\s+/).some(sentence => /\b(?:lower[- ]cost|cheaper|cheap|inexpensive)\b/i.test(sentence) && !/\b(?:if|may|might|could|unverified|unknown|not|doesn.t|cannot|can.t)\b/i.test(sentence))) {
+    if (text.split(/(?<=[.!?])\s+/).some(sentence => /\b(?:lower[- ]cost|cheaper|cheap|inexpensive|below[- ]market)\b/i.test(sentence) && !/\b(?:if|may|might|could|unverified|unknown|not|doesn.t|cannot|can.t)\b/i.test(sentence))) {
       issues.push('No incoming price was calculated. Do not call a receiver lower-cost or cheaper as an established fact based on his current-team charge or active contract horizon. State the conditional investigation basis and the price evidence still needed.');
     }
   }

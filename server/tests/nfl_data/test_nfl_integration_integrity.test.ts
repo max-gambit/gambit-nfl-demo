@@ -38,9 +38,9 @@ test('explicit removal changes calculation while retained protection blocks it',
  assert.deepEqual(explicitPlayerProtections("Don't unprotect Burns.",['Brian Burns']).names,['Brian Burns']);
  assert.deepEqual(explicitPlayerProtections('Keep Brian Burns and Andrew Thomas.').names,['Brian Burns','Andrew Thomas']);
 });
-test('exact result statements carry quantities while model-written claims cannot',async()=>{
+test('legacy exact statements retain their historical sentence filter',async()=>{
  let round=0;
- const result=await buildNflAiAnswer('Compare our recorded receiver production.',{prefetch:false,loadData:loaded,reviewDraft:async()=>[],callModel:async()=>response(round++?[{name:'finish_analysis',input:{answer:'The answer is 99 percent certain.',answer_statements:['lookup_1:answer'],evidence_id:'lookup_1',continuation_query_id:'lookup_1'}}]:[{name:'compare_receivers',input:{}}])});
+ const result=await buildNflAiAnswer('Compare our recorded receiver production.',{pipeline:'legacy',prefetch:false,loadData:loaded,reviewDraft:async()=>[],callModel:async()=>response(round++?[{name:'finish_analysis',input:{answer:'The answer is 99 percent certain.',answer_statements:['lookup_1:answer'],evidence_id:'lookup_1',continuation_query_id:'lookup_1'}}]:[{name:'compare_receivers',input:{}}])});
  assert.equal(result.body.ai_analysis?.outcome,'complete');assert.doesNotMatch(result.body.answer,/99 percent/);
  assert.match(result.body.answer,/Courtland Sutton recorded/);assert.doesNotMatch(result.body.answer,/Ordered by observed/);assert.match(result.body.supporting_details![0].body,/Ordered by observed/);assert.ok(result.body.tables.length);
 });
@@ -54,8 +54,8 @@ test('executed contract state persists without a model-authored scenario and can
  assert.deepEqual((result.body.contract_scenario!.args as any).budget,result.body.conversation_state?.active.budget);
 });
 
-test('a reviewed rule keeps its conditions instead of an unchecked additional model claim',async()=>{
+test('legacy rule presentation keeps its original conditions',async()=>{
  let round=0;
- const result=await buildNflAiAnswer('Explain 2026 regular-season overtime.',{prefetch:false,loadData:loaded,reviewDraft:async()=>[],callModel:async()=>response(round++?[{name:'finish_analysis',input:{answer:'The clock stops until the second offense has possessed the ball.',evidence_id:'lookup_1',continuation_query_id:'lookup_1',answer_statements:['lookup_1:answer']}}]:[{name:'read_nfl_rules',input:{question:'Under the 2026 NFL playing rulebook, how does regular-season overtime handle possession opportunities and the time limit?'}}])});
+ const result=await buildNflAiAnswer('Explain 2026 regular-season overtime.',{pipeline:'legacy',prefetch:false,loadData:loaded,reviewDraft:async()=>[],callModel:async()=>response(round++?[{name:'finish_analysis',input:{answer:'The clock stops until the second offense has possessed the ball.',evidence_id:'lookup_1',continuation_query_id:'lookup_1',answer_statements:['lookup_1:answer']}}]:[{name:'read_nfl_rules',input:{question:'Under the 2026 NFL playing rulebook, how does regular-season overtime handle possession opportunities and the time limit?'}}])});
  assert.match(result.body.answer,/10-minute/);assert.doesNotMatch(result.body.answer,/clock stops/);assert.equal(result.body.conversation_state?.active.objective,'rules');
 });

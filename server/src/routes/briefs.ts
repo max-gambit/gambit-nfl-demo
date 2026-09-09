@@ -356,12 +356,13 @@ briefRoutes.post('/', async (c) => {
   // investigation and prose; the server still owns table cells and arithmetic.
   try {
     const analysis = await buildNflAiAnswer(question, {
+      sessionId: session_id,
       history: [...contextBriefs].reverse().filter(row => row.status === 'ready').map(row => ({ question: row.question, body: row.body?.kind === 'data_analysis' ? row.body : null })),
       initialEvidence: preparedMarketBody ? { body: preparedMarketBody, sources: preparedSources } : undefined,
     });
     preparedMarketBody = analysis.body;
     preparedSources = analysis.sources;
-    preparedProgress = analysis.body.ai_analysis?.outcome==='complete' ? readyBriefProgress('Analysis ready','The answer and supporting sources are ready.') : readyBriefProgress('Analysis incomplete','The checked evidence and saved question are available; written analysis did not complete.');
+    preparedProgress = analysis.body.ai_analysis?.outcome==='needs_input' ? readyBriefProgress('Contract input needed','The saved-contract lookup completed; the answer identifies the missing terms.') : analysis.body.ai_analysis?.outcome==='complete' ? readyBriefProgress('Analysis ready','The answer and supporting sources are ready.') : readyBriefProgress('Analysis incomplete','The checked evidence and saved question are available; written analysis did not complete.');
   } catch (error) {
     console.error('[nfl analyst] Analysis failed:', error instanceof Error ? error.message : 'Unknown error');
     return c.json({ error: 'analysis_unavailable', detail: 'The AI analysis could not finish. Please retry your question.' }, 503);
@@ -867,6 +868,9 @@ export async function regenerateBriefById(
       initialEvidence = await buildNflCurrentAnswer(currentQuestionKind);
     }
     return replaceWithFactualAnswer(existingBrief, await buildNflAiAnswer(existingBrief.question, {
+      sessionId: existingBrief.session_id,
+      savedContractScope: { created_before: existingBrief.created_at, exclude_brief_id: existingBrief.id },
+      pinnedSavedContract: existingBrief.body?.kind === 'data_analysis' ? existingBrief.body.saved_contract_reference : undefined,
       history: [...(priorContextRes.data ?? [])].reverse().filter(row => row.status === 'ready').map(row => ({ question: row.question, body: row.body?.kind === 'data_analysis' ? row.body : null })),
       initialEvidence,
     }));
@@ -948,7 +952,7 @@ async function regenerateCurrentNflBrief(
 export async function replaceWithFactualAnswer(existingBrief: Brief, prepared: Awaited<ReturnType<typeof buildNflFactualAnswer>>): Promise<Brief | null> {
   const startedAt = Date.now();
   if (prepared.body.language_policy !== 'grounded_ai_v1') prepared.body = factualBody(prepared.body);
-  const progress = prepared.body.ai_analysis&&prepared.body.ai_analysis.outcome!=='complete' ? readyBriefProgress('Analysis incomplete','The checked evidence and saved question are available.') : readyBriefProgress('Analysis ready', 'The answer and supporting sources are ready.');
+  const progress = prepared.body.ai_analysis?.outcome==='needs_input' ? readyBriefProgress('Contract input needed','The saved-contract lookup completed; the answer identifies the missing terms.') : prepared.body.ai_analysis&&prepared.body.ai_analysis.outcome!=='complete' ? readyBriefProgress('Analysis incomplete','The checked evidence and saved question are available.') : readyBriefProgress('Analysis ready', 'The answer and supporting sources are ready.');
   progress.updated_at = new Date(Math.max(Date.now(), Date.parse(existingBrief.updated_at) + 1)).toISOString();
   const generation = await claimHistoricalBriefGeneration(existingBrief, progress.updated_at);
   if (!generation) return null;

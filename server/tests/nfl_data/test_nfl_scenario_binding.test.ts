@@ -32,16 +32,17 @@ test('newly requested player protection is enforced before any model scenario up
 });
 test('unavailable-by-user cannot be created by a tool argument alone',async()=>{
  const seed=await loadNflDemoSeed();
- await assert.rejects(buildNflReceiverComparison({assumed_unavailable_names:['Malik Nabers']},seed,'Compare our receiver options.'),/No user supplied/);
- const answer=await buildNflReceiverComparison({assumed_unavailable_names:['Malik Nabers']},seed,'Assume Nabers is unavailable.');
+ await assert.rejects(buildNflReceiverComparison({player_names:['Malik Nabers'],assumed_unavailable_names:['Malik Nabers']},seed,'Compare our receiver options.'),/No user supplied/);
+ const answer=await buildNflReceiverComparison({player_names:['Malik Nabers'],assumed_unavailable_names:['Malik Nabers']},seed,'Assume Nabers is unavailable.');
  assert.ok(answer.body.tables[0].rows.some(r=>r[0]==='Malik Nabers'&&r[2]==='Assumed unavailable by user'));
 });
-test('quantitative model prose is withheld while the exact retrieved comparison stays usable',async()=>{
+test('repeated unsupported risk prose returns explicitly incomplete evidence',async()=>{
  const seed=await loadNflDemoSeed();let count=0;
  const result=await buildNflAiAnswer('Compare our options.',{prefetch:false,loadData:async()=>({seed,source_mode:'supabase_current_views',fallback_reason:null}),reviewDraft:async()=>[],callModel:async()=>({id:'test',type:'message',role:'assistant',model:'test',stop_reason:'tool_use',stop_sequence:null,usage:{input_tokens:0,output_tokens:0},content:[{type:'tool_use',id:String(++count),name:count===1?'compare_receivers':'finish_analysis',input:count===1?{}:{answer:'Compare the recorded production with the shorter commitments. He has a twenty percent injury risk.',key_findings:[],tables:[{table_id:'lookup_1:0',title:'Made-up 2099 claims',row_ids:['r0'],column_names:['Player','2025 receiving yards']}],evidence_id:'lookup_1',continuation_query_id:'lookup_1',caveats:[],assumptions:[],followups:[]}}]} as any)});
- assert.equal(result.body.ai_analysis?.outcome,'complete');
+ assert.equal(result.body.ai_analysis?.outcome,'evidence_only');
+ assert.match(result.body.answer,/did not finish/);
  assert.doesNotMatch(result.body.answer,/twenty|risk/);
- assert.equal(result.body.ai_analysis?.withheld_numeric_sentences,1);
+ assert.equal(result.body.ai_analysis?.repair_count,1);
  assert.doesNotMatch(result.body.tables[0].title,/2099/);
  assert.ok(result.body.receiver_query);
 });
