@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { updateNflConversationState } from '../../src/nfl_conversation/state.js';
-import { resolveEvidenceProse } from '../../src/nfl_conversation/grounding.js';
+import { resolveEvidenceProse } from '../../src/nfl_conversation/grounding_v1.js';
 import { buildNflReceiverComparison,suppliedEvaluations } from '../../src/nfl_scouting/evidence.js';
 import { loadNflDemoSeed } from '../../src/nfl_data/seed.js';
 
@@ -21,9 +21,9 @@ test('numbers cannot acquire new meaning in model prose; tool tables own quantit
 });
 test('receiver priorities change evidence order and multi-team totals use the whole regular season',async()=>{
  const seed=await loadNflDemoSeed();
- const production=await buildNflReceiverComparison({priority:'receiving_production'},seed,'');
- const flexibility=await buildNflReceiverComparison({priority:'contract_horizon'},seed,'');
- const inside=await buildNflReceiverComparison({priority:'inside_role'},seed,'');
+ const production=await buildNflReceiverComparison({priority:'receiving_production',player_names:['Courtland Sutton','Jakobi Meyers','Christian Kirk','Darnell Mooney','Malik Nabers']},seed,'');
+ const flexibility=await buildNflReceiverComparison({priority:'contract_horizon',player_names:['Courtland Sutton','Jakobi Meyers','Christian Kirk','Darnell Mooney','Malik Nabers']},seed,'');
+ const inside=await buildNflReceiverComparison({priority:'inside_role',player_names:['Courtland Sutton','Jakobi Meyers','Christian Kirk','Darnell Mooney','Malik Nabers']},seed,'');
  assert.equal(production.body.tables[0].rows[0][0],'Courtland Sutton');
  assert.notEqual(flexibility.body.tables[0].rows[0][0],'Courtland Sutton');
  assert.equal(inside.body.tables[0].rows[0][0],'Jakobi Meyers');
@@ -35,7 +35,7 @@ test('receiver priorities change evidence order and multi-team totals use the wh
 test('an added evaluation retains exact attribution and cannot masquerade as a verified public source',async()=>{
  const text='[Evaluation]\nPlayer: Christian Kirk\nAuthor: Example evaluator v1\nDate: 2026-09-08\nObservation: Illustrative review: investigate the inside role.\n[/Evaluation]';
  assert.equal(suppliedEvaluations(text)[0].author,'Example evaluator v1');
- const answer=await buildNflReceiverComparison({},await loadNflDemoSeed(),text);
+ const answer=await buildNflReceiverComparison({player_names:['Christian Kirk']},await loadNflDemoSeed(),text);
  assert.ok(answer.sources.some(s=>s.source==='user-supplied evaluation'&&JSON.stringify(s.data).includes('not independently verified')));
 });
 

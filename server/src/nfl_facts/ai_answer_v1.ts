@@ -5,10 +5,10 @@ import { contractDossiersEvidence, executeCapStrategy, executeContractComparison
 import { nflCapStrategyTool } from '../nfl_contracts/tool_schema.js';
 import {observationsFromScenario} from '../nfl_contracts/funding_observations.js';
 import { buildNflExampleEvidence, nflExampleTool, nflExampleCoverage, type NflExampleArgs } from '../nfl_examples/evidence.js';
-import { buildNflReceiverComparison, nflReceiverTool, officialReceivingTotals } from '../nfl_scouting/evidence.js';
+import { buildNflReceiverComparison, nflReceiverTool, officialReceivingTotals } from '../nfl_scouting/evidence_v1.js';
 import { nflScenarioTool, updateNflConversationState, userMoneyAmounts } from '../nfl_conversation/state.js';
-import { collectEvidenceFacts, validateSourcedParagraphs, evidenceFingerprint, type SourcedParagraph } from '../nfl_conversation/claims.js';
-import { categoricalGroundingIssues, reviewNflAnalystSemantics, type AnalystAuthoredProse } from '../nfl_conversation/semantic_grounding.js';
+import { resolveEvidenceProse } from '../nfl_conversation/grounding_v1.js';
+import { categoricalGroundingIssues, reviewNflAnalystSemantics, type AnalystAuthoredProse } from '../nfl_conversation/semantic_grounding_v1.js';
 import { evaluationCostsFromContracts } from '../nfl_conversation/evaluation_tools.js';
 import { buildNflOptionEvaluation, nflEvaluationTool, type NflEvaluationState, type NflOptionEvaluationArgs } from '../nfl_evaluation/index.js';
 import type Anthropic from '@anthropic-ai/sdk';
@@ -25,10 +25,7 @@ import { factualMarketAnswer } from '@shared/nflAnswerDepth';
 import { deterministicMarketSourceRows, deterministicMarketEventSourceRows } from '../claude/nfl_transaction_market_guardrails.js';
 
 export interface AnalystTurn { question: string; body: DataAnalysisBriefBody | null }
-export interface AnalystOptions {
-  pipeline?: 'legacy' | 'candidate';
-  onEvidence?: (evidence: unknown[]) => void;
-  onTrace?: (event: Record<string, unknown>) => void;
+interface AnalystOptions {
   history?: AnalystTurn[];
   initialEvidence?: FactualAnswer;
   loadData?: typeof loadCurrentNflDataWithMode;
@@ -50,35 +47,57 @@ function remapEvidenceRefs<T>(value: T, remap: (refs: number[]) => number[]): T 
   ])) as T;
 }
 const positions = ['QB', 'RB', 'WR', 'TE', 'OT', 'IOL', 'EDGE', 'IDL', 'LB', 'CB', 'S', 'ST'];
-const numericFields = ['age', 'cap_2026', 'starts_2025', 'snaps_2025', 'games_2025', 'receiving_yards_2025'];
-const sorts = ['name', 'cap_asc', 'cap_desc', 'starts_asc', 'starts_desc', 'snaps_asc', 'snaps_desc', 'games_asc', 'games_desc', 'age_asc', 'age_desc', 'receiving_yards_desc', 'receiving_yards_asc'];
+const numericFields = ['age', 'cap_2026', 'starts_2025', 'snaps_2025', 'games_2025'];
+const sorts = ['name', 'cap_asc', 'cap_desc', 'starts_asc', 'starts_desc', 'snaps_asc', 'snaps_desc', 'games_asc', 'games_desc', 'age_asc', 'age_desc'];
 const strings = (description: string) => ({ type: 'array', items: { type: 'string' }, description });
 const integerRefs = { type: 'array', items: { type: 'integer', minimum: 1 } };
 
-export const NFL_ANALYST_SYSTEM = `You are Gambit's football analyst for the New York Giants front office. Understand the decision, investigate the available evidence, and explain a useful working recommendation. The user can challenge the recommendation or change the objective in ordinary language.
+export const NFL_ANALYST_SYSTEM = `You are Gambit's AI analyst working with the New York Giants front office. Understand the user's football problem, investigate it with the available tools, and give a useful, evidence-backed answer. You can reason, synthesize, compare approaches and suggest next investigations. Do not make the user speak a query language.
 
-INVESTIGATE
-- Treat we/our/us as NYG unless the user specifies another team. Distinguish the scenario subject from acquisition candidates. A supplied absence is an assumption, not a diagnosis.
-- For open-ended player decisions, search the applicable whole recorded population, then investigate a small useful shortlist and compare internal options. Use receiving_yards_desc for production-led receiving research, not total snaps or a low cap charge as a proxy for talent. Search outside NYG for acquisitions. Prepared dossiers enrich the search; they do not define it. For named comparisons or compatible follow-ups, use the relevant existing scope directly.
-- For an open-ended receiver acquisition question, your first lookup must search_player_records with team_ids:[], position_groups:['WR'], exclude_nyg:true. Do not start by naming familiar prepared receivers. Compare the resulting candidates, including missing enrichment honestly.
-- Decide what evidence the question needs. Use independent lookups together, reuse successful evidence, and finish once the material questions are supported. Read the Giants cap observations for cap-sensitive decisions and sourced rules for transaction mechanics. A table limit is a displayed sample, not the size of the researched population.
-- Keep explicit filters, exclusions, budgets, reserve and protections. A vague preference is not a numeric cutoff. Change the scope when the objective changes. Use set_scenario before a dependent calculation, and restore an earlier scenario explicitly when requested. Saved illustrative terms are distinct from actual reported contracts and current budget constraints.
-- Use historical/snapshot dates as supplied. An old model recommendation is not evidence. Missing data limits the affected claim; continue useful supported work. Ask a focused question only for an input needed to complete the decision.
+INTERPRET THE REQUEST
+- Treat we/our/us as NYG unless another club is specified. Separate the situation from the action requested: an injured Giants player can motivate an outside acquisition search without being the player to acquire or trade away.
+- A user's injury statement is scenario context, not a verified diagnosis. Work with the scenario naturally (for example, "With Nabers' availability in doubt..."); do not turn every contextual adjective into a filter or demand that the user remove it.
+- Understand ordinary language such as "without blowing up our cap", "someone who has actually played", "cheaper", "what about...", and "keep the same budget". Preserve concrete numeric constraints and exclusions through follow-ups. Never silently discard a condition, change a strict bound, or equate missing with zero.
+- A vague budget is a preference, not an arbitrary numerical cutoff. You may investigate illustrative price bands if you identify them as your working screen, or ask one focused budget question while still providing useful analysis. Explicit user limits are mandatory.
+- Use the conversation to resolve pronouns, motivations and changed assumptions. An earlier parser error is not the user's intended constraint. Ignore parser debris in old answers and interpret the original user words.
 
-REASON
-- State a defensible working recommendation, why it fits the objective, credible alternatives (including internal or hold), and the assumption or evidence that would change the choice. Conditional football judgments are welcome when their premise is supported; confirmed seller interest is not required to investigate a candidate. Do not invent seller intent, role/scouting traits, prices, health or forecasts.
-- Dated public cap observations with conflicting bases do not establish that NYG is currently over the cap or must clear room. Keep any cost-pressure inference conditional on reconciling the ledger.
-- Explain contract term separately from guaranteed liability, current-team cap separately from incoming cost, and cap recognition separately from cash. A budget alone cannot establish actual incoming price. Use executed contract comparisons and funding calculations for numerical scenarios; never supply new financial inputs the user did not provide.
-- Compare like metrics, periods and cohorts. Production is not a scouting grade. A player can lead in receptions while another leads in yards; specify the metric. Attribute scouting evaluations and distinguish user-supplied grades from verified team assessments.
-- Availability reports support staff questions, not medical conclusions. Coaching outcomes support review hypotheses; film/charting is required for coverage, assignment or causal claims. Limited practice is not full participation, and one observed game cannot establish a workload trend.
+INVESTIGATE AND REASON
+- Use supplied initial_evidence first. If it already supports the answer, finish immediately and do not repeat lookups. For receiver value questions, prefer compare_receivers for like-for-like production and attributed evaluations. Use search_player_records to broaden the cohort only when the user asks. Call data tools before making player-specific or numerical claims. Use several lookups in parallel when useful. Search outside NYG for acquisitions. Query enough records to make a meaningful comparison, then select a small set to show and explain why those records are relevant.
+- For a cap-sensitive acquisition question, read the Giants cap position as well as player records. Use receiving yards and offensive usage when discussing receivers. A low cap charge by itself is not evidence of useful receiving production.
+- Current-team cap charges, scheduled annual cash, acquiring-team cap costs and trade compensation are different things. Never label a player's current-team cap hit as the Giants' cost to acquire him. Exact incoming cap cost needs remaining unpaid compensation, transferred guarantees, timing and contract terms; it is not established by these snapshot columns. Never certify affordability from these numbers.
+- A shorter active contract is a shorter recorded term, not proof of no future obligations, a clean exit, or a shorter guaranteed tail. Compare guaranteed liability only from complete year-by-year guarantee terms and transaction assumptions; otherwise describe the recorded term. Do not promise an exact incoming cost from a budget alone. For receiver comparisons, read each player's Team / scope field before calling him internal or external.
+- Current roster status does not prove a player is available for trade, a free agent, healthy, on the block or willing to sign. Do not invent seller willingness, asking prices, medical prognoses, scouting traits or future performance. Specific contract-year claims require the returned contract-end field. Unknown means unknown, not zero or unavailable as a player.
+- Discuss acquisition routes and tradeoffs as analysis, with any unverified seller/role assumptions explicit. Qualified judgments such as "may be attainable" are welcome when you explain sound reasoning from the contract, usage, roster context or a clearly stated scenario. Confirmed seller interest is NOT required for a conditional judgment. Make the reasoning useful and distinguish an inference from an established fact. You may identify which records deserve investigation and why. A cheap productive star is not automatically a practical target solely because his current cap charge is low. Claims about a team's current depth require a roster/usage lookup; hypothetical seller motivations can be framed as hypotheses to test.
+- Dates on the tools are snapshot dates. Do not freshen sources, assume the public cap observations reconcile, or convert historical transactions into current asking prices. Consult the rules tool for technical transaction-rule claims.
+- For contract alternatives, use nfl_contract_comparison directly. It already reads the relevant dossier, computes hold versus the requested moves and supplies the controlling CBA mechanism; no preliminary dossier lookup or separate hold calculation is needed. Keep the requested moves for a changed-amount follow-up. Omit credited seasons and unpaid salary unless supplied. For a funded acquisition, include the acquisition and funding moves in the same comparison; do not infer an incoming price from the seller's cap charge.
+- For minimum funding, financing discovery, sensitivity, or what would change a financing recommendation, use find_minimum_cap_funding directly. Omit scenario when retaining the last acquisition terms; current explicit budget/reserve changes are read by the tool. Do not reuse an old maximum or specified conversion as the recommendation. Only this tool derives conversion amounts and sensitivity cases; the ordinary scenario tools still require literal user amounts. Explain the preferred single conversion, including no funding when acquisition already fits, and distinguish an unsupported funding fit from an unavailable player. This search does not optimize roster removals or combined conversions. Do not say uncalculated multiple conversions, releases/trades or extensions would close the gap; they require separate evaluation. Describe the budget, reserve or price changes that the sensitivity rows actually tested. Preserve all future-year allocations and the supplied player protections.
+- Do not claim that a player led the whole room in a metric if any relevant player's metric is unknown. Observed yards and games are not measures of talent, upside or current health. Do not label a player the highest-upside/best talent without an attributed evaluation. Keep rankings to the specified evidence and method.
+- If a tool returns an explicit coverage gap, finish with that exact answer statement and explain the useful next input. Do not repeat a lookup or substitute another player to obtain a probability or current medical claim.
+- Practice participation, game designation and observed game workload are separate fields. LP means limited, FP means full, DNP means did not participate. Read each dated label before making a claim. A single observed game has no earlier workload baseline: never call it a snap drop, recovery or improvement. Prioritize questions for staff from observed flags, not a medical risk score or unsupported causal explanation.
+- Coaching summaries support review hypotheses, not prescriptions. Query the relevant play outcomes and distance buckets before recommending a film-review priority. Do not claim that run/pass rates show coverage, pressure, routes or play-action. A proposed coaching adjustment must identify the charting or film observation needed to validate it.
+- For coaching follow-ups, map changed distances, outcomes, field zones and exact game/play IDs into coachingFilters. Use inherit_previous to preserve the teams and weeks; supply the complete retained coachingFilters when replacing that object. Check the executed selection in initial evidence: a broad prefetched summary does not satisfy a newly requested filter. Use coachingView review_queue for identified plays and matched_situations to compare shared down/distance/field-position cells.
+- Keep availability report scope separate from an absence assumption. A question about whom to review across the report plus Thomas being unavailable needs the whole investigation queue and a Thomas-only contingency. An operational review order is not a medical severity ranking.
+- Use evaluate_nfl_options when the user supplies grades, floors, weights or a decision model. Interpret natural language and quoted evaluations into the tool's exact literal inputs. A role grade needs its stated scale; never invent a grade or infer it from public adjectives. For a grade/weight refinement, use inherit_previous and omit the unchanged role/domain. A new role starts fresh judgments. Use the supplied criterion labels consistently, and omit author/date/source unless the user actually supplied them for that player. A calculated preference is conditional on that user's method; it is not an independently validated Giants forecast.
+- A public college role comparison should use the attributed receiving and blocking assessments and their limitations, not rank NFL projection by college yards. Public tradeoff/frontier results describe their listed dimensions only. For a complete acquisition decision, compare the football role first, then calculate incoming terms and funding alternatives; show when extra funding is unnecessary under the supplied budget.
+- If one field is missing, explain that particular gap in normal English and continue the useful supported analysis. Do not refuse the entire football question because it contains contextual language or an unsupported statistic.
 
-WRITE
-- Put the reasoning in answer_paragraphs. Avoid restating those paragraphs as key_findings; use an empty findings list when redundant. Select compact table IDs without repeating their cells.
-- Answer naturally in connected paragraphs. A simple question usually needs 80–180 words; a substantial comparison may need 250–450. These are guidance, not quotas. A short refinement should lead with what changed and its consequence. Do not impose a template or repeat the answer in findings.
-- Explain meaningful numbers in prose with their subject, metric, time period and accounting basis. Every factual quantity must come from a labelled tool fact or executed calculation. Do not perform new arithmetic. Use source_refs on each answer_paragraph; fact_ids are optional when those sources unambiguously identify the facts. The server checks the exact bindings, including rounding. For a rule or compound calculated statement, you can select its exact text from answer_statements and explain its implication.
-- Lead with the decision, not methodology, data-policy language or a statistics roll call. Keep material conditions beside the affected claim and put routine methodology in supporting evidence. Do not substitute canned rule/calculation text for answering the question.
-- Use finish_analysis with answer_paragraphs [{text,source_refs,fact_ids?}], relevant labelled tables, and up to three useful executable follow-ups. answer may be omitted when paragraphs are supplied. evidence_id preserves the main executed artifact; continuation_query_id preserves the intended search or scenario. Table rows and values come from tools. Preserve attribution. Do not include raw tool markup.
-- Before finishing, check that the opening, findings and tables agree and that the proposed next action is actually supported. If validation identifies a material issue, repair that issue using the existing evidence, preserving the supported explanation. Communicate through tool calls only.`;
+- Make an acquisition shortlist useful for actual calls. Lead with a few plausible investigation candidates and explain the contract/usage rationale for each. Cheap stars who are probably retained can explain a tradeoff in one sentence; they should not dominate the recommendation or table. Do not infer a rookie contract from a low cap charge, age or draft history: a player may have signed an extension. Use only the recorded contract terms.
+
+- Negative dated public cap observations do not establish that the Giants are currently over the cap, have no room, or must offset every acquisition. Their accounting bases disagree and are not the club ledger. Explain that they suggest cost pressure, conditional on reconciliation. Keep this qualification with the claim and keep it brief; lead with the football recommendation, not an extended cap disclaimer. A stated budget narrows profiles; it does not let these snapshot fields establish exact affordability.
+
+- Missing historical usage means this dataset cannot compare that player's workload; it does not imply inexperience or establish that someone else is the team's only proven/full-time player. Say "among the records available" when coverage is incomplete. Use the recorded NFL-experience field for career-stage claims. A workload comparison does not establish who will absorb targets, outside/slot assignments, pedigree or upside; frame role ideas as hypotheses that need coaching/scouting evidence.
+
+WRITE THE ANSWER
+- Lead with the players, options or football tradeoff that answers the actual question, in natural, connected prose. Do not open with sorting rules, dossier/snapshot terminology, evidence-policy disclaimers or a roll call of statistics. Methodology and supporting records belong in the comparison details. Mention a missing input in the lead only when it prevents the requested conclusion; keep other material qualifications beside their affected claim. Keep the lead to about eighty words, with 2-3 short supporting findings and 3-6 player rows when helpful. Avoid repetitive disclaimers, internal tool/schema labels and process narration. Do not repeat the entire answer in the findings.
+- For a receiver shortlist, focus the opening on whom to investigate, recorded production versus active contract length, and the internal alternative. Do not discuss or rank guarantees in this summary: the receiver comparison does not calculate transferred liability. Do not append the public-cap accounting warning when you have made no affordability claim, or end with a generic offer to model something. The interface already provides labeled tables, relevant limits and follow-ups.
+- Use plain prose in string fields; the interface supplies headings and typography. Do not use Markdown headings, bold markers or raw source tokens in prose. Put exact numeric source refs in findings; tools own all source links and tables.
+- Select tables/rows/columns from tool results. Do not invent table cells or calculate new figures in narrative. Copy figures from the retrieved evidence. Label current-team cap clearly. State essential qualifications next to the affected assertion rather than burying them.
+- Usually select a table with its table_id alone; this preserves all labelled fields and rows without copying the schema. Supply row_ids or column_names only when narrowing the displayed evidence helps answer the request. Omit empty optional finish fields and avoid repeating qualifications already present on the selected evidence.
+- Keep ALL numerical facts in tool-owned tables/calculations. Prose and table titles must contain no numbers, spelled-out quantities, money, dates or cell tokens. Use qualitative prose: this year, last season, current deal, a shorter commitment. Never turn the model prose into a calculator.
+- Before calculation, call set_scenario if changing a budget or protected player, or restoring an earlier scenario. Put it before calculation in the same tool batch. A new objective must use fresh search scope. Omit unchanged state fields. Include scenario in finish_analysis for other objective changes. Do not clear earlier constraints without a user request.
+- Keep the final answer to a short paragraph and use at most two findings and two tables. Do not repeat evidence in prose. For exact quantitative results or a reviewed rule statement, select answer_statements by ID: code inserts the complete statement with its source refs. Copy result IDs, never rewrite figures. A final response must include answer and may omit empty arrays. Do not add prose containing a number that you intend code to remove.
+- Use finish_analysis to submit the final answer. Select the evidence that owns the main question and the player-query lookup that should carry into the next turn. Propose useful follow-ups as requests the user can click, such as "Compare the lower-cost players with the most receiving usage." Ask any needed budget question in the answer, not as a clickable button that repeats your question back to you. Do not submit a list of keyword filters as the answer.
+- Communicate only through tool calls. Do not write a draft as a text block before finish_analysis. Before submitting, check every named player's contract year and statistic against that exact row's field names, and check every source reference.`;
 
 export const nflAnalystTools: Anthropic.Tool[] = [
   {
@@ -117,15 +136,13 @@ export const nflAnalystTools: Anthropic.Tool[] = [
     scenario: nflScenarioTool.input_schema,
     answer_statements: {type:'array', maxItems:4, items:{type:'string'}, description:'Exact complete tool-authored statements. IDs are listed on evidence. Select only statements that answer the current question; supporting records stay in comparison details when your interpretation leads.'},
     answer: { type: 'string' },
-    answer_paragraphs: {type:'array',maxItems:8,items:{type:'object',properties:{text:{type:'string'},source_refs:integerRefs,fact_ids:strings('Optional exact numerical fact IDs from the evidence.')},required:['text','source_refs'],additionalProperties:false}},
-    answer_source_refs: integerRefs,
     key_findings: { type: 'array', maxItems: 5, items: { type: 'object', properties: { label: { type: 'string' }, body: { type: 'string' }, source_refs: integerRefs }, required: ['label', 'body', 'source_refs'], additionalProperties: false } },
     tables: { type: 'array', maxItems: 4, items: { type: 'object', properties: { table_id: { type: 'string' }, title: { type: 'string',description:'Optional; code preserves the original evidence title.' }, row_ids: strings('Omit to keep every row. Otherwise exact row IDs, e.g. r0.'), column_names: strings('Omit to preserve the complete labelled evidence. Otherwise exact column names.') }, required: ['table_id'], additionalProperties: false } },
     evidence_id: { type: 'string' }, continuation_query_id: { type: 'string' },
     caveats: strings('Only material qualifications, expressed in plain English.'),
     assumptions: strings('User-supplied scenarios and clearly labeled working assumptions, never inferred medical facts.'),
     followups: { type: 'array', maxItems: 3, items: { type: 'string' } },
-  }, required: ['evidence_id', 'continuation_query_id'], additionalProperties: false } },
+  }, required: ['answer', 'evidence_id', 'continuation_query_id'], additionalProperties: false } },
 ];
 
 function object(value: unknown): Record<string, unknown> {
@@ -215,7 +232,6 @@ export function analystPlayerEvidence(query: NflFactualQuery, seed: NflDemoSeed)
   seed = { ...seed, player_metrics: seed.player_metrics.map(metric => metric.metric_families?.includes('nflverse_snap_counts') ? metric : {
     ...metric, snaps_2025: null, offense_snaps_2025: null, defense_snaps_2025: null, special_teams_snaps_2025: null,
   }) };
-  seed = {...seed, player_metrics:seed.player_metrics.map(metric=>{const official=officialReceivingTotals(metric.player_name);return official?{...metric,receiving_yards_2025:official.yards,games_2025:official.games,source_status:'captured' as const}:metric;})};
   const result = rosterFactsAnswer(query, seed);
   const table = result.body.tables[0];
   if (!table) return result;
@@ -227,8 +243,8 @@ export function analystPlayerEvidence(query: NflFactualQuery, seed: NflDemoSeed)
     const cap = seed.cap_rows.find(row => row.player_name === values[0] && row.team_id === values[1]);
     const metric = seed.player_metrics.find(row => row.player_name === values[0] && row.team_id === values[1]);
     const officialReceiving=receiving?officialReceivingTotals(String(values[0])):null;
-    if(officialReceiving){const i=table.columns.findIndex(c=>/games/i.test(c));if(i>=0)values[i]=String(officialReceiving.games);}
-    if(metric&&!metric.metric_families?.includes('nflverse_snap_counts')){const i=table.columns.findIndex(c=>/snaps/i.test(c));if(i>=0)values[i]='Not recorded';}
+    if(officialReceiving)values[7]=String(officialReceiving.games);
+    if(metric&&!metric.metric_families?.includes('nflverse_snap_counts'))values[6]='Not recorded';
     const capturedCap = cap?.source_status === 'captured' ? cap : null;
     const dossier=getNflContractDossier(String(values[0]));
     const conflict=dossier?.source_status==='source_conflict';
@@ -273,16 +289,6 @@ export async function analystTradeEvidence(input: unknown, loadSnapshot = loadCu
 }
 
 export async function buildNflAiAnswer(question: string, options: AnalystOptions = {}): Promise<FactualAnswer> {
-  if ((options.pipeline ?? process.env.NYG_ANALYST_PIPELINE) === 'legacy') {
-    const baseline = await import('./ai_answer_v1.js');
-    const answer = await baseline.buildNflAiAnswer(question, options);
-    if(answer.body.ai_analysis) answer.body.ai_analysis.pipeline_version='analyst_v1';
-    return answer;
-  }
-  return buildNflAiAnswerV2(question,options);
-}
-
-export async function buildNflAiAnswerV2(question: string, options: AnalystOptions = {}): Promise<FactualAnswer> {
   const started = Date.now();
   const loaded = await (options.loadData ?? loadCurrentNflDataWithMode)();
   const seed = structuredClone(loaded.seed);
@@ -317,8 +323,6 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
   const sources: FactualAnswer['sources'] = [];
   const toolNames: string[] = [];
   let servingModel = BRIEF_MODEL;
-  const stageMs={retrieval:0,generation:0,review:0,repair:0};
-  const retrievalStart=Date.now();
 
   const register = (answer: FactualAnswer, isPlayerSearch = false, executed = false): Evidence => {
     const id = 'lookup_' + (evidence.size + 1);
@@ -332,7 +336,6 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
       ...(isPlayerSearch && body.tables[0] ? { rowRefs: body.tables[0].rows.map((_, index) => [sourceMap.get(answer.sources[index]?.ref_index) ?? body.tables[0].source_refs[0]]) } : {}),
     };
     evidence.set(id, item);
-    options.onEvidence?.([...evidence.values()].map(forModel));
     return item;
   };
   const adoptExecutedState=(item:Evidence)=>{
@@ -362,7 +365,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
     conversationState=next;
   };
   const forModel = (item: Evidence) => ({
-    lookup_id: item.id, population:item.body.population, facts:collectEvidenceFacts([item]), answer: item.body.answer, selection: item.body.factual_query,receiver_selection:item.body.receiver_query,example_selection:item.body.example_query,evaluation_selection:item.body.evaluation_query,
+    lookup_id: item.id, answer: item.body.answer, selection: item.body.factual_query,receiver_selection:item.body.receiver_query,example_selection:item.body.example_query,evaluation_selection:item.body.evaluation_query,
     answer_statements: [{id:item.id+':answer',text:item.body.answer}, ...item.body.key_findings.map((f,i)=>({id:item.id+':finding:'+i,label:f.label,text:f.body}))], findings: item.body.key_findings, supporting_details: item.body.supporting_details, calculations: item.body.calculations, caveats: item.body.caveats,
     tables: item.body.tables.map((table, index) => ({ table_id: item.id + ':' + index, title: table.title, columns: table.columns, rows: table.rows.map((values, rowIndex) => ({ row_id: 'r' + rowIndex, fields: Object.fromEntries(table.columns.map((column, index) => [column, values[index]])), source_refs: index === 0 && item.rowRefs ? item.rowRefs[rowIndex] : table.source_refs })) })),
     sources: item.sources.map(source => ({ ref: source.ref_index, title: source.title, source: source.source, as_of: source.updated_at,
@@ -370,13 +373,33 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
   });
   const initialPlayer=options.initialEvidence?.body.seller_move_analysis?.result?.player.player_name;
   const initial = options.initialEvidence ? register(initialPlayer&&getNflContractDossier(initialPlayer)?.source_status==='source_conflict'?contractDossiersEvidence([initialPlayer]):options.initialEvidence) : null;
-  // Discovery is chosen by the analyst from the actual question, not names in a prepared example.
-  stageMs.retrieval += Date.now()-retrievalStart;
+  const relevantToReceivers = /receiver|\bWR\b/i.test(question) || ['acquisition','internal_roster'].includes(conversationState?.active.objective ?? '') || /receiver|\bWR\b/i.test(history.at(-1)?.question ?? '');
+  if (options.prefetch !== false && relevantToReceivers && !/college|draft|prospect|tight end|hypothetical|signing.bonus|conversion|restructure|recalculate|grade|weight|threshold|supplied model/i.test(question)) {
+    try {
+      const scope = /(?:already|existing|only).*roster|our roster instead|internal only/i.test(question) ? 'internal' : 'both';
+      const priority = /flexibility|next.year|overcommitt/i.test(question) && !/production over|prioritize (?:receiving )?production/i.test(question) ? 'contract_horizon' : 'receiving_production';
+      register(await buildNflReceiverComparison({candidate_scope:scope,priority}, seed, [...history.map(t=>t.question),question].join('\n')));
+      register(await buildNflCurrentAnswer('cap_space'));
+      if(scope!=='internal')register(contractDossiersEvidence(['Courtland Sutton','Jakobi Meyers','Christian Kirk']));
+    } catch { /* Prefetch failure does not substitute a different player cohort. */ }
+  }
+
+  if(options.prefetch!==false){
+    const domain=/Warren/i.test(question)&&/Loveland/i.test(question)||/same college comparison|historical draft prospects/i.test(question)?'college':/availability timeline|practice.label changes|historical.*(?:practice|availability)|Andrew Thomas.*participation/i.test(question)?'availability':/captured.*(?:sample|regular.season).*|same weeks/i.test(question)&&/offense|Giants|Dallas|Kansas City|third down|red zone/i.test(question)?'coaching':undefined;
+    if(domain){
+      const args:Record<string,unknown>={...(lastExampleQuery?.domain===domain?lastExampleQuery:{}),domain,question};
+      // A changed role or situation is interpreted from the actual new text.
+      if(domain==='college')delete args.collegePriority;
+      if(domain==='availability'&&/all|changes|report/i.test(question))args.playerName='all';
+      if(domain==='coaching'){delete args.situation;delete args.teamId;delete args.comparisonTeamId;}
+      const prepared=await buildNflExampleEvidence(args as unknown as NflExampleArgs, {previousQuery:lastExampleQuery?.domain===domain ? lastExampleQuery as unknown as NflExampleArgs : undefined});prepared.body.example_query??=args;lastExampleQuery=prepared.body.example_query;register(prepared,false,false);
+    }
+  }
+
   const messages: Anthropic.MessageParam[] = [{ role: 'user', content: JSON.stringify({
     question, today: new Date().toISOString().slice(0, 10), roster_as_of: seed.as_of_date, historical_usage_season: 2025, source_mode: loaded.source_mode,
     contract_dossier_coverage: getNflContractDossierCoverage(), previous_contract_scenario: priorContractScenario,
     known_gaps: ['No verified current medical status, seller availability, asking prices or club-certified cap ledger.', 'Recorded age may be unavailable. Current team cap is not acquiring-team cap cost.'],
-    capability_summary: 'Search the full recorded roster/usage population; enrich named receivers with available evaluations and dossiers; calculate literal contract scenarios and minimum single-conversion funding; inspect sourced rules and recorded historical packages. College, availability and coaching examples have the explicitly returned coverage.',
     team_ids: seed.teams.map(team => team.team_id), roster_status_codes: [...new Set(seed.roster_entries.map(row => row.roster_status))],
     conversation: history.slice(-8).map(turn => ({ question: turn.question, answer: turn.body?.answer, findings: turn.body?.key_findings, tables: turn.body?.tables, player_selection: turn.body?.factual_query, assumptions: turn.body?.ai_analysis?.assumptions, scenario:turn.body?.conversation_state?.active, receiver_query:turn.body?.receiver_query, example_query:turn.body?.example_query, contract_scenario:turn.body?.contract_scenario?.args })),
     previous_player_selection: previousQuery, scenario_state: conversationState, example_coverage: nflExampleCoverage, previous_example_query: history.at(-1)?.body?.example_query, previous_evaluation: lastEvaluation,
@@ -414,34 +437,19 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
     body.language_policy = 'facts_only_v1';
     body.caveats = [...body.caveats, 'Analysis incomplete: ' + reason];
     body.conversation_state = conversationState;
-    body.ai_analysis = { model: servingModel, elapsed_ms: Date.now()-started, tool_names:toolNames, assumptions:conversationState?.active.assumptions ?? [], outcome:selected ? 'evidence_only':'unavailable', grounding_checked:false,pipeline_version:'analyst_v2',stage_ms:{...stageMs},repair_count:finalFailures,validation_outcome:'incomplete' };
+    body.ai_analysis = { model: servingModel, elapsed_ms: Date.now()-started, tool_names:toolNames, assumptions:conversationState?.active.assumptions ?? [], outcome:selected ? 'evidence_only':'unavailable', grounding_checked:false };
     body.followups = [question];
     return { body, sources };
   };
   let finalFailures = 0;
-  const readCache=new Map<string,Promise<{answer?:FactualAnswer;error?:unknown}>>();
-  const registeredReads=new Map<string,Evidence>();
-  const canonical=(value:unknown):unknown=>Array.isArray(value)?value.map(canonical):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).sort(([a],[b])=>a.localeCompare(b)).map(([k,v])=>[k,canonical(v)])):value;
-  const independentRead=(tool:Anthropic.ToolUseBlock):(()=>Promise<FactualAnswer>)|undefined=>{
-    if(tool.name==='compare_receivers')return ()=>buildNflReceiverComparison(tool.input,seed,[...history.map(t=>t.question),question].join('\n'));
-    if(tool.name==='read_giants_cap')return ()=>buildNflCurrentAnswer('cap_space');
-    if(tool.name==='read_contract_dossiers')return async()=>contractDossiersEvidence(object(tool.input).player_names?stringList(object(tool.input).player_names,'player names'):undefined);
-    if(tool.name==='read_trade_history')return ()=>analystTradeEvidence(tool.input);
-    if(tool.name==='read_nfl_rules')return ()=>{const args=object(tool.input);if(args.domain&&!['cba','playing_rules','league_dates'].includes(String(args.domain)))throw new Error('Unknown rule domain.');return searchNflAuthority({question:text(args.question,'rules question',1500),domain:args.domain as 'cba'|'playing_rules'|'league_dates'|undefined,limit:4});};
-    return undefined;
-  };
   for (let round = 0; round < 6; round++) {
     if (Date.now() - started > deadlineMs) return partial('Response deadline reached.');
     let response: Anthropic.Message;
-    const generationStart=Date.now();
-    if(Date.now()-started>deadlineMs-20_000)messages.push({role:'user',content:'Finish from the available evidence now. Identify any material unfinished input; do not start another research round.'});
-    try { response = await call({ model: BRIEF_MODEL, max_tokens: 4500, output_config:{effort:'low'}, system: NFL_ANALYST_SYSTEM, tools: nflAnalystTools,
+    try { response = await call({ model: BRIEF_MODEL, max_tokens: 2500, output_config:{effort:'low'}, system: NFL_ANALYST_SYSTEM, tools: nflAnalystTools,
       tool_choice: { type: 'auto' }, messages,
     }, { timeout: Math.max(1, deadlineMs - (Date.now() - started)), maxRetries: 0 });
     } catch (error) { return partial(error instanceof Error && /timeout|timed out|abort/i.test(error.message) ? 'Response deadline reached.' : 'The analysis provider is unavailable.'); }
     console.info('[nfl analyst] round',round+1,'elapsed_ms',Date.now()-started,'output_tokens',response.usage.output_tokens,'stop',response.stop_reason,'tools',response.content.filter(b=>b.type==='tool_use').map(b=>(b as Anthropic.ToolUseBlock).name).join(','));
-    stageMs[finalFailures?'repair':'generation']+=Date.now()-generationStart;
-    options.onTrace?.({stage:finalFailures?'repair':'generation',round,model:response.model,usage:response.usage,content:response.content});
     servingModel = response.model;
     const calls = response.content.filter((block): block is Anthropic.ToolUseBlock => block.type === 'tool_use');
     if (!calls.length) {
@@ -450,16 +458,9 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
     }
     messages.push({ role: 'assistant', content: response.content });
     const results: Anthropic.ToolResultBlockParam[] = [];
-    const batchStart=Date.now();
-    const readKeys=new Map<string,string>();
-    // Reads use an immutable turn context. State-changing/dependent tools remain ordered below.
-    for(const tool of calls){const run=independentRead(tool);if(!run||finalFailures)continue;const key=tool.name+JSON.stringify(canonical(tool.input));readKeys.set(tool.id,key);if(!readCache.has(key))readCache.set(key,Promise.resolve().then(run).then(answer=>({answer}),error=>({error})));}
-
     for (const tool of calls) {
       toolNames.push(tool.name);
       try {
-        if(finalFailures&&tool.name!=='finish_analysis')throw new Error('Repair the identified claim using the evidence already retrieved, then resubmit finish_analysis.');
-        if(readKeys.has(tool.id)){const key=readKeys.get(tool.id)!;const result=await readCache.get(key)!;if(result.error)throw result.error;let item=registeredReads.get(key);if(!item){item=register(result.answer!,false,true);registeredReads.set(key,item);}results.push({type:'tool_result',tool_use_id:tool.id,content:JSON.stringify(forModel(item))});continue;}
         if (tool.name === 'finish_analysis') {
           if (calls.length !== 1) throw new Error('Submit finish_analysis on its own after reading the tool results.');
           if (!evidence.size) throw new Error('Retrieve relevant evidence before submitting.');
@@ -500,10 +501,10 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
             if (!Array.isArray(value) || value.some(ref => !Number.isInteger(ref) || ref < 1 || ref > sources.length)) throw new Error('Use only retrieved source refs.');
             return [...new Set(value)];
           };
-          args.key_findings??=[];args.tables??=[];
           if (!Array.isArray(args.key_findings) || !Array.isArray(args.tables)) throw new Error('Invalid findings or table selection.');
-          const withheldSentences=0;
-          const prose = (value: unknown, label: string, max = 9000) => cleanNflAnalystProse(text(value,label,max));
+          let withheldSentences=0;
+          let answerOpeningWithheld=false;
+          const prose = (value: unknown, label: string, max = 6000) => cleanNflAnalystProse(text(value,label,max)).split(/(?<=[.!?])\s+/).filter((sentence,index)=>{try{resolveEvidenceProse(sentence,evidence);return true;}catch{withheldSentences++;if(label==='answer'&&index===0)answerOpeningWithheld=true;return false;}}).join(' ');
           const findings = args.key_findings.slice(0,5).map(value => { const row = object(value); return { label: prose(row.label, 'finding label', 120), body: prose(row.body, 'finding body', 2500), source_refs: refs(row.source_refs) }; }).filter(row=>row.body.length>0).map(row=>({...row,label:row.label||'Evidence'}));
           const tables = args.tables.slice(0,4).map((value): DataAnalysisTable => {
             const selected = object(value);
@@ -528,33 +529,35 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
             if(!finding)return [];
             return [{text:finding.body,refs:finding.source_refs}];
           });
-          const catalog=collectEvidenceFacts(evidence.values());
-          const rawParagraphs:SourcedParagraph[]=Array.isArray(args.answer_paragraphs)&&args.answer_paragraphs.length
-            ? args.answer_paragraphs.map(value=>{const p=object(value);return {text:prose(p.text,'paragraph'),source_refs:refs(p.source_refs),fact_ids:stringList(p.fact_ids??[],'fact IDs')};})
-            : prose(args.answer??'', 'answer').split(/\n\s*\n/).filter(Boolean).map(value=>({text:value,source_refs:refs(args.answer_source_refs??[])}));
-          if(rawParagraphs.length>8)throw new Error('Use at most eight connected answer paragraphs.');
-          const paragraphs=validateSourcedParagraphs([...statements.map(s=>({text:s.text,source_refs:s.refs})),...rawParagraphs],catalog,new Set(sources.map(s=>s.ref_index)));
-          validateSourcedParagraphs(findings.map(f=>({text:f.body,source_refs:f.source_refs})),catalog,new Set(sources.map(s=>s.ref_index)));
-          const interpretation=paragraphs.map(p=>p.text).join('\n\n');
+          let interpretation=prose(args.answer??'', 'answer');
+          const reviewedRules=primary?.body.key_findings.filter(f=>f.label==='Rule summary')??[];
+          if(reviewedRules.length){statements.splice(0,statements.length,...reviewedRules.slice(0,2).map(f=>({text:f.body,refs:f.source_refs})));interpretation='';findings.splice(0,findings.length);}
+          // If all quantitative narrative was withheld, retain the full executed
+          // result statement. Never leave an orphan such as "New York time."
+          if(!statements.length&&primary&&(withheldSentences||!interpretation||Array.isArray(args.answer_statements)&&args.answer_statements.length)){const summaries=primary.body.key_findings.filter(f=>f.label==='Rule summary');statements.push(...(summaries.length?summaries.slice(0,2).map(f=>({text:f.body,refs:f.source_refs})):[{text:primary.body.answer,refs:primary.sources.map(s=>s.ref_index)}]));}
           const receiverEvidence = queryEvidence?.body.receiver_query ? queryEvidence : primary?.body.receiver_query ? primary : undefined;
+          // When the guard removed the opening premise, lead with the executed
+          // statement so a remaining "that change" still has its antecedent.
+          const interpretationLead = Boolean(interpretation.length >= 35 && !answerOpeningWithheld && !primary?.body.contract_scenario && !reviewedRules.length);
           const supportingDetails = [
             ...(primary?.body.supporting_details ?? []),
             ...(evaluationEvidence?.body.key_findings.filter(f=>f.label!=='Decision basis') ?? []),
             ...(receiverEvidence && receiverEvidence !== primary ? receiverEvidence.body.supporting_details ?? [] : []),
+            ...(interpretationLead ? statements.map(s => ({label:'Recorded comparison',body:s.text,source_refs:s.refs})) : []),
           ];
-          const answer=interpretation;
-          if (!answer) throw new Error('Write the useful answer in sourced paragraphs; do not submit an empty interpretation.');
+          const answer=interpretationLead ? interpretation : [...statements.map(s=>s.text),interpretation.length>=35?interpretation:''].filter(Boolean).join('\n\n');
+          if (!answer) return partial('The written answer contained only unverified quantitative prose. The labelled evidence is preserved.');
           if(!tables.length&&primary)tables.push(...primary.body.tables.slice(0,2));
           const suppliedGrades = evaluationEvidence?.body.tables.find(t=>t.title==='User-supplied judgments · unverified attribution');
           if(suppliedGrades&&!tables.some(t=>t.title===suppliedGrades.title))tables.push(suppliedGrades);
           if(contractEvidence?.body.cap_strategy)for(const table of contractEvidence.body.tables.slice(0,2)){if(!tables.some(t=>t.title===table.title))tables.push(table);}
-          const caveats = [...new Set([...(primary?.body.caveats??[]),...stringList(args.caveats,'caveats')])];
+          const caveats = [...new Set([...(primary?.body.caveats??[]),...stringList(args.caveats,'caveats').filter(value=>{try{resolveEvidenceProse(value,evidence);return true;}catch{return false;}})])];
           if (loaded.source_mode !== 'supabase_current_views') caveats.push('Player records are from the saved public snapshot dated ' + seed.as_of_date + '; the database was unavailable.');
           if(primary)adoptExecutedState(primary);
           const draft: FactualAnswer = { body: {
-            kind: 'data_analysis', language_policy: 'grounded_ai_v1', ...(primary?.body.population?{population:primary.body.population}:{}), answer, answer_paragraphs:paragraphs, answer_source_refs:[...new Set(paragraphs.flatMap(p=>p.source_refs))], ...(supportingDetails.length ? { supporting_details: supportingDetails } : {}), key_findings: findings, tables,
+            kind: 'data_analysis', language_policy: 'grounded_ai_v1', answer, answer_source_refs:[...new Set(statements.flatMap(s=>s.refs))], ...(supportingDetails.length ? { supporting_details: supportingDetails } : {}), key_findings: findings, tables,
             calculations: primary?.body.calculations ?? [], caveats,
-            followups: stringList(args.followups, 'followups').slice(0, 3),
+            followups: (primary?.body.example_query || primary?.body.cap_strategy ? primary.body.followups : stringList(args.followups, 'followups')).slice(0, 3),
             ...(query ? { factual_query: query } : {}),
             ...((queryEvidence?.body.receiver_query??primary?.body.receiver_query)?{receiver_query:queryEvidence?.body.receiver_query??primary?.body.receiver_query}:{}),
             ...(primary?.body.market_analysis ? { market_analysis: primary.body.market_analysis, answer_layout: primary.body.answer_layout, historical_selection: primary.body.historical_selection } : {}),
@@ -565,7 +568,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
             ...(contractEvidence?.body.funding_observations ? {funding_observations:contractEvidence.body.funding_observations}: {}),
             ...(primary?.body.example_query ? {example_query:primary.body.example_query}: {}),
             ...(evaluationEvidence ? {evaluation_query:evaluationEvidence.body.evaluation_query,evaluation_result:evaluationEvidence.body.evaluation_result} : {}),
-            ai_analysis: { outcome:'complete', withheld_numeric_sentences:withheldSentences, model: servingModel, elapsed_ms: Date.now() - started, tool_names: toolNames, assumptions: stringList(args.assumptions, 'assumptions'),pipeline_version:'analyst_v2',stage_ms:{...stageMs},repair_count:finalFailures,validation_outcome:'passed',evidence_hash:evidenceFingerprint(catalog) },
+            ai_analysis: { outcome:'complete', withheld_numeric_sentences:withheldSentences, model: servingModel, elapsed_ms: Date.now() - started, tool_names: toolNames, assumptions: stringList(args.assumptions, 'assumptions') },
           }, sources };
           const authored: AnalystAuthoredProse = { answer: interpretation, findings,
             caveats: stringList(args.caveats, 'caveats'), assumptions: stringList(args.assumptions, 'assumptions'), followups: draft.body.followups,
@@ -573,20 +576,15 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
           const categoricalIssues = categoricalGroundingIssues(authored, [...evidence.values()]);
           if (categoricalIssues.length) throw new Error('Correct these factual premises and resubmit: ' + categoricalIssues.join(' | '));
           let issues: string[];
-          const reviewStart=Date.now();
-          options.onEvidence?.([...evidence.values()].map(forModel));
           try {
             issues = options.reviewDraft ? await options.reviewDraft(draft, [...evidence.values()].map(forModel)) : await reviewNflAnalystSemantics({
               question, user_context: history.slice(-8).map(turn => turn.question), authored, selected_answer: answer, selected_tables: tables, evidence: [...evidence.values()].map(forModel),
               tool_coverage: { examples: nflExampleCoverage, tools: nflAnalystTools.filter(t => t.name !== 'finish_analysis').map(t => ({name: t.name, description: t.description})) },
             }, { timeoutMs: Math.min(15_000, Math.max(1, deadlineMs - (Date.now() - started))) });
-          } catch { stageMs.review+=Date.now()-reviewStart; return partial('The factual interpretation review could not finish.'); }
-          stageMs.review+=Date.now()-reviewStart;
-          options.onTrace?.({stage:'review',issues,elapsed_ms:Date.now()-reviewStart});
+          } catch { return partial('The factual interpretation review could not finish.'); }
           if (issues.length) throw new Error('Revise these material issues and resubmit finish_analysis: ' + issues.join(' | '));
           draft.body.ai_analysis!.elapsed_ms = Date.now() - started;
           draft.body.ai_analysis!.grounding_checked = true;
-          draft.body.ai_analysis!.stage_ms={...stageMs};
           return draft;
         }
         if (tool.name === 'set_scenario') {
@@ -646,12 +644,10 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
         results.push({ type: 'tool_result', tool_use_id: tool.id, content: JSON.stringify(forModel(register(prepared, tool.name === 'search_player_records', true))) });
       } catch (error) {
         console.info('[nfl analyst] validation',tool.name,error instanceof Error?error.message:'lookup failed');
-        options.onTrace?.({stage:'validation',tool:tool.name,error:error instanceof Error?error.message:'Lookup unavailable'});
         if (tool.name === 'finish_analysis' && ++finalFailures > 1) return partial('The written answer failed evidence validation.');
         results.push({ type: 'tool_result', tool_use_id: tool.id, is_error: true, content: error instanceof Error ? error.message : 'Lookup unavailable.' });
       }
     }
-    if(!calls.some(t=>t.name==='finish_analysis'))stageMs.retrieval+=Date.now()-batchStart;
     messages.push({ role: 'user', content: results });
   }
   return partial('The written analysis did not finish.');

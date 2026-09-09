@@ -173,7 +173,7 @@ export function rosterFactsAnswer(query: NflFactualQuery, seed: NflDemoSeed): Fa
   const missingCap = candidates.filter(r => { const c = caps.get(`${r.team_id}:${r.player_id}`); return c?.source_status !== 'captured' || c.cap_number_2026 == null; }).length;
   const missingStarts = candidates.filter(r => recordedValue(r, 'starts_2025') == null).length;
   const matched = candidates.filter(r => numericFilters.every(filter => numericMatches(recordedValue(r, filter.field), filter)));
-  const sortField: NflRosterNumericField | null = query.sort === 'name' ? null : query.sort.startsWith('age') ? 'age' : query.sort.startsWith('cap') ? 'cap_2026' : query.sort.startsWith('snaps') ? 'snaps_2025' : query.sort.startsWith('games') ? 'games_2025' : 'starts_2025';
+  const sortField: NflRosterNumericField | null = query.sort === 'name' ? null : query.sort.startsWith('receiving_yards') ? 'receiving_yards_2025' : query.sort.startsWith('age') ? 'age' : query.sort.startsWith('cap') ? 'cap_2026' : query.sort.startsWith('snaps') ? 'snaps_2025' : query.sort.startsWith('games') ? 'games_2025' : 'starts_2025';
   const sortValue = (r: NflRosterEntry): number | null => sortField ? recordedValue(r, sortField) : null;
   matched.sort((a, b) => {
     if (query.sort !== 'name') { const av = sortValue(a), bv = sortValue(b); if (av == null && bv != null) return 1; if (bv == null && av != null) return -1; if (av != null && bv != null && av !== bv) return query.sort.endsWith('_asc') ? av - bv : bv - av; }
@@ -216,13 +216,13 @@ export function rosterFactsAnswer(query: NflFactualQuery, seed: NflDemoSeed): Fa
     }
     return base;
   });
-  const sortLabel = ({ name: 'player name (A–Z)', cap_asc: '2026 cap number, lowest first', cap_desc: '2026 cap number, highest first', snaps_desc: 'recorded 2025 snaps, highest first', snaps_asc: 'recorded 2025 snaps, lowest first', starts_desc: 'recorded 2025 starts, highest first', starts_asc: 'recorded 2025 starts, lowest first', games_desc: 'recorded 2025 games, highest first', games_asc: 'recorded 2025 games, lowest first', age_asc: 'recorded age, youngest first', age_desc: 'recorded age, oldest first' } as const)[query.sort];
+  const sortLabel = ({ name: 'player name (A–Z)', receiving_yards_desc: 'recorded 2025 receiving yards, highest first', receiving_yards_asc: 'recorded 2025 receiving yards, lowest first', cap_asc: '2026 cap number, lowest first', cap_desc: '2026 cap number, highest first', snaps_desc: 'recorded 2025 snaps, highest first', snaps_asc: 'recorded 2025 snaps, lowest first', starts_desc: 'recorded 2025 starts, highest first', starts_asc: 'recorded 2025 starts, lowest first', games_desc: 'recorded 2025 games, highest first', games_asc: 'recorded 2025 games, lowest first', age_asc: 'recorded age, youngest first', age_desc: 'recorded age, oldest first' } as const)[query.sort];
   const scope = [query.team_ids.join(', ') || 'all loaded NFL teams', query.exclude_nyg ? 'excluding NYG' : '', query.position_groups.join(', '), query.veterans_only ? 'at least one recorded year of NFL experience' : '', ...numericFilters.map(numericFilterLabel), query.excluded_team_ids?.length ? `excluding ${query.excluded_team_ids.join(', ')}` : '', query.excluded_player_names?.length ? `excluding ${query.excluded_player_names.join(', ')}` : '', query.roster_statuses?.join(', ')].filter(Boolean).join(' · ');
   const caveats = [
     'Roster and contract records do not establish trade availability, asking prices, football fit or a recommended order of contact.',
     'Usage is recorded for the 2025 season. It is not a projection of 2026 role or health. Missing values are not zero.',
   ];
-  const fieldLabels = { age: 'recorded age', cap_2026: 'a captured 2026 cap number', starts_2025: 'recorded 2025 starts', snaps_2025: 'recorded 2025 snaps', games_2025: 'recorded 2025 games' };
+  const fieldLabels = { receiving_yards_2025: 'recorded 2025 receiving yards', age: 'recorded age', cap_2026: 'a captured 2026 cap number', starts_2025: 'recorded 2025 starts', snaps_2025: 'recorded 2025 snaps', games_2025: 'recorded 2025 games' };
   const coverageGaps = [...new Set(numericFilters.map(filter => filter.field))].flatMap(field => {
     const missing = candidates.filter(row => recordedValue(row, field) == null).length;
     return missing ? [`${missing} of ${candidates.length} cohort records lack ${fieldLabels[field]}`] : [];
@@ -248,6 +248,7 @@ export function rosterFactsAnswer(query: NflFactualQuery, seed: NflDemoSeed): Fa
       : rows.length ? `${query.hypothetical_unavailable ? `If ${(query.hypothetical_player_names ?? []).join(', ') || 'the player'} is unavailable, current role assignments would be needed to assess coverage. ` : ''}${matched.length.toLocaleString()} players match${rows.length < matched.length ? `; showing ${rows.length}` : ''}, ordered by ${sortLabel}. Roster as of ${seed.as_of_date}; usage from 2025.` : `No matches in the ${seed.as_of_date} roster data.${coverageGaps.length ? ` ${coverageGaps.join('; ')}; players missing those figures could not be included.` : ''}`,
     key_findings: [{ label: 'Filters', body: scope, source_refs: refs }],
     tables: records.length ? [{ title: query.transaction === 'none' ? 'Roster, contracts and usage' : `${query.transaction[0].toUpperCase()}${query.transaction.slice(1)} cap effect`, columns: ['Player','Team','Position','Status','2026 cap','2025 starts','2025 snaps', ...(includeAge ? ['Age'] : []),'2025 games', ...(query.transaction === 'none' ? [] : ['2026 savings','2026 dead money'])], rows: records, source_refs: refs }] : [],
+    population: {eligible_count:candidates.length,matched_count:matched.length,displayed_count:rows.length,selection_basis:scope+'; ordered by '+sortLabel,missing_fields:coverageGaps,complete:rows.length===matched.length},
     calculations: [], caveats, followups: rows.length ? ['Sort by most 2025 starts.', 'Only include players with at least 10 starts.'] : [], factual_query: query,
   }), sources };
 }

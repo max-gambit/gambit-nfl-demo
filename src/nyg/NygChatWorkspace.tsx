@@ -160,7 +160,7 @@ function FactualAnswer({ body: savedBody, previous = null, briefId, onEvidence }
   const primaryMarket = body.market_analysis && !body.seller_move_analysis && body.answer_layout !== 'trade_packages';
   const cite = (refs: number[]) => refs.length ? <button className="gc-cite" onClick={() => onEvidence(refs[0])}>[{refs.slice(0, 4).join(', ')}{refs.length > 4 ? '…' : ''}]</button> : null;
   return <div className="gc-factual-answer" onFocus={() => setActiveBrief(briefId)} onMouseDown={() => setActiveBrief(briefId)}>
-    <p className="gc-answer-lead">{body.answer} {cite(body.answer_source_refs??[])}</p>
+    {body.answer_paragraphs?.length ? body.answer_paragraphs.map((paragraph,index)=><p className="gc-answer-lead" key={index}>{paragraph.text} {cite(paragraph.source_refs)}</p>) : <p className="gc-answer-lead">{body.answer} {cite(body.answer_source_refs??[])}</p>}
     {body.conversation_state && <details className="gc-calculation-details"><summary>Scenario and assumptions</summary><div className="gc-details-body"><p><strong>Objective:</strong> {body.conversation_state.active.objective.replaceAll('_',' ')} · {body.conversation_state.active.candidate_scope} candidates</p><p><strong>Horizon:</strong> {body.conversation_state.active.horizon || 'Not specified'}</p>{body.conversation_state.active.budget && <p><strong>Budget:</strong> {body.conversation_state.active.budget.type} {money(body.conversation_state.active.budget.amount)} · reserve {money(body.conversation_state.active.budget.reserve)}</p>}{[...body.conversation_state.active.protected_player_names.map(p=>'Keep '+p), ...body.conversation_state.active.assumptions, ...body.conversation_state.active.supplied_terms, ...body.conversation_state.active.unresolved_inputs].map((text,i)=><p key={i}>{text}</p>)}</div></details>}
     {result && <div className="gc-fact-strip"><div><small>{result.cap.current_year} CAP SPACE CREATED</small><strong>{money(result.cap.current_year_cap_space_created_dollars)}</strong></div><div><small>{result.cap.current_year} DEAD MONEY</small><strong>{money(result.cap.current_year_dead_money_dollars)}</strong></div><div><small>PROPOSED RETURN</small><strong>{result.proposal.pick_year} · Round {result.proposal.pick_round}</strong></div></div>}
     {result && previous?.seller_move_analysis?.result && <ScenarioChangeEvidence current={result} previous={previous.seller_move_analysis.result} />}
@@ -203,7 +203,8 @@ function downloadBrief(brief: Brief, sources: BriefSource[]) {
   if (!isFactualBody(brief.body)) return;
   const body = factualAnswerPresentation(brief.body);
   const cell = (value: unknown) => String(value ?? 'Not recorded').replaceAll('|', '\\|').replaceAll('\n', ' ');
-  const lines = [`# ${briefTitle(brief)}`, `New York Giants · saved ${brief.created_at}`, '', `Question: ${brief.question}`, '', body.answer, ''];
+  const narrative=body.answer_paragraphs?.length?body.answer_paragraphs.map(p=>p.text+(p.source_refs.length?' '+p.source_refs.map(ref=>'['+ref+']').join(' '):'')).join('\n\n'):body.answer;
+  const lines = [`# ${briefTitle(brief)}`, `New York Giants · saved ${brief.created_at}`, '', `Question: ${brief.question}`, '', narrative, ''];
   const table = (title: string, columns: string[], rows: unknown[][]) => {
     if (!rows.length) return;
     lines.push(`## ${title}`, `| ${columns.map(cell).join(' | ')} |`, `| ${columns.map(() => '---').join(' | ')} |`, ...rows.map(row => `| ${row.map(cell).join(' | ')} |`), '');

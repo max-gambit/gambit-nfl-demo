@@ -38,6 +38,7 @@ export function DataAnalysisCardBody({ body }: Props) {
 
   return (
     <div style={{ display: 'grid', gap: SPACE.lg }}>
+      {body.answer_paragraphs?.map((p,i)=><p key={i} style={{whiteSpace:'pre-line'}}>{p.text} {p.source_refs.map(ref=>renderRefs([ref]))}</p>)}
       {body.key_findings.length > 0 && (
         <section>
           <SectionLabel>Key findings</SectionLabel>

@@ -211,7 +211,7 @@ export function numericMatches(value: number | null | undefined, filter: NflRost
 }
 
 export function numericFilterLabel(filter: NflRosterNumericFilter): string {
-  const fields: Record<NflRosterNumericField, string> = { age: 'recorded age', cap_2026: '2026 cap', starts_2025: '2025 starts', snaps_2025: '2025 snaps', games_2025: '2025 games' };
+  const fields: Record<NflRosterNumericField, string> = { receiving_yards_2025: '2025 receiving yards', age: 'recorded age', cap_2026: '2026 cap', starts_2025: '2025 starts', snaps_2025: '2025 snaps', games_2025: '2025 games' };
   const operators = { lt: '<', lte: '≤', gt: '>', gte: '≥', eq: '=' };
   const value = filter.field === 'cap_2026' ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(filter.value) : filter.value.toLocaleString();
   return `${fields[filter.field]} ${operators[filter.operator]} ${value}`;

@@ -1,6 +1,6 @@
 import type { DataAnalysisBriefBody, NflPositionMarketGroup } from './types';
 
-export type NflRosterNumericField = 'age' | 'cap_2026' | 'starts_2025' | 'snaps_2025' | 'games_2025';
+export type NflRosterNumericField = 'age' | 'cap_2026' | 'starts_2025' | 'snaps_2025' | 'games_2025' | 'receiving_yards_2025';
 export interface NflRosterNumericFilter {
   field: NflRosterNumericField;
   operator: 'lt' | 'lte' | 'gt' | 'gte' | 'eq';
@@ -15,7 +15,7 @@ export interface NflFactualQuery {
   exclude_nyg: boolean;
   veterans_only: boolean;
   limit: number;
-  sort: 'name' | 'cap_asc' | 'cap_desc' | 'snaps_desc' | 'snaps_asc' | 'starts_desc' | 'starts_asc' | 'games_desc' | 'games_asc' | 'age_asc' | 'age_desc';
+  sort: 'name' | 'cap_asc' | 'cap_desc' | 'snaps_desc' | 'snaps_asc' | 'starts_desc' | 'starts_asc' | 'games_desc' | 'games_asc' | 'age_asc' | 'age_desc' | 'receiving_yards_desc' | 'receiving_yards_asc';
   transaction: 'none' | 'release' | 'trade' | 'restructure';
   post_june: boolean;
   hypothetical_unavailable: boolean;

@@ -97,9 +97,9 @@ test('named workflow facts retain their own source references after another evid
   for (const claim of claims) for (const ref of claim.source_refs) assert.equal(result.sources.find(s => s.ref_index === ref)?.kind,'AVAILABILITY');
 });
 
-test('a withheld opening premise keeps the executed summary ahead of dependent prose', async () => {
+test('legacy: a withheld opening premise keeps the executed summary ahead of dependent prose', async () => {
   let count = 0;
-  const result = await buildNflAiAnswer('Use the historical Giants availability report to prioritize investigation.', {
+  const result = await buildNflAiAnswer('Use the historical Giants availability report to prioritize investigation.', {pipeline:'legacy',
     prefetch:false, loadData:async()=>({seed:await loadNflDemoSeed(),source_mode:'supabase_current_views',fallback_reason:null}), reviewDraft:async()=>[],
     callModel:async()=> ++count === 1 ? message('get_nfl_example_evidence',{domain:'availability'})
       : message('finish_analysis',{answer:'Start with the players who changed from limited to DNP on September 19. That directional change is a participation flag and warrants checking the next dated report.',evidence_id:'lookup_1',continuation_query_id:'lookup_1'}),

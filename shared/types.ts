@@ -202,7 +202,11 @@ export interface DataAnalysisBriefBody {
   kind: 'data_analysis';
   /** Distinguishes preserved factual answers from AI synthesis of retrieved evidence. */
   language_policy?: 'facts_only_v1' | 'grounded_ai_v1';
-  ai_analysis?: { model: string; elapsed_ms: number; tool_names: string[]; assumptions: string[]; evidence_validated?: boolean; grounding_checked?: boolean; withheld_numeric_sentences?: number; outcome?: 'complete' | 'evidence_only' | 'unavailable' };
+  ai_analysis?: { model: string; elapsed_ms: number; tool_names: string[]; assumptions: string[]; evidence_validated?: boolean; grounding_checked?: boolean; withheld_numeric_sentences?: number; outcome?: 'complete' | 'evidence_only' | 'unavailable'; pipeline_version?: 'analyst_v1' | 'analyst_v2'; stage_ms?: { retrieval: number; generation: number; review: number; repair: number }; repair_count?: number; validation_outcome?: 'passed' | 'incomplete' | 'needs_input'; evidence_hash?: string };
+  /** Source-bound paragraphs are authoritative in v2; answer is their text projection. */
+  answer_paragraphs?: Array<{ text: string; source_refs: number[]; fact_ids?: string[] }>;
+  /** Executed population, before the display limit. Never a claim of availability. */
+  population?: { eligible_count: number; matched_count: number; displayed_count: number; selection_basis: string; missing_fields: string[]; complete: boolean };
   answer_source_refs?: number[];
   /** Supporting facts and methodology, preserved outside the conversational lead. */
   supporting_details?: DataAnalysisFinding[];
