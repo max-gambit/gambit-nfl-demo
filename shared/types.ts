@@ -209,6 +209,9 @@ export interface DataAnalysisBriefBody {
   conversation_state?: import('./nflConversation').NflConversationState;
   contract_scenario?: { args: unknown; result: unknown; tables?: DataAnalysisTable[]; calculations?: DataAnalysisCalculation[] };
   example_query?: Record<string, unknown>;
+  /** Executed user-owned decision rule and literal inputs, retained for follow-ups. */
+  evaluation_query?: Record<string, unknown>;
+  evaluation_result?: Record<string, unknown>;
   receiver_query?: Record<string, unknown>;
   /** Factual answer structure; the underlying recorded artifact remains authoritative. */
   answer_layout?: 'market_overview' | 'trade_scenario' | 'trade_packages';

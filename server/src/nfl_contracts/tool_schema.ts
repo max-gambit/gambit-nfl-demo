@@ -37,3 +37,12 @@ export const NFL_CONTRACT_SCENARIO_TOOL_SCHEMA = {
   required: ['schema_version', 'season', 'team_id', 'timing', 'moves'],
   additionalProperties: false,
 } as const;
+
+export const NFL_CONTRACT_COMPARISON_TOOL_SCHEMA = NFL_CONTRACT_SCENARIO_TOOL_SCHEMA;
+export const NFL_CONTRACT_COMPARISON_TOOL_DESCRIPTION =
+  'Calculate hold versus the requested contract alternative in ONE call, including this year, next year, every later contract/void year, cash changes, future obligations, budget/reserve and controlling CBA mechanisms with sources. Supply only the requested moves, once per player: for hold versus a $6m conversion, submit one restructure move with conversion_amount 6000000, never separate hold and restructure moves for that player. The tool automatically computes hold on the same selected cohort. When an acquisition and funding moves are supplied, it also computes acquisition without funding. Preserve the requested moves for follow-ups. Conversion amounts and all illustrative terms must come from the user; never invent credited seasons, unpaid amounts, terms or availability. Omit optional credited_seasons and unpaid_salary_available unless explicitly supplied. For an acquisition, supply complete literal illustrative terms when the user provides them; otherwise the tool shows the incoming-terms gap and original-team obligations. Do not call a separate CBA search for the controlling mechanisms already returned here.';
+export const nflContractComparisonTool = {
+  name: 'nfl_contract_comparison',
+  description: NFL_CONTRACT_COMPARISON_TOOL_DESCRIPTION,
+  input_schema: NFL_CONTRACT_COMPARISON_TOOL_SCHEMA,
+} as const;

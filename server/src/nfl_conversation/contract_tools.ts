@@ -1,20 +1,41 @@
 import {extractBudget} from '../nfl_contracts/input_provenance.js';
-import { buildNflContractScenario, getNflContractDossier, getNflContractDossierCoverage, validateNflContractScenarioArgs, validateNflScenarioInputProvenance, type NflContractScenarioArgs } from '../nfl_contracts/index.js';
+import { buildNflContractComparison, buildNflContractScenario, getNflContractDossier, getNflContractDossierCoverage, validateNflContractScenarioArgs, validateNflScenarioInputProvenance, type NflContractScenarioArgs, type NflContractComparisonAnswer } from '../nfl_contracts/index.js';
 import type { FactualAnswer } from '../nfl_facts/answer.js';
 import type { NflScenarioState } from '@shared/nflConversation';
 
 
 const normalize=(v:string)=>v.toLowerCase().replace(/[^a-z0-9]/g,'');
-export function explicitPlayerProtections(currentQuestion:string, previous:string[]=[]){
-  const known=getNflContractDossierCoverage().map(d=>({name:d.player_name,aliases:[d.player_name,d.player_name.split(' ').at(-1)!]}));
+export function explicitPlayerProtections(currentQuestion:string, previous:string[]=[], candidateNames:string[]=[]){
+  const escape=(value:string)=>value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const names=[...new Set([...getNflContractDossierCoverage().map(d=>d.player_name),...previous,...candidateNames].map(name=>getNflContractDossier(name)?.player_name??name))];
+  const known=names.map(name=>({name,aliases:[name,name.split(' ').at(-1)!]}));
   const resolve=(name:string)=>known.find(d=>d.aliases.some(a=>normalize(a)===normalize(name)))?.name??name;
   const protectedNames=new Set(previous.map(resolve)); const removed=new Set<string>();
-  const clauses=currentQuestion.split(/[.!?\n]/);
-  for(const d of known)for(const clause of clauses){
-    const alias=d.aliases.find(a=>new RegExp('\\b'+a+'\\b','i').test(clause));if(!alias)continue;
-    const unprotect=new RegExp('(?:^|\\b(?:and|but|actually)\\s+)(?:please\\s+)?(?:unprotect|remove (?:the )?protection (?:from|for)|allow (?:a )?(?:trade|release|move) (?:of|for))\\s+(?:'+d.aliases.join('|')+')\\b|(?:'+d.aliases.join('|')+') (?:is |are )?no longer protected','i');
+  const clauses=currentQuestion.split(/[.!?\n]/).map(clause=>clause.trim());
+  for(const clause of clauses){
+    // A protection command must name a player list, not merely mention a
+    // player somewhere after "keep" (for example, keep Slayton's conflict unresolved).
+    const command=clause.match(/(?:^|\b(?:and|but|actually)\s+)(?:please\s+)?(protect(?:\s+only)?|keep|do not (?:trade|release|move)|don.t (?:trade|release|move))\s+(.+)$/i);
+    if(command){
+      let remaining=command[2];const selected:string[]=[];
+      for(const d of known){
+        for(const alias of [...d.aliases].sort((a,b)=>b.length-a.length)){
+          if(alias!==d.name&&known.filter(p=>p.aliases.includes(alias)).length>1)continue;
+          const expression=new RegExp('\\b'+escape(alias)+'\\b','gi');
+          if(expression.test(remaining)){selected.push(d.name);remaining=remaining.replace(expression,'#');}
+        }
+      }
+      if(selected.length&&/^\s*#(?:\s*(?:,|and|&)\s*#)*\s*(?:protected|on (?:the |our )?roster|on (?:the |our )?team)?\s*$/i.test(remaining)){
+        if(/^protect\s+only$/i.test(command[1]))protectedNames.clear();
+        for(const selectedName of selected){protectedNames.add(selectedName);removed.delete(selectedName);}
+      }
+    }
+    for(const d of known){
+    const alias=d.aliases.find(a=>new RegExp('\\b'+escape(a)+'\\b','i').test(clause));if(!alias)continue;
+    const aliases=d.aliases.map(escape).join('|');
+    const unprotect=new RegExp('(?:^|\\b(?:and|but|actually)\\s+)(?:please\\s+)?(?:unprotect|remove (?:the )?protection (?:from|for)|allow (?:a )?(?:trade|release|move) (?:of|for))\\s+(?:'+aliases+')\\b|(?:'+aliases+') (?:is |are )?no longer protected','i');
     if(unprotect.test(clause)){protectedNames.delete(d.name);removed.add(d.name);continue;}
-    if(/\b(?:keep|protect|do not (?:trade|release|move)|don.t (?:trade|release|move))\b/i.test(clause)){protectedNames.add(d.name);removed.delete(d.name);}
+    }
   }
   return {names:[...protectedNames],removed:[...removed]};
 }
@@ -45,9 +66,8 @@ export function bindContractScenario(input:unknown, userText:string, prior:NflCo
   if(priorForValidation)priorForValidation.moves=priorForValidation.moves.map(m=>({...m,player_id:getNflContractDossier(m.player_id)?.player_name??m.player_id}));
   const validation=validateNflScenarioInputProvenance(args,{current_question:currentQuestion,prior_args:priorForValidation});
   if(!validation.ok)throw new Error('Use explicit user inputs for these fields: '+validation.gaps.map(g=>g.path+': '+g.message).join(' | '));
-  const protections=explicitPlayerProtections(currentQuestion,state?.protected_player_names??[]);
-  const removedIds=protections.removed.flatMap(name=>[name,getNflContractDossier(name)?.player_id??name]).map(normalize);
-  args.protected_player_ids=[...new Set([...(args.protected_player_ids??[]).filter(id=>!removedIds.includes(normalize(id))),...protections.names])];
+  const protections=explicitPlayerProtections(currentQuestion,state?.protected_player_names??prior?.protected_player_ids??[],args.protected_player_ids);
+  args.protected_player_ids=protections.names;
   return args;
 }
 export async function executeContractScenario(input:unknown,userText:string,prior:NflContractScenarioArgs|undefined,state:NflScenarioState|undefined,currentQuestion=userText):Promise<FactualAnswer>{
@@ -55,6 +75,13 @@ export async function executeContractScenario(input:unknown,userText:string,prio
   const result=await buildNflContractScenario(args);
   result.body.contract_scenario={args:result.scenario_args,result:result.scenario_result,tables:structuredClone(result.body.tables),calculations:structuredClone(result.body.calculations)};
   return result;
+}
+export async function executeContractComparison(input:unknown,userText:string,prior:NflContractScenarioArgs|undefined,state:NflScenarioState|undefined,currentQuestion=userText):Promise<NflContractComparisonAnswer>{
+  const args=bindContractScenario(input,userText,prior,state,currentQuestion);
+  const answer=await buildNflContractComparison(args);
+  // Persist the requested alternative, never the generated hold baseline.
+  answer.body.contract_scenario={args:answer.scenario_args,result:{...answer.scenario_result,comparison:answer.comparison_result},tables:structuredClone(answer.body.tables),calculations:structuredClone(answer.body.calculations)};
+  return answer;
 }
 export function contractDossiersEvidence(playerNames?:string[]):FactualAnswer {
   const coverage=getNflContractDossierCoverage();

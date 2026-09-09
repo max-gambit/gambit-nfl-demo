@@ -7,7 +7,9 @@ export * from './types.js';
 export {validateNflScenarioInputProvenance} from './input_provenance.js';
 export type {NflScenarioInputProvenanceContext,NflScenarioInputProvenanceGap,NflScenarioInputProvenanceResult} from './input_provenance.js';
 export { validateNflContractScenarioArgs, validateIllustrativeTerms } from './validation.js';
-export { NFL_CONTRACT_SCENARIO_TOOL_SCHEMA } from './tool_schema.js';
+export { NFL_CONTRACT_SCENARIO_TOOL_SCHEMA, NFL_CONTRACT_COMPARISON_TOOL_SCHEMA, NFL_CONTRACT_COMPARISON_TOOL_DESCRIPTION, nflContractComparisonTool } from './tool_schema.js';
+export { buildNflContractComparison, calculateNflContractComparison } from './comparison.js';
+export type { NflContractComparisonAnswer, NflContractComparisonResult, NflContractComparisonAlternative, NflContractComparisonYear, NflContractComparisonMechanism, NflContractAlternativeId } from './comparison.js';
 
 export const NFL_CONTRACT_CBA_URL = 'https://nflpaweb.blob.core.windows.net/website/PDFs/CBA/March-15-2020-NFL-NFLPA-Collective-Bargaining-Agreement-Final-Executed-Copy.pdf';
 const dossiers = captured.dossiers as NflContractDossier[];
@@ -160,7 +162,7 @@ function calculateMove(move: NflContractScenarioMove, args: NflContractScenarioA
     result.assumptions.push(`Convert ${money(move.conversion_amount!)} of unpaid base salary to a signing bonus over ${period.length} existing active years; preserve annual total cash and existing guarantees, bonuses and proration. The new bonus is fully guaranteed.`,
       `Annual salary floor: ${money(floor)}. ${move.credited_seasons == null ? 'The highest veteran tier is used conservatively because credited seasons were not supplied.' : `Credited seasons supplied: ${move.credited_seasons}.`}`,
       `Unpaid salary available: ${move.unpaid_salary_available == null ? 'unknown; conversion requires confirmation before execution' : money(move.unpaid_salary_available)}. Contract permission, consent and remaining weekly minimum salary still require review.`);
-    result.issues.push(issue('CONVERSION_GUARANTEE_EFFECT', 'Converting previously unguaranteed salary makes that amount guaranteed as a signing bonus. Existing guarantees are not removed; the displayed reported guarantee column is the original contract context.', d.player_id, 'conditional'));
+    result.issues.push(issue('CONVERSION_GUARANTEE_EFFECT', 'If converted salary was previously unguaranteed, its guarantee treatment may change. This calculation does not establish a change in guaranteed compensation; salary may already be guaranteed. Existing guarantees are not removed, and the displayed guarantee column is the original reported contract context.', d.player_id, 'conditional'));
     return result;
   }
   const pre = move.action === 'trade' ? 'trade' : 'cut';

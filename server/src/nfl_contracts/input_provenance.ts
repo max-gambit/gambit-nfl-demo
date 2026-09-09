@@ -9,7 +9,7 @@ export interface NflScenarioInputProvenanceContext {
 export interface NflScenarioInputProvenanceGap { path: string; code: string; message: string }
 export interface NflScenarioInputProvenanceResult { ok: boolean; gaps: NflScenarioInputProvenanceGap[] }
 
-const normalize = (s: string) => s.toLowerCase().replace(/(20\d{2})\s*[–—−-]\s*(20\d{2})/g, '$1 through $2').replace(/[–—−-]/g, ' ').replace(/[’']/g, '').replace(/\s+/g, ' ').trim();
+const normalize = (s: string) => s.toLowerCase().replace(/(20\d{2})\s*[–—−-]\s*(20\d{2})/g, '$1 through $2').replace(/[–—−-]/g, ' ').replace(/[’']s\b/g, '').replace(/[’']/g, '').replace(/\s+/g, ' ').trim();
 const name = (s: string) => normalize(s.split(':').at(-1)!);
 const samePlayer = (a: string, b: string) => name(a) === name(b);
 const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -41,7 +41,7 @@ const markers: Marker[] = [
   { field: 'signing_bonus', expression: /\b(?:new )?signing bonus\b/g, annual: false },
   { field: 'unpaid_salary_available', expression: /\bunpaid (?:base )?salary(?: available)?\b/g, annual: false },
   { field: 'credited_seasons', expression: /\bcredited seasons?\b/g, annual: false },
-  { field: 'conversion_amount', expression: /\b(?:salary conversion|conversion|convert|restructure)\b/g, annual: false },
+  { field: 'conversion_amount', expression: /\b(?:salary conversion|conversion|convert(?:ing)?|restructure)\b/g, annual: false },
 ];
 const annualFields: Exclude<keyof NflIllustrativeContractYear, 'year' | 'kind'>[] = ['base_salary', 'other_cash', 'incentives_cap_charge', 'incentives_cash', 'guaranteed_salary', 'guaranteed_other_cash', 'salary_paid_by_prior_team', 'other_cash_paid_by_prior_team'];
 interface ZeroClause { fields: Set<Field | 'prior_obligations'>; other: boolean }
@@ -109,9 +109,12 @@ function yearList(text: string): number[] {
 }
 
 function explicitActors(text: string): string[] {
-  return [...text.matchAll(/\b(?:for|acquire|restructure|trade|release|hold)\s+([a-z][a-z ]{0,65})/g)].flatMap(m => {
-    const candidate = m[1].split(/\s+(?:for|to|in|on|by|with|after|before|at|from|and|or|salary|base|contract|cap|cash)\b/)[0].trim();
-    if (/^(?:the|a|an|this|that|these|those|each|every|all|any|of|with)\b/.test(candidate) || /^[a-z]{2,3}$/.test(candidate)) return [];
+  const direct = [...text.matchAll(/\b(?:for|acquire|restructure|trade|release|hold)\s+([a-z][a-z ]{0,65})/g)].map(m => m[1]);
+  // The actor follows the amount in "convert $6m of Paulson Adebo's salary".
+  const conversions = [...text.matchAll(new RegExp(`\\bconvert(?:ing)?\\s+(?:${MONEY})\\s+(?:of|from)\\s+([a-z][a-z ]{0,65})`, 'g'))].map(m => m[1]);
+  return [...direct, ...conversions].flatMap(actor => {
+    const candidate = actor.split(/\s+(?:for|to|in|on|by|with|after|before|at|from|and|or|salary|base|contract|cap|cash)\b/)[0].trim();
+    if (/^(?:the|a|an|this|that|these|those|each|every|all|any|of|with|vs|versus|and|or|unchanged)\b/.test(candidate) || /^[a-z]{2,3}$/.test(candidate)) return [];
     return [candidate];
   });
 }
@@ -119,17 +122,28 @@ function explicitActors(text: string): string[] {
 function buildEvidence(question: string, args: NflContractScenarioArgs, prior?: NflContractScenarioArgs) {
   const normalizedQuestion = normalize(question);
   const players = [...new Set([...args.moves, ...(prior?.moves ?? [])].map(m => name(m.player_id)))];
-  const mentioned = (text: string) => players.filter(p => new RegExp(`(?:^|\\b)${escape(p)}(?:\\b|$)`).test(text));
+  const aliases = (player: string) => {
+    const surname = player.split(' ').at(-1)!;
+    return players.filter(p => p.split(' ').at(-1) === surname).length === 1 ? [player, surname] : [player];
+  };
+  const knownActor = (actor: string) => players.some(p => aliases(p).includes(actor));
+  const mentioned = (text: string) => players.filter(p => aliases(p).some(alias => new RegExp(`(?:^|\\b)${escape(alias)}(?:\\b|$)`).test(text)));
   const allMentions = mentioned(normalizedQuestion);
   const priorConversions = prior?.moves.filter(m => m.action === 'restructure') ?? [];
   const priorIllustrations = prior?.moves.filter(m => m.illustrative_terms) ?? [];
-  const explicitlyNamesUnknownPlayer = explicitActors(normalizedQuestion).some(p => !players.includes(p));
+  // A complete, narrow follow-up can refer to the sole prior conversion. It
+  // authorizes only that field, never a budget or another player's amount.
+  const deicticConversion = priorConversions.length === 1 && priorIllustrations.length === 0
+    ? normalizedQuestion.match(new RegExp('^(?:please\\s+)?make\\s+that\\s+(' + MONEY + ')(?:\\s+instead)?[.!]?$'))
+    : null;
+  const explicitlyNamesUnknownPlayer = explicitActors(normalizedQuestion).some(p => !knownActor(p));
   let fallback: string | null = allMentions.length === 1 ? allMentions[0] : null;
   if (!allMentions.length && !explicitlyNamesUnknownPlayer) {
     if (priorConversions.length === 1 && /\b(?:increase|decrease|change|keep|recalculate)\b.*\bconversion\b/.test(normalizedQuestion)) fallback = name(priorConversions[0].player_id);
     if (priorIllustrations.length === 1 && (/\b(?:those|same|exact|previous)\b.*\b(?:terms|contract)\b/.test(normalizedQuestion) || /\bchange (?:the )?20\d{2} base salary\b/.test(normalizedQuestion))) fallback = name(priorIllustrations[0].player_id);
   }
   const output = new Map(players.map(p => [p, blankEvidence()]));
+  if (deicticConversion) record(output.get(name(priorConversions[0].player_id))!, 'conversion_amount', moneyValue(deicticConversion[1]));
   const scopingErrors: string[] = [];
   let current = fallback;
   // A decimal point is preserved; a sentence-ending period after a year is split.
@@ -137,7 +151,7 @@ function buildEvidence(question: string, args: NflContractScenarioArgs, prior?: 
   for (const sentence of sentences) {
     const local = mentioned(sentence);
     const financial = markers.some(m => new RegExp(m.expression.source).test(sentence));
-    const unknownActor = explicitActors(sentence).some(p => !players.includes(p));
+    const unknownActor = explicitActors(sentence).some(p => !knownActor(p));
     if (unknownActor) {
       current = null;
       if (financial) scopingErrors.push('Financial wording names a player who is absent from the proposed or prior scenario; it cannot supply another player’s values.');
@@ -159,7 +173,7 @@ function buildEvidence(question: string, args: NflContractScenarioArgs, prior?: 
 
 export function extractBudget(question: string, kind: 'cap' | 'cash' | 'reserve'): number[] {
   const text = normalize(question);
-  const label = kind === 'reserve' ? 'reserve' : `${kind} budget`;
+  const label = kind === 'reserve' ? 'reserve' : `(?:available\\s+)?${kind}\\s+budget`;
   const values: number[] = [];
   for (const m of text.matchAll(new RegExp(`\\b${label}\\s*(?:is|of|to|:|=)?\\s*(${MONEY})`, 'g'))) values.push(moneyValue(m[1]));
   for (const m of text.matchAll(new RegExp(`(${MONEY})\\s+${label}\\b`, 'g'))) values.push(moneyValue(m[1]));
@@ -210,7 +224,9 @@ export function validateNflScenarioInputProvenance(input: NflContractScenarioArg
     const scoped = e.text.join('. ');
     if (!old && !new RegExp(`\\b${escape(name(move.player_id))}\\b`).test(normalize(context.current_question))) gap(`${path}.player_id`, 'PLAYER_NOT_EXPLICIT', 'New illustrative terms must name this exact player; another player or an unbound receiver cannot supply their terms.');
     if (!old && !/\b(?:hypothetical|illustrative|assume|assumed)\b/.test(scoped)) gap(`${p}.basis`, 'ILLUSTRATION_NOT_REQUESTED', 'The user must explicitly request hypothetical or illustrative terms.');
-    if (!old && !/\bcomplete (?:compensation schedule|contract terms|compensation terms)\b/.test(scoped)) gap(`${p}.terms_complete`, 'COMPLETENESS_NOT_EXPLICIT', 'The user must identify the supplied compensation schedule as complete.');
+    const complete = e.text.some(sentence => /\bcomplete (?:illustrative |hypothetical )?(?:compensation schedule|contract terms|compensation terms)\b/.test(sentence)
+      && !/\b(?:not|isnt|never)\b[^.;]{0,40}\bcomplete\b/.test(sentence));
+    if (!old && !complete) gap(`${p}.terms_complete`, 'COMPLETENESS_NOT_EXPLICIT', 'The user must identify the supplied compensation schedule as complete.');
     if (!old && !/\bno\b[^.;]{0,60}\boptions\b/.test(scoped)) gap(`${p}.terms_complete`, 'OPTIONS_NOT_EXCLUDED', 'Explicitly exclude options for this bounded illustrative model.');
     bind(`${p}.signing_bonus`, t.signing_bonus, old?.signing_bonus, e.amounts.get(key('signing_bonus')) ?? []);
     bindYears(`${p}.active_years`, t.years.filter(y => y.kind === 'active').map(y => y.year), old?.years.filter(y => y.kind === 'active').map(y => y.year), e.activeYears);

@@ -18,6 +18,10 @@ Coaching arithmetic excludes non-run/pass rows, kneels, spikes, aborted plays an
 
 Independent capture checks: NYG 188 plays / 128 dropbacks / 1,018 yards / 11 of 40 third downs converted; KC 179 / 126 / 950 / 17 of 40; DAL 205 / 139 / 1,183 / 16 of 36. Red-zone play counts: NYG 34, KC 23, DAL 30.
 
+The coaching workflow supports outcome, distance, field-zone, play-type and exact game/play-ID filters. Converted/failed splits and matched down/distance/field-zone cells remain descriptive. `coaching-play-details.json` adds the original descriptions for all 765 captured rows, verified against the same source hash; refresh it with `python3 server/src/nfl_examples/capture_play_details.py`. Exact-ID follow-ups use the offense recorded on the play, rather than treating an opponent abbreviation inside the ID as a requested offense. Suggested follow-ups are limited to executable sample and play-review actions. Coverage, pressure and assignments still require external film or charting.
+
+Availability prioritization orders operational review questions from observed report changes and participation. It is not medical severity or injury probability. The report scope and a named hypothetical absence are separate: a whole-report queue can coexist with an Andrew Thomas contingency, and an inherited timeline keeps that accepted assumption. There is no prior-game workload baseline from which to infer a snap decline.
+
 Refresh only these artifacts with `python3 scripts/capture-nfl-examples.py` from the repo. The script downloads public sources, validates reviewed fact anchors, and fails on drift before replacing the JSON files. Source availability or shape changes require review. Broad roster/cap refresh is separate and was not run.
 
 Validation: from `server`, run `node --import tsx --test tests/nfl_data/test_nfl_examples.test.ts` and `npm run typecheck`. Tests cover source arithmetic, named scope changes, missing-vs-zero usage, dated hypothetical separation, and refusal to substitute unavailable scope.

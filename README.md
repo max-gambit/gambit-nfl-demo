@@ -15,6 +15,12 @@ The app is intentionally product-shaped rather than demo-slide-shaped: the first
 - **Settings profile/preferences**: profile and source-connection surfaces tuned for the NFL internal demo.
 - **QA harness**: optional Playwright + Claude exploratory QA that walks canonical flows and writes a findings report.
 
+## Giants conversational presentation
+
+The presentation entry point is the workspace in `src/nyg`, started with `npm run present:thursday` (web 5174, API 8791). It preserves the earlier application surfaces. Current decision tools compare contract alternatives in one calculation, apply explicitly supplied scouting grades and decision rules, prioritize dated availability questions, and drill from coaching samples into captured play descriptions. Source drawers, saved briefs and Markdown exports retain the executed inputs. The broader roster/cap refresh remains a separate presenter action.
+
+Supplied evaluations are transparent user-defined scoring, not a validated club model. Enter the player, criterion, grade scale, direction and weights; author/date/source can be a shared heading or scoped to individual grades. Unchanged inputs survive a follow-up; a changed role requires new judgments. Incoming-cost gates accept only executed acquisition scenarios, and unknown prices stay unknown. Categorical guards and an evidence review check generated prose; if review cannot complete, the response retains labeled evidence and an incomplete status.
+
 ## Tech Stack
 
 - React 18, TypeScript, Vite

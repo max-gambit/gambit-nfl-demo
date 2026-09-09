@@ -1,11 +1,14 @@
 import { cleanNflAnalystProse } from '@shared/nflReceiverPresentation';
 import { searchNflAuthority } from '../nfl_authority/index.js';
-import { describeNflIllustrativeTerms, getNflContractDossier, getNflContractDossierCoverage, NFL_CONTRACT_SCENARIO_TOOL_SCHEMA, type NflContractScenarioArgs, type NflContractScenarioResult } from '../nfl_contracts/index.js';
-import { contractDossiersEvidence, executeContractScenario, explicitPlayerProtections } from '../nfl_conversation/contract_tools.js';
+import { describeNflIllustrativeTerms, getNflContractDossier, getNflContractDossierCoverage, NFL_CONTRACT_SCENARIO_TOOL_SCHEMA, nflContractComparisonTool, type NflContractScenarioArgs, type NflContractScenarioResult } from '../nfl_contracts/index.js';
+import { contractDossiersEvidence, executeContractComparison, executeContractScenario, explicitPlayerProtections } from '../nfl_conversation/contract_tools.js';
 import { buildNflExampleEvidence, nflExampleTool, nflExampleCoverage, type NflExampleArgs } from '../nfl_examples/evidence.js';
 import { buildNflReceiverComparison, nflReceiverTool, officialReceivingTotals } from '../nfl_scouting/evidence.js';
 import { nflScenarioTool, updateNflConversationState, userMoneyAmounts } from '../nfl_conversation/state.js';
 import { resolveEvidenceProse } from '../nfl_conversation/grounding.js';
+import { categoricalGroundingIssues, reviewNflAnalystSemantics, type AnalystAuthoredProse } from '../nfl_conversation/semantic_grounding.js';
+import { evaluationCostsFromContracts } from '../nfl_conversation/evaluation_tools.js';
+import { buildNflOptionEvaluation, nflEvaluationTool, type NflEvaluationState, type NflOptionEvaluationArgs } from '../nfl_evaluation/index.js';
 import type Anthropic from '@anthropic-ai/sdk';
 import type { DataAnalysisBriefBody, DataAnalysisTable } from '@shared/types';
 import type { NflFactualQuery, NflRosterNumericFilter } from '@shared/nflFacts';
@@ -30,6 +33,17 @@ interface AnalystOptions {
   reviewDraft?: (draft: FactualAnswer, evidence: unknown[]) => Promise<string[]>;
 }
 interface Evidence extends FactualAnswer { id: string; rowRefs?: number[][]; executed?: boolean }
+/** Evidence packs may carry source refs in named facts, workflow metadata and
+ * saved calculation artifacts as well as the visible tables. Remap all of them
+ * together; preserve structured (non-integer) source descriptors verbatim. */
+function remapEvidenceRefs<T>(value: T, remap: (refs: number[]) => number[]): T {
+  if (Array.isArray(value)) return value.map(item => remapEvidenceRefs(item, remap)) as T;
+  if (!value || typeof value !== 'object') return value;
+  return Object.fromEntries(Object.entries(value).map(([key, item]) => [key,
+    ['source_refs', 'answer_source_refs'].includes(key) && Array.isArray(item) && item.every(Number.isInteger)
+      ? remap(item) : remapEvidenceRefs(item, remap),
+  ])) as T;
+}
 const positions = ['QB', 'RB', 'WR', 'TE', 'OT', 'IOL', 'EDGE', 'IDL', 'LB', 'CB', 'S', 'ST'];
 const numericFields = ['age', 'cap_2026', 'starts_2025', 'snaps_2025', 'games_2025'];
 const sorts = ['name', 'cap_asc', 'cap_desc', 'starts_asc', 'starts_desc', 'snaps_asc', 'snaps_desc', 'games_asc', 'games_desc', 'age_asc', 'age_desc'];
@@ -53,8 +67,15 @@ INVESTIGATE AND REASON
 - Current roster status does not prove a player is available for trade, a free agent, healthy, on the block or willing to sign. Do not invent seller willingness, asking prices, medical prognoses, scouting traits or future performance. Specific contract-year claims require the returned contract-end field. Unknown means unknown, not zero or unavailable as a player.
 - Discuss acquisition routes and tradeoffs as analysis, with any unverified seller/role assumptions explicit. Qualified judgments such as "may be attainable" are welcome when you explain sound reasoning from the contract, usage, roster context or a clearly stated scenario. Confirmed seller interest is NOT required for a conditional judgment. Make the reasoning useful and distinguish an inference from an established fact. You may identify which records deserve investigation and why. A cheap productive star is not automatically a practical target solely because his current cap charge is low. Claims about a team's current depth require a roster/usage lookup; hypothetical seller motivations can be framed as hypotheses to test.
 - Dates on the tools are snapshot dates. Do not freshen sources, assume the public cap observations reconcile, or convert historical transactions into current asking prices. Consult the rules tool for technical transaction-rule claims.
+- For contract alternatives, use nfl_contract_comparison directly. It already reads the relevant dossier, computes hold versus the requested moves and supplies the controlling CBA mechanism; no preliminary dossier lookup or separate hold calculation is needed. Keep the requested moves for a changed-amount follow-up. Omit credited seasons and unpaid salary unless supplied. For a funded acquisition, include the acquisition and funding moves in the same comparison; do not infer an incoming price from the seller's cap charge.
 - Do not claim that a player led the whole room in a metric if any relevant player's metric is unknown. Observed yards and games are not measures of talent, upside or current health. Do not label a player the highest-upside/best talent without an attributed evaluation. Keep rankings to the specified evidence and method.
 - If a tool returns an explicit coverage gap, finish with that exact answer statement and explain the useful next input. Do not repeat a lookup or substitute another player to obtain a probability or current medical claim.
+- Practice participation, game designation and observed game workload are separate fields. LP means limited, FP means full, DNP means did not participate. Read each dated label before making a claim. A single observed game has no earlier workload baseline: never call it a snap drop, recovery or improvement. Prioritize questions for staff from observed flags, not a medical risk score or unsupported causal explanation.
+- Coaching summaries support review hypotheses, not prescriptions. Query the relevant play outcomes and distance buckets before recommending a film-review priority. Do not claim that run/pass rates show coverage, pressure, routes or play-action. A proposed coaching adjustment must identify the charting or film observation needed to validate it.
+- For coaching follow-ups, map changed distances, outcomes, field zones and exact game/play IDs into coachingFilters. Use inherit_previous to preserve the teams and weeks; supply the complete retained coachingFilters when replacing that object. Check the executed selection in initial evidence: a broad prefetched summary does not satisfy a newly requested filter. Use coachingView review_queue for identified plays and matched_situations to compare shared down/distance/field-position cells.
+- Keep availability report scope separate from an absence assumption. A question about whom to review across the report plus Thomas being unavailable needs the whole investigation queue and a Thomas-only contingency. An operational review order is not a medical severity ranking.
+- Use evaluate_nfl_options when the user supplies grades, floors, weights or a decision model. Interpret natural language and quoted evaluations into the tool's exact literal inputs. A role grade needs its stated scale; never invent a grade or infer it from public adjectives. For a grade/weight refinement, use inherit_previous and omit the unchanged role/domain. A new role starts fresh judgments. Use the supplied criterion labels consistently, and omit author/date/source unless the user actually supplied them for that player. A calculated preference is conditional on that user's method; it is not an independently validated Giants forecast.
+- A public college role comparison should use the attributed receiving and blocking assessments and their limitations, not rank NFL projection by college yards. Public tradeoff/frontier results describe their listed dimensions only. For a complete acquisition decision, compare the football role first, then calculate incoming terms and funding alternatives; show when extra funding is unnecessary under the supplied budget.
 - If one field is missing, explain that particular gap in normal English and continue the useful supported analysis. Do not refuse the entire football question because it contains contextual language or an unsupported statistic.
 
 - Make an acquisition shortlist useful for actual calls. Lead with a few plausible investigation candidates and explain the contract/usage rationale for each. Cheap stars who are probably retained can explain a tradeoff in one sentence; they should not dominate the recommendation or table. Do not infer a rookie contract from a low cap charge, age or draft history: a player may have signed an extension. Use only the recorded contract terms.
@@ -68,6 +89,7 @@ WRITE THE ANSWER
 - For a receiver shortlist, focus the opening on whom to investigate, recorded production versus active contract length, and the internal alternative. Do not discuss or rank guarantees in this summary: the receiver comparison does not calculate transferred liability. Do not append the public-cap accounting warning when you have made no affordability claim, or end with a generic offer to model something. The interface already provides labeled tables, relevant limits and follow-ups.
 - Use plain prose in string fields; the interface supplies headings and typography. Do not use Markdown headings, bold markers or raw source tokens in prose. Put exact numeric source refs in findings; tools own all source links and tables.
 - Select tables/rows/columns from tool results. Do not invent table cells or calculate new figures in narrative. Copy figures from the retrieved evidence. Label current-team cap clearly. State essential qualifications next to the affected assertion rather than burying them.
+- Usually select a table with its table_id alone; this preserves all labelled fields and rows without copying the schema. Supply row_ids or column_names only when narrowing the displayed evidence helps answer the request. Omit empty optional finish fields and avoid repeating qualifications already present on the selected evidence.
 - Keep ALL numerical facts in tool-owned tables/calculations. Prose and table titles must contain no numbers, spelled-out quantities, money, dates or cell tokens. Use qualitative prose: this year, last season, current deal, a shorter commitment. Never turn the model prose into a calculator.
 - Before calculation, call set_scenario if changing a budget or protected player, or restoring an earlier scenario. Put it before calculation in the same tool batch. A new objective must use fresh search scope. Omit unchanged state fields. Include scenario in finish_analysis for other objective changes. Do not clear earlier constraints without a user request.
 - Keep the final answer to a short paragraph and use at most two findings and two tables. Do not repeat evidence in prose. For exact quantitative results or a reviewed rule statement, select answer_statements by ID: code inserts the complete statement with its source refs. Copy result IDs, never rewrite figures. A final response must include answer and may omit empty arrays. Do not add prose containing a number that you intend code to remove.
@@ -93,9 +115,11 @@ export const nflAnalystTools: Anthropic.Tool[] = [
     }, additionalProperties: false },
   },
   nflReceiverTool,
+  { ...nflEvaluationTool, input_schema:{...nflEvaluationTool.input_schema, required:[], properties:{...(nflEvaluationTool.input_schema.properties as Record<string,unknown>),inherit_previous:{type:'boolean',description:'Keep the previous validated role and domain for a grade, weight or threshold change; omit unchanged fields. A changed role clears old judgments.'}}} } as Anthropic.Tool,
   nflScenarioTool as Anthropic.Tool,
   {name:'read_contract_dossiers',description:'Inspect all years, active versus void, guarantees and source conflicts in the eight deep public contract dossiers. Includes originals from other teams; never implies incoming cost.',input_schema:{type:'object',properties:{player_names:{type:'array',items:{type:'string'}}},additionalProperties:false}},
   {name:'calculate_contract_scenario',description:'Read-only simulation, never a real transaction. Call even for a protected-player conflict to show the explicit blocked result. Calculate hold, trade, release, salary-conversion restructure or an acquisition with complete literal user-supplied illustrative terms. Code owns all figures and future-year obligations. This replaces broad estimated lever columns for numerical scenarios. Every new amount must be supplied by the user; incomplete incoming terms remain blocked.',input_schema:NFL_CONTRACT_SCENARIO_TOOL_SCHEMA as unknown as Anthropic.Tool.InputSchema},
+  nflContractComparisonTool as unknown as Anthropic.Tool,
   { ...nflExampleTool, input_schema: {...nflExampleTool.input_schema, properties:{...nflExampleTool.input_schema.properties, inherit_previous:{type:'boolean',description:'Retain the previous example scope and change only supplied fields.'}}}} as Anthropic.Tool,
   { name: 'read_giants_cap', description: 'Read dated public Giants cap observations, their disagreement and verified arithmetic. Not a live certified ledger.', input_schema: { type: 'object', properties: {}, additionalProperties: false } },
   { name: 'read_nfl_rules', description: 'Look up sourced NFL CBA/transaction rules. Ask a focused rules question, e.g. acquiring obligations in a trade, practice squad signing, waiver claim or June 1 accounting.', input_schema: { type: 'object', properties: { question: { type: 'string' }, domain:{type:'string',enum:['cba','playing_rules','league_dates']} }, required: ['question'], additionalProperties: false } },
@@ -106,15 +130,15 @@ export const nflAnalystTools: Anthropic.Tool[] = [
   }, required: ['start_year', 'end_year', 'position_groups'], additionalProperties: false } },
   { name: 'finish_analysis', description: 'Submit evidence-backed prose plus exact tool-owned tables. Copy row_ids (r0, r1, etc.) and column_names from the selected table. These IDs are distinct from numeric source refs. Empty row_ids selects all returned rows; keep visible tables compact. evidence_id preserves any underlying market/scenario artifact. continuation_query_id identifies the player search or receiver comparison whose selection follows into the next turn.', input_schema: { type: 'object', properties: {
     scenario: nflScenarioTool.input_schema,
-    answer_statements: {type:'array', maxItems:3, items:{type:'string'}, description:'Exact complete tool-authored statements to include before your qualitative interpretation. IDs are listed in answer_statements on evidence. Select only statements that answer the current question.'},
+    answer_statements: {type:'array', maxItems:4, items:{type:'string'}, description:'Exact complete tool-authored statements. IDs are listed on evidence. Select only statements that answer the current question; supporting records stay in comparison details when your interpretation leads.'},
     answer: { type: 'string' },
     key_findings: { type: 'array', maxItems: 5, items: { type: 'object', properties: { label: { type: 'string' }, body: { type: 'string' }, source_refs: integerRefs }, required: ['label', 'body', 'source_refs'], additionalProperties: false } },
-    tables: { type: 'array', maxItems: 4, items: { type: 'object', properties: { table_id: { type: 'string' }, title: { type: 'string',description:'Optional presentation label; code preserves the original evidence title.' }, row_ids: strings('Exact row IDs from this table, e.g. r0. Never use source refs as row IDs.'), column_names: strings('Exact column names from this table.') }, required: ['table_id', 'title', 'row_ids', 'column_names'], additionalProperties: false } },
+    tables: { type: 'array', maxItems: 4, items: { type: 'object', properties: { table_id: { type: 'string' }, title: { type: 'string',description:'Optional; code preserves the original evidence title.' }, row_ids: strings('Omit to keep every row. Otherwise exact row IDs, e.g. r0.'), column_names: strings('Omit to preserve the complete labelled evidence. Otherwise exact column names.') }, required: ['table_id'], additionalProperties: false } },
     evidence_id: { type: 'string' }, continuation_query_id: { type: 'string' },
     caveats: strings('Only material qualifications, expressed in plain English.'),
     assumptions: strings('User-supplied scenarios and clearly labeled working assumptions, never inferred medical facts.'),
     followups: { type: 'array', maxItems: 3, items: { type: 'string' } },
-  }, required: ['answer', 'key_findings', 'tables', 'evidence_id', 'continuation_query_id', 'caveats', 'assumptions', 'followups'], additionalProperties: false } },
+  }, required: ['answer', 'evidence_id', 'continuation_query_id'], additionalProperties: false } },
 ];
 
 function object(value: unknown): Record<string, unknown> {
@@ -269,19 +293,22 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
   const previousQuery = [...history].reverse().find(turn => turn.body?.factual_query)?.body?.factual_query ?? null;
   let lastPlayerQuery = previousQuery;
   let lastExampleQuery=history.at(-1)?.body?.example_query;
+  let lastEvaluation = [...history].reverse().find(turn => turn.body?.evaluation_result)?.body?.evaluation_result?.state as NflEvaluationState | undefined;
   const priorContractScenario=[...history].reverse().find(t=>t.body?.contract_scenario)?.body?.contract_scenario?.args as NflContractScenarioArgs|undefined;
   let conversationState = structuredClone(history.at(-1)?.body?.conversation_state);
+  const stateBeforeTurn = structuredClone(conversationState);
   if(conversationState)conversationState.active.protected_player_names=explicitPlayerProtections(question,conversationState.active.protected_player_names).names;
   const applyScenario=(input:unknown)=>{
     const next=updateNflConversationState(input,conversationState,question);
-    const explicit=explicitPlayerProtections(question,conversationState?.active.protected_player_names??[]);
+    const explicit=explicitPlayerProtections(question,conversationState?.active.protected_player_names??[],next.active.protected_player_names);
     // A refinement cannot silently remove a protection. New objectives are
     // isolated by updateNflConversationState; explicit changes apply now.
-    if(next.active.objective===conversationState?.active.objective||['acquisition','contract'].includes(next.active.objective)&&['acquisition','contract'].includes(conversationState?.active.objective??''))next.active.protected_player_names=explicitPlayerProtections(question,[...next.active.protected_player_names,...explicit.names]).names;
-    else next.active.protected_player_names=explicitPlayerProtections(question,next.active.protected_player_names).names;
+    if(object(input).operation==='restore')next.active.protected_player_names=explicitPlayerProtections(question,next.active.protected_player_names).names;
+    else if(next.active.objective===conversationState?.active.objective||['acquisition','contract'].includes(next.active.objective)&&['acquisition','contract'].includes(conversationState?.active.objective??''))next.active.protected_player_names=explicit.names;
+    else next.active.protected_player_names=explicitPlayerProtections(question,[],next.active.protected_player_names).names;
     conversationState=next;
   };
-  const deadlineMs = options.deadlineMs ?? 28_000;
+  const deadlineMs = options.deadlineMs ?? 60_000;
   const evidence = new Map<string, Evidence>();
   const sources: FactualAnswer['sources'] = [];
   const toolNames: string[] = [];
@@ -290,20 +317,12 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
   const register = (answer: FactualAnswer, isPlayerSearch = false, executed = false): Evidence => {
     const id = 'lookup_' + (evidence.size + 1);
     const sourceMap = new Map<number, number>();
-    for (const source of answer.sources) {
-      const ref = sources.length + 1;
-      sourceMap.set(source.ref_index, ref);
-      sources.push({ ...source, ref_index: ref });
-    }
+    answer.sources.forEach((source, index) => sourceMap.set(source.ref_index, sources.length + index + 1));
     const remap = (refs: number[]) => refs.map(ref => sourceMap.get(ref)).filter((ref): ref is number => ref != null);
-    const body = { ...answer.body,
-      ...(answer.body.supporting_details ? { supporting_details: answer.body.supporting_details.map(row => ({ ...row, source_refs: remap(row.source_refs) })) } : {}),
-      key_findings: answer.body.key_findings.map(row => ({ ...row, source_refs: remap(row.source_refs) })),
-      tables: answer.body.tables.map(row => ({ ...row, source_refs: remap(row.source_refs) })),
-      calculations: answer.body.calculations.map(row => ({ ...row, source_refs: remap(row.source_refs) })),
-      ...(answer.body.contract_scenario?{contract_scenario:{...answer.body.contract_scenario,tables:answer.body.contract_scenario.tables?.map(t=>({...t,source_refs:remap(t.source_refs)})),calculations:answer.body.contract_scenario.calculations?.map(c=>({...c,source_refs:remap(c.source_refs)}))}}:{}),
-    };
-    const item: Evidence = { id, body, executed, sources: answer.sources.map(source => ({ ...source, ref_index: sourceMap.get(source.ref_index)! })),
+    const mappedSources = answer.sources.map(source => ({ ...source, ref_index: sourceMap.get(source.ref_index)!, ...(source.data ? {data: remapEvidenceRefs(source.data, remap)} : {}) }));
+    sources.push(...mappedSources);
+    const body = remapEvidenceRefs(answer.body, remap);
+    const item: Evidence = { id, body, executed, sources: mappedSources,
       ...(isPlayerSearch && body.tables[0] ? { rowRefs: body.tables[0].rows.map((_, index) => [sourceMap.get(answer.sources[index]?.ref_index) ?? body.tables[0].source_refs[0]]) } : {}),
     };
     evidence.set(id, item);
@@ -314,12 +333,14 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
     const contract=body.contract_scenario;
     const receiver=body.receiver_query;
     const example=body.example_query;
+    const evaluation=body.evaluation_query;
     const rules=item.sources.some(s=>['CBA','NFL_RULEBOOK','NFL_CALENDAR'].includes(s.kind??''))&&!contract&&!body.seller_move_analysis;
-    const objective=contract||body.seller_move_analysis?'contract':receiver?receiver.candidate_scope==='internal'?'internal_roster':'acquisition':example?String(example.domain):body.market_analysis?'history':body.factual_query?body.factual_query.team_ids.length===1&&body.factual_query.team_ids[0]==='NYG'&&!body.factual_query.exclude_nyg?'internal_roster':'acquisition':rules?'rules':undefined;
+    const objective=evaluation?evaluation.domain==='college'?'college':'acquisition':contract||body.seller_move_analysis?'contract':receiver?receiver.candidate_scope==='internal'?'internal_roster':'acquisition':example?String(example.domain):body.market_analysis?'history':body.factual_query?body.factual_query.team_ids.length===1&&body.factual_query.team_ids[0]==='NYG'&&!body.factual_query.exclude_nyg?'internal_roster':'acquisition':rules?'rules':undefined;
     if(!objective)return;
     const next=updateNflConversationState({objective},conversationState,question);
     if(receiver){next.active.candidate_scope=receiver.candidate_scope as 'external'|'internal'|'both';next.active.horizon=receiver.priority==='contract_horizon'?'Remaining reported active contract years':'2025 receiving evidence';next.active.transaction=receiver.candidate_scope==='internal'?'hold':'none';}
     if(example){next.active.horizon=String(example.domain==='college'?'Historical 2025 draft class':'Historical 2025 season');next.active.candidate_scope='unspecified';next.active.transaction='none';}
+    if(evaluation){next.active.horizon=String(evaluation.role);next.active.transaction='none';next.active.unresolved_inputs=body.evaluation_result?.unresolved_inputs as string[] ?? [];}
     if(body.factual_query){const q=body.factual_query;next.active.candidate_scope=q.exclude_nyg?'external':q.team_ids.length===1&&q.team_ids[0]==='NYG'?'internal':'both';next.active.objective=next.active.candidate_scope==='internal'?'internal_roster':'acquisition';}
     if(contract){
       const a=contract.args as NflContractScenarioArgs;const r=contract.result as NflContractScenarioResult;
@@ -333,15 +354,16 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
     conversationState=next;
   };
   const forModel = (item: Evidence) => ({
-    lookup_id: item.id, answer: item.body.answer, selection: item.body.factual_query,receiver_selection:item.body.receiver_query,example_selection:item.body.example_query,
-    answer_statements: [{id:item.id+':answer',text:item.body.answer}, ...item.body.key_findings.flatMap((f,i)=>f.label==='Rule summary'?[{id:item.id+':finding:'+i,text:f.body}]:[])], findings: item.body.key_findings, supporting_details: item.body.supporting_details, calculations: item.body.calculations, caveats: item.body.caveats,
+    lookup_id: item.id, answer: item.body.answer, selection: item.body.factual_query,receiver_selection:item.body.receiver_query,example_selection:item.body.example_query,evaluation_selection:item.body.evaluation_query,
+    answer_statements: [{id:item.id+':answer',text:item.body.answer}, ...item.body.key_findings.map((f,i)=>({id:item.id+':finding:'+i,label:f.label,text:f.body}))], findings: item.body.key_findings, supporting_details: item.body.supporting_details, calculations: item.body.calculations, caveats: item.body.caveats,
     tables: item.body.tables.map((table, index) => ({ table_id: item.id + ':' + index, title: table.title, columns: table.columns, rows: table.rows.map((values, rowIndex) => ({ row_id: 'r' + rowIndex, fields: Object.fromEntries(table.columns.map((column, index) => [column, values[index]])), source_refs: index === 0 && item.rowRefs ? item.rowRefs[rowIndex] : table.source_refs })) })),
-    sources: item.sources.map(source => ({ ref: source.ref_index, title: source.title, source: source.source, as_of: source.updated_at })),
+    sources: item.sources.map(source => ({ ref: source.ref_index, title: source.title, source: source.source, as_of: source.updated_at,
+      factual_assertions: source.data?.factual_assertions, counterfacts: source.data?.counterfacts, workflow: source.data?.workflow, followup_actions: source.data?.followup_actions })),
   });
   const initialPlayer=options.initialEvidence?.body.seller_move_analysis?.result?.player.player_name;
   const initial = options.initialEvidence ? register(initialPlayer&&getNflContractDossier(initialPlayer)?.source_status==='source_conflict'?contractDossiersEvidence([initialPlayer]):options.initialEvidence) : null;
   const relevantToReceivers = /receiver|\bWR\b/i.test(question) || ['acquisition','internal_roster'].includes(conversationState?.active.objective ?? '') || /receiver|\bWR\b/i.test(history.at(-1)?.question ?? '');
-  if (options.prefetch !== false && relevantToReceivers && !/college|draft|prospect|tight end|hypothetical|signing.bonus|conversion|restructure|recalculate/i.test(question)) {
+  if (options.prefetch !== false && relevantToReceivers && !/college|draft|prospect|tight end|hypothetical|signing.bonus|conversion|restructure|recalculate|grade|weight|threshold|supplied model/i.test(question)) {
     try {
       const scope = /(?:already|existing|only).*roster|our roster instead|internal only/i.test(question) ? 'internal' : 'both';
       const priority = /flexibility|next.year|overcommitt/i.test(question) && !/production over|prioritize (?:receiving )?production/i.test(question) ? 'contract_horizon' : 'receiving_production';
@@ -359,7 +381,7 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
       if(domain==='college')delete args.collegePriority;
       if(domain==='availability'&&/all|changes|report/i.test(question))args.playerName='all';
       if(domain==='coaching'){delete args.situation;delete args.teamId;delete args.comparisonTeamId;}
-      const prepared=await buildNflExampleEvidence(args as unknown as NflExampleArgs);prepared.body.example_query??=args;lastExampleQuery=prepared.body.example_query;register(prepared,false,false);
+      const prepared=await buildNflExampleEvidence(args as unknown as NflExampleArgs, {previousQuery:lastExampleQuery?.domain===domain ? lastExampleQuery as unknown as NflExampleArgs : undefined});prepared.body.example_query??=args;lastExampleQuery=prepared.body.example_query;register(prepared,false,false);
     }
   }
 
@@ -369,19 +391,38 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
     known_gaps: ['No verified current medical status, seller availability, asking prices or club-certified cap ledger.', 'Recorded age may be unavailable. Current team cap is not acquiring-team cap cost.'],
     team_ids: seed.teams.map(team => team.team_id), roster_status_codes: [...new Set(seed.roster_entries.map(row => row.roster_status))],
     conversation: history.slice(-8).map(turn => ({ question: turn.question, answer: turn.body?.answer, findings: turn.body?.key_findings, tables: turn.body?.tables, player_selection: turn.body?.factual_query, assumptions: turn.body?.ai_analysis?.assumptions, scenario:turn.body?.conversation_state?.active, receiver_query:turn.body?.receiver_query, example_query:turn.body?.example_query, contract_scenario:turn.body?.contract_scenario?.args })),
-    previous_player_selection: previousQuery, scenario_state: conversationState, example_coverage: nflExampleCoverage, previous_example_query: history.at(-1)?.body?.example_query,
+    previous_player_selection: previousQuery, scenario_state: conversationState, example_coverage: nflExampleCoverage, previous_example_query: history.at(-1)?.body?.example_query, previous_evaluation: lastEvaluation,
     initial_evidence: [...evidence.values()].map(forModel),
   }) }];
   const call = options.callModel ?? createClaudeMessage;
-  // Exact cells, calculations and source IDs are validated in code. An optional
-  // external reviewer is a test/audit hook, never another model latency gate.
-  const review = options.reviewDraft ?? (async () => []);
+  // Code validates exact cells and categorical facts. A separate bounded
+  // evidence review checks the premises and completeness of AI interpretation.
+  // Tests can replace that review explicitly; production never defaults to pass.
   const partial = (reason: string): FactualAnswer => {
-    const selected = [...evidence.values()].filter(e=>e.executed).at(-1) ?? [...evidence.values()].find(e=>e.body.receiver_query) ?? [...evidence.values()].at(-1);
+    // Unreviewed set_scenario prose is not accepted merely because calculation
+    // failed or the provider timed out. Derive this turn's state from execution.
+    conversationState = structuredClone(stateBeforeTurn);
+    const executed = [...evidence.values()].filter(e => e.executed);
+    const decisionWeight = (item: Evidence) => {
+      const scenario = item.body.contract_scenario?.result as NflContractScenarioResult & {comparison?:unknown} | undefined;
+      return scenario?.comparison ? 6 : item.body.evaluation_query ? 5 : scenario?.moves.some(m => m.action !== 'hold') ? 4 : item.body.example_query ? 3 : item.body.receiver_query ? 2 : 1;
+    };
+    const selected = executed.slice().sort((a,b) => decisionWeight(b)-decisionWeight(a) || Number(b.id.split('_')[1])-Number(a.id.split('_')[1]))[0]
+      ?? [...evidence.values()].find(e=>e.body.receiver_query) ?? [...evidence.values()].at(-1);
     if(selected)adoptExecutedState(selected);
     const body: DataAnalysisBriefBody = selected ? { ...selected.body,
       answer: 'The checked evidence is ready below. The written analysis did not finish, so this is an evidence view; it does not complete the requested comparison.',
     } : { kind:'data_analysis', answer:'The analyst could not retrieve enough evidence to answer this question. Your question is saved; retry it to continue.', key_findings:[], tables:[], calculations:[], caveats:[], followups:[] };
+    if (selected) {
+      const seen = new Set(body.tables.map(t => JSON.stringify([t.title,t.rows])));
+      body.tables = [...body.tables];
+      for (const item of executed.filter(e => e !== selected)) for (const table of item.body.tables) {
+        const key = JSON.stringify([table.title,table.rows]);
+        if (seen.has(key)) continue;
+        seen.add(key); body.tables.push(table);
+      }
+      body.tables = body.tables.slice(0,6);
+    }
     body.language_policy = 'facts_only_v1';
     body.caveats = [...body.caveats, 'Analysis incomplete: ' + reason];
     body.conversation_state = conversationState;
@@ -416,12 +457,24 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
           for(const key of ['key_findings','tables','caveats','assumptions','followups']) if(args[key]==null)args[key]=[];
           if (args.scenario) applyScenario(args.scenario);
           const primaryId = text(args.evidence_id, 'evidence_id');
-          const primary = primaryId ? evidence.get(primaryId) : null;
+          let primary = primaryId ? evidence.get(primaryId) : null;
           if (primaryId && !primary) throw new Error('Unknown evidence_id.');
-          if(primary?.body.contract_scenario&&conversationState){
-            const executed=primary.body.contract_scenario.args as NflContractScenarioArgs;
+          const selectedLookupIds = new Set([
+            ...((args.tables as unknown[]) ?? []).map(value => String(object(value).table_id ?? '').split(':')[0]),
+            ...stringList(args.answer_statements ?? [], 'answer statements').map(id => id.split(':')[0]),
+          ]);
+          const selectedContracts = [...evidence.values()].filter(item => item.body.contract_scenario && selectedLookupIds.has(item.id));
+          if (selectedContracts.length > 1) throw new Error('Use one contract comparison result for the selected alternatives, so the saved scenario and its follow-ups match the displayed calculation.');
+          const contractEvidence = selectedContracts[0] ?? (primary?.body.contract_scenario ? primary : undefined);
+          const selectedEvaluations = [...evidence.values()].filter(item => item.body.evaluation_query && (selectedLookupIds.has(item.id) || item.id === primaryId || item.id === args.continuation_query_id));
+          if (selectedEvaluations.length > 1) throw new Error('Select one executed evaluation rule as the decision to preserve for follow-ups.');
+          const evaluationEvidence = selectedEvaluations[0];
+          if (evaluationEvidence) primary = evaluationEvidence;
+          else if (contractEvidence) primary = contractEvidence;
+          if(contractEvidence?.body.contract_scenario&&conversationState){
+            const executed=contractEvidence.body.contract_scenario.args as NflContractScenarioArgs;
             const expected=explicitPlayerProtections(question,conversationState.active.protected_player_names).names;
-            for(const move of (primary.body.contract_scenario.result as NflContractScenarioResult).moves){if(move.action!=='hold'&&expected.includes(move.player_name)&&!move.issues.some(i=>i.code==='PROTECTED_PLAYER'))throw new Error('Protection changed after calculation. Recalculate with the current scenario before finishing.');}
+            for(const move of (contractEvidence.body.contract_scenario.result as NflContractScenarioResult).moves){if(move.action!=='hold'&&expected.includes(move.player_name)&&!move.issues.some(i=>i.code==='PROTECTED_PLAYER'))throw new Error('Protection changed after calculation. Recalculate with the current scenario before finishing.');}
             const executedBudget=executed.budget??null;
             if(JSON.stringify(conversationState.active.budget)!==JSON.stringify(executedBudget)&&conversationState.active.budget)throw new Error('Budget changed after calculation. Recalculate with the current budget before finishing.');
             conversationState.active.budget=executedBudget;
@@ -429,16 +482,18 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
           }
 
           const queryId = text(args.continuation_query_id, 'continuation_query_id');
-          const queryEvidence = queryId ? evidence.get(queryId) : undefined;
-          const query = queryEvidence?.body.factual_query;
+          let queryEvidence = queryId ? evidence.get(queryId) : undefined;
           if (queryId && !queryEvidence) throw new Error('continuation_query_id must identify retrieved evidence.');
+          if (primary?.body.contract_scenario || primary?.body.evaluation_query) queryEvidence = primary;
+          const query = queryEvidence?.body.factual_query;
           const refs = (value: unknown): number[] => {
             if (!Array.isArray(value) || value.some(ref => !Number.isInteger(ref) || ref < 1 || ref > sources.length)) throw new Error('Use only retrieved source refs.');
             return [...new Set(value)];
           };
           if (!Array.isArray(args.key_findings) || !Array.isArray(args.tables)) throw new Error('Invalid findings or table selection.');
           let withheldSentences=0;
-          const prose = (value: unknown, label: string, max = 6000) => cleanNflAnalystProse(text(value,label,max)).split(/(?<=[.!?])\s+/).filter(sentence=>{try{resolveEvidenceProse(sentence,evidence);return true;}catch{withheldSentences++;return false;}}).join(' ');
+          let answerOpeningWithheld=false;
+          const prose = (value: unknown, label: string, max = 6000) => cleanNflAnalystProse(text(value,label,max)).split(/(?<=[.!?])\s+/).filter((sentence,index)=>{try{resolveEvidenceProse(sentence,evidence);return true;}catch{withheldSentences++;if(label==='answer'&&index===0)answerOpeningWithheld=true;return false;}}).join(' ');
           const findings = args.key_findings.slice(0,5).map(value => { const row = object(value); return { label: prose(row.label, 'finding label', 120), body: prose(row.body, 'finding body', 2500), source_refs: refs(row.source_refs) }; }).filter(row=>row.body.length>0).map(row=>({...row,label:row.label||'Evidence'}));
           const tables = args.tables.slice(0,4).map((value): DataAnalysisTable => {
             const selected = object(value);
@@ -447,20 +502,20 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
             const item = evidence.get(lookupId);
             const table = /^\d+$/.test(index ?? '') ? item?.body.tables[Number(index)] : undefined;
             if (!table || !item) throw new Error('Unknown table ID.');
-            const rowIds = stringList(selected.row_ids, 'table rows');
+            const rowIds = stringList(selected.row_ids ?? [], 'table rows');
             if (rowIds.some(id => !/^r\d+$/.test(id))) throw new Error('Unknown table row ID. Copy exact row_ids from the table.');
             const indices = integerList(rowIds.map(id => Number(id.slice(1))), table.rows.length, 'table row');
             const rows = indices.length ? indices : table.rows.map((_, index) => index);
-            const chosenColumns = integerList(stringList(selected.column_names, 'table columns').map(column => table.columns.indexOf(column)), table.columns.length, 'table column');
+            const chosenColumns = integerList(stringList(selected.column_names ?? [], 'table columns').map(column => table.columns.indexOf(column)), table.columns.length, 'table column');
             const columns = chosenColumns.length ? chosenColumns : table.columns.map((_, index) => index);
             return { title: table.title, columns: columns.map(index => table.columns[index]), rows: rows.map(index => columns.map(column => table.rows[index][column])),
               source_refs: Number(index) === 0 && item.rowRefs ? [...new Set(rows.flatMap(index => item.rowRefs![index]))] : table.source_refs };
           });
-          const statements=stringList(args.answer_statements??[],'answer statements').slice(0,3).flatMap(id=>{
+          const statements=stringList(args.answer_statements??[],'answer statements').slice(0,4).flatMap(id=>{
             const [lookup,kind,index]=id.split(':');const item=evidence.get(lookup);if(!item)return [];
             if(kind==='answer'&&!index)return [{text:item.body.answer,refs:item.sources.map(s=>s.ref_index)}];
             const finding=kind==='finding'&&/^\d+$/.test(index??'')?item.body.key_findings[Number(index)]:undefined;
-            if(!finding||finding.label!=='Rule summary')return [];
+            if(!finding)return [];
             return [{text:finding.body,refs:finding.source_refs}];
           });
           let interpretation=prose(args.answer??'', 'answer');
@@ -470,31 +525,49 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
           // result statement. Never leave an orphan such as "New York time."
           if(!statements.length&&primary&&(withheldSentences||!interpretation||Array.isArray(args.answer_statements)&&args.answer_statements.length)){const summaries=primary.body.key_findings.filter(f=>f.label==='Rule summary');statements.push(...(summaries.length?summaries.slice(0,2).map(f=>({text:f.body,refs:f.source_refs})):[{text:primary.body.answer,refs:primary.sources.map(s=>s.ref_index)}]));}
           const receiverEvidence = queryEvidence?.body.receiver_query ? queryEvidence : primary?.body.receiver_query ? primary : undefined;
-          const receiverLead = Boolean(receiverEvidence && interpretation.length >= 35);
+          // When the guard removed the opening premise, lead with the executed
+          // statement so a remaining "that change" still has its antecedent.
+          const interpretationLead = Boolean(interpretation.length >= 35 && !answerOpeningWithheld && !primary?.body.contract_scenario && !reviewedRules.length);
           const supportingDetails = [
             ...(primary?.body.supporting_details ?? []),
+            ...(evaluationEvidence?.body.key_findings.filter(f=>f.label!=='Decision basis') ?? []),
             ...(receiverEvidence && receiverEvidence !== primary ? receiverEvidence.body.supporting_details ?? [] : []),
-            ...(receiverLead ? statements.map(s => ({label:'Recorded comparison',body:s.text,source_refs:s.refs})) : []),
+            ...(interpretationLead ? statements.map(s => ({label:'Recorded comparison',body:s.text,source_refs:s.refs})) : []),
           ];
-          const answer=receiverLead ? interpretation : [...statements.map(s=>s.text),interpretation.length>=35?interpretation:''].filter(Boolean).join('\n\n');
+          const answer=interpretationLead ? interpretation : [...statements.map(s=>s.text),interpretation.length>=35?interpretation:''].filter(Boolean).join('\n\n');
           if (!answer) return partial('The written answer contained only unverified quantitative prose. The labelled evidence is preserved.');
           if(!tables.length&&primary)tables.push(...primary.body.tables.slice(0,2));
+          const suppliedGrades = evaluationEvidence?.body.tables.find(t=>t.title==='User-supplied judgments · unverified attribution');
+          if(suppliedGrades&&!tables.some(t=>t.title===suppliedGrades.title))tables.push(suppliedGrades);
           const caveats = [...new Set([...(primary?.body.caveats??[]),...stringList(args.caveats,'caveats').filter(value=>{try{resolveEvidenceProse(value,evidence);return true;}catch{return false;}})])];
           if (loaded.source_mode !== 'supabase_current_views') caveats.push('Player records are from the saved public snapshot dated ' + seed.as_of_date + '; the database was unavailable.');
           if(primary)adoptExecutedState(primary);
           const draft: FactualAnswer = { body: {
             kind: 'data_analysis', language_policy: 'grounded_ai_v1', answer, answer_source_refs:[...new Set(statements.flatMap(s=>s.refs))], ...(supportingDetails.length ? { supporting_details: supportingDetails } : {}), key_findings: findings, tables,
-            calculations: primary?.body.calculations ?? [], caveats, followups: stringList(args.followups, 'followups').slice(0, 3),
+            calculations: primary?.body.calculations ?? [], caveats,
+            followups: (primary?.body.example_query ? primary.body.followups : stringList(args.followups, 'followups')).slice(0, 3),
             ...(query ? { factual_query: query } : {}),
             ...((queryEvidence?.body.receiver_query??primary?.body.receiver_query)?{receiver_query:queryEvidence?.body.receiver_query??primary?.body.receiver_query}:{}),
             ...(primary?.body.market_analysis ? { market_analysis: primary.body.market_analysis, answer_layout: primary.body.answer_layout, historical_selection: primary.body.historical_selection } : {}),
             ...(primary?.body.seller_move_analysis ? { seller_move_analysis: primary.body.seller_move_analysis, answer_layout: primary.body.answer_layout } : {}),
             conversation_state: conversationState,
-            ...(primary?.body.contract_scenario ? {contract_scenario:primary.body.contract_scenario}: {}),
+            ...(contractEvidence?.body.contract_scenario ? {contract_scenario:contractEvidence.body.contract_scenario}: {}),
             ...(primary?.body.example_query ? {example_query:primary.body.example_query}: {}),
+            ...(evaluationEvidence ? {evaluation_query:evaluationEvidence.body.evaluation_query,evaluation_result:evaluationEvidence.body.evaluation_result} : {}),
             ai_analysis: { outcome:'complete', withheld_numeric_sentences:withheldSentences, model: servingModel, elapsed_ms: Date.now() - started, tool_names: toolNames, assumptions: stringList(args.assumptions, 'assumptions') },
           }, sources };
-          const issues = await review(draft, [...evidence.values()].map(forModel));
+          const authored: AnalystAuthoredProse = { answer: interpretation, findings,
+            caveats: stringList(args.caveats, 'caveats'), assumptions: stringList(args.assumptions, 'assumptions'), followups: draft.body.followups,
+            scenario_state: conversationState };
+          const categoricalIssues = categoricalGroundingIssues(authored, [...evidence.values()]);
+          if (categoricalIssues.length) throw new Error('Correct these factual premises and resubmit: ' + categoricalIssues.join(' | '));
+          let issues: string[];
+          try {
+            issues = options.reviewDraft ? await options.reviewDraft(draft, [...evidence.values()].map(forModel)) : await reviewNflAnalystSemantics({
+              question, user_context: history.slice(-8).map(turn => turn.question), authored, selected_answer: answer, selected_tables: tables, evidence: [...evidence.values()].map(forModel),
+              tool_coverage: { examples: nflExampleCoverage, tools: nflAnalystTools.filter(t => t.name !== 'finish_analysis').map(t => ({name: t.name, description: t.description})) },
+            }, { timeoutMs: Math.min(15_000, Math.max(1, deadlineMs - (Date.now() - started))) });
+          } catch { return partial('The factual interpretation review could not finish.'); }
           if (issues.length) throw new Error('Revise these material issues and resubmit finish_analysis: ' + issues.join(' | '));
           draft.body.ai_analysis!.elapsed_ms = Date.now() - started;
           draft.body.ai_analysis!.grounding_checked = true;
@@ -524,9 +597,22 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
           const prior = lastExampleQuery;
           if (inherit_previous && !prior) throw new Error('No previous football example to inherit.');
           const executed = { ...(inherit_previous ? prior : {}), ...args, question };
-          prepared = await buildNflExampleEvidence(executed as unknown as NflExampleArgs);
+          prepared = await buildNflExampleEvidence(executed as unknown as NflExampleArgs,{previousQuery:inherit_previous ? prior as unknown as NflExampleArgs : undefined});
           prepared.body.example_query ??= executed;
           lastExampleQuery=prepared.body.example_query;
+        }
+        else if (tool.name === 'evaluate_nfl_options') {
+          const {inherit_previous, ...args} = object(tool.input);
+          if (inherit_previous && !lastEvaluation) throw new Error('There is no previous executed evaluation. Supply the role and domain.');
+          const previous = inherit_previous || history.at(-1)?.body?.evaluation_result ? lastEvaluation : undefined;
+          const evaluationArgs = { ...(inherit_previous ? {domain:previous!.query.domain,role:previous!.query.role} : {}), ...args } as unknown as NflOptionEvaluationArgs;
+          const contractArtifacts = [
+            ...history.flatMap((turn,index) => turn.body?.contract_scenario ? [{id:'prior-turn-'+index,...turn.body.contract_scenario}] : []),
+            ...[...evidence.values()].flatMap(item => item.body.contract_scenario ? [{id:item.id,...item.body.contract_scenario}] : []),
+          ];
+          const evaluated = await buildNflOptionEvaluation(evaluationArgs,{seed,userText:question,previous,trustedCosts:evaluationCostsFromContracts(contractArtifacts)});
+          lastEvaluation = evaluated.evaluation.state;
+          prepared = evaluated;
         }
         else if (tool.name === 'compare_receivers') prepared = await buildNflReceiverComparison(tool.input, seed, [...history.map(t=>t.question),question].join('\n'));
         else if (tool.name === 'read_giants_cap') prepared = await buildNflCurrentAnswer('cap_space');
@@ -537,6 +623,7 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
         }
         else if (tool.name === 'read_contract_dossiers') prepared=contractDossiersEvidence(object(tool.input).player_names ? stringList(object(tool.input).player_names,'player names'):undefined);
         else if (tool.name === 'calculate_contract_scenario') prepared=await executeContractScenario(tool.input,[...history.map(t=>t.question),question].join('\n'),priorContractScenario as NflContractScenarioArgs|undefined,conversationState?.active,question);
+        else if (tool.name === 'nfl_contract_comparison') prepared=await executeContractComparison(tool.input,[...history.map(t=>t.question),question].join('\n'),priorContractScenario as NflContractScenarioArgs|undefined,conversationState?.active,question);
         else if (tool.name === 'read_trade_history') prepared=await analystTradeEvidence(tool.input);
         else throw new Error('Unknown data tool.');
         results.push({ type: 'tool_result', tool_use_id: tool.id, content: JSON.stringify(forModel(register(prepared, tool.name === 'search_player_records', true))) });

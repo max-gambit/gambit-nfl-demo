@@ -1,0 +1,19 @@
+import type Anthropic from '@anthropic-ai/sdk';
+const score = { type: 'object', properties: { value: { type: 'number', minimum: 0 }, out_of: { type: 'number', exclusiveMinimum: 0 } }, required: ['value', 'out_of'], additionalProperties: false };
+export const nflEvaluationTool: Anthropic.Tool = {
+  name: 'evaluate_nfl_options',
+  description: 'Make a bounded role decision for pro receivers or the historical Warren/Loveland 2025 draft example. Without user grades/rules use public_tradeoffs: a descriptive production/active-contract Pareto shortlist, explicit role/price/path gaps, and concrete next decisions. With user-supplied grades use threshold or weighted to identify a conditional preference and exact changes that flip it. Parse natural user input into typed arguments; no magic blocks are required. Use the user’s exact player, criterion, value and scale. Prefer an exact supporting quote, including any shared criterion heading; code can repair a shortened quote only when the original user message uniquely supports the entire supplied field. Conflicting grades or rules fail explicitly. A rule may include a weight and minimum stated at separate occurrences of the same criterion. Never invent grades, weights, thresholds, forecasts, authors or dates. Optional metadata defaults visibly to Conversation supplied and receipt date. Unknown prices/medical availability never become scores. Root-calculated incoming contract costs are supplied separately by code. A role/objective change clears prior rules and grades unless explicitly supplied again. Public assessments remain separate; no proprietary Giants model is connected.',
+  input_schema: {
+    type: 'object', properties: {
+      domain: { type: 'string', enum: ['receiver', 'college'] }, role: { type: 'string', description: 'The requested role/objective, using the user’s words.' },
+      player_names: { type: 'array', items: { type: 'string' }, maxItems: 8, description: 'Captured outside receivers plus recorded internal NYG receivers, or Warren/Loveland historical college example.' },
+      method: { type: 'string', enum: ['public_tradeoffs', 'threshold', 'weighted'] },
+      judgments: { type: 'array', maxItems: 40, items: { type: 'object', properties: {
+        player_name: { type: 'string' }, criterion: { type: 'string' }, value: { type: 'number', minimum: 0 }, out_of: { type: 'number', exclusiveMinimum: 0 },
+        quote: { type: 'string', description: 'Supporting quote hint; include the shared heading when multiple player grades follow one criterion. Code preserves only literal user evidence.' }, author: { type: 'string' }, date: { type: 'string' }, source: { type: 'string' }, metadata_quote: { type: 'string', description: 'Exact quote with this player’s named block/segment, or a unique global metadata header preceding multiple graded entries. Explicit shared metadata also works. Never borrow another player’s author, date or source; omit metadata if scope is unclear.' },
+      }, required: ['player_name', 'criterion', 'value', 'out_of', 'quote'], additionalProperties: false } },
+      rules: { type: 'array', maxItems: 5, items: { type: 'object', properties: { criterion: { type: 'string' }, minimum: score, weight: { type: 'number', minimum: 0, maximum: 1, description: 'Fraction of total weight. Literal 70% becomes 0.7; weights must sum to one.' }, quote: { type: 'string' } }, required: ['criterion', 'quote'], additionalProperties: false } },
+      constraints: { type: 'object', properties: { internal_only: { type: 'boolean' }, max_incoming_cap: { type: 'number', minimum: 0 }, max_incoming_cap_operator: { type: 'string', enum: ['lt', 'lte'], description: 'Optional: code derives and checks the literal quote. Under/below means lt; at most/ceiling means lte.' }, quote: { type: 'string' } }, required: ['quote'], additionalProperties: false },
+    }, required: ['domain', 'role'], additionalProperties: false,
+  },
+};
