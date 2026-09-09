@@ -33,11 +33,12 @@ test('actual report rejects the observed full-practice premise and unsupported w
 
 test('review fails closed on malformed or inconsistent verdicts and passes specific evidence issues through', async () => {
   const input = {question:'What should we inspect?',authored:prose('Thomas was fully healthy.'),selected_answer:'Thomas was fully healthy.',selected_tables:[],evidence:[],tool_coverage:{}};
-  for (const bad of [{pass:true,issues:['Contradiction']},{pass:false,issues:[]},{issues:[]}]) {
+  for (const bad of [{pass:true,issues:['Contradiction']},{pass:false,issues:[]},{issues:'not an array'}]) {
     await assert.rejects(reviewNflAnalystSemantics(input,{callModel:async()=>message('review_answer',bad)}),/valid result/);
   }
   assert.deepEqual(await reviewNflAnalystSemantics(input,{callModel:async()=>message('review_answer',{pass:false,issues:['The practice label does not certify health.']})}),['The practice label does not certify health.']);
   assert.deepEqual(await reviewNflAnalystSemantics(input,{callModel:async()=>message('review_answer',{pass:true,issues:[]})}),[]);
+  assert.deepEqual(await reviewNflAnalystSemantics(input,{callModel:async()=>message('review_answer',{issues:['Specific correction']})}),['Specific correction']);
 });
 
 test('a rejected factual premise must be repaired before the saved answer is complete', async () => {

@@ -175,14 +175,14 @@ function buildEvidence(question: string, args: NflContractScenarioArgs, prior?: 
   return { output, scopingErrors };
 }
 
-export function extractBudget(question: string, kind: 'cap' | 'cash' | 'reserve', previous?: NflContractScenarioArgs['budget']): number[] {
+export function extractBudget(question: string, kind: 'cap' | 'cash' | 'reserve', previous?: NflContractScenarioArgs['budget'], season=2026): number[] {
   const text = normalize(question);
   const label = kind === 'reserve' ? 'reserve' : `(?:available\\s+)?${kind}\\s+budget`;
   const values: number[] = [];
   for (const m of text.matchAll(new RegExp(`\\b${label}\\s*(?:is|of|to|:|=)?\\s*(${MONEY})`, 'g'))) values.push(moneyValue(m[1]));
   // Natural connectors do not change the field: "$5m of available cap
   // budget" and "$1m in reserve" remain separately bound amounts.
-  for (const m of text.matchAll(new RegExp(`(${MONEY})\\s+(?:(?:of|in|for)\\s+)?(?:a\\s+|the\\s+)?${label}\\b`, 'g'))) values.push(moneyValue(m[1]));
+  for (const m of text.matchAll(new RegExp(`(${MONEY})\\s+(?:(?:of|in|for)\\s+)?(?:a\\s+|the\\s+)?(?:${season}\\s+)?${label}\\b`, 'g'))) values.push(moneyValue(m[1]));
   if (previous && kind === previous.type) {
     // A follow-up may omit the already established cap/cash basis. Require
     // explicit budget/available-funds wording, never any amount in the turn.
@@ -264,7 +264,7 @@ export function validateNflScenarioInputProvenance(input: NflContractScenarioArg
   }
   if (args.budget) {
     const old = prior?.budget;
-    bind('budget.amount', args.budget.amount, old?.type === args.budget.type ? old.amount : undefined, extractBudget(context.current_question, args.budget.type, context.budget_before_turn??old));
+    bind('budget.amount', args.budget.amount, old?.type === args.budget.type ? old.amount : undefined, extractBudget(context.current_question, args.budget.type, context.budget_before_turn??old,args.season));
     bind('budget.reserve', args.budget.reserve, old?.reserve, extractBudget(context.current_question, 'reserve'));
     const otherType = args.budget.type === 'cap' ? 'cash' : 'cap';
     if (extractBudget(context.current_question, otherType).length) gap('budget.type', 'BUDGET_TYPE_MISMATCH', `The user supplied a ${otherType} budget; it cannot silently become a ${args.budget.type} budget.`);

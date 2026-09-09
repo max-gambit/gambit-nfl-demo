@@ -38,7 +38,7 @@ export function numericMentions(text: string): Array<{ raw: string; value: numbe
     const following=text.slice(match.index!+match[0].length);
     const unit:EvidenceFact['unit']=/\$|dollars/i.test(raw)||/^\s*dollars\b/i.test(following)?'USD':/%|percent/i.test(raw)||/^\s*percent\b/i.test(following)?'percent':'number';
     const prefix=text.slice(0,index);
-    const comparison=/\b(?:cleared|exceeded|above|more than|over)\s*$/i.test(prefix)?'gt' as const:/\bat least\s*$/i.test(prefix)?'gte' as const:/\b(?:under|below|less than)\s*$/i.test(prefix)?'lt' as const:/\bat most\s*$/i.test(prefix)?'lte' as const:undefined;
+    const comparison=/^[-–]?plus\b|^\+/.test(following)?'gte' as const:/\b(?:cleared|exceeded|above|more than|over)\s*$/i.test(prefix)?'gt' as const:/\bat least\s*$/i.test(prefix)?'gte' as const:/\b(?:under|below|less than)\s*$/i.test(prefix)?'lt' as const:/\bat most\s*$/i.test(prefix)?'lte' as const:undefined;
     return [{raw,value,unit,index,comparison,after:following.split(/\d/)[0].slice(0,35),precision:scale/10**(digits.split('.')[1]?.length??0)}];
   }).sort((a,b)=>a.index-b.index);
 }
@@ -74,17 +74,32 @@ export function collectEvidenceFacts(evidence: Iterable<Evidence>): EvidenceFact
         const subject = playerColumn>=0?String(row[playerColumn]):(subjectColumns.length ? subjectColumns.map(i => String(row[i])).join(' · ') : String(row[0] ?? table.title));
         for (const [ci, cell] of row.entries()) {
           const value = scalar(cell);
-          if (value == null) continue;
+          if (value == null) {
+            if(typeof cell==='string')for(const quantity of numericMentions(cell))add({subject,...(playerColumn>=0?{subject_kind:'player' as const}:{}),metric:table.columns[ci]+': '+cell,period:table.columns[ci].match(/20\d{2}/)?.[0]??'',unit:quantity.unit,basis:table.title,value:quantity.value,source_refs:table.source_refs});
+            continue;
+          }
           const metric = table.columns[ci];
-          const period = yearColumn >= 0 ? String(row[yearColumn]) : metric.match(/20\d{2}/)?.[0] ?? table.title.match(/20\d{2}/)?.[0] ?? '';
+          const period = yearColumn >= 0 ? String(row[yearColumn]) : metric.match(/20\d{2}/)?.[0] ?? (/cap|cash|salary|bonus|guarantee|budget|cost/i.test(metric)?table.title.match(/dated (20\d{2})/)?.[1]:undefined) ?? table.title.match(/20\d{2}/)?.[0] ?? '';
           const unit = /\$/.test(String(cell)) || /cap|cash|salary|bonus|guarantee|dead money|savings|reserve|funding|budget|cost/i.test(metric) && !/years|status|source|basis|method|rank|fit/i.test(metric) ? 'USD' : /%|percent|rate|share/i.test(metric) ? 'percent' : 'number';
           add({ subject,...(playerColumn>=0?{subject_kind:'player' as const}:{}), metric, period, unit, basis: table.title, value, source_refs: ti === 0 && item.rowRefs?.[ri] ? item.rowRefs[ri] : table.source_refs });
         }
       }
     }
+    const market=item.body.market_analysis;
+    if(market)for(const [metric,value] of Object.entries(market.coverage))if(typeof value==='number')add({subject:'Executed historical cohort',metric,period:market.query.start_year+'–'+market.query.end_year,unit:'number',basis:'Executed historical coverage',value,source_refs:item.sources.map(s=>s.ref_index)});
+    const evaluation=item.body.evaluation_query as {rules?:Array<{criterion:string;weight?:number}>}|undefined;
+    for(const rule of evaluation?.rules??[])if(rule.weight!=null){
+      add({subject:rule.criterion,metric:'User supplied weight fraction',period:'',unit:'number',basis:'Executed user evaluation',value:rule.weight,source_refs:item.sources.map(s=>s.ref_index)});
+      add({subject:rule.criterion,metric:'User supplied weight percent',period:'',unit:'percent',basis:'Executed user evaluation',value:100*rule.weight,source_refs:item.sources.map(s=>s.ref_index)});
+    }
+    const contract=item.body.contract_scenario?.args as {season?:number;moves?:Array<{player_id:string;unpaid_salary_available?:number}>}|undefined;
+    for(const move of contract?.moves??[])if(move.unpaid_salary_available!=null)add({subject:move.player_id,subject_kind:'player',metric:'Validated unpaid salary available',period:String(contract?.season??''),unit:'USD',basis:'Executed contract input',value:move.unpaid_salary_available,source_refs:item.sources.map(s=>s.ref_index)});
     for(const calculation of item.body.calculations){
-      const value=scalar(calculation.value);if(value==null)continue;
-      add({subject:calculation.label,metric:calculation.label,period:'',unit:/\$/.test(String(calculation.value))?'USD':/%/.test(String(calculation.value))?'percent':'number',basis:'Executed calculation: '+calculation.formula,value,source_refs:calculation.source_refs});
+      const value=scalar(calculation.value);if(value==null){
+        for(const quantity of numericMentions(String(calculation.value)))add({subject:calculation.label,metric:calculation.label,period:calculation.label.match(/20\d{2}/)?.[0]??'',unit:quantity.unit,basis:'Executed calculation: '+calculation.formula,value:quantity.value,source_refs:calculation.source_refs});
+        continue;
+      }
+      add({subject:calculation.label,metric:calculation.label,period:calculation.label.match(/20\d{2}/)?.[0]??'',unit:/\$/.test(String(calculation.value))?'USD':/%/.test(String(calculation.value))?'percent':'number',basis:'Executed calculation: '+calculation.formula,value,source_refs:calculation.source_refs});
     }
     const modeledYears=[...new Set(item.body.tables.flatMap(t=>{const i=t.columns.findIndex(c=>/^(year|season)$/i.test(c));return i<0?[]:t.rows.map(r=>String(r[i])).filter(y=>/^20\d{2}$/.test(y));}))];
     if(modeledYears.length)add({subject:'Executed scenario',metric:'Displayed years',period:'',unit:'number',basis:'Executed year coverage',value:modeledYears.length,source_refs:item.sources.map(s=>s.ref_index)});
@@ -104,10 +119,11 @@ export function collectEvidenceFacts(evidence: Iterable<Evidence>): EvidenceFact
 function matches(mention: ReturnType<typeof numericMentions>[number], fact: EvidenceFact): boolean {
   if (fact.value == null) return false;
   if (mention.unit !== 'number' && fact.unit !== mention.unit) return false;
+  if(fact.metric.startsWith('Flip condition:')&&mention.value===fact.value)return true;
   if(mention.comparison)return mention.comparison==='gt'?fact.value>mention.value:mention.comparison==='gte'?fact.value>=mention.value:mention.comparison==='lt'?fact.value<mention.value:fact.value<=mention.value;
   if (mention.value === fact.value) return true;
   // Rounding is at the explicitly written precision, not an arbitrary tolerance.
-  return mention.precision > 1 && Math.sign(mention.value) === Math.sign(fact.value)
+  return mention.precision !== 1 && Math.sign(mention.value) === Math.sign(fact.value)
     && Math.abs(Math.round(fact.value / mention.precision) * mention.precision - mention.value) < 1e-6;
 }
 
@@ -116,7 +132,7 @@ function metricCompatible(mention: ReturnType<typeof numericMentions>[number], f
   const metric = fact.metric.toLowerCase();
   const domains = [['receiving yards','yards'],['receptions','reception'],['touchdowns','touchdown'],['offensive snaps','offensive snap'],['snaps','snap'],['games','game']];
   for (const [plural, singular] of domains) {
-    if (new RegExp(`\\b${plural}|\\b${singular}s?\\b`).test(nearby) && !new RegExp(plural === 'touchdowns' ? 'touchdown|\\btd\\b' : singular === 'reception' ? 'reception|\\brec\\b' : singular).test(metric)) return false;
+    if (new RegExp(`\\b(?:${plural}|${singular}s?)\\b`).test(nearby) && !new RegExp(plural === 'touchdowns' ? 'touchdown|\\btd\\b' : singular === 'reception' ? 'reception|\\brec\\b' : singular).test(metric)) return false;
   }
   return true;
 }
@@ -136,9 +152,10 @@ export function validateSourcedParagraphs(paragraphs: SourcedParagraph[], facts:
       for (const mention of numericMentions(sentence)) {
         // Calendar labels are context. Any quantified fact in this sentence must
         // still match that period below; contract-horizon assertions also receive semantic review.
-        if (mention.unit==='number' && /^20\d{2},?$/.test(mention.raw) && (/(?:\bin|\bduring|\bfor)\s*$/.test(sentence.slice(0,mention.index)) || /^\s*(?:and beyond|flexibility|production|season|regular[- ]season|snapshot|cap |budget)/i.test(mention.after))) continue;
+        if (mention.unit==='number' && /^20\d{2},?$/.test(mention.raw) && (/(?:\bin|\bduring|\bfor)\s*$/.test(sentence.slice(0,mention.index)) || /^\s*(?:and beyond|flexibility|production|season|regular[- ]season|snapshot|cap |budget|[–-]|EDGE|seller|second|third|fourth|fifth|sixth|seventh)/i.test(mention.after))) continue;
         // Down names, draft-round labels and a numbered list are nomenclature;
         // their football meaning is checked with the semantic evidence review.
+        if (/^\s*Day\s*$/i.test(sentence.slice(0,mention.index))&&mention.value>=1&&mention.value<=3) continue;
         if (/^(?:[1-4](?:st|nd|rd|th)?[- ]down|[1-7](?:st|nd|rd|th)?[- ]round)/i.test(sentence.slice(mention.index).trim()) || /^\s*\d+[.)]\s/.test(sentence) && mention.index < 3) continue;
         const subjectNames=[...new Set(facts.filter(f=>f.subject_kind==='player').map(f=>f.subject.split(' · ')[0]).filter(name=>normalize(name).split(' ').length>=2))];
         const occurrences=subjectNames.flatMap(name=>{const full=normalize(name);const alias=full.split(' ').at(-1)!;const variants=subjectNames.filter(n=>normalize(n).split(' ').at(-1)===alias).length===1?[full,alias]:[full];return variants.flatMap(v=>[...sentence.toLowerCase().matchAll(new RegExp('\\b'+v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','g'))].map(m=>({subject:full,index:m.index!})));});
@@ -148,10 +165,10 @@ export function validateSourcedParagraphs(paragraphs: SourcedParagraph[], facts:
         const actors=occurrences.filter(o=>{
           if(o.index<clauseStart||o.index>mention.index)return false;
           const tail=sentence.slice(o.index,mention.index);
-          return /(?:['’]s)?\s+(?:recorded|produced|has|had|played|carries|carried|posted|took|costs|received|receives|logged|finished)\b/i.test(tail) || /['’]s\s*$/.test(tail);
+          return /^[a-z ]+\s*$/i.test(tail) || /(?:['’]s)?\s+(?:recorded|produced|has|had|played|carries|carried|posted|took|costs|received|receives|logged|finished)\b/i.test(tail) || /['’]s\s*$/.test(tail);
         });
         const nearest=actors.sort((a,b)=>b.index-a.index)[0];
-        const mentionedSubjects=nearest?[nearest.subject]:[];
+        const mentionedSubjects=mention.comparison&&/\beach\b/i.test(prefix)?[...new Set(occurrences.filter(o=>o.index<mention.index).map(o=>o.subject))]:nearest?[nearest.subject]:[];
         const matchFact = (f:EvidenceFact) => {
           if (f.statement) return normalize(f.statement).includes(normalize(sentence)) || normalize(sentence).includes(normalize(f.statement));
           // Period labels are part of the bound record even when not a value cell.

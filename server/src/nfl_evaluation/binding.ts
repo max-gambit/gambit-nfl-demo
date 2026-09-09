@@ -49,7 +49,7 @@ function boundPairs(text: string, player: string, criterion: string, names: stri
     const end = hits.slice(i + 1).find(h => h.index >= hits[i].end)?.index ?? text.length;
     const playerText = text.slice(hits[i].end, end);
     const prefix = text.slice(0, hits[i].index);
-    const headings = [...prefix.matchAll(/([A-Za-z][A-Za-z -]{0,70})\s*:/g)];
+    const headings = [...prefix.matchAll(/([A-Za-z][A-Za-z -]{0,70})\s*[:,]/g)];
     const heading = headings.at(-1);
     const sharedCriterion = heading ? word(criterion).test(heading[1]) : new RegExp(escape(criterion) + '\\s*$', 'i').test(prefix.trim());
     const pairs = [...playerText.matchAll(pairPattern)];

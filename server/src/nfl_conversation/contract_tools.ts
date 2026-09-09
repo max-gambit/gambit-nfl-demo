@@ -16,11 +16,11 @@ export function explicitPlayerProtections(currentQuestion:string, previous:strin
   const known=names.map(name=>({name,aliases:[name,name.split(' ').at(-1)!]}));
   const resolve=(name:string)=>known.find(d=>d.aliases.some(a=>normalize(a)===normalize(name)))?.name??name;
   const protectedNames=new Set(previous.map(resolve)); const removed=new Set<string>();
-  const clauses=currentQuestion.split(/[.!?\n]/).map(clause=>clause.trim());
+  const clauses=currentQuestion.split(/[.!?;\n]/).map(clause=>clause.trim());
   for(const clause of clauses){
     // A protection command must name a player list, not merely mention a
     // player somewhere after "keep" (for example, keep Slayton's conflict unresolved).
-    const command=clause.match(/(?:^|\b(?:and|but|actually)\s+)(?:please\s+)?(protect(?:\s+only)?|keep|do not (?:trade|release|move)|don.t (?:trade|release|move))\s+(.+)$/i);
+    const command=clause.match(/(?:^|\b(?:and|but|actually)\s+)(?:please\s+)?(protect(?:\s+only)?|(?:retain|preserve) (?:the )?protection (?:for|of)|keep|do not (?:trade|release|move)|don.t (?:trade|release|move))\s+(.+)$/i);
     if(command){
       let remaining=command[2];const selected:string[]=[];
       for(const d of known){

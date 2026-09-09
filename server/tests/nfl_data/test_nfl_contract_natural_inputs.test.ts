@@ -146,3 +146,18 @@ test('unpaid salary wording binds the amount to the supplied season', () => {
   const wrongYear=question.replace('unpaid 2026 salary','unpaid 2027 salary');
   assert.equal(validateNflScenarioInputProvenance(args,{current_question:wrongYear}).ok,false);
 });
+
+
+test('a year-qualified cap budget binds only to the calculation season', () => {
+  assert.deepEqual(extractBudget('Use an $8 million 2026 cap budget and a $2 million reserve.','cap'),[8e6]);
+  assert.deepEqual(extractBudget('Use an $8 million 2027 cap budget.','cap'),[]);
+  assert.deepEqual(extractBudget('Use an $8 million 2027 cap budget.','cap',undefined,2027),[8e6]);
+});
+
+
+test('semicolon commands and retained protection wording resolve the same named constraint',async()=>{
+  const {explicitPlayerProtections}=await import('../../src/nfl_conversation/contract_tools.js');
+  assert.deepEqual(explicitPlayerProtections('Use the saved terms; protect Brian Burns.').names,['Brian Burns']);
+  assert.deepEqual(explicitPlayerProtections('Retain protection for Brian Burns.').names,['Brian Burns']);
+  assert.deepEqual(explicitPlayerProtections('Keep Slayton’s source conflict unresolved.').names,[]);
+});

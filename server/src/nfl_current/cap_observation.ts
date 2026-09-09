@@ -35,6 +35,7 @@ export function capObservationAnswer(data: CapObservation): PreparedNflCurrentAn
         ['League table', `${money(league.active_cap_spending)} active cap spending`, money(league.dead_money), money(league.cap_space)],
       ], source_refs: [1, 2] }],
       calculations: [
+        {label:'Public cap observation difference',formula:`abs(${money(team.cap_space)} − ${money(league.cap_space)})`,value:money(difference),source_refs:[1,2]},
         { label: 'Team page arithmetic', formula: `${money(calculator.applied_cap)} applied cap − ${money(team.total_liabilities)} total liabilities`, value: money(team.cap_space), source_refs: [1, 3] },
         { label: 'League table arithmetic', formula: `${money(calculator.applied_cap)} applied cap − ${money(league.active_cap_spending)} active spending − ${money(league.dead_money)} dead money`, value: money(league.cap_space), source_refs: [2, 3] },
       ],

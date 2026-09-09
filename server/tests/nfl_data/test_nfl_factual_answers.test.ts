@@ -54,7 +54,7 @@ test('public cap observations preserve conflicting totals and reject arithmetic 
   assert.ok(answer);
   assert.ok(answer.body.answer.includes(new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(Math.abs(data.team.cap_space - data.league.cap_space))));
   assert.equal(answer.sources.length, 3);
-  assert.equal(answer.body.calculations.length, 2);
+  assert.equal(answer.body.calculations.length, 3);
   assert.match(answer.body.caveats.join(' '), /not a live feed/);
   const altered = structuredClone(data); altered.league.cap_space += 1;
   assert.equal(capObservationAnswer(altered), null);

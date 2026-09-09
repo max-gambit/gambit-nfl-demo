@@ -296,3 +296,15 @@ test('cap equality fails strict under/below and passes inclusive at-most/ceiling
     }
   }
 });
+
+
+test('comma-separated shared criteria bind each supplied player grade without swapping fields', async () => {
+  const text='These are illustrative user-supplied evaluations: receiving, Warren 8/10 and Loveland 9/10; movement blocking, Warren 9/10 and Loveland 6/10. Weight receiving 70% and movement blocking 30%.';
+  const query=weighted();query.role='receiving-first tight end';
+  query.judgments=[['Warren','receiving',8],['Loveland','receiving',9],['Warren','movement blocking',9],['Loveland','movement blocking',6]].map(([player_name,criterion,value])=>({player_name:String(player_name),criterion:String(criterion),value:Number(value),out_of:10,quote:text}));
+  query.rules=[{criterion:'receiving',weight:.7,quote:text},{criterion:'movement blocking',weight:.3,quote:text}];
+  const result=await buildNflOptionEvaluation(query,context(text));
+  assert.deepEqual(result.evaluation.preferred_player_names,['Tyler Warren']);
+  query.judgments[0].value=9;
+  await assert.rejects(()=>buildNflOptionEvaluation(query,context(text)),/different value|same literal/);
+});

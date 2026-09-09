@@ -1,3 +1,4 @@
+import { jsonSchemaOutputFormat } from '@anthropic-ai/sdk/helpers/json-schema';
 import { cleanNflAnalystProse } from '@shared/nflReceiverPresentation';
 import { searchNflAuthority } from '../nfl_authority/index.js';
 import { describeNflIllustrativeTerms, getNflContractDossier, getNflContractDossierCoverage, NFL_CONTRACT_SCENARIO_TOOL_SCHEMA, nflContractComparisonTool, type NflContractScenarioArgs, type NflContractScenarioResult } from '../nfl_contracts/index.js';
@@ -13,7 +14,7 @@ import { categoricalGroundingIssues, reviewNflAnalystSemantics, type AnalystAuth
 import { evaluationCostsFromContracts } from '../nfl_conversation/evaluation_tools.js';
 import { buildNflOptionEvaluation, nflEvaluationTool, type NflEvaluationState, type NflOptionEvaluationArgs } from '../nfl_evaluation/index.js';
 import type Anthropic from '@anthropic-ai/sdk';
-import type { DataAnalysisBriefBody, DataAnalysisTable } from '@shared/types';
+import type { DataAnalysisBriefBody, DataAnalysisTable, NflTransactionTradePackage } from '@shared/types';
 import type { NflFactualQuery, NflRosterNumericFilter } from '@shared/nflFacts';
 import { BRIEF_MODEL, createClaudeMessage } from '../claude/client.js';
 import { loadCurrentNflDataWithMode, type NflDemoSeed } from '../nfl_data/seed.js';
@@ -92,10 +93,11 @@ REASON
 
 
 WRITE
-- If no dependent calculation is needed, include any scenario update in finish_analysis.scenario instead of a separate set_scenario round.
+- Use set_scenario only for an explicit assumption or restored scenario not already represented by executed tools. Batch it with independent reads when possible.
+- Omit empty optional fields and qualifications already present in the inherited evidence.
 - Put the reasoning in answer_paragraphs. Avoid restating those paragraphs as key_findings; use an empty findings list when redundant. Select compact table IDs without repeating their cells.
 - Answer naturally in connected paragraphs. A simple question usually needs 80–180 words; a substantial comparison may need 250–450. These are guidance, not quotas. A short refinement should lead with what changed and its consequence. Do not impose a template or repeat the answer in findings.
-- Explain meaningful numbers in prose with their subject, metric, time period and accounting basis. Every factual quantity must come from a labelled tool fact or executed calculation. Do not perform new arithmetic. Use source_refs on each answer_paragraph; fact_ids are optional when those sources unambiguously identify the facts. The server checks the exact bindings, including rounding. For a rule or compound calculated statement, you can select its exact text from answer_statements and explain its implication.
+- Explain meaningful numbers in prose with their subject, metric, time period and accounting basis. Every factual quantity must come from a labelled tool fact or executed calculation. Do not perform new arithmetic. Use source_refs on each answer_paragraph; Prefer source_refs alone; include fact_ids only to resolve an ambiguous binding. The server checks the exact bindings, including rounding. For a rule or compound calculated statement, you can select its exact text from answer_statements and explain its implication.
 - Lead with the decision, not methodology, data-policy language or a statistics roll call. Keep material conditions beside the affected claim and put routine methodology in supporting evidence. Do not substitute canned rule/calculation text for answering the question.
 - Use finish_analysis with answer_paragraphs [{text,source_refs,fact_ids?}], relevant labelled tables, and up to three useful executable follow-ups. answer may be omitted when paragraphs are supplied. evidence_id preserves the main executed artifact; continuation_query_id preserves the intended search or scenario. Table rows and values come from tools. Preserve attribution. Do not include raw tool markup.
 - Before finishing, check that the opening, findings and tables agree and that the proposed next action is actually supported. If validation identifies a material issue, repair that issue using the existing evidence, preserving the supported explanation. Communicate through tool calls only.`;
@@ -122,7 +124,7 @@ export const nflAnalystTools: Anthropic.Tool[] = [
   },
   nflReceiverTool,
   { ...nflEvaluationTool, input_schema:{...nflEvaluationTool.input_schema, required:[], properties:{...(nflEvaluationTool.input_schema.properties as Record<string,unknown>),inherit_previous:{type:'boolean',description:'Keep the previous validated role and domain for a grade, weight or threshold change; omit unchanged fields. A changed role clears old judgments.'}}} } as Anthropic.Tool,
-  nflScenarioTool as Anthropic.Tool,
+  {...nflScenarioTool,description:'Persist explicit user assumptions or restore an earlier scenario. Calculations already record their validated budget, protections and terms. Batch independent reads with this update when no read depends on it.'} as Anthropic.Tool,
   {...readSavedNflContractTool,description:readSavedNflContractTool.description+'\n'+contractToolGuidance.saved} as Anthropic.Tool,
   {name:'read_contract_dossiers',description:'Inspect all years, active versus void, guarantees and source conflicts in the eight deep public contract dossiers. Includes originals from other teams; never implies incoming cost.',input_schema:{type:'object',properties:{player_names:{type:'array',items:{type:'string'}}},additionalProperties:false}},
   {name:'calculate_contract_scenario',description:'Read-only simulation, never a real transaction. Call even for a protected-player conflict to show the explicit blocked result. Calculate hold, trade, release, salary-conversion restructure or an acquisition with complete literal user-supplied illustrative terms. Code owns all figures and future-year obligations. This replaces broad estimated lever columns for numerical scenarios. Every new amount must be supplied by the user; incomplete incoming terms remain blocked.',input_schema:NFL_CONTRACT_SCENARIO_TOOL_SCHEMA as unknown as Anthropic.Tool.InputSchema},
@@ -138,7 +140,7 @@ export const nflAnalystTools: Anthropic.Tool[] = [
   }, required: ['start_year', 'end_year', 'position_groups'], additionalProperties: false } },
   { name: 'finish_analysis', description: 'Submit evidence-backed prose plus exact tool-owned tables. Copy row_ids (r0, r1, etc.) and column_names from the selected table. These IDs are distinct from numeric source refs. Empty row_ids selects all returned rows; keep visible tables compact. evidence_id preserves any underlying market/scenario artifact. continuation_query_id identifies the player search or receiver comparison whose selection follows into the next turn.', input_schema: { type: 'object', properties: {
     scenario: nflScenarioTool.input_schema,
-    answer_statements: {type:'array', maxItems:4, items:{type:'string'}, description:'Exact complete tool-authored statements. IDs are listed on evidence. Select only statements that answer the current question; supporting records stay in comparison details when your interpretation leads.'},
+    answer_statements: {type:'array', maxItems:4, items:{type:'string'}, description:'Optional exact statement IDs, such as lookup_1:answer. Never copy the statement text here. Omit when the prose already explains the result.'},
     answer: { type: 'string' },
     answer_paragraphs: {type:'array',maxItems:8,items:{type:'object',properties:{text:{type:'string'},source_refs:integerRefs,fact_ids:strings('Optional exact numerical fact IDs from the evidence.')},required:['text','source_refs'],additionalProperties:false}},
     answer_source_refs: integerRefs,
@@ -288,9 +290,15 @@ export async function analystTradeEvidence(input: unknown, loadSnapshot = loadCu
   }, { loadSnapshot });
   if (start === end || args.package_question) {
     const selected = historicalPackageAnswer(args.package_question ? text(args.package_question, 'package question') : 'Show the complete trade packages.', market);
-    return start === end
-      ? historicalPackageAnswer('Only ' + start + '.', market, { ...selected.body.historical_selection!, years: [start] })
-      : selected;
+    if(start===end)return historicalPackageAnswer('Only ' + start + '.', market, { ...selected.body.historical_selection!, years: [start] });
+    // A named package enriches the requested market window; it does not replace its trend evidence.
+    const broad=factualMarketAnswer(market);
+    const broadSources=[...deterministicMarketSourceRows(market,1),...deterministicMarketEventSourceRows(market,market.source_refs.length+1)];
+    const offset=broadSources.length;
+    const packageBody=remapEvidenceRefs(selected.body,refs=>refs.map(ref=>ref+offset));
+    const packageSources=selected.sources.map(source=>({...source,ref_index:source.ref_index+offset}));
+    const assetRows=selected.sources.flatMap(source=>((source.data?.trade_package as NflTransactionTradePackage|undefined)?.assets??[]).map(asset=>[source.title?.split(' · ')[0]??'Trade',asset.pick_season??asset.event_year,asset.received_team_id,asset.asset_type==='player'?asset.pfr_name??'Recorded player':'Draft pick',asset.pick_round??'—',asset.pick_number??'—',asset.conditional===true?'Conditional':asset.conditional===false?'Unconditional':'Not recorded']));
+    return {body:{...packageBody,answer:broad.answer+'\n\nNamed package: '+packageBody.answer,key_findings:[...broad.key_findings,...packageBody.key_findings],tables:[...broad.tables,{title:'Complete recorded trade assets',columns:['Player','Year','Received by','Asset','Round','Overall pick','Condition'],rows:assetRows,source_refs:packageSources.map(source=>source.ref_index)}]},sources:[...broadSources,...packageSources]};
   }
   return { body: factualMarketAnswer(market), sources: [...deterministicMarketSourceRows(market, 1), ...deterministicMarketEventSourceRows(market, market.source_refs.length + 1)] };
 }
@@ -388,7 +396,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
     conversationState=next;
   };
   const forModel = (item: Evidence) => ({
-    lookup_id: item.id, population:item.body.population, fact_fields:['id','subject','metric','period','unit','value','source_refs'],facts:collectEvidenceFacts([item]).filter(f=>f.value!=null).map(f=>[f.id,f.subject,f.metric,f.period,f.unit,f.value,f.source_refs]), answer: item.body.answer, selection: item.body.factual_query,receiver_selection:item.body.receiver_query,example_selection:item.body.example_query,evaluation_selection:item.body.evaluation_query,
+    lookup_id: item.id, population:item.body.population, historical_scope:item.body.market_analysis?{query:item.body.market_analysis.query,coverage:item.body.market_analysis.coverage,yearly_series:item.body.market_analysis.yearly_series,package_selection:item.body.historical_selection}:undefined, fact_fields:['id','subject','metric','period','unit','value','source_refs'],facts:collectEvidenceFacts([item]).filter(f=>f.value!=null).map(f=>[f.id,f.subject,f.metric,f.period,f.unit,f.value,f.source_refs]), answer: item.body.answer, selection: item.body.factual_query,receiver_selection:item.body.receiver_query,example_selection:item.body.example_query,evaluation_selection:item.body.evaluation_query,
     answer_statements: [{id:item.id+':answer',text:item.body.answer}, ...item.body.key_findings.map((f,i)=>({id:item.id+':finding:'+i,label:f.label,text:currentTermsText(f.body)}))], findings: item.body.key_findings.map(f=>({...f,body:currentTermsText(f.body)})), supporting_details: item.body.supporting_details, calculations: item.body.calculations, caveats: item.body.caveats.map(currentTermsText).filter(Boolean),
     saved_contract_lookup: item.body.saved_contract_lookup?{...item.body.saved_contract_lookup,scenario_args:contractArgsForModel(item.body.saved_contract_lookup.scenario_args as NflContractScenarioArgs|undefined)}:undefined, saved_contract_reference: item.body.saved_contract_reference,
     tables: item.body.tables.map((table, index) => ({ table_id: item.id + ':' + index, title: table.title, columns: table.columns, rows: table.rows.map((values, rowIndex) => ({ row_id: 'r' + rowIndex, fields: Object.fromEntries(table.columns.map((column, index) => [column, values[index]])), source_refs: index === 0 && item.rowRefs ? item.rowRefs[rowIndex] : table.source_refs })) })),
@@ -411,7 +419,12 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
   }) }];
   const needsCalculation=!!priorContractScenario||/fund(?:ing)?|financ|calculat|convert|conversion|restructur|salary|guarantee|hypothetical|illustrative|saved (?:deal|contract)|cap (?:impact|relief|saving)|model.{0,30}(?:trade|release)/i.test(question);
   const needsEvaluation=!!lastEvaluation||/evaluat|grades?|weights?|threshold|scores?/i.test(question);
-  const exposedTools=nflAnalystTools.filter(tool=>!['calculate_contract_scenario','nfl_contract_comparison','find_minimum_cap_funding'].includes(tool.name)||needsCalculation).filter(tool=>tool.name!=='evaluate_nfl_options'||needsEvaluation);
+  const exposedTools=nflAnalystTools.filter(tool=>!['calculate_contract_scenario','nfl_contract_comparison','find_minimum_cap_funding'].includes(tool.name)||needsCalculation).filter(tool=>tool.name!=='evaluate_nfl_options'||needsEvaluation).map(tool=>{
+    if(tool.name!=='finish_analysis')return tool;
+    // Keep the submission grammar small. Older payload fields remain accepted by the handler.
+    const properties=Object.fromEntries(Object.entries(tool.input_schema.properties??{}).filter(([key])=>['answer_paragraphs','tables','followups','evidence_id','continuation_query_id'].includes(key)));
+    return {...tool,strict:false,input_examples:[{answer_paragraphs:[{text:'The supported recommendation and its evidence.',source_refs:[1]}],tables:[],followups:[],evidence_id:'lookup_1',continuation_query_id:'lookup_1'}],input_schema:jsonSchemaOutputFormat({type:'object',properties,required:['answer_paragraphs','tables','followups','evidence_id','continuation_query_id'],additionalProperties:false} as any).schema as Anthropic.Tool.InputSchema};
+  });
   const call = options.callModel ?? createClaudeMessage;
   // Code validates exact cells and categorical facts. A separate bounded
   // evidence review checks the premises and completeness of AI interpretation.
@@ -467,7 +480,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
     const mustFinish=finalFailures>0||Date.now()-started>deadlineMs-30_000;
     if(mustFinish&&!finalFailures)messages.push({role:'user',content:'Finish from the available evidence now. Identify any material unfinished input; do not start another research round.'});
     try { response = await call({ model: BRIEF_MODEL, max_tokens: 4500, output_config:{effort:'low'}, system: NFL_ANALYST_SYSTEM, tools: exposedTools,
-      tool_choice: mustFinish?{type:'tool',name:'finish_analysis'}:{type:'auto'}, messages,
+      tool_choice: mustFinish?{type:'tool',name:'finish_analysis',disable_parallel_tool_use:true}:{type:'auto'}, messages,
     }, { timeout: Math.max(1, deadlineMs - (Date.now() - started)), maxRetries: 0 });
     } catch (error) { return partial(error instanceof Error && /timeout|timed out|abort/i.test(error.message) ? 'Response deadline reached.' : 'The analysis provider is unavailable.'); }
     console.info('[nfl analyst] round',round+1,'elapsed_ms',Date.now()-started,'output_tokens',response.usage.output_tokens,'stop',response.stop_reason,'tools',response.content.filter(b=>b.type==='tool_use').map(b=>(b as Anthropic.ToolUseBlock).name).join(','));
@@ -486,6 +499,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
     // Reads use an immutable turn context. State-changing/dependent tools remain ordered below.
     for(const tool of calls){const run=independentRead(tool);if(!run||finalFailures)continue;const key=tool.name+JSON.stringify(canonical(tool.input));readKeys.set(tool.id,key);if(!readCache.has(key))readCache.set(key,Promise.resolve().then(run).then(answer=>({answer}),error=>({error})));}
 
+    let finishFailedThisRound=false;
     for (const tool of calls) {
       toolNames.push(tool.name);
       try {
@@ -527,9 +541,10 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
           if (queryId && !queryEvidence) throw new Error('continuation_query_id must identify retrieved evidence.');
           if (primary?.body.contract_scenario || primary?.body.evaluation_query) queryEvidence = primary;
           const query = queryEvidence?.body.factual_query;
+          const sourceIssues:string[]=[];
           const refs = (value: unknown): number[] => {
-            if (!Array.isArray(value) || value.some(ref => !Number.isInteger(ref) || ref < 1 || ref > sources.length)) throw new Error('Use only retrieved source refs.');
-            return [...new Set(value)];
+            if (!Array.isArray(value) || value.some(ref => !Number.isInteger(ref) || ref < 1 || ref > sources.length))sourceIssues.push('Use only retrieved source refs: integers from 1 through '+sources.length+'.');
+            return Array.isArray(value)?[...new Set(value.filter(Number.isInteger))]:[];
           };
           args.key_findings??=[];args.tables??=[];
           if (!Array.isArray(args.key_findings) || !Array.isArray(args.tables)) throw new Error('Invalid findings or table selection.');
@@ -565,7 +580,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
             : prose(args.answer??'', 'answer').split(/\n\s*\n/).filter(Boolean).map(value=>({text:value,source_refs:refs(args.answer_source_refs??[])}));
           if(rawParagraphs.length>8)throw new Error('Use at most eight connected answer paragraphs.');
           let paragraphs=rawParagraphs.length?rawParagraphs:statements.map(s=>({text:s.text,source_refs:s.refs}));
-          const quantitativeIssues:string[]=[];
+          const quantitativeIssues:string[]=[...sourceIssues];
           try{paragraphs=validateSourcedParagraphs(paragraphs,catalog,new Set(sources.map(s=>s.ref_index)));}catch(error){quantitativeIssues.push(error instanceof Error?error.message:'Invalid paragraph claims.');}
           try{validateSourcedParagraphs(findings.map(f=>({text:f.body,source_refs:f.source_refs})),catalog,new Set(sources.map(s=>s.ref_index)));}catch(error){quantitativeIssues.push(error instanceof Error?error.message:'Invalid finding claims.');}
           const interpretation=paragraphs.map(p=>p.text).join('\n\n');
@@ -584,7 +599,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
           if(contractEvidence?.body.cap_strategy)for(const table of contractEvidence.body.tables.slice(0,2)){if(!tables.some(t=>t.title===table.title))tables.push(table);}
           const caveats = [...new Set([...(primary?.body.caveats??[]),...stringList(args.caveats,'caveats')])];
           if (loaded.source_mode !== 'supabase_current_views') caveats.push('Player records are from the saved public snapshot dated ' + seed.as_of_date + '; the database was unavailable.');
-          if(primary)adoptExecutedState(primary);
+          if(contractEvidence??primary)adoptExecutedState((contractEvidence??primary)!);
           const draft: FactualAnswer = { body: {
             kind: 'data_analysis', language_policy: 'grounded_ai_v1', ...(primary?.body.population?{population:primary.body.population}:{}), answer, answer_paragraphs:paragraphs, answer_source_refs:[...new Set(paragraphs.flatMap(p=>p.source_refs))], ...(supportingDetails.length ? { supporting_details: supportingDetails } : {}), key_findings: findings, tables,
             calculations: primary?.body.calculations ?? [], caveats,
@@ -613,7 +628,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
           try {
             issues = options.reviewDraft ? await options.reviewDraft(draft, [...evidence.values()].map(forModel)) : await reviewNflAnalystSemantics({
               question, user_context: history.slice(-8).map(turn => turn.question), authored, selected_answer: answer, selected_tables: tables, evidence: [...evidence.values()].map(forModel),
-              tool_coverage: { examples: nflExampleCoverage, tools: nflAnalystTools.filter(t => t.name !== 'finish_analysis').map(t => ({name: t.name, description: t.description})) },
+              tool_coverage: { examples: nflExampleCoverage, tools: nflAnalystTools.filter(t => t.name !== 'finish_analysis').map(t => ({name: t.name, description: t.description?.split('. ').slice(0,2).join('. ')})) },
             }, { callModel:options.callModel, timeoutMs: Math.min(15_000, Math.max(1, deadlineMs - (Date.now() - started))) });
           } catch(error) { stageMs.review+=Date.now()-reviewStart; options.onTrace?.({stage:'review_error',error:String(error)}); return partial('The factual interpretation review could not finish.'); }
           stageMs.review+=Date.now()-reviewStart;
@@ -711,7 +726,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
       } catch (error) {
         console.info('[nfl analyst] validation',tool.name,error instanceof Error?error.message:'lookup failed');
         options.onTrace?.({stage:'validation',tool:tool.name,error:error instanceof Error?error.message:'Lookup unavailable'});
-        if (tool.name === 'finish_analysis' && ++finalFailures > 1) return partial('The written answer failed evidence validation.');
+        if (tool.name === 'finish_analysis'&&!finishFailedThisRound){finishFailedThisRound=true;if(++finalFailures>1)return partial('The written answer failed evidence validation.');}
         results.push({ type: 'tool_result', tool_use_id: tool.id, is_error: true, content: error instanceof Error ? error.message : 'Lookup unavailable.' });
       }
     }

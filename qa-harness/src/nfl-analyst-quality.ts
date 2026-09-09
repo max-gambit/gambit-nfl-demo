@@ -38,7 +38,7 @@ if(['writing','e2e','judge'].includes(phase)){
 async function pool<T>(jobs:(()=>Promise<T>)[]){let index=0;const results:T[]=[];await Promise.all([0,1].map(async()=>{while(index<jobs.length){const at=index++;results[at]=await jobs[at]();}}));return results;}
 async function runTurn(id:string,question:string,pipeline:string,history:unknown[]=[]){
  const events:unknown[]=[];let evidence:unknown[]=[];const started=Date.now();
- const callModel=async(params:any,options:any)=>{events.push({request:params});const result=await client.createClaudeMessage(params,options);events.push({response:result});return result;};
+ const callModel=async(params:any,options:any)=>{events.push({request:params});try{const result=await client.createClaudeMessage(params,options);events.push({response:result});return result;}catch(error){events.push({provider_error:String(error)});throw error;}};
  try{const result=await api.buildNflAiAnswer(question,{pipeline,history,callModel,sessionId:'00000000-0000-4000-8000-000000000003',readSavedContract:async(request:any,context:any)=>savedContracts.selectSavedNflContract(savedRows,request,context),loadTradeSnapshot:async()=>(await trades.loadReviewedNflTransactionSnapshot()).snapshot,onEvidence:(e:unknown[])=>{evidence=e;},onTrace:(e:unknown)=>events.push(e)});const record={id,question,pipeline,history,runtime_hash:hash(runtimeHashes),result,evidence,events,elapsed_ms:Date.now()-started,evidence_hash:hash(evidence)};await save(id+'.json',record);console.log(id,result.body.ai_analysis?.outcome,record.elapsed_ms);return record;}
  catch(error){const record={id,question,pipeline,history,runtime_hash:hash(runtimeHashes),error:String(error),evidence,events,elapsed_ms:Date.now()-started};await save(id+'.json',record);console.log(id,'ERROR',String(error));return record;}
 }
@@ -68,7 +68,11 @@ if(phase==='judge'){
   if(await exists(id+'.json'))return;
   const ordered=records.slice().sort((a,b)=>hash(id+a.id).localeCompare(hash(id+b.id)));
   const labels=Object.fromEntries(ordered.map((r,i)=>[String.fromCharCode(65+i),r.id]));
-  const answers=ordered.map((r,i)=>({label:String.fromCharCode(65+i),answer:r.error?'INCOMPLETE: '+r.error:r.answer??JSON.stringify(r.result?.body)}));
+  const answers=ordered.map((r,i)=>{
+    const body=r.result?.body;
+    const rendered=body?JSON.stringify({answer:body.answer_paragraphs?.length?body.answer_paragraphs.map((p:any)=>p.text+' ['+p.source_refs.join(', ')+']').join('\n\n'):body.answer,findings:body.key_findings,tables:body.tables,calculations:body.calculations,supporting_details:body.supporting_details,followups:body.followups,caveats:body.caveats,scenario_state:body.conversation_state,historical_selection:body.historical_selection}):'INCOMPLETE';
+    return {label:String.fromCharCode(65+i),answer:r.error?'INCOMPLETE: '+r.error:r.answer??rendered};
+  });
   try{const result=await judgeNflAnswerQuality({apiKey:process.env.OPENAI_API_KEY,anthropicCall:client.createClaudeMessage,anthropicModel:client.BRIEF_MODEL,question,context,evidence,answers});await save(id+'.json',{id,labels,...result});console.log(id,'done');}
   catch(error){await save(id+'.json',{id,labels,error:String(error)});console.log(id,'ERROR',String(error));}
  }
@@ -88,7 +92,10 @@ if(phase==='report'){
  const candidate=scores.filter(s=>s.id.includes('-candidate-'));const materialErrors=candidate.flatMap(s=>s.material_errors.map((error:string)=>({id:s.id,error})));
  const runs=await Promise.all(files.filter(f=>f.startsWith('e2e-')&&f.includes('-candidate-')&&f.endsWith('.json')).map(read));
  const latencies=runs.map(r=>r.elapsed_ms).sort((a,b)=>a-b);
- const summary={sample:'Bounded historical prompt replays and actual tool pipelines; not universal reliability',judges:judgments.length,judge_errors:judgments.filter(j=>j.error),writing_scores:byVariant,candidate_scores:averages(candidate),pair_count:pairs.length,pairwise_preference:prefScore(pairs),writing_preference:prefScore(pairs.filter(p=>p.judge.startsWith('judge-writing'))),e2e_preference:prefScore(pairs.filter(p=>p.judge.startsWith('judge-e2e'))),complete_fraction:candidate.filter(s=>s.complete_or_useful_input).length/Math.max(1,candidate.length),material_errors:materialErrors,e2e_candidate_median_ms:latencies[Math.floor(latencies.length/2)]??null,e2e_candidate_max_ms:Math.max(0,...latencies),direct_claim_review:await exists('direct-claim-review.json')?await read('direct-claim-review.json'):null,
+ const captures=await Promise.all(files.filter(f=>f.startsWith('capture-')&&f.endsWith('.json')).map(read));
+ const ordinary=[...captures.filter(r=>NFL_QUALITY_CASES.some(c=>!c.complex&&r.id==='capture-'+c.id)),...runs.filter(r=>/^e2e-scope-candidate-[12]-[23]$|^e2e-saved-candidate-[12]-2$/.test(r.id))].map(r=>r.elapsed_ms).sort((a,b)=>a-b);
+ const median=(values:number[])=>values.length?(values[Math.floor((values.length-1)/2)]+values[Math.floor(values.length/2)])/2:null;
+ const summary={sample:'Bounded historical prompt replays and actual tool pipelines; not universal reliability',judges:judgments.length,judge_errors:judgments.filter(j=>j.error),writing_scores:byVariant,candidate_scores:averages(candidate),pair_count:pairs.length,pairwise_preference:prefScore(pairs),writing_preference:prefScore(pairs.filter(p=>p.judge.startsWith('judge-writing'))),e2e_preference:prefScore(pairs.filter(p=>p.judge.startsWith('judge-e2e'))),complete_fraction:candidate.filter(s=>s.complete_or_useful_input).length/Math.max(1,candidate.length),material_errors:materialErrors,ordinary_sample_count:ordinary.length,ordinary_median_ms:median(ordinary),e2e_candidate_median_ms:median(latencies),e2e_candidate_max_ms:Math.max(0,...latencies),direct_claim_review:await exists('direct-claim-review.json')?await read('direct-claim-review.json'):null,
  expected_counts:{writing:96,e2e:48,judgments:48},
  actual_counts:{writing:files.filter(f=>f.startsWith('writing-')&&f.endsWith('.json')).length,e2e:files.filter(f=>f.startsWith('e2e-')&&f.endsWith('.json')).length,judgments:judgments.filter(j=>!j.error).length},
  judge_models:[...new Set(judgments.filter(j=>!j.error).map(j=>j.model))],
@@ -101,8 +108,9 @@ if(phase==='report'){
  completion:summary.complete_fraction>=0.9&&summary.e2e_complete_fraction>=0.9,
  no_material_errors:materialErrors.length===0,
  direct_review:summary.direct_claim_review?.passed===true,
+ ordinary_latency:summary.ordinary_median_ms!=null&&summary.ordinary_median_ms<=30000,
  complex_deadline:summary.e2e_candidate_max_ms<=61000};
- await save('gates.json',{...gates,accepted:Object.values(gates).every(Boolean),ordinary_latency_gate:'Assess ordinary first-turn records separately; E2E mixes complex calculations and refinements.'});
+ await save('gates.json',{...gates,accepted:Object.values(gates).every(Boolean)});
  await save('summary.json',summary);console.log(JSON.stringify(summary,null,2));
  const report=['# Giants analyst restoration comparison','',JSON.stringify(summary,null,2),'','## Anonymous judgments and source records',...judgments.map(j=>`- [${j.id}](${j.id}.json)`)].join('\n');await fs.writeFile(path.join(out,'comparison.md'),report);
 }
