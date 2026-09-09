@@ -346,7 +346,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
     else next.active.protected_player_names=explicitPlayerProtections(question,[],next.active.protected_player_names).names;
     conversationState=next;
   };
-  const deadlineMs = options.deadlineMs ?? 60_000;
+  const deadlineMs = options.deadlineMs ?? 120_000;
   const evidence = new Map<string, Evidence>();
   const sources: FactualAnswer['sources'] = [];
   const toolNames: string[] = [];
@@ -629,7 +629,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
             issues = options.reviewDraft ? await options.reviewDraft(draft, [...evidence.values()].map(forModel)) : await reviewNflAnalystSemantics({
               question, user_context: history.slice(-8).map(turn => turn.question), authored, selected_answer: answer, selected_tables: tables, evidence: [...evidence.values()].map(forModel),
               tool_coverage: { examples: nflExampleCoverage, tools: nflAnalystTools.filter(t => t.name !== 'finish_analysis').map(t => ({name: t.name, description: t.description?.split('. ').slice(0,2).join('. ')})) },
-            }, { callModel:options.callModel, timeoutMs: Math.min(15_000, Math.max(1, deadlineMs - (Date.now() - started))) });
+            }, { callModel:options.callModel, timeoutMs: Math.min(30_000, Math.max(1, deadlineMs - (Date.now() - started))) });
           } catch(error) { stageMs.review+=Date.now()-reviewStart; options.onTrace?.({stage:'review_error',error:String(error)}); return partial('The factual interpretation review could not finish.'); }
           stageMs.review+=Date.now()-reviewStart;
           options.onTrace?.({stage:'review',issues,elapsed_ms:Date.now()-reviewStart});

@@ -39,7 +39,7 @@ async function pool<T>(jobs:(()=>Promise<T>)[]){let index=0;const results:T[]=[]
 async function runTurn(id:string,question:string,pipeline:string,history:unknown[]=[]){
  const events:unknown[]=[];let evidence:unknown[]=[];const started=Date.now();
  const callModel=async(params:any,options:any)=>{events.push({request:params});try{const result=await client.createClaudeMessage(params,options);events.push({response:result});return result;}catch(error){events.push({provider_error:String(error)});throw error;}};
- try{const result=await api.buildNflAiAnswer(question,{pipeline,history,callModel,sessionId:'00000000-0000-4000-8000-000000000003',readSavedContract:async(request:any,context:any)=>savedContracts.selectSavedNflContract(savedRows,request,context),loadTradeSnapshot:async()=>(await trades.loadReviewedNflTransactionSnapshot()).snapshot,onEvidence:(e:unknown[])=>{evidence=e;},onTrace:(e:unknown)=>events.push(e)});const record={id,question,pipeline,history,runtime_hash:hash(runtimeHashes),result,evidence,events,elapsed_ms:Date.now()-started,evidence_hash:hash(evidence)};await save(id+'.json',record);console.log(id,result.body.ai_analysis?.outcome,record.elapsed_ms);return record;}
+ try{const result=await api.buildNflAiAnswer(question,{pipeline,deadlineMs:120000,history,callModel,sessionId:'00000000-0000-4000-8000-000000000003',readSavedContract:async(request:any,context:any)=>savedContracts.selectSavedNflContract(savedRows,request,context),loadTradeSnapshot:async()=>(await trades.loadReviewedNflTransactionSnapshot()).snapshot,onEvidence:(e:unknown[])=>{evidence=e;},onTrace:(e:unknown)=>events.push(e)});const record={id,question,pipeline,history,runtime_hash:hash(runtimeHashes),result,evidence,events,elapsed_ms:Date.now()-started,evidence_hash:hash(evidence)};await save(id+'.json',record);console.log(id,result.body.ai_analysis?.outcome,record.elapsed_ms);return record;}
  catch(error){const record={id,question,pipeline,history,runtime_hash:hash(runtimeHashes),error:String(error),evidence,events,elapsed_ms:Date.now()-started};await save(id+'.json',record);console.log(id,'ERROR',String(error));return record;}
 }
 if(phase==='probe'){const selected=process.argv.includes('--case')?arg('--case','receiver_flexibility').split(','):['receiver_flexibility'];await pool(NFL_QUALITY_CASES.filter(c=>selected.includes(c.id)).map(c=>()=>runTurn('probe-'+c.id+'-'+Date.now(),c.question,'candidate')));}
@@ -47,7 +47,7 @@ if(phase==='freeze'){
  const paths=execFileSync('git',['ls-files','data'],{cwd:root,encoding:'utf8'}).trim().split('\n').filter(p=>p.includes('/nfl'));
  const files=await Promise.all(paths.map(async p=>{const contents=await fs.readFile(path.join(root,p));const frozen=path.join(out,'frozen-data',p);await fs.mkdir(path.dirname(frozen),{recursive:true});await fs.writeFile(frozen,contents);return {path:p,sha256:createHash('sha256').update(contents).digest('hex')};}));
  if(!files.length)throw new Error('No frozen public evidence files found.');
- await save('manifest.json',{created_at:new Date().toISOString(),saved_contract_fixture_hash:hash(savedRows),candidate_revision:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),baseline_revision:'e16ec81',historical_revisions:['32722f3','7c740fc'],model:client.BRIEF_MODEL,effort:'low',concurrency:2,runtimeHashes,files,question_bank:NFL_QUALITY_CASES,sequences:NFL_QUALITY_SEQUENCES});
+ await save('manifest.json',{created_at:new Date().toISOString(),saved_contract_fixture_hash:hash(savedRows),candidate_revision:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),baseline_revision:'e16ec81',historical_revisions:['32722f3','7c740fc'],model:client.BRIEF_MODEL,effort:'low',concurrency:2,deadline_ms:120000,latency_policy:'Quality is the release priority; elapsed time is reported as a tradeoff per user direction.',runtimeHashes,files,question_bank:NFL_QUALITY_CASES,sequences:NFL_QUALITY_SEQUENCES});
  await pool(NFL_QUALITY_CASES.map(c=>async()=>{if(await exists('evidence-'+c.id+'.json'))return;const r=await runTurn('capture-'+c.id,c.question,'candidate');await save('evidence-'+c.id+'.json',{question:c.question,heldOut:c.heldOut,evidence:r.evidence,evidence_hash:hash(r.evidence)});}));
 }
 if(phase==='e2e')await pool(NFL_QUALITY_SEQUENCES.flatMap(sequence=>['legacy','candidate'].flatMap(pipeline=>[1,2].map(trial=>async()=>{const history:unknown[]=[];for(const [i,q] of sequence.questions.entries()){const id=`e2e-${sequence.id}-${pipeline}-${trial}-${i+1}`;const r=await exists(id+'.json')?await read(id+'.json'):await runTurn(id,q,pipeline,history);history.push({question:q,body:r.result?.body??null});}}))));
@@ -105,11 +105,11 @@ if(phase==='report'){
  const gates={comparison_complete:summary.actual_counts.writing===96&&summary.actual_counts.e2e===48&&summary.actual_counts.judgments===48,
  pairwise_preference:summary.pairwise_preference>=0.7,
  relevance_depth_decision:['relevance','depth','decision_usefulness'].every(k=>summary.candidate_scores[k]>=4),
+ historical_writing_quality:['relevance','depth','decision_usefulness'].every(k=>byVariant.candidate[k]>=Math.max(byVariant.original[k],byVariant.september8[k])),
  completion:summary.complete_fraction>=0.9&&summary.e2e_complete_fraction>=0.9,
  no_material_errors:materialErrors.length===0,
  direct_review:summary.direct_claim_review?.passed===true,
- ordinary_latency:summary.ordinary_median_ms!=null&&summary.ordinary_median_ms<=30000,
- complex_deadline:summary.e2e_candidate_max_ms<=61000};
+ bounded_deadline:summary.e2e_candidate_max_ms<=121000};
  await save('gates.json',{...gates,accepted:Object.values(gates).every(Boolean)});
  await save('summary.json',summary);console.log(JSON.stringify(summary,null,2));
  const report=['# Giants analyst restoration comparison','',JSON.stringify(summary,null,2),'','## Anonymous judgments and source records',...judgments.map(j=>`- [${j.id}](${j.id}.json)`)].join('\n');await fs.writeFile(path.join(out,'comparison.md'),report);

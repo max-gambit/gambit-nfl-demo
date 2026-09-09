@@ -89,3 +89,17 @@ test('accepted compensation and active constraints survive beyond the prose hist
   const args=result.body.contract_scenario!.args as typeof prior;
   assert.deepEqual(args.budget,prior.budget);assert.deepEqual(args.protected_player_ids,['Brian Burns']);assert.deepEqual(args.moves[0].illustrative_terms.years,prior.moves[0].illustrative_terms.years);
 });
+
+
+test('worded adjacent quantities, parenthesized lists and year ranges retain their meaning',()=>{
+  const record={...evidence,body:{...evidence.body,tables:[{...evidence.body.tables[0],columns:['Player','2025 receiving yards','2025 games','2026 current-team cap'],rows:[['Jakobi Meyers',835,16,'$6,210,588']]}]}};
+  const catalog=collectEvidenceFacts([record]);
+  const check=(text:string)=>validateSourcedParagraphs([{text,source_refs:[1]}],catalog,new Set([1]));
+  assert.ok(check('Meyers recorded 835 receiving yards across sixteen games in 2025.'));
+  assert.ok(check('Review (1) his 2026 cap/contract record and (2) the 2015–2017 period and round-1-to-3 nomenclature.'));
+  assert.throws(()=>check('Meyers recorded 835 games in 2025.'),/Unsupported quantity/);
+  const table={...evidence,body:{...evidence.body,tables:[{title:'Period comparison',columns:['Position','Measure','2015–2017','2023–2025'],rows:[['EDGE','Share of league movements','7.50%','11.05%']],source_refs:[1]}]}};
+  const periodFacts=collectEvidenceFacts([table]);
+  assert.ok(periodFacts.some(f=>f.value===7.5&&f.unit==='percent'&&f.period==='2015–2017'));
+  assert.ok(validateSourcedParagraphs([{text:'The share of league movements rose from 7.5% in 2015–2017 to 11.05% in 2023–2025.',source_refs:[1]}],periodFacts,new Set([1])));
+});

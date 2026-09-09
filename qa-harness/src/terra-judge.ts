@@ -254,6 +254,7 @@ export async function judgeNflAnswerQuality(options:{apiKey?:string;question:str
   if(body.status!=='completed')throw new Error('Quality judge incomplete: '+body.status);
   const text=body.output.flatMap((o:any)=>o.content??[]).filter((c:any)=>c.type==='output_text').map((c:any)=>c.text).join('');
   const verdict=JSON.parse(text);
-  if(verdict.answers.length!==labels.length||new Set(verdict.answers.map((a:any)=>a.label)).size!==labels.length||verdict.preferences.length!==labels.length*(labels.length-1)/2)throw new Error('Quality judge omitted a label or pair.');
+  const pairs=verdict.preferences.map((p:any)=>[p.a,p.b].sort().join('|'));
+  if(verdict.answers.length!==labels.length||new Set(verdict.answers.map((a:any)=>a.label)).size!==labels.length||verdict.answers.some((a:any)=>!labels.includes(a.label))||verdict.preferences.length!==labels.length*(labels.length-1)/2||new Set(pairs).size!==pairs.length||verdict.preferences.some((p:any)=>p.a===p.b||!labels.includes(p.a)||!labels.includes(p.b)||!['tie',p.a,p.b].includes(p.winner)))throw new Error('Quality judge omitted or duplicated a label or pair.');
   return {verdict,model:body.model,usage:body.usage};
 }

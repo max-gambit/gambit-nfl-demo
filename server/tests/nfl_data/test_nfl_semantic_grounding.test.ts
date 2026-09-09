@@ -36,9 +36,9 @@ test('review fails closed on malformed or inconsistent verdicts and passes speci
   for (const bad of [{pass:true,issues:['Contradiction']},{pass:false,issues:[]},{issues:'not an array'}]) {
     await assert.rejects(reviewNflAnalystSemantics(input,{callModel:async()=>message('review_answer',bad)}),/valid result/);
   }
-  assert.deepEqual(await reviewNflAnalystSemantics(input,{callModel:async()=>message('review_answer',{pass:false,issues:['The practice label does not certify health.']})}),['The practice label does not certify health.']);
-  assert.deepEqual(await reviewNflAnalystSemantics(input,{callModel:async()=>message('review_answer',{pass:true,issues:[]})}),[]);
-  assert.deepEqual(await reviewNflAnalystSemantics(input,{callModel:async()=>message('review_answer',{issues:['Specific correction']})}),['Specific correction']);
+  assert.deepEqual(await reviewNflAnalystSemantics(input,{callModel:async()=>message('review_answer',{claim_checks:[{claim:'fully healthy',status:'unsupported',reason:'The practice label does not certify health.'}],pass:false,issues:['The practice label does not certify health.']})}),['The practice label does not certify health.','fully healthy: The practice label does not certify health.']);
+  assert.deepEqual(await reviewNflAnalystSemantics(input,{callModel:async()=>message('review_answer',{claim_checks:[{claim:'recorded participation',status:'supported',reason:'The report records participation.'}],pass:true,issues:[]})}),[]);
+  await assert.rejects(reviewNflAnalystSemantics(input,{callModel:async()=>message('review_answer',{pass:true,issues:[]})}),/valid result/);
 });
 
 test('a rejected factual premise must be repaired before the saved answer is complete', async () => {
@@ -109,4 +109,11 @@ test('legacy: a withheld opening premise keeps the executed summary ahead of dep
   assert.equal(result.body.ai_analysis?.withheld_numeric_sentences,1);
   assert.ok(!result.body.answer.startsWith('That directional change'));
   assert.ok(result.body.answer.indexOf('Olszewski') < result.body.answer.indexOf('That directional change'));
+});
+
+
+test('a concrete unsupported claim check is not hidden by a nominal pass verdict',async()=>{
+  const input={question:'Compare incoming costs.',authored:prose('This is the cheaper acquisition.'),selected_answer:'This is the cheaper acquisition.',selected_tables:[],evidence:[],tool_coverage:{}};
+  const issues=await reviewNflAnalystSemantics(input,{callModel:async()=>message('review_answer',{claim_checks:[{claim:'cheaper acquisition',status:'unsupported',reason:'Only current-team cap was retrieved.'}],pass:true,issues:[]})});
+  assert.match(issues.join(' '),/Only current-team cap/);
 });

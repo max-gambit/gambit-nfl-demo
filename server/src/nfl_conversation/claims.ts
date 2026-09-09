@@ -26,7 +26,7 @@ export function numericMentions(text: string): Array<{ raw: string; value: numbe
   for(const match of text.matchAll(/\bon\s+\d{1,2}\/\d{1,2}(?:\s*(?:and|,)\s*\d{1,2}\/\d{1,2})*/gi))dateSpans.push([match.index!,match.index!+match[0].length]);
   for(const match of text.matchAll(/\b(?:on\s+)?the\s+(?:[1-9]|[12]\d|3[01])(?:st|nd|rd|th)(?:\s*(?:and|,)\s*(?:the\s+)?(?:[1-9]|[12]\d|3[01])(?:st|nd|rd|th))*/gi))dateSpans.push([match.index!,match.index!+match[0].length]);
   const spelled=/\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)(?:[- ](one|two|three|four|five|six|seven|eight|nine))?\s+(billion|million|thousand|dollars|percent|yards|receptions|games|snaps|years)\b/gi;
-  return [...text.matchAll(amountPattern),...text.matchAll(spelled)].flatMap(match=>{
+  const mentions=[...text.matchAll(amountPattern),...text.matchAll(spelled)].flatMap(match=>{
     const raw=match[0].trim();
     const index=match.index!+match[0].indexOf(raw);
     if(dateSpans.some(([from,to])=>index>=from&&index<to))return [];
@@ -41,6 +41,7 @@ export function numericMentions(text: string): Array<{ raw: string; value: numbe
     const comparison=/^[-–]?plus\b|^\+/.test(following)?'gte' as const:/\b(?:cleared|exceeded|above|more than|over)\s*$/i.test(prefix)?'gt' as const:/\bat least\s*$/i.test(prefix)?'gte' as const:/\b(?:under|below|less than)\s*$/i.test(prefix)?'lt' as const:/\bat most\s*$/i.test(prefix)?'lte' as const:undefined;
     return [{raw,value,unit,index,comparison,after:following.split(/\d/)[0].slice(0,35),precision:scale/10**(digits.split('.')[1]?.length??0)}];
   }).sort((a,b)=>a.index-b.index);
+  return mentions.map((mention,i)=>({...mention,after:text.slice(mention.index+mention.raw.length,mentions[i+1]?.index).slice(0,35)}));
 }
 
 function scalar(value: unknown): number | undefined {
@@ -68,6 +69,7 @@ export function collectEvidenceFacts(evidence: Iterable<Evidence>): EvidenceFact
     };
     for (const [ti, table] of item.body.tables.entries()) {
       const subjectColumns = table.columns.map((c, i) => /^(player|name|team|option|alternative|scenario|move|year|season|period|position|status|metric|measure|basis)$/i.test(c) ? i : -1).filter(i => i >= 0);
+      const measureColumn=table.columns.findIndex(c=>/^(measure|metric)$/i.test(c));
       const yearColumn = table.columns.findIndex(c => /^(year|season|period)$/i.test(c));
       for (const [ri, row] of table.rows.entries()) {
         const playerColumn=table.columns.findIndex(c=>/^(player|name)$/i.test(c));
@@ -78,9 +80,9 @@ export function collectEvidenceFacts(evidence: Iterable<Evidence>): EvidenceFact
             if(typeof cell==='string')for(const quantity of numericMentions(cell))add({subject,...(playerColumn>=0?{subject_kind:'player' as const}:{}),metric:table.columns[ci]+': '+cell,period:table.columns[ci].match(/20\d{2}/)?.[0]??'',unit:quantity.unit,basis:table.title,value:quantity.value,source_refs:table.source_refs});
             continue;
           }
-          const metric = table.columns[ci];
-          const period = yearColumn >= 0 ? String(row[yearColumn]) : metric.match(/20\d{2}/)?.[0] ?? (/cap|cash|salary|bonus|guarantee|budget|cost/i.test(metric)?table.title.match(/dated (20\d{2})/)?.[1]:undefined) ?? table.title.match(/20\d{2}/)?.[0] ?? '';
-          const unit = /\$/.test(String(cell)) || /cap|cash|salary|bonus|guarantee|dead money|savings|reserve|funding|budget|cost/i.test(metric) && !/years|status|source|basis|method|rank|fit/i.test(metric) ? 'USD' : /%|percent|rate|share/i.test(metric) ? 'percent' : 'number';
+          const metric = measureColumn>=0&&ci!==measureColumn?String(row[measureColumn])+' · '+table.columns[ci]:table.columns[ci];
+          const period = yearColumn >= 0 ? String(row[yearColumn]) : metric.match(/20\d{2}(?:[–-]20\d{2})?/)?.[0] ?? (/cap|cash|salary|bonus|guarantee|budget|cost/i.test(metric)?table.title.match(/dated (20\d{2})/)?.[1]:undefined) ?? table.title.match(/20\d{2}/)?.[0] ?? '';
+          const unit = /\$/.test(String(cell)) || /cap|cash|salary|bonus|guarantee|dead money|savings|reserve|funding|budget|cost/i.test(metric) && !/years|status|source|basis|method|rank|fit/i.test(metric) ? 'USD' : /%/.test(String(cell)) || /percent|rate|share/i.test(metric) ? 'percent' : 'number';
           add({ subject,...(playerColumn>=0?{subject_kind:'player' as const}:{}), metric, period, unit, basis: table.title, value, source_refs: ti === 0 && item.rowRefs?.[ri] ? item.rowRefs[ri] : table.source_refs });
         }
       }
@@ -152,7 +154,10 @@ export function validateSourcedParagraphs(paragraphs: SourcedParagraph[], facts:
       for (const mention of numericMentions(sentence)) {
         // Calendar labels are context. Any quantified fact in this sentence must
         // still match that period below; contract-horizon assertions also receive semantic review.
-        if (mention.unit==='number' && /^20\d{2},?$/.test(mention.raw) && (/(?:\bin|\bduring|\bfor)\s*$/.test(sentence.slice(0,mention.index)) || /^\s*(?:and beyond|flexibility|production|season|regular[- ]season|snapshot|cap |budget|[–-]|EDGE|seller|second|third|fourth|fifth|sixth|seventh)/i.test(mention.after))) continue;
+        if (mention.unit==='number' && /^20\d{2},?$/.test(mention.raw) && (/(?:\bin|\bduring|\bfor)\s*$/.test(sentence.slice(0,mention.index)) || /^\s*(?:and beyond|flexibility|production|season|regular[- ]season|snapshot|cap(?:[ /]|$)|budget|[–-]|EDGE|seller|second|third|fourth|fifth|sixth|seventh)/i.test(mention.after))) continue;
+        if(mention.unit==='number'&&/^20\d{2}$/.test(mention.raw)&&/20\d{2}[–-]\s*$/.test(sentence.slice(0,mention.index)))continue;
+        if(mention.unit==='number'&&/\(\s*$/.test(sentence.slice(0,mention.index))&&/^\)\s/.test(sentence.slice(mention.index+mention.raw.length)))continue;
+        if(mention.unit==='number'&&/round(?:[- ]\d[- ]to)?$/i.test(sentence.slice(0,mention.index))&&Math.abs(mention.value)>=1&&Math.abs(mention.value)<=7)continue;
         // Down names, draft-round labels and a numbered list are nomenclature;
         // their football meaning is checked with the semantic evidence review.
         if (/^\s*Day\s*$/i.test(sentence.slice(0,mention.index))&&mention.value>=1&&mention.value<=3) continue;
