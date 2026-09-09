@@ -1,6 +1,6 @@
 # Giants demo QA harness
 
-This harness validates the New York Giants public-demo workflow with deterministic Playwright and API checks. It does not require Anthropic or any other model provider.
+This harness validates the New York Giants public-demo workflow. Its deterministic modes do not require a model provider; the explicitly selected live and analyst-quality modes use the configured providers.
 
 ## Modes
 
@@ -21,3 +21,30 @@ The default gate is deterministic and free. The live gate is always explicit, ne
 If `OPENAI_API_KEY` is absent, the live report records `skipped_no_openai_key`; it does not claim that Terra passed. Set `NFL_RELIABILITY_REQUIRE_JUDGE=1` to make that skip or an inconclusive verdict fail a required demo/release run. Set `NFL_RELIABILITY_REQUIRE_LIVE=1` to prevent a deterministic-only invocation where live coverage is mandatory.
 
 Every live scenario uses a unique `workspace_key=nyg-demo` session whose `seed_key` begins `qa:answer-reliability:`. Cleanup deletes only those exact seed keys and reads them back to verify zero remaining rows.
+
+
+## Analyst restoration comparison
+
+`quality:nfl` runs the approved analyst restoration evaluation against checked-in public evidence and a clearly labelled saved-contract illustration. It does not create, regenerate or delete presenter conversations. It reads the configured answer model from `server/.env`; do not put credentials into evaluation artifacts.
+
+Run these commands from `qa-harness`, using a new output directory for each runtime change:
+
+```bash
+npm run quality:nfl -- --phase freeze --out test-results/analyst-restoration/my-comparison
+npm run quality:nfl -- --phase writing --out test-results/analyst-restoration/my-comparison
+npm run quality:nfl -- --phase e2e --out test-results/analyst-restoration/my-comparison
+npm run quality:nfl -- --phase judge --out test-results/analyst-restoration/my-comparison
+npm run quality:nfl -- --phase report --out test-results/analyst-restoration/my-comparison
+```
+
+Output paths are relative to the repository root. Freeze captures twelve first-turn evidence bundles, copies the public records and records file hashes, runtime hashes, model/effort, the exact question bank and the illustrative saved terms. Subsequent phases reject runtime or evidence drift. Existing records are retained, including errors and incomplete answers.
+
+Writing runs four prompt contracts—original `32722f3`, September 8 `7c740fc`, accepted integration `e16ec81`, and the restoration—against identical checked evidence, with two trials for each of twelve questions (96 answers). These are historical-prompt replays with only the output format adapted, not reproductions of the historical applications. The accepted integration pipeline includes the common literal-input and contract-engine repairs present in this branch; its writing, investigation, grounding and semantic-review modules remain frozen.
+
+End-to-end runs the integration and candidate tool pipelines on four three-turn sequences with two trials each (48 turns), retaining structured scenario state across turns. Both receive a two-minute total allowance. Max clarified during implementation that quality is the primary release concern and latency is a meeting tradeoff, so elapsed times remain visible without applying the earlier 30/60-second release thresholds. Provider concurrency is capped at two within each phase; run phases sequentially.
+
+Judging presents answers in a reproducibly randomized order and evaluates grounding, relevance, depth, alternatives, uncertainty, decision usefulness and follow-ups separately from the existing reliability judge. It requires one result for every answer and unordered pair. With an OpenAI credential it uses the configured Terra judge; otherwise it uses a separate blinded call to the configured answer model. The report identifies the actual judge model and the same-family limitation. Direct review must check critical claims against the captured evidence and retain disagreements; an automated score alone does not clear acceptance.
+
+A complete release report requires all 96 writing answers, 48 end-to-end turns, 48 valid judgments, at least 70% preference against current (ties half), 4/5 relevance/depth/decision usefulness, writing quality at least matching the stronger historical contract, at least 90% completion/useful missing input, no material factual errors, and a passed direct claim review. Record that review in `direct-claim-review.json` alongside the run with `passed`, reviewed case IDs, source-backed findings and retained judge disagreements. Run `report` again after recording it. Browser persistence/export verification and normal server/build checks remain separate requirements.
+
+The local candidate uses `NYG_ANALYST_PIPELINE=candidate` (also the new branch default); `NYG_ANALYST_PIPELINE=legacy` selects the preserved integration writing pipeline for recovery. Existing saved answers are read in their original representation.

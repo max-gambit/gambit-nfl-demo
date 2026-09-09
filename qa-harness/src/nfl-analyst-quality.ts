@@ -62,7 +62,19 @@ if(phase==='writing'){
  catch(error){await save(id+'.json',{id,variant,trial,question:c.question,evidence_hash:bundle.evidence_hash,error:String(error),elapsed_ms:Date.now()-start});console.log(id,'ERROR');}
  }))));
 }
+function comparableWriterText(raw:string):string {
+ // Historical JSON wrappers are formatting, not a different quality criterion.
+ // Preserve every authored field; only lay out the common narrative fields.
+ try {
+  const parsed=JSON.parse(raw.trim().replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,''));
+  if(!parsed||typeof parsed!=='object'||typeof parsed.answer!=='string')return raw;
+  const {answer,findings,key_findings,...rest}=parsed;
+  const rows=(findings??key_findings??[]).map((f:any)=>typeof f==='string'?f:[f.label,f.body,(f.source_refs??[]).map((r:number)=>'['+r+']').join(' ')].filter(Boolean).join(': '));
+  return [answer,...rows,Object.keys(rest).length?JSON.stringify(rest):''].filter(Boolean).join('\n\n');
+ }catch{return raw;}
+}
 if(phase==='judge'){
+ await save('judge-context.json',{runtime_hash:hash(runtimeHashes),harness_sha256:createHash('sha256').update(await fs.readFile(fileURLToPath(import.meta.url))).digest('hex'),format_policy:'Normalize historical JSON wrappers, preserving all authored fields; evaluate meaning rather than serialization.',answer_label_policy:'Deterministic shuffled labels; pipeline names omitted.'});
  const {judgeNflAnswerQuality}=await import('./terra-judge.js');
  async function judge(id:string,question:string,records:any[],evidence:unknown,context:unknown){
   if(await exists(id+'.json'))return;
@@ -71,7 +83,7 @@ if(phase==='judge'){
   const answers=ordered.map((r,i)=>{
     const body=r.result?.body;
     const rendered=body?JSON.stringify({answer:body.answer_paragraphs?.length?body.answer_paragraphs.map((p:any)=>p.text+' ['+p.source_refs.join(', ')+']').join('\n\n'):body.answer,findings:body.key_findings,tables:body.tables,calculations:body.calculations,supporting_details:body.supporting_details,followups:body.followups,caveats:body.caveats,scenario_state:body.conversation_state,historical_selection:body.historical_selection}):'INCOMPLETE';
-    return {label:String.fromCharCode(65+i),answer:r.error?'INCOMPLETE: '+r.error:r.answer??rendered};
+    return {label:String.fromCharCode(65+i),answer:r.error?'INCOMPLETE: '+r.error:r.stop_reason==='max_tokens'?'INCOMPLETE (token limit): '+(r.answer??''):typeof r.answer==='string'?comparableWriterText(r.answer):rendered};
   });
   try{const result=await judgeNflAnswerQuality({apiKey:process.env.OPENAI_API_KEY,anthropicCall:client.createClaudeMessage,anthropicModel:client.BRIEF_MODEL,question,context,evidence,answers});await save(id+'.json',{id,labels,...result});console.log(id,'done');}
   catch(error){await save(id+'.json',{id,labels,error:String(error)});console.log(id,'ERROR',String(error));}
