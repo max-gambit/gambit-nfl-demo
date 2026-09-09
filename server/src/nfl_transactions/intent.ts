@@ -22,6 +22,10 @@ export interface NflAnalysisTurnContext {
   historical_years?: number[];
 }
 
+export function isNflContractPlanningQuestion(question:string):boolean {
+  return /\bminimum(?:\s+necessary)?\s+funding\b|\bfunding\s+(?:gap|sensitivity|choice|recommendation)\b|\bcomplete\s+(?:illustrative\s+|hypothetical\s+)?compensation\s+schedule\b|\bsensitivity\b[\s\S]{0,80}\b(?:cap|budget|reserve|signing bonus)\b/i.test(question);
+}
+
 /**
  * Server-owned routing for a new Analysis turn. Prior channel state is a
  * bounded input to classification; its mere existence never selects a route.
@@ -31,6 +35,9 @@ export function classifyNflAnalysisTurn(
   context: NflAnalysisTurnContext,
 ): NflAnalysisTurnIntent {
   const value = question.trim();
+  // Explicit financing/illustrative terms belong to the conversational
+  // calculator. Generic "price" and contract years are not a market query.
+  if(isNflContractPlanningQuestion(value))return {kind:'general'};
   const currentQuestion = classifyNflCurrentQuestion(value);
   // Fixed-scope convenience answers cannot honor additional player filters.
   if (currentQuestion === 'largest_cap_hits' || currentQuestion === 'wide_receiver_contracts') return { kind: 'general' };

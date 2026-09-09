@@ -40,6 +40,14 @@ const fresh = { market_query: null, seller_scenario: null };
 const marketChannel = { market_query: market, seller_scenario: null };
 const sellerChannel = { market_query: market, seller_scenario: scenario };
 
+test('explicit funding and illustrative acquisition requests bypass unrelated market prefetch',()=>{
+  for(const question of [
+    'Find minimum funding for the same illustrative Meyers acquisition. Keep the $5 million available cap budget and $1 million reserve. Show sensitivity and thresholds.',
+    'For a clearly hypothetical price test, acquire Jakobi Meyers for NYG after June 1 in 2026. This is the complete illustrative compensation schedule, not his actual contract or an asking price. Paulson Adebo has unpaid salary available of $1 million. Find minimum funding without assuming a conversion amount.',
+    'Show the funding gap, sensitivity and controlling CBA mechanism for this acquisition.',
+  ])for(const context of [fresh,marketChannel,sellerChannel])assert.equal(classifyNflAnalysisTurn(question,context).kind,'general');
+});
+
 test('server intent matrix keeps prior context bounded to recognizable continuations', () => {
   const cases = [
     ['Which position markets have grown or shrunk over the last 10 years?', fresh, 'transaction_market', false],

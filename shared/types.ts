@@ -208,6 +208,9 @@ export interface DataAnalysisBriefBody {
   supporting_details?: DataAnalysisFinding[];
   conversation_state?: import('./nflConversation').NflConversationState;
   contract_scenario?: { args: unknown; result: unknown; tables?: DataAnalysisTable[]; calculations?: DataAnalysisCalculation[] };
+  /** Server-derived funding decisions, separate from literal compensation inputs. */
+  cap_strategy?: Record<string, unknown>;
+  funding_observations?: {team_id:string;season:number;observations:Array<{player_id:string;unpaid_salary_available?:number;credited_seasons?:number}>};
   example_query?: Record<string, unknown>;
   /** Executed user-owned decision rule and literal inputs, retained for follow-ups. */
   evaluation_query?: Record<string, unknown>;

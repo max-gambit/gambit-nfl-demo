@@ -1,7 +1,9 @@
 import { cleanNflAnalystProse } from '@shared/nflReceiverPresentation';
 import { searchNflAuthority } from '../nfl_authority/index.js';
 import { describeNflIllustrativeTerms, getNflContractDossier, getNflContractDossierCoverage, NFL_CONTRACT_SCENARIO_TOOL_SCHEMA, nflContractComparisonTool, type NflContractScenarioArgs, type NflContractScenarioResult } from '../nfl_contracts/index.js';
-import { contractDossiersEvidence, executeContractComparison, executeContractScenario, explicitPlayerProtections } from '../nfl_conversation/contract_tools.js';
+import { contractDossiersEvidence, executeCapStrategy, executeContractComparison, executeContractScenario, explicitPlayerProtections } from '../nfl_conversation/contract_tools.js';
+import { nflCapStrategyTool } from '../nfl_contracts/tool_schema.js';
+import {observationsFromScenario} from '../nfl_contracts/funding_observations.js';
 import { buildNflExampleEvidence, nflExampleTool, nflExampleCoverage, type NflExampleArgs } from '../nfl_examples/evidence.js';
 import { buildNflReceiverComparison, nflReceiverTool, officialReceivingTotals } from '../nfl_scouting/evidence.js';
 import { nflScenarioTool, updateNflConversationState, userMoneyAmounts } from '../nfl_conversation/state.js';
@@ -68,6 +70,7 @@ INVESTIGATE AND REASON
 - Discuss acquisition routes and tradeoffs as analysis, with any unverified seller/role assumptions explicit. Qualified judgments such as "may be attainable" are welcome when you explain sound reasoning from the contract, usage, roster context or a clearly stated scenario. Confirmed seller interest is NOT required for a conditional judgment. Make the reasoning useful and distinguish an inference from an established fact. You may identify which records deserve investigation and why. A cheap productive star is not automatically a practical target solely because his current cap charge is low. Claims about a team's current depth require a roster/usage lookup; hypothetical seller motivations can be framed as hypotheses to test.
 - Dates on the tools are snapshot dates. Do not freshen sources, assume the public cap observations reconcile, or convert historical transactions into current asking prices. Consult the rules tool for technical transaction-rule claims.
 - For contract alternatives, use nfl_contract_comparison directly. It already reads the relevant dossier, computes hold versus the requested moves and supplies the controlling CBA mechanism; no preliminary dossier lookup or separate hold calculation is needed. Keep the requested moves for a changed-amount follow-up. Omit credited seasons and unpaid salary unless supplied. For a funded acquisition, include the acquisition and funding moves in the same comparison; do not infer an incoming price from the seller's cap charge.
+- For minimum funding, financing discovery, sensitivity, or what would change a financing recommendation, use find_minimum_cap_funding directly. Omit scenario when retaining the last acquisition terms; current explicit budget/reserve changes are read by the tool. Do not reuse an old maximum or specified conversion as the recommendation. Only this tool derives conversion amounts and sensitivity cases; the ordinary scenario tools still require literal user amounts. Explain the preferred single conversion, including no funding when acquisition already fits, and distinguish an unsupported funding fit from an unavailable player. This search does not optimize roster removals or combined conversions. Do not say uncalculated multiple conversions, releases/trades or extensions would close the gap; they require separate evaluation. Describe the budget, reserve or price changes that the sensitivity rows actually tested. Preserve all future-year allocations and the supplied player protections.
 - Do not claim that a player led the whole room in a metric if any relevant player's metric is unknown. Observed yards and games are not measures of talent, upside or current health. Do not label a player the highest-upside/best talent without an attributed evaluation. Keep rankings to the specified evidence and method.
 - If a tool returns an explicit coverage gap, finish with that exact answer statement and explain the useful next input. Do not repeat a lookup or substitute another player to obtain a probability or current medical claim.
 - Practice participation, game designation and observed game workload are separate fields. LP means limited, FP means full, DNP means did not participate. Read each dated label before making a claim. A single observed game has no earlier workload baseline: never call it a snap drop, recovery or improvement. Prioritize questions for staff from observed flags, not a medical risk score or unsupported causal explanation.
@@ -120,6 +123,7 @@ export const nflAnalystTools: Anthropic.Tool[] = [
   {name:'read_contract_dossiers',description:'Inspect all years, active versus void, guarantees and source conflicts in the eight deep public contract dossiers. Includes originals from other teams; never implies incoming cost.',input_schema:{type:'object',properties:{player_names:{type:'array',items:{type:'string'}}},additionalProperties:false}},
   {name:'calculate_contract_scenario',description:'Read-only simulation, never a real transaction. Call even for a protected-player conflict to show the explicit blocked result. Calculate hold, trade, release, salary-conversion restructure or an acquisition with complete literal user-supplied illustrative terms. Code owns all figures and future-year obligations. This replaces broad estimated lever columns for numerical scenarios. Every new amount must be supplied by the user; incomplete incoming terms remain blocked.',input_schema:NFL_CONTRACT_SCENARIO_TOOL_SCHEMA as unknown as Anthropic.Tool.InputSchema},
   nflContractComparisonTool as unknown as Anthropic.Tool,
+  nflCapStrategyTool as unknown as Anthropic.Tool,
   { ...nflExampleTool, input_schema: {...nflExampleTool.input_schema, properties:{...nflExampleTool.input_schema.properties, inherit_previous:{type:'boolean',description:'Retain the previous example scope and change only supplied fields.'}}}} as Anthropic.Tool,
   { name: 'read_giants_cap', description: 'Read dated public Giants cap observations, their disagreement and verified arithmetic. Not a live certified ledger.', input_schema: { type: 'object', properties: {}, additionalProperties: false } },
   { name: 'read_nfl_rules', description: 'Look up sourced NFL CBA/transaction rules. Ask a focused rules question, e.g. acquiring obligations in a trade, practice squad signing, waiver claim or June 1 accounting.', input_schema: { type: 'object', properties: { question: { type: 'string' }, domain:{type:'string',enum:['cba','playing_rules','league_dates']} }, required: ['question'], additionalProperties: false } },
@@ -294,7 +298,13 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
   let lastPlayerQuery = previousQuery;
   let lastExampleQuery=history.at(-1)?.body?.example_query;
   let lastEvaluation = [...history].reverse().find(turn => turn.body?.evaluation_result)?.body?.evaluation_result?.state as NflEvaluationState | undefined;
-  const priorContractScenario=[...history].reverse().find(t=>t.body?.contract_scenario)?.body?.contract_scenario?.args as NflContractScenarioArgs|undefined;
+  const priorContractBody=[...history].reverse().find(t=>t.body?.contract_scenario)?.body;
+  const priorContractScenario=priorContractBody?.contract_scenario?.args as NflContractScenarioArgs|undefined;
+  const fundingObservationHistory=history.flatMap(turn=>{
+    if(turn.body?.funding_observations)return [turn.body.funding_observations];
+    const args=turn.body?.contract_scenario?.args as NflContractScenarioArgs|undefined;
+    return args?[{team_id:args.team_id,season:args.season,observations:observationsFromScenario(args)}]:[];
+  });
   let conversationState = structuredClone(history.at(-1)?.body?.conversation_state);
   const stateBeforeTurn = structuredClone(conversationState);
   if(conversationState)conversationState.active.protected_player_names=explicitPlayerProtections(question,conversationState.active.protected_player_names).names;
@@ -347,7 +357,8 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
       next.active.team_id=a.team_id;next.active.budget=a.budget??null;next.active.transaction=a.moves.length===1?a.moves[0].action:'none';next.active.horizon=a.season+' and all modeled later contract years';
       next.active.candidate_scope=a.moves.some(m=>m.action==='acquire')?'external':'internal';
       next.active.protected_player_names=(a.protected_player_ids??[]).map(id=>getNflContractDossier(id)?.player_name??id);
-      next.active.supplied_terms=a.moves.flatMap(m=>m.illustrative_terms?describeNflIllustrativeTerms(m):m.conversion_amount!=null?['Requested conversion for '+m.player_id+': $'+m.conversion_amount.toLocaleString('en-US')]:[]);
+      next.active.supplied_terms=a.moves.flatMap(m=>m.illustrative_terms?describeNflIllustrativeTerms(m):m.conversion_amount!=null?[(body.cap_strategy?'Calculated minimum conversion for ':'Requested conversion for ')+m.player_id+': $'+m.conversion_amount.toLocaleString('en-US')]:[]);
+      for(const observation of body.funding_observations?.observations??[]){if(observation.unpaid_salary_available!=null)next.active.supplied_terms.push(observation.player_id+' · supplied unpaid salary available: $'+observation.unpaid_salary_available.toLocaleString('en-US'));if(observation.credited_seasons!=null)next.active.supplied_terms.push(observation.player_id+' · supplied credited seasons: '+observation.credited_seasons);}
       next.active.unresolved_inputs=r.issues.map(i=>i.message).slice(0,20);
     }
     next.active.protected_player_names=explicitPlayerProtections(question,next.active.protected_player_names).names;
@@ -539,19 +550,22 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
           if(!tables.length&&primary)tables.push(...primary.body.tables.slice(0,2));
           const suppliedGrades = evaluationEvidence?.body.tables.find(t=>t.title==='User-supplied judgments · unverified attribution');
           if(suppliedGrades&&!tables.some(t=>t.title===suppliedGrades.title))tables.push(suppliedGrades);
+          if(contractEvidence?.body.cap_strategy)for(const table of contractEvidence.body.tables.slice(0,2)){if(!tables.some(t=>t.title===table.title))tables.push(table);}
           const caveats = [...new Set([...(primary?.body.caveats??[]),...stringList(args.caveats,'caveats').filter(value=>{try{resolveEvidenceProse(value,evidence);return true;}catch{return false;}})])];
           if (loaded.source_mode !== 'supabase_current_views') caveats.push('Player records are from the saved public snapshot dated ' + seed.as_of_date + '; the database was unavailable.');
           if(primary)adoptExecutedState(primary);
           const draft: FactualAnswer = { body: {
             kind: 'data_analysis', language_policy: 'grounded_ai_v1', answer, answer_source_refs:[...new Set(statements.flatMap(s=>s.refs))], ...(supportingDetails.length ? { supporting_details: supportingDetails } : {}), key_findings: findings, tables,
             calculations: primary?.body.calculations ?? [], caveats,
-            followups: (primary?.body.example_query ? primary.body.followups : stringList(args.followups, 'followups')).slice(0, 3),
+            followups: (primary?.body.example_query || primary?.body.cap_strategy ? primary.body.followups : stringList(args.followups, 'followups')).slice(0, 3),
             ...(query ? { factual_query: query } : {}),
             ...((queryEvidence?.body.receiver_query??primary?.body.receiver_query)?{receiver_query:queryEvidence?.body.receiver_query??primary?.body.receiver_query}:{}),
             ...(primary?.body.market_analysis ? { market_analysis: primary.body.market_analysis, answer_layout: primary.body.answer_layout, historical_selection: primary.body.historical_selection } : {}),
             ...(primary?.body.seller_move_analysis ? { seller_move_analysis: primary.body.seller_move_analysis, answer_layout: primary.body.answer_layout } : {}),
             conversation_state: conversationState,
             ...(contractEvidence?.body.contract_scenario ? {contract_scenario:contractEvidence.body.contract_scenario}: {}),
+            ...(contractEvidence?.body.cap_strategy ? {cap_strategy:contractEvidence.body.cap_strategy}: {}),
+            ...(contractEvidence?.body.funding_observations ? {funding_observations:contractEvidence.body.funding_observations}: {}),
             ...(primary?.body.example_query ? {example_query:primary.body.example_query}: {}),
             ...(evaluationEvidence ? {evaluation_query:evaluationEvidence.body.evaluation_query,evaluation_result:evaluationEvidence.body.evaluation_result} : {}),
             ai_analysis: { outcome:'complete', withheld_numeric_sentences:withheldSentences, model: servingModel, elapsed_ms: Date.now() - started, tool_names: toolNames, assumptions: stringList(args.assumptions, 'assumptions') },
@@ -622,8 +636,9 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
           prepared = await searchNflAuthority({question:text(args.question,'rules question',1500),domain:domain as 'cba'|'playing_rules'|'league_dates'|undefined,limit:4});
         }
         else if (tool.name === 'read_contract_dossiers') prepared=contractDossiersEvidence(object(tool.input).player_names ? stringList(object(tool.input).player_names,'player names'):undefined);
-        else if (tool.name === 'calculate_contract_scenario') prepared=await executeContractScenario(tool.input,[...history.map(t=>t.question),question].join('\n'),priorContractScenario as NflContractScenarioArgs|undefined,conversationState?.active,question);
-        else if (tool.name === 'nfl_contract_comparison') prepared=await executeContractComparison(tool.input,[...history.map(t=>t.question),question].join('\n'),priorContractScenario as NflContractScenarioArgs|undefined,conversationState?.active,question);
+        else if (tool.name === 'calculate_contract_scenario') prepared=await executeContractScenario(tool.input,[...history.map(t=>t.question),question].join('\n'),priorContractScenario as NflContractScenarioArgs|undefined,conversationState?.active,question,fundingObservationHistory);
+        else if (tool.name === 'nfl_contract_comparison') prepared=await executeContractComparison(tool.input,[...history.map(t=>t.question),question].join('\n'),priorContractScenario as NflContractScenarioArgs|undefined,conversationState?.active,question,fundingObservationHistory);
+        else if (tool.name === 'find_minimum_cap_funding') prepared=await executeCapStrategy(tool.input,priorContractScenario,priorContractBody?.cap_strategy,conversationState?.active,question,fundingObservationHistory);
         else if (tool.name === 'read_trade_history') prepared=await analystTradeEvidence(tool.input);
         else throw new Error('Unknown data tool.');
         results.push({ type: 'tool_result', tool_use_id: tool.id, content: JSON.stringify(forModel(register(prepared, tool.name === 'search_player_records', true))) });

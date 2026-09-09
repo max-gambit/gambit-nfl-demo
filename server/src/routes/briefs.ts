@@ -91,7 +91,7 @@ import {
   transactionMarketRequestFromQuestion,
 } from '../nfl_transactions/question.js';
 import { runNflSellerMoveConversationTurn } from '../nfl_transactions/seller_move_conversation.js';
-import { classifyNflAnalysisTurn, isNflRulesQuestion } from '../nfl_transactions/intent.js';
+import { classifyNflAnalysisTurn, isNflRulesQuestion, isNflContractPlanningQuestion } from '../nfl_transactions/intent.js';
 import { buildNflRuleAnswer } from '../nfl_rules/analysis.js';
 import { loadNflRulesCorpus } from '../nfl_rules/seed.js';
 import { buildNflCurrentAnswer, classifyNflCurrentQuestion, type NflCurrentQuestionKind } from '../nfl_current/analysis.js';
@@ -238,7 +238,7 @@ briefRoutes.post('/', async (c) => {
     historical_selection: Boolean(previousHistoricalSelection),
     historical_years: previousHistoricalSelection?.years,
   });
-  const ruleQuestion=(isNflRulesQuestion(question)||/playing rulebook|trade deadline|onside|overtime/i.test(question))&&!/\b(?:calculate|recalculate|convert|conversion|hypothetical)\b|how much.*(?:cap|cash|savings)/i.test(question);
+  const ruleQuestion=(isNflRulesQuestion(question)||/playing rulebook|trade deadline|onside|overtime/i.test(question))&&!isNflContractPlanningQuestion(question)&&!/\b(?:calculate|recalculate|convert|conversion|hypothetical)\b|how much.*(?:cap|cash|savings)/i.test(question);
   const intent=ruleQuestion?{kind:'rules' as const}:classifiedIntent;
   const preparedSellerTurn = intent.kind === 'seller_move'
     ? await runNflSellerMoveConversationTurn(question, latestMarketAnalysis, latestSellerMove).catch(() => null)
@@ -259,7 +259,7 @@ briefRoutes.post('/', async (c) => {
   const previousFactualQuery = contextBriefs[0]?.body?.kind === 'data_analysis' ? contextBriefs[0].body.factual_query ?? null : null;
   // Historical package selection still supplies exact recorded assets. Open
   // football questions go directly to the AI analyst, never the word parser.
-  const preparedFactualAnswer = intent.kind === 'general' && isHistoricalRecordQuestion(question, Boolean(latestMarketAnalysis), Boolean(previousHistoricalSelection))
+  const preparedFactualAnswer = intent.kind === 'general' && !isNflContractPlanningQuestion(question) && isHistoricalRecordQuestion(question, Boolean(latestMarketAnalysis), Boolean(previousHistoricalSelection))
     ? await buildNflFactualAnswer(question, previousFactualQuery, latestMarketAnalysis, previousHistoricalSelection)
     : null;
   const explicitMode = normalizeBriefMode(body.mode);

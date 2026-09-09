@@ -74,6 +74,17 @@ export interface NflContractScenarioArgs {
   budget?: { type: 'cap' | 'cash'; amount: number; reserve: number };
 }
 
+export interface NflFundingObservation {
+  player_id: string;
+  unpaid_salary_available?: number;
+  credited_seasons?: number;
+}
+export interface NflFundingObservationSnapshot {
+  team_id: string;
+  season: number;
+  observations: NflFundingObservation[];
+}
+
 export interface NflContractScenarioIssue {
   code: string;
   severity: 'blocked' | 'conditional' | 'note';

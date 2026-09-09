@@ -210,6 +210,8 @@ function downloadBrief(brief: Brief, sources: BriefSource[]) {
   };
   if(body.conversation_state) {const active=body.conversation_state.active;lines.push('## Scenario', active.objective+'; '+active.candidate_scope+' candidates; '+active.horizon, ...active.assumptions,...active.supplied_terms,...active.unresolved_inputs,'');if(active.budget) lines.push('Budget: '+active.budget.type+' '+money(active.budget.amount)+'; reserve '+money(active.budget.reserve),'');}
   if(body.contract_scenario) lines.push('## Executed contract scenario', '```json', JSON.stringify(body.contract_scenario,null,2), '```', '');
+  if(body.cap_strategy) lines.push('## Calculated funding strategy and sensitivity', '```json', JSON.stringify(body.cap_strategy,null,2), '```', '');
+  if(body.funding_observations) lines.push('## Retained funding observations', '```json', JSON.stringify(body.funding_observations,null,2), '```', '');
   for (const finding of body.key_findings) lines.push(`## ${finding.label}`, finding.body, '');
   for (const item of body.tables) table(item.title, item.columns, item.rows);
   for (const detail of body.supporting_details ?? []) lines.push(`## ${detail.label}`, detail.body, '');

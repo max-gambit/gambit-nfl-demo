@@ -57,6 +57,13 @@ export function categoricalGroundingIssues(prose: AnalystAuthoredProse, evidence
       issues.push('The contract comparison calculates cap allocation and annual cash, not a change in guaranteed compensation. Salary may already be guaranteed. Remove the assertion that this conversion creates new guarantees or converts previously unguaranteed money unless an executed guarantee-change calculation establishes it.');
     }
   }
+  if(evidence.some(e=>e.body.cap_strategy)){
+    const unsupported=text.split(/(?<=[.!?])\s+/).some(sentence=>
+      /multiple conversions|combined conversions|releases?\/?trades?|extensions?/i.test(sentence)
+      && /\b(?:would|will|can|could)\b.{0,100}\b(?:fit|bridge|close|solve|cover)\b/i.test(sentence)
+      && !/\b(?:not|cannot|can.t|unknown|unproven|unverified)\b|need.{0,30}(?:calculat|evaluat|test)/i.test(sentence));
+    if(unsupported)issues.push('The funding search calculates single conversions only. Do not claim that multiple conversions, releases/trades or extensions would close the gap; their fit has not been calculated. Describe them as separate options requiring evaluation.');
+  }
   return [...new Set(issues)];
 }
 
@@ -66,6 +73,7 @@ Flag only material errors: a fact contradicts an exact row; an unsupported factu
 Qualified hypotheses and suggestions are useful. Accept them when their observed premise is supported and their uncertainty is stated. Do not require confirmed seller interest for a conditional investigation candidate. Do not reject a useful bounded answer merely because team-private data is unavailable.
 In availability evidence LP means limited participation, FP means full, DNP means did not participate. Blank or absent game designation does not certify health. Stable limited practice, Questionable designation and partial game usage are compatible; they are not a mismatch or unexpected without an expected workload or staff plan. One game of snaps has no earlier baseline and cannot show a drop, increase, recovery or medical risk. A hypothetical absence stays a user scenario.
 In contracts, active contract end does not prove an exit is clean or rank guarantees. Current-team cap is not incoming cost. Compare cash, cap and deferred proration only from their labelled calculated fields. A restructure shifts recognition; it does not itself create new total cash or certify consent/eligibility beyond the stated assumptions. Salary may already be guaranteed. Do not infer new guaranteed compensation or call converted salary previously unguaranteed from a cap/cash comparison that does not calculate guarantee changes.
+Funding discovery tests single salary conversions only. A failed single-conversion fit does not establish that multiple conversions, releases/trades or extensions would work. Those require a separate calculation. Explain the budget, reserve or price changes actually tested by the sensitivity rows.
 In coaching, run/pass and conversion rates do not identify coverage, pressure, routes or play-action unless supplied charting says so. Descriptive rates do not prove which tactic will work. In scouting, attributed observations are not verified club grades, forecasts or current eligibility.
 Return pass=true only if there are no material issues. Each issue must quote or identify the specific claim and the conflicting/missing evidence. Do not add stylistic suggestions or generic disclaimers. Be concise.`;
 

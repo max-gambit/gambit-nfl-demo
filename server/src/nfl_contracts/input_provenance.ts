@@ -1,10 +1,11 @@
-import type { NflContractScenarioArgs, NflIllustrativeContractYear } from './types.js';
+import type { NflContractScenarioArgs, NflIllustrativeContractYear, NflFundingObservation } from './types.js';
 import { validateNflContractScenarioArgs } from './validation.js';
 
 export interface NflScenarioInputProvenanceContext {
   current_question: string;
   /** Previously executed, server-retained arguments; never model-supplied state. */
   prior_args?: NflContractScenarioArgs;
+  additional_player_names?: string[];
 }
 export interface NflScenarioInputProvenanceGap { path: string; code: string; message: string }
 export interface NflScenarioInputProvenanceResult { ok: boolean; gaps: NflScenarioInputProvenanceGap[] }
@@ -119,9 +120,9 @@ function explicitActors(text: string): string[] {
   });
 }
 
-function buildEvidence(question: string, args: NflContractScenarioArgs, prior?: NflContractScenarioArgs) {
+function buildEvidence(question: string, args: NflContractScenarioArgs, prior?: NflContractScenarioArgs, additionalPlayers:string[] = []) {
   const normalizedQuestion = normalize(question);
-  const players = [...new Set([...args.moves, ...(prior?.moves ?? [])].map(m => name(m.player_id)))];
+  const players = [...new Set([...args.moves.map(m=>m.player_id), ...(prior?.moves ?? []).map(m=>m.player_id),...additionalPlayers].map(name))];
   const aliases = (player: string) => {
     const surname = player.split(' ').at(-1)!;
     return players.filter(p => p.split(' ').at(-1) === surname).length === 1 ? [player, surname] : [player];
@@ -192,7 +193,7 @@ export function validateNflScenarioInputProvenance(input: NflContractScenarioArg
   try { args = validateNflContractScenarioArgs(input); } catch (error) { return { ok: false, gaps: [{ path: 'args', code: 'INVALID_ARGUMENTS', message: error instanceof Error ? error.message : 'Invalid scenario arguments.' }] }; }
   if (typeof context.current_question !== 'string' || !context.current_question.trim()) return { ok: false, gaps: [{ path: 'current_question', code: 'MISSING_USER_TEXT', message: 'The actual current user question is required.' }] };
   const prior = context.prior_args;
-  const { output: evidence, scopingErrors } = buildEvidence(context.current_question, args, prior);
+  const { output: evidence, scopingErrors } = buildEvidence(context.current_question, args, prior,context.additional_player_names);
   for (const message of [...new Set(scopingErrors)]) gap('current_question', 'AMBIGUOUS_PLAYER_FIELD_TEXT', message);
   const bind = (path: string, value: number, previous: number | undefined, candidates: number[]) => {
     const unique = [...new Set(candidates)];
@@ -254,4 +255,36 @@ export function validateNflScenarioInputProvenance(input: NflContractScenarioArg
     if (extractBudget(context.current_question, otherType).length) gap('budget.type', 'BUDGET_TYPE_MISMATCH', `The user supplied a ${otherType} budget; it cannot silently become a ${args.budget.type} budget.`);
   } else if (prior?.budget) gap('budget', 'PRIOR_BUDGET_REMOVED', 'The executed budget and reserve were removed; retain them or explicitly restate the revised scenario.');
   return { ok: gaps.length === 0, gaps };
+}
+
+/** Candidate observations have their own literal binding; no conversion target
+ * or fabricated placeholder amount is needed to state an unpaid-salary limit. */
+export function bindFundingObservationInputs(question:string,args:NflContractScenarioArgs,prior:NflFundingObservation[],proposed:unknown,candidateNames:string[]):NflFundingObservation[]{
+  if(proposed!==undefined&&!Array.isArray(proposed))throw new Error('funding_observations must be an array.');
+  const incoming=(proposed??[]) as NflFundingObservation[];
+  for(const value of incoming){
+    if(!value||typeof value!=='object'||Array.isArray(value)||typeof value.player_id!=='string'||Object.keys(value).some(k=>!['player_id','unpaid_salary_available','credited_seasons'].includes(k)))throw new Error('Each funding observation needs a player and only unpaid_salary_available or credited_seasons.');
+    for(const field of ['unpaid_salary_available','credited_seasons'] as const)if(value[field]!==undefined&&(!Number.isSafeInteger(value[field])||value[field]!<0||value[field]!>(field==='credited_seasons'?25:1_000_000_000)))throw new Error('Invalid funding observation '+field+'.');
+  }
+  const names=[...new Set([...candidateNames,...prior.map(v=>v.player_id),...incoming.map(v=>v.player_id)])];
+  const {output:evidence,scopingErrors}=buildEvidence(question,args,undefined,names);
+  // New observations must name a reviewed candidate, or retain a validated one.
+  const result=new Map(prior.map(v=>[name(v.player_id),structuredClone(v)]));
+  for(const player of names){
+    const priorValue=result.get(name(player)),submitted=incoming.filter(v=>samePlayer(v.player_id,player));
+    if(submitted.length>1)throw new Error('Supply each funding candidate once.');
+    if(submitted.length&&!candidateNames.some(v=>samePlayer(v,player))&&!priorValue)throw new Error('No reviewed funding dossier for '+player+'.');
+    const updated={player_id:player,...priorValue};let touched=false;
+    for(const field of ['unpaid_salary_available','credited_seasons'] as const){
+      const literals=[...new Set(evidence.get(name(player))?.amounts.get(key(field))??[])];
+      const value=submitted[0]?.[field];
+      if(literals.length>1)throw new Error('Conflicting '+field+' observations for '+player+'.');
+      if(value!=null&&(literals.length?value!==literals[0]:value!==priorValue?.[field]))throw new Error('Use an explicit player-bound '+field+' observation for '+player+'.');
+      const next=literals[0]??value;
+      if(next!=null){if(!Number.isSafeInteger(next)||next<0||next>(field==='credited_seasons'?25:1_000_000_000))throw new Error('Invalid '+field+' observation.');updated[field]=next;touched=true;}
+    }
+    if(touched)result.set(name(player),updated);
+  }
+  if((incoming.length||/unpaid (?:base )?salary|credited seasons?/i.test(question))&&scopingErrors.length)throw new Error(scopingErrors.join(' '));
+  return [...result.values()];
 }
