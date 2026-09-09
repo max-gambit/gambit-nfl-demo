@@ -1,3 +1,4 @@
+import { cleanNflAnalystProse } from '@shared/nflReceiverPresentation';
 import { searchNflAuthority } from '../nfl_authority/index.js';
 import { describeNflIllustrativeTerms, getNflContractDossier, getNflContractDossierCoverage, NFL_CONTRACT_SCENARIO_TOOL_SCHEMA, type NflContractScenarioArgs, type NflContractScenarioResult } from '../nfl_contracts/index.js';
 import { contractDossiersEvidence, executeContractScenario, explicitPlayerProtections } from '../nfl_conversation/contract_tools.js';
@@ -48,6 +49,7 @@ INVESTIGATE AND REASON
 - Use supplied initial_evidence first. If it already supports the answer, finish immediately and do not repeat lookups. For receiver value questions, prefer compare_receivers for like-for-like production and attributed evaluations. Use search_player_records to broaden the cohort only when the user asks. Call data tools before making player-specific or numerical claims. Use several lookups in parallel when useful. Search outside NYG for acquisitions. Query enough records to make a meaningful comparison, then select a small set to show and explain why those records are relevant.
 - For a cap-sensitive acquisition question, read the Giants cap position as well as player records. Use receiving yards and offensive usage when discussing receivers. A low cap charge by itself is not evidence of useful receiving production.
 - Current-team cap charges, scheduled annual cash, acquiring-team cap costs and trade compensation are different things. Never label a player's current-team cap hit as the Giants' cost to acquire him. Exact incoming cap cost needs remaining unpaid compensation, transferred guarantees, timing and contract terms; it is not established by these snapshot columns. Never certify affordability from these numbers.
+- A shorter active contract is a shorter recorded term, not proof of no future obligations, a clean exit, or a shorter guaranteed tail. Compare guaranteed liability only from complete year-by-year guarantee terms and transaction assumptions; otherwise describe the recorded term. Do not promise an exact incoming cost from a budget alone. For receiver comparisons, read each player's Team / scope field before calling him internal or external.
 - Current roster status does not prove a player is available for trade, a free agent, healthy, on the block or willing to sign. Do not invent seller willingness, asking prices, medical prognoses, scouting traits or future performance. Specific contract-year claims require the returned contract-end field. Unknown means unknown, not zero or unavailable as a player.
 - Discuss acquisition routes and tradeoffs as analysis, with any unverified seller/role assumptions explicit. Qualified judgments such as "may be attainable" are welcome when you explain sound reasoning from the contract, usage, roster context or a clearly stated scenario. Confirmed seller interest is NOT required for a conditional judgment. Make the reasoning useful and distinguish an inference from an established fact. You may identify which records deserve investigation and why. A cheap productive star is not automatically a practical target solely because his current cap charge is low. Claims about a team's current depth require a roster/usage lookup; hypothetical seller motivations can be framed as hypotheses to test.
 - Dates on the tools are snapshot dates. Do not freshen sources, assume the public cap observations reconcile, or convert historical transactions into current asking prices. Consult the rules tool for technical transaction-rule claims.
@@ -62,7 +64,8 @@ INVESTIGATE AND REASON
 - Missing historical usage means this dataset cannot compare that player's workload; it does not imply inexperience or establish that someone else is the team's only proven/full-time player. Say "among the records available" when coverage is incomplete. Use the recorded NFL-experience field for career-stage claims. A workload comparison does not establish who will absorb targets, outside/slot assignments, pedigree or upside; frame role ideas as hypotheses that need coaching/scouting evidence.
 
 WRITE THE ANSWER
-- Lead with a concrete answer to the actual question, in natural, connected prose. Keep the lead to about eighty words, with 2-3 short supporting findings and 3-6 player rows when helpful. Avoid repetitive disclaimers, internal tool/schema labels and process narration. Do not repeat the entire answer in the findings.
+- Lead with the players, options or football tradeoff that answers the actual question, in natural, connected prose. Do not open with sorting rules, dossier/snapshot terminology, evidence-policy disclaimers or a roll call of statistics. Methodology and supporting records belong in the comparison details. Mention a missing input in the lead only when it prevents the requested conclusion; keep other material qualifications beside their affected claim. Keep the lead to about eighty words, with 2-3 short supporting findings and 3-6 player rows when helpful. Avoid repetitive disclaimers, internal tool/schema labels and process narration. Do not repeat the entire answer in the findings.
+- For a receiver shortlist, focus the opening on whom to investigate, recorded production versus active contract length, and the internal alternative. Do not discuss or rank guarantees in this summary: the receiver comparison does not calculate transferred liability. Do not append the public-cap accounting warning when you have made no affordability claim, or end with a generic offer to model something. The interface already provides labeled tables, relevant limits and follow-ups.
 - Use plain prose in string fields; the interface supplies headings and typography. Do not use Markdown headings, bold markers or raw source tokens in prose. Put exact numeric source refs in findings; tools own all source links and tables.
 - Select tables/rows/columns from tool results. Do not invent table cells or calculate new figures in narrative. Copy figures from the retrieved evidence. Label current-team cap clearly. State essential qualifications next to the affected assertion rather than burying them.
 - Keep ALL numerical facts in tool-owned tables/calculations. Prose and table titles must contain no numbers, spelled-out quantities, money, dates or cell tokens. Use qualitative prose: this year, last season, current deal, a shorter commitment. Never turn the model prose into a calculator.
@@ -294,6 +297,7 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
     }
     const remap = (refs: number[]) => refs.map(ref => sourceMap.get(ref)).filter((ref): ref is number => ref != null);
     const body = { ...answer.body,
+      ...(answer.body.supporting_details ? { supporting_details: answer.body.supporting_details.map(row => ({ ...row, source_refs: remap(row.source_refs) })) } : {}),
       key_findings: answer.body.key_findings.map(row => ({ ...row, source_refs: remap(row.source_refs) })),
       tables: answer.body.tables.map(row => ({ ...row, source_refs: remap(row.source_refs) })),
       calculations: answer.body.calculations.map(row => ({ ...row, source_refs: remap(row.source_refs) })),
@@ -330,7 +334,7 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
   };
   const forModel = (item: Evidence) => ({
     lookup_id: item.id, answer: item.body.answer, selection: item.body.factual_query,receiver_selection:item.body.receiver_query,example_selection:item.body.example_query,
-    answer_statements: [{id:item.id+':answer',text:item.body.answer}, ...item.body.key_findings.flatMap((f,i)=>f.label==='Rule summary'?[{id:item.id+':finding:'+i,text:f.body}]:[])], findings: item.body.key_findings, calculations: item.body.calculations, caveats: item.body.caveats,
+    answer_statements: [{id:item.id+':answer',text:item.body.answer}, ...item.body.key_findings.flatMap((f,i)=>f.label==='Rule summary'?[{id:item.id+':finding:'+i,text:f.body}]:[])], findings: item.body.key_findings, supporting_details: item.body.supporting_details, calculations: item.body.calculations, caveats: item.body.caveats,
     tables: item.body.tables.map((table, index) => ({ table_id: item.id + ':' + index, title: table.title, columns: table.columns, rows: table.rows.map((values, rowIndex) => ({ row_id: 'r' + rowIndex, fields: Object.fromEntries(table.columns.map((column, index) => [column, values[index]])), source_refs: index === 0 && item.rowRefs ? item.rowRefs[rowIndex] : table.source_refs })) })),
     sources: item.sources.map(source => ({ ref: source.ref_index, title: source.title, source: source.source, as_of: source.updated_at })),
   });
@@ -434,7 +438,7 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
           };
           if (!Array.isArray(args.key_findings) || !Array.isArray(args.tables)) throw new Error('Invalid findings or table selection.');
           let withheldSentences=0;
-          const prose = (value: unknown, label: string, max = 6000) => text(value,label,max).split(/(?<=[.!?])\s+/).filter(sentence=>{try{resolveEvidenceProse(sentence,evidence);return true;}catch{withheldSentences++;return false;}}).join(' ');
+          const prose = (value: unknown, label: string, max = 6000) => cleanNflAnalystProse(text(value,label,max)).split(/(?<=[.!?])\s+/).filter(sentence=>{try{resolveEvidenceProse(sentence,evidence);return true;}catch{withheldSentences++;return false;}}).join(' ');
           const findings = args.key_findings.slice(0,5).map(value => { const row = object(value); return { label: prose(row.label, 'finding label', 120), body: prose(row.body, 'finding body', 2500), source_refs: refs(row.source_refs) }; }).filter(row=>row.body.length>0).map(row=>({...row,label:row.label||'Evidence'}));
           const tables = args.tables.slice(0,4).map((value): DataAnalysisTable => {
             const selected = object(value);
@@ -465,14 +469,21 @@ export async function buildNflAiAnswer(question: string, options: AnalystOptions
           // If all quantitative narrative was withheld, retain the full executed
           // result statement. Never leave an orphan such as "New York time."
           if(!statements.length&&primary&&(withheldSentences||!interpretation||Array.isArray(args.answer_statements)&&args.answer_statements.length)){const summaries=primary.body.key_findings.filter(f=>f.label==='Rule summary');statements.push(...(summaries.length?summaries.slice(0,2).map(f=>({text:f.body,refs:f.source_refs})):[{text:primary.body.answer,refs:primary.sources.map(s=>s.ref_index)}]));}
-          const answer=[...statements.map(s=>s.text),interpretation.length>=35?interpretation:''].filter(Boolean).join('\n\n');
+          const receiverEvidence = queryEvidence?.body.receiver_query ? queryEvidence : primary?.body.receiver_query ? primary : undefined;
+          const receiverLead = Boolean(receiverEvidence && interpretation.length >= 35);
+          const supportingDetails = [
+            ...(primary?.body.supporting_details ?? []),
+            ...(receiverEvidence && receiverEvidence !== primary ? receiverEvidence.body.supporting_details ?? [] : []),
+            ...(receiverLead ? statements.map(s => ({label:'Recorded comparison',body:s.text,source_refs:s.refs})) : []),
+          ];
+          const answer=receiverLead ? interpretation : [...statements.map(s=>s.text),interpretation.length>=35?interpretation:''].filter(Boolean).join('\n\n');
           if (!answer) return partial('The written answer contained only unverified quantitative prose. The labelled evidence is preserved.');
           if(!tables.length&&primary)tables.push(...primary.body.tables.slice(0,2));
           const caveats = [...new Set([...(primary?.body.caveats??[]),...stringList(args.caveats,'caveats').filter(value=>{try{resolveEvidenceProse(value,evidence);return true;}catch{return false;}})])];
           if (loaded.source_mode !== 'supabase_current_views') caveats.push('Player records are from the saved public snapshot dated ' + seed.as_of_date + '; the database was unavailable.');
           if(primary)adoptExecutedState(primary);
           const draft: FactualAnswer = { body: {
-            kind: 'data_analysis', language_policy: 'grounded_ai_v1', answer, answer_source_refs:[...new Set(statements.flatMap(s=>s.refs))], key_findings: findings, tables,
+            kind: 'data_analysis', language_policy: 'grounded_ai_v1', answer, answer_source_refs:[...new Set(statements.flatMap(s=>s.refs))], ...(supportingDetails.length ? { supporting_details: supportingDetails } : {}), key_findings: findings, tables,
             calculations: primary?.body.calculations ?? [], caveats, followups: stringList(args.followups, 'followups').slice(0, 3),
             ...(query ? { factual_query: query } : {}),
             ...((queryEvidence?.body.receiver_query??primary?.body.receiver_query)?{receiver_query:queryEvidence?.body.receiver_query??primary?.body.receiver_query}:{}),

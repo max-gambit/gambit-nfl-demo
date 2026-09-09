@@ -169,6 +169,7 @@ function FactualAnswer({ body: savedBody, previous = null, briefId, onEvidence }
     {body.tables.map((table, i) => <div className={`gc-fact-table${table.title.includes('packages') ? ' gc-package-table' : ''}`} key={i}>
       <h3>{table.title} {cite(table.source_refs)}</h3><div><table><thead><tr>{table.columns.map((column, j) => <th key={j}>{column}</th>)}</tr></thead><tbody>{table.rows.map((row, j) => <tr key={j}>{row.map((cell, k) => <td key={k}>{String(cell ?? 'Not recorded')}</td>)}</tr>)}</tbody></table></div>
     </div>)}
+    {Boolean(body.supporting_details?.length) && <details className="gc-calculation-details"><summary>Comparison details</summary><div className="gc-details-body">{body.supporting_details!.map((detail,i)=><div className="gc-finding" key={i}><strong>{detail.label}</strong><p>{detail.body} {cite(detail.source_refs)}</p></div>)}</div></details>}
     {body.contract_scenario?.tables && <details className="gc-calculation-details"><summary>All contract years and obligations</summary><div className="gc-details-body">{body.contract_scenario.tables.map((table,i)=><div className="gc-fact-table" key={i}><h3>{table.title} {cite(table.source_refs)}</h3><div><table><thead><tr>{table.columns.map((c,j)=><th key={j}>{c}</th>)}</tr></thead><tbody>{table.rows.map((row,j)=><tr key={j}>{row.map((cell,k)=><td key={k}>{String(cell??'Unknown')}</td>)}</tr>)}</tbody></table></div></div>)}</div></details>}
     {body.historical_selection && body.market_analysis && <HistoricalPackageEvidence analysis={body.market_analysis} selection={body.historical_selection} sources={sourcesByBrief[briefId] ?? []} onEvidence={onEvidence} />}
     {body.answer_layout === 'market_overview' && body.market_analysis && <MarketAnswerEvidence analysis={body.market_analysis} sources={sourcesByBrief[briefId] ?? []} onEvidence={onEvidence} />}
@@ -211,6 +212,7 @@ function downloadBrief(brief: Brief, sources: BriefSource[]) {
   if(body.contract_scenario) lines.push('## Executed contract scenario', '```json', JSON.stringify(body.contract_scenario,null,2), '```', '');
   for (const finding of body.key_findings) lines.push(`## ${finding.label}`, finding.body, '');
   for (const item of body.tables) table(item.title, item.columns, item.rows);
+  for (const detail of body.supporting_details ?? []) lines.push(`## ${detail.label}`, detail.body, '');
   for (const calc of body.calculations) lines.push(`**${calc.label}:** ${calc.formula} = ${calc.value}`, '');
   const seller = body.seller_move_analysis?.result;
   if (seller?.cap.next_year) {

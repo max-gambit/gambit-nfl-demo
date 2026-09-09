@@ -42,7 +42,7 @@ test('exact result statements carry quantities while model-written claims cannot
  let round=0;
  const result=await buildNflAiAnswer('Compare our recorded receiver production.',{prefetch:false,loadData:loaded,callModel:async()=>response(round++?[{name:'finish_analysis',input:{answer:'The answer is 99 percent certain.',answer_statements:['lookup_1:answer'],evidence_id:'lookup_1',continuation_query_id:'lookup_1'}}]:[{name:'compare_receivers',input:{}}])});
  assert.equal(result.body.ai_analysis?.outcome,'complete');assert.doesNotMatch(result.body.answer,/99 percent/);
- assert.match(result.body.answer,/Ordered by observed/);assert.ok(result.body.tables.length);
+ assert.match(result.body.answer,/Courtland Sutton recorded/);assert.doesNotMatch(result.body.answer,/Ordered by observed/);assert.match(result.body.supporting_details![0].body,/Ordered by observed/);assert.ok(result.body.tables.length);
 });
 
 

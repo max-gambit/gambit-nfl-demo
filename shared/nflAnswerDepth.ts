@@ -4,6 +4,7 @@ import type {
   NflTransactionMarketSignal,
 } from './types';
 import { factualBody } from './nflFacts';
+import { receiverAnswerPresentation } from './nflReceiverPresentation';
 import { nflTransactionMarketCohortEvidence, nflTransactionTradeAssetLabel, nflTransactionTradePackageLines } from './nflTransactionMarket';
 
 const money = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
@@ -198,6 +199,7 @@ export function factualPackageAnswer(body: DataAnalysisBriefBody): DataAnalysisB
 
 /** Enrich earlier factual answers from their own saved data without refreshing or replacing it. */
 export function factualAnswerPresentation(body: DataAnalysisBriefBody): DataAnalysisBriefBody {
+  if (body.receiver_query) return receiverAnswerPresentation(body);
   if (body.ai_analysis || body.language_policy !== 'facts_only_v1') return body;
   if (body.seller_move_analysis?.result) return factualSellerAnswer(body);
   if (body.answer_layout === 'trade_packages') return factualPackageAnswer(body);

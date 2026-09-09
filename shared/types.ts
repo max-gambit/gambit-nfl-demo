@@ -204,6 +204,8 @@ export interface DataAnalysisBriefBody {
   language_policy?: 'facts_only_v1' | 'grounded_ai_v1';
   ai_analysis?: { model: string; elapsed_ms: number; tool_names: string[]; assumptions: string[]; evidence_validated?: boolean; grounding_checked?: boolean; withheld_numeric_sentences?: number; outcome?: 'complete' | 'evidence_only' | 'unavailable' };
   answer_source_refs?: number[];
+  /** Supporting facts and methodology, preserved outside the conversational lead. */
+  supporting_details?: DataAnalysisFinding[];
   conversation_state?: import('./nflConversation').NflConversationState;
   contract_scenario?: { args: unknown; result: unknown; tables?: DataAnalysisTable[]; calculations?: DataAnalysisCalculation[] };
   example_query?: Record<string, unknown>;
