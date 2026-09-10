@@ -47,8 +47,18 @@ export function categoricalGroundingIssues(prose: AnalystAuthoredProse, evidence
     }
   }
   if (evidence.some(e => e.body.receiver_query) && !evidence.some(e => e.body.contract_scenario)) {
-    if (/no future obligations|no (?:remaining |future )?guarantees|clean exit|shorter guaranteed tail|(?:less|lower|more|higher) guaranteed (?:liability|exposure)/i.test(text)) {
-      issues.push('The receiver comparison records active contract horizon, not complete transferred guarantee liability. Remove the unsupported financial conclusion.');
+    for (const sentence of text.split(/(?<=[.!?])\s+/)) {
+      const claims = sentence.matchAll(/no future obligations|no (?:remaining |future )?guarantees|clean exit|shorter guaranteed tail|(?:less|lower|more|higher) guaranteed (?:liability|exposure)/gi);
+      for (const claim of claims) {
+        // A caution that explicitly disclaims this inference is supported.
+        // Bind negation to this clause; another player's caveat cannot excuse
+        // an affirmative claim later in the paragraph or after "but".
+        const before = sentence.slice(0, claim.index).split(/;|\bbut\b|\bhowever\b|[—–]/i).at(-1) ?? '';
+        const after = sentence.slice((claim.index ?? 0) + claim[0].length);
+        const disclaimed = /\b(?:not|never|cannot|can't|doesn't|don't|isn't)\b[^,;.!?]{0,70}$/i.test(before)
+          || /^[\s”"']*(?:(?:is|remains)\s+(?:not established|unverified|unknown)|cannot be inferred|requires? verification|must be verified)\b/i.test(after);
+        if (!disclaimed) issues.push('The receiver comparison records active contract horizon, not complete transferred guarantee liability. Repair this unsupported conclusion: ' + sentence);
+      }
     }
     if (text.split(/(?<=[.!?])\s+/).some(sentence => /\b(?:lower[- ]cost|cheaper|cheap|inexpensive|below[- ]market)\b/i.test(sentence) && !/\b(?:if|may|might|could|unverified|unknown|not|doesn.t|cannot|can.t)\b/i.test(sentence))) {
       issues.push('No incoming price was calculated. Do not call a receiver lower-cost or cheaper as an established fact based on his current-team charge or active contract horizon. State the conditional investigation basis and the price evidence still needed.');

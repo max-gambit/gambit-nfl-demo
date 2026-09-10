@@ -24,6 +24,21 @@ test('unknown incoming price cannot become a cheaper-player assertion', async ()
   assert.deepEqual(categoricalGroundingIssues(prose('If an acceptable price is confirmed, investigate Kirk as a short-horizon alternative. Current-team cap does not establish a cheaper acquisition.'),evidence),[]);
 });
 
+test('contract-horizon cautions are allowed while affirmative liability claims still require evidence', async () => {
+  const evidence = [await buildNflReceiverComparison({}, await loadNflDemoSeed(), 'Compare receiver options.')];
+  for (const answer of [
+    'The active end date does not establish a clean exit.',
+    'We cannot infer no future obligations from that snapshot.',
+    'A shorter guaranteed tail is not established by an active contract end date.',
+    'Do not assume lower guaranteed liability from fewer active years.',
+  ]) assert.deepEqual(categoricalGroundingIssues(prose(answer), evidence), [], answer);
+  for (const answer of [
+    'Kirk offers a clean exit.',
+    'Do not assume guarantees for Meyers. Kirk has no future obligations.',
+    'Meyers does not offer a clean exit, but Kirk offers a clean exit.',
+  ]) assert.ok(categoricalGroundingIssues(prose(answer), evidence).some(issue => issue.includes('transferred guarantee liability')), answer);
+});
+
 test('actual report rejects the observed full-practice premise and unsupported workload decline', async () => {
   const evidence = [await buildNflExampleEvidence({domain:'availability',question:'Show the historical Andrew Thomas report.',playerName:'Andrew Thomas'})];
   assert.ok(categoricalGroundingIssues(prose('Andrew Thomas was a full participant all week.'), evidence).some(i => i.includes('Andrew Thomas')));
