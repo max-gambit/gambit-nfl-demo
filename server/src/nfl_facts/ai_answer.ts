@@ -16,7 +16,7 @@ import { buildNflOptionEvaluation, nflEvaluationTool, type NflEvaluationState, t
 import type Anthropic from '@anthropic-ai/sdk';
 import type { DataAnalysisBriefBody, DataAnalysisTable, NflTransactionTradePackage } from '@shared/types';
 import type { NflFactualQuery, NflRosterNumericFilter } from '@shared/nflFacts';
-import { BRIEF_MODEL, createClaudeMessage } from '../claude/client.js';
+import { ANALYST_MODEL, ANALYST_EFFORT, AnalystProviderError, createAnalystMessage, analystModelMetadata } from '../nfl_conversation/model.js';
 import { loadCurrentNflDataWithMode, type NflDemoSeed } from '../nfl_data/seed.js';
 import { rosterFactsAnswer, historicalPackageAnswer, type FactualAnswer } from './answer.js';
 import { buildNflCurrentAnswer } from '../nfl_current/analysis.js';
@@ -39,7 +39,7 @@ export interface AnalystOptions {
   initialEvidence?: FactualAnswer;
   loadData?: typeof loadCurrentNflDataWithMode;
   loadTradeSnapshot?: typeof loadCurrentNflTransactionMarketSnapshot;
-  callModel?: typeof createClaudeMessage;
+  callModel?: typeof createAnalystMessage;
   deadlineMs?: number;
   prefetch?: boolean;
   reviewDraft?: (draft: FactualAnswer, evidence: unknown[]) => Promise<string[]>;
@@ -348,11 +348,12 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
     else next.active.protected_player_names=explicitPlayerProtections(question,[],next.active.protected_player_names).names;
     conversationState=next;
   };
-  const deadlineMs = options.deadlineMs ?? 180_000;
+  const deadlineMs = options.deadlineMs ?? 300_000;
   const evidence = new Map<string, Evidence>();
   const sources: FactualAnswer['sources'] = [];
   const toolNames: string[] = [];
-  let servingModel = BRIEF_MODEL;
+  let servingModel = ANALYST_MODEL;
+  let servingConfig: ReturnType<typeof analystModelMetadata>;
   const stageMs={retrieval:0,generation:0,review:0,repair:0};
   const retrievalStart=Date.now();
 
@@ -427,7 +428,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
     const properties=Object.fromEntries(Object.entries(tool.input_schema.properties??{}).filter(([key])=>['answer_paragraphs','tables','followups','evidence_id','continuation_query_id'].includes(key)));
     return {...tool,strict:false,input_examples:[{answer_paragraphs:[{text:'The supported recommendation and its evidence.',source_refs:[1]}],tables:[],followups:[],evidence_id:'lookup_1',continuation_query_id:'lookup_1'}],input_schema:jsonSchemaOutputFormat({type:'object',properties,required:['answer_paragraphs','tables','followups','evidence_id','continuation_query_id'],additionalProperties:false} as any).schema as Anthropic.Tool.InputSchema};
   });
-  const call = options.callModel ?? createClaudeMessage;
+  const call = options.callModel ?? createAnalystMessage;
   // Code validates exact cells and categorical facts. A separate bounded
   // evidence review checks the premises and completeness of AI interpretation.
   // Tests can replace that review explicitly; production never defaults to pass.
@@ -459,7 +460,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
     body.language_policy = 'facts_only_v1';
     body.caveats = [...body.caveats, 'Analysis incomplete: ' + reason];
     body.conversation_state = conversationState;
-    body.ai_analysis = { model: servingModel, elapsed_ms: Date.now()-started, tool_names:toolNames, assumptions:conversationState?.active.assumptions ?? [], outcome:selected ? 'evidence_only':'unavailable', grounding_checked:false,pipeline_version:'analyst_v2',stage_ms:{...stageMs},repair_count:Math.min(finalFailures,1),validation_outcome:'incomplete' };
+    body.ai_analysis = { model: servingModel, model_config:servingConfig, elapsed_ms: Date.now()-started, tool_names:toolNames, assumptions:conversationState?.active.assumptions ?? [], outcome:selected ? 'evidence_only':'unavailable', grounding_checked:false,pipeline_version:'analyst_v2',stage_ms:{...stageMs},repair_count:Math.min(finalFailures,1),validation_outcome:'incomplete' };
     body.followups = [question];
     return { body, sources };
   };
@@ -479,16 +480,21 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
     if (Date.now() - started > deadlineMs) return partial('Response deadline reached.');
     let response: Anthropic.Message;
     const generationStart=Date.now();
-    const mustFinish=evidence.size>0&&(finalFailures>0||Date.now()-started>deadlineMs-30_000);
+    const mustFinish=evidence.size>0&&(finalFailures>0||Date.now()-started>deadlineMs-150_000);
     if(mustFinish&&!finalFailures)messages.push({role:'user',content:'Finish from the available evidence now. Identify any material unfinished input; do not start another research round.'});
-    try { response = await call({ model: BRIEF_MODEL, max_tokens: 4500, output_config:{effort:'medium'}, system: NFL_ANALYST_SYSTEM, tools: evidence.size?exposedTools:exposedTools.filter(tool=>tool.name!=='finish_analysis'),
+    try { response = await call({ model: ANALYST_MODEL, max_tokens: 4500, output_config:{effort:ANALYST_EFFORT}, system: NFL_ANALYST_SYSTEM, tools: evidence.size?exposedTools:exposedTools.filter(tool=>tool.name!=='finish_analysis'),
       tool_choice: mustFinish?{type:'tool',name:'finish_analysis',disable_parallel_tool_use:true}:{type:'auto'}, messages,
     }, { timeout: Math.max(1, deadlineMs - (Date.now() - started)), maxRetries: 0 });
-    } catch (error) { return partial(error instanceof Error && /timeout|timed out|abort/i.test(error.message) ? 'Response deadline reached.' : 'The analysis provider is unavailable.'); }
+    } catch (error) {
+      options.onTrace?.({stage:'provider_error',code:error instanceof AnalystProviderError?error.code:'request_failed',message:error instanceof Error?error.message:'Unknown provider error'});
+      return partial(error instanceof Error && /timeout|timed out|abort/i.test(error.message) ? 'Response deadline reached.' : error instanceof AnalystProviderError&&error.code==='missing_api_key'?'The OpenAI analyst connection is not configured.':'The analysis provider is unavailable.');
+    }
     console.info('[nfl analyst] round',round+1,'elapsed_ms',Date.now()-started,'output_tokens',response.usage.output_tokens,'stop',response.stop_reason,'tools',response.content.filter(b=>b.type==='tool_use').map(b=>(b as Anthropic.ToolUseBlock).name).join(','));
     stageMs[finalFailures?'repair':'generation']+=Date.now()-generationStart;
-    options.onTrace?.({stage:finalFailures?'repair':'generation',round,model:response.model,usage:response.usage,content:response.content});
+    options.onTrace?.({stage:finalFailures?'repair':'generation',round,model:response.model,model_config:analystModelMetadata(response),usage:response.usage,content:response.content});
     servingModel = response.model;
+    servingConfig = analystModelMetadata(response);
+    if (response.stop_reason === 'max_tokens') return partial('The analysis exceeded its output allowance.');
     const calls = response.content.filter((block): block is Anthropic.ToolUseBlock => block.type === 'tool_use');
     if (!calls.length) {
       messages.push({ role: 'assistant', content: response.content }, { role: 'user', content: 'Use the data tools to investigate, then submit with finish_analysis. Do not answer outside that tool.' });
@@ -618,7 +624,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
             ...(primary?.body.saved_contract_lookup ? {saved_contract_lookup:primary.body.saved_contract_lookup}: {}),
             ...(primary?.body.example_query ? {example_query:primary.body.example_query}: {}),
             ...(evaluationEvidence ? {evaluation_query:evaluationEvidence.body.evaluation_query,evaluation_result:evaluationEvidence.body.evaluation_result} : {}),
-            ai_analysis: { outcome:primary?.body.saved_contract_lookup?.status==='not_found'&&!contractEvidence?'needs_input':'complete', withheld_numeric_sentences:withheldSentences, model: servingModel, elapsed_ms: Date.now() - started, tool_names: toolNames, assumptions: stringList(args.assumptions, 'assumptions'),pipeline_version:'analyst_v2',stage_ms:{...stageMs},repair_count:Math.min(finalFailures,1),validation_outcome:'passed',evidence_hash:evidenceFingerprint(catalog) },
+            ai_analysis: { outcome:primary?.body.saved_contract_lookup?.status==='not_found'&&!contractEvidence?'needs_input':'complete', withheld_numeric_sentences:withheldSentences, model: servingModel, model_config:analystModelMetadata(response), elapsed_ms: Date.now() - started, tool_names: toolNames, assumptions: stringList(args.assumptions, 'assumptions'),pipeline_version:'analyst_v2',stage_ms:{...stageMs},repair_count:Math.min(finalFailures,1),validation_outcome:'passed',evidence_hash:evidenceFingerprint(catalog) },
           }, sources };
           const authored: AnalystAuthoredProse = { answer: interpretation, findings,
             caveats: stringList(args.caveats, 'caveats'), assumptions: stringList(args.assumptions, 'assumptions'), followups: draft.body.followups,
@@ -637,7 +643,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
                 return reviewEvidence;
               }),
               tool_coverage: { examples: nflExampleCoverage, contract_dossiers:getNflContractDossierCoverage(), tools: nflAnalystTools.filter(t => t.name !== 'finish_analysis').map(t => ({name: t.name, description: t.description?.split('. ').slice(0,2).join('. ')})) },
-            }, { callModel:options.callModel, timeoutMs: Math.min(90_000, Math.max(1, deadlineMs - (Date.now() - started))) });
+            }, { callModel:options.callModel, onTrace:options.onTrace, timeoutMs: Math.min(120_000, Math.max(1, deadlineMs - (Date.now() - started))) });
           } catch(error) { stageMs.review+=Date.now()-reviewStart; options.onTrace?.({stage:'review_error',error:String(error)}); return partial('The factual interpretation review could not finish.'); }
           stageMs.review+=Date.now()-reviewStart;
           options.onTrace?.({stage:'review',issues,elapsed_ms:Date.now()-reviewStart});

@@ -31,15 +31,15 @@ The actual candidate pipeline completed only 9 of 24 turns (37.5%). Combined wri
 
 At `5e82a3d`, a second diagnostic capture completed 12 of 12 first-turn answers. Direct inspection still found a snapshot-horizon-to-commitment inference and unsupported role/trend labels. That capture is diagnostic and is not a replacement accepted sample. The runtime was revised before its next phase, and the harness correctly stopped on the hash mismatch.
 
-The next candidate reasoning/model configuration is pending Max's clarification of GPT-6 Astra / Ultra / Fast: the Codex task, the Giants analyst, or both. No model-provider migration has been made.
+Max clarified that GPT-6 Astra / Ultra / Fast applies to the Giants demo analyst. The candidate now requests `gpt-6-astra`, `max` reasoning (the API's highest supported level), and Fast mode for generation and semantic review. The legacy baseline remains Claude/low. The replacement comparison uses Astra/max/Fast for all four controlled writing variants and records actual serving model/tier. It remains pending acceptance.
 
 ## Verification and evidence limits
 
-- 856 server tests passed at `5e82a3d`; server and QA typechecks and the application build passed. Later uncommitted reasoning/prompt changes still require final verification.
+- The Astra adapter's six protocol tests pass; the full server suite passes 862 tests, and server/QA typechecks and the application build pass. Two live Astra/max/Fast probes completed without repair: outside-shortlist receiver diligence and saved minimum funding. The model and Fast tier were confirmed from returned API metadata. Replacement acceptance and browser checks remain in progress.
 - Browser readback confirmed that an older conversation and its original source drawer remain readable. A fresh accepted conversation, changed objective, save/reload/export and continuation remain required.
 - The single advisory code-review helper run failed structured-output validation because it rejected the reviewer's absolute file path. It produced no usable clean-review result and has not been retried.
-- No OpenAI judge credential was configured. Judgments used a separate blinded call to the configured Claude model, with randomized labels. Same-family bias is possible; direct source review found material issues the model review missed.
-- Max superseded the initial 30/60-second latency gates, prioritizing useful complete answers. The later candidate allowance is three minutes, with up to 90 seconds for review inside that total. Timings remain reported.
+- The initial comparison had no OpenAI judge credential and used separate blinded Claude calls with randomized labels. Same-family bias is possible; direct source review found material issues that review missed. OpenAI is now configured for the requested candidate and the replacement Terra judgments.
+- Max superseded the initial 30/60-second latency gates, prioritizing useful complete answers. The first Astra probes completed in 133 and 142 seconds without repairs. The replacement allowance is five minutes, with up to two minutes for review inside that total, preserving time for a repair. Timings remain reported.
 
 ## Reproduce and inspect
 

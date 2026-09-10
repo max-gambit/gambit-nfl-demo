@@ -1,7 +1,7 @@
 import { jsonSchemaOutputFormat } from '@anthropic-ai/sdk/helpers/json-schema';
 import type Anthropic from '@anthropic-ai/sdk';
 import type { DataAnalysisBriefBody } from '@shared/types';
-import { BRIEF_MODEL, createClaudeMessage } from '../claude/client.js';
+import { ANALYST_MODEL, ANALYST_EFFORT, createAnalystMessage, analystModelMetadata } from './model.js';
 
 export interface AnalystAuthoredProse {
   answer: string;
@@ -89,14 +89,15 @@ export async function reviewNflAnalystSemantics(input: {
   selected_tables: DataAnalysisBriefBody['tables'];
   evidence: unknown[];
   tool_coverage: unknown;
-}, options: { callModel?: typeof createClaudeMessage; timeoutMs?: number } = {}): Promise<string[]> {
-  const response = await (options.callModel ?? createClaudeMessage)({
-    model: BRIEF_MODEL, max_tokens: 2000, output_config: { effort: 'medium' }, system: NFL_SEMANTIC_REVIEW_SYSTEM,
+}, options: { callModel?: typeof createAnalystMessage; timeoutMs?: number; onTrace?: (event: Record<string, unknown>) => void } = {}): Promise<string[]> {
+  const response = await (options.callModel ?? createAnalystMessage)({
+    model: ANALYST_MODEL, max_tokens: 2000, output_config: { effort: ANALYST_EFFORT }, system: NFL_SEMANTIC_REVIEW_SYSTEM,
     tools: [{ name: 'review_answer',strict:true, description: 'Report material evidence or request-completion errors.', input_schema: jsonSchemaOutputFormat({
       type: 'object', properties: { claim_checks:{type:'array',minItems:1,maxItems:12,items:{type:'object',properties:{claim:{type:'string'},status:{type:'string',enum:['supported','conditional','unsupported']},reason:{type:'string'}},required:['claim','status','reason'],additionalProperties:false}}, issues: { type: 'array', maxItems: 5, items: { type: 'string' } },pass:{type:'boolean'} }, required: ['claim_checks','issues','pass'], additionalProperties: false,
     }).schema as Anthropic.Tool.InputSchema }], tool_choice: { type: 'tool', name: 'review_answer' },
     messages: [{ role: 'user', content: JSON.stringify(input) }],
   }, { timeout: options.timeoutMs ?? 60_000, maxRetries: 0 });
+  options.onTrace?.({stage:'review_response',model:response.model,model_config:analystModelMetadata(response),usage:response.usage});
   const calls = response.content.filter((b): b is Anthropic.ToolUseBlock => b.type === 'tool_use' && b.name === 'review_answer');
   const result = calls.length === 1 ? calls[0].input as { pass?: unknown; issues?: unknown; claim_checks?: Array<{claim:string;status:string;reason:string}> } : undefined;
   if (response.stop_reason==='max_tokens'||!result || !Array.isArray(result.claim_checks)||result.claim_checks.length<1||result.claim_checks.length>12||result.claim_checks.some(check=>!check||typeof check.claim!=='string'||typeof check.reason!=='string'||!['supported','conditional','unsupported'].includes(check.status))||!Array.isArray(result.issues) || result.issues.some(i => typeof i !== 'string') || (result.pass!==undefined&&result.pass !== (result.issues.length === 0))) {
