@@ -1,5 +1,24 @@
 # Giants analyst restoration: comparison record
 
+## September 9: High reasoning latency test
+
+Max reported the multi-minute wait and selected “Keep Astra, test High reasoning for faster answers.” The candidate now uses **Astra / High / Fast** for generation and semantic review. Only the reasoning setting changed; prompts, tools, source checks, calculation checks, repair handling and charts are unchanged. Historical max-reasoning metadata remains readable.
+
+[Open the verified two-turn High conversation](http://localhost:5175/?conversation=6770c2da-82bd-42e7-8f0a-b432e1a11b5b).
+
+| Prompt | Prior max run | High replay | Reduction |
+|---|---:|---:|---:|
+| Nabers unavailable; outside receivers versus our roster | 187.413 s | 56.618 s | 69.8% |
+| Saved Meyers terms; $5m budget, $1m reserve, protect Burns/Thomas | 120.678 s | 36.524 s | 69.7% |
+
+Both completed with grounded validation and no answer-repair pass. The receiver replay encountered an unavailable Nacua deep-dossier lookup, recovered, and kept that contract gap explicit. Every displayed paragraph/table source reference resolves. The cap decision table is exactly equal to the prior max-run table, with the budget, reserve and protections preserved. Direct review retained the conditional receiver investigation, internal alternatives, unknown availability/prices, sourced contract distinctions, and separation of cap and cash. The receiver answer is 363 words versus 326 in the latest max baseline; lower effort does not itself ensure shorter prose.
+
+Browser verification covered submitting both prompts, rendered receiver/cap charts and persisted conversation reload. Nineteen focused protocol and semantic-grounding tests, server typecheck and production build passed. Detailed local evidence is retained in `test-results/analyst-restoration/high-reasoning-verification.json`, `speed-baseline-max.json`, `speed-high-readback.json` and the per-brief source files. The measurements are one live replay of each prompt, with different generated tool paths and answers, not a controlled average or proof of unchanged general quality. The earlier broad comparative acceptance work remains unfinished.
+
+The [current OpenAI reasoning guide](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-without-stored-responses) confirms encrypted reasoning is returned automatically with `store:false`; the initial suspected missing `include` flag was ruled out. No transport/state change was made. Streaming has not been implemented.
+
+## Initial restoration and acceptance scope
+
 The implementation is available to try at [the shorter visual answer](http://localhost:5175/?conversation=14ec3596-07f5-4edf-8366-64d2147d91c4). It restores sourced quantitative explanations, expands candidate selection beyond a fixed shortlist, preserves saved contracts and scenario state, and repairs unsupported claims without deleting whole sentences. The initial Astra/browser implementation was `fe3c5e1`; subsequent visual refinements are on `codex/giants-analyst-restoration-20260909`.
 
 The restoration is not yet promoted over the presentation build. The complete earlier fixed-setting comparison showed a substantial writing improvement, but incomplete live answers and unsupported recommendation premises failed acceptance. Those failures were retained and corrected; the replacement Astra comparison remains unfinished. Max asked to wrap up after the implementation and main browser workflow were verified, so the remaining 96-answer writing and 48-turn end-to-end repeat is not being started at this handoff.

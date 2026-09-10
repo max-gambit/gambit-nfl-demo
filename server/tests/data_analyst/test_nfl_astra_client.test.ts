@@ -13,10 +13,10 @@ const apiResponse = (output: unknown[], extra = {}) => new Response(JSON.stringi
   usage: { input_tokens: 100, output_tokens: 80, output_tokens_details: { reasoning_tokens: 50 }, input_tokens_details: { cached_tokens: 60 } }, ...extra,
 }), { status: 200 });
 
-test('Astra uses max reasoning, Fast mode and application tools without forcing optional fields', () => {
+test('Astra uses High reasoning, Fast mode and application tools without forcing optional fields', () => {
   const request = analystResponseRequest(params());
   assert.equal(request.model, ANALYST_MODEL);
-  assert.deepEqual(request.reasoning, { effort: 'max' });
+  assert.deepEqual(request.reasoning, { effort: 'high' });
   assert.equal(request.service_tier, 'fast');
   assert.equal(request.store, false);
   assert.equal(request.max_output_tokens, 32768);

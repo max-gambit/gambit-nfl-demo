@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 export const ANALYST_MODEL = 'gpt-6-astra';
-export const ANALYST_EFFORT = 'max';
+export const ANALYST_EFFORT = 'high';
 export const ANALYST_SERVICE_TIER = 'fast';
 export const ANALYST_MAX_OUTPUT_TOKENS = 32768;
 const localEnvironment = fileURLToPath(new URL('../../.env.local', import.meta.url));
@@ -13,7 +13,7 @@ export interface AnalystModelMetadata {
   provider: 'openai';
   requested_model: string;
   model: string;
-  reasoning_effort: 'max';
+  reasoning_effort: 'high' | 'max';
   requested_service_tier: 'fast';
   service_tier: string | null;
   response_id: string;
