@@ -48,6 +48,23 @@ test('explicit funding and illustrative acquisition requests bypass unrelated ma
   ])for(const context of [fresh,marketChannel,sellerChannel])assert.equal(classifyNflAnalysisTurn(question,context).kind,'general');
 });
 
+test('contract verification and individual comparisons do not become historical market requests', () => {
+  for (const question of [
+    'What contract and payroll details must we verify before executing Adebo’s conversion?',
+    'Which contract rights should we check before converting Brian Burns’s salary?',
+    'Compare Meyers versus Sutton for next-year guaranteed obligations and exit conditions.',
+    'What changed in the contract after the salary conversion?',
+    'Compare the same contract moves before and after June 1.',
+    'What contract and payroll details should we verify before converting a cornerback’s salary?',
+    'Compare the receiver’s contract costs before and after June 1.',
+  ]) for (const context of [fresh, marketChannel]) assert.equal(classifyNflAnalysisTurn(question, context).kind, 'general', question);
+  for (const question of [
+    'How have receiver contracts changed since 2020?',
+    'Compare safety and running-back material-move rates before and after 2020.',
+    'Compare trades leaguewide from 2016 through 2025.',
+  ]) assert.equal(classifyNflAnalysisTurn(question, fresh).kind, 'transaction_market', question);
+});
+
 test('server intent matrix keeps prior context bounded to recognizable continuations', () => {
   const cases = [
     ['Which position markets have grown or shrunk over the last 10 years?', fresh, 'transaction_market', false],

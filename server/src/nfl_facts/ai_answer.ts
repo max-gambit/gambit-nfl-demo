@@ -360,6 +360,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
   const toolNames: string[] = [];
   let servingModel = ANALYST_MODEL;
   let servingConfig: ReturnType<typeof analystModelMetadata>;
+  let providerErrorCode: string | undefined;
   const stageMs={retrieval:0,generation:0,review:0,repair:0};
   const retrievalStart=Date.now();
 
@@ -451,12 +452,14 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
       const scenario = item.body.contract_scenario?.result as NflContractScenarioResult & {comparison?:unknown} | undefined;
       return scenario?.comparison ? 6 : item.body.evaluation_query ? 5 : scenario?.moves.some(m => m.action !== 'hold') ? 4 : item.body.example_query ? 3 : item.body.receiver_query ? 2 : 1;
     };
-    const selected = executed.slice().sort((a,b) => decisionWeight(b)-decisionWeight(a) || Number(b.id.split('_')[1])-Number(a.id.split('_')[1]))[0]
-      ?? [...evidence.values()].find(e=>e.body.receiver_query) ?? [...evidence.values()].at(-1);
+    // A legacy prefetch is context, not a completed investigation of this turn.
+    // Never promote it into an answer or overwrite the saved objective when
+    // the provider fails before choosing and executing any tools.
+    const selected = executed.slice().sort((a,b) => decisionWeight(b)-decisionWeight(a) || Number(b.id.split('_')[1])-Number(a.id.split('_')[1]))[0];
     if(selected)adoptExecutedState(selected);
     const body: DataAnalysisBriefBody = selected ? { ...selected.body,
-      answer: 'The checked evidence is ready below. The written analysis did not finish, so this is an evidence view; it does not complete the requested comparison.',
-    } : { kind:'data_analysis', answer:'The analyst could not retrieve enough evidence to answer this question. Your question is saved; retry it to continue.', key_findings:[], tables:[], calculations:[], caveats:[], followups:[] };
+      answer: 'The answer could not finish. These are the records retrieved for this question.',
+    } : { kind:'data_analysis', answer:'The answer could not finish. Your question is saved; retry it.', key_findings:[], tables:[], calculations:[], caveats:[], followups:[] };
     if (selected) {
       const seen = new Set(body.tables.map(t => JSON.stringify([t.title,t.rows])));
       body.tables = [...body.tables];
@@ -470,9 +473,9 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
     body.language_policy = 'facts_only_v1';
     body.caveats = [...body.caveats, 'Analysis incomplete: ' + reason];
     body.conversation_state = conversationState;
-    body.ai_analysis = { model: servingModel, model_config:servingConfig, elapsed_ms: Date.now()-started, tool_names:toolNames, assumptions:conversationState?.active.assumptions ?? [], outcome:selected ? 'evidence_only':'unavailable', grounding_checked:false,pipeline_version:'analyst_v2',stage_ms:{...stageMs},repair_count:Math.min(finalFailures,1),validation_outcome:'incomplete' };
+    body.ai_analysis = { model: servingModel, model_config:servingConfig, ...(providerErrorCode?{provider_error_code:providerErrorCode}:{}), elapsed_ms: Date.now()-started, tool_names:toolNames, assumptions:conversationState?.active.assumptions ?? [], outcome:selected ? 'evidence_only':'unavailable', grounding_checked:false,pipeline_version:'analyst_v2',stage_ms:{...stageMs},repair_count:Math.min(finalFailures,1),validation_outcome:'incomplete' };
     body.followups = [question];
-    return { body, sources };
+    return { body, sources: executed.flatMap(item => item.sources) };
   };
   let finalFailures = 0;
   const readCache=new Map<string,Promise<{answer?:FactualAnswer;error?:unknown}>>();
@@ -496,7 +499,10 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
       tool_choice: mustFinish?{type:'tool',name:'finish_analysis',disable_parallel_tool_use:true}:{type:'auto'}, messages,
     }, { timeout: Math.max(1, deadlineMs - (Date.now() - started)), maxRetries: 0 });
     } catch (error) {
-      options.onTrace?.({stage:'provider_error',code:error instanceof AnalystProviderError?error.code:'request_failed',message:error instanceof Error?error.message:'Unknown provider error'});
+      stageMs[finalFailures?'repair':'generation']+=Date.now()-generationStart;
+      providerErrorCode=error instanceof AnalystProviderError?error.code:'request_failed';
+      console.warn('[nfl analyst] provider_error',providerErrorCode);
+      options.onTrace?.({stage:'provider_error',code:providerErrorCode,message:error instanceof Error?error.message:'Unknown provider error'});
       return partial(error instanceof Error && /timeout|timed out|abort/i.test(error.message) ? 'Response deadline reached.' : error instanceof AnalystProviderError&&error.code==='missing_api_key'?'The OpenAI analyst connection is not configured.':'The analysis provider is unavailable.');
     }
     console.info('[nfl analyst] round',round+1,'elapsed_ms',Date.now()-started,'output_tokens',response.usage.output_tokens,'stop',response.stop_reason,'tools',response.content.filter(b=>b.type==='tool_use').map(b=>(b as Anthropic.ToolUseBlock).name).join(','));

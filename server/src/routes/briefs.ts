@@ -890,7 +890,12 @@ export async function regenerateBriefById(
     // Keep the original conversational interpretation when regenerating an AI
     // answer. Historical artifacts retain their executed scope as evidence.
     let initialEvidence;
-    if (inheritedMarketQuery) {
+    const completedHistoricalAnswer = existingBrief.body?.kind === 'data_analysis' && existingBrief.body.ai_analysis?.outcome === 'complete';
+    const historicalQuestion = classifyNflAnalysisTurn(existingBrief.question, { market_query: inheritedMarketQuery, seller_scenario: null }).kind === 'transaction_market'
+      || isHistoricalRecordQuestion(existingBrief.question, Boolean(inheritedMarketQuery), Boolean(existingBrief.body?.kind === 'data_analysis' && existingBrief.body.historical_selection));
+    // An incomplete answer may contain a misrouted prefetch. Replaying that
+    // artifact would reintroduce the wrong topic into this same question.
+    if (inheritedMarketQuery && (completedHistoricalAnswer || historicalQuestion)) {
       const lookup = await ensureNflTransactionMarketLookup('', { messages: [{ role: 'user', content: existingBrief.question }], traces: [] }, inheritedMarketQuery);
       const market = latestNflTransactionMarketAnalysis(lookup.traces);
       if (!market) throw new Error('Required NFL transaction-market analysis was not returned.');

@@ -52,9 +52,9 @@ test('numerical draft failures trigger one targeted repair without silently dele
   }});
   assert.equal(calls,2);assert.equal(result.body.ai_analysis?.outcome,'complete');assert.equal(result.body.ai_analysis?.repair_count,1);assert.match(result.body.answer,/835/);assert.ok(result.body.answer_paragraphs?.[0].fact_ids?.length);
 });
-test('repeated unsupported quantity returns incomplete evidence and never a mutilated recommendation',async()=>{
+test('repeated unsupported quantity cannot promote prefetched evidence into an accepted answer',async()=>{
   const result=await buildNflAiAnswer('Compare Meyers.',{loadData:async()=>({seed:await seed,source_mode:'supabase_current_views',fallback_reason:null}),initialEvidence:evidence,reviewDraft:async()=>[],callModel:async()=>response('finish_analysis',{answer:'Meyers recorded 999 yards. Therefore acquire him.',answer_source_refs:[1],evidence_id:'lookup_1',continuation_query_id:'lookup_1'})});
-  assert.equal(result.body.ai_analysis?.outcome,'evidence_only');assert.doesNotMatch(result.body.answer,/Therefore acquire/);
+  assert.equal(result.body.ai_analysis?.outcome,'unavailable');assert.doesNotMatch(result.body.answer,/Therefore acquire/);assert.deepEqual(result.sources,[]);
 });
 test('semantic checks reject unsupported best-producer and separation claims',()=>{
   const prose={answer:'Meyers has the best recorded receiving production and is a clear separator.',findings:[],caveats:[],assumptions:[],followups:[]};

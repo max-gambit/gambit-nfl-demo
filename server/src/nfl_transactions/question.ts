@@ -87,8 +87,15 @@ export function isNflTransactionMarketQuestion(question: string): boolean {
   const value = question.trim().toLowerCase();
   if (!value) return false;
   const marketLanguage = /\b(?:transaction|trade|traded|market|free agen|contract|extension|signing|comparables?|compensation|pick return|mobility|material[- ]move)/i.test(value);
-  const analysisLanguage = /\b(?:trend|grew|grown|growth|shrank|shrunk|shrinkage|changed|compare|versus|vs\.?|before|after|since|recent|influenc|most often|over the last|historical)/i.test(value);
-  return marketLanguage && analysisLanguage;
+  const historicalAnalysis = /\b(?:trends?|grew|grown|growth|shrank|shrunk|shrinkage|most often|over the last|historical(?:ly)?)\b|\b(?:before|after|since)\s+20\d{2}\b|\b20\d{2}\s*(?:through|to|[-–—])\s*20\d{2}\b|\b(?:recent transactions?|influenced|drove)\b/i.test(value);
+  const populationComparison = /\b(?:compare|versus|vs)\b/i.test(value) && (isNflTransactionMarketRefinement(value)
+    || /\b(?:markets?|rates?|frequenc\w*|volumes?|mobility|material[- ]move|pick returns?)\b/i.test(value));
+  // "Contract ... before executing" is a contract question, not a historical
+  // cohort. Aggregate prefetch requires a market/population subject. Ambiguous
+  // individual-player questions stay with the conversational analyst.
+  const aggregateSubject = /\b(?:markets?|transactions|trades|comparables?|mobility|material[- ]move|pick returns?|leaguewide|league-wide|across the (?:nfl|league)|all teams|all positions|position markets?)\b/i.test(value)
+    || positionGroupsFromQuestion(value).length > 0;
+  return marketLanguage && aggregateSubject && (historicalAnalysis || populationComparison);
 }
 
 export function transactionMarketRequestFromQuestion(
