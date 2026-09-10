@@ -49,6 +49,8 @@ export function NygChatWorkspace({ showLibrary = false, onOpenChat }: { showLibr
   const selectedBrief = briefId ? briefs.find(b => b.id === briefId) : null;
   const evidenceBrief = evidenceId ? briefs.find(b => b.id === evidenceId) : null;
 
+  useEffect(() => { setSavedFeedback(null); }, [briefId]);
+
   useEffect(() => {
     void loadSessions(); void loadAllBriefs(); void loadBookmarks();
     return subscribeBriefUpdates();
@@ -147,7 +149,7 @@ export function NygChatWorkspace({ showLibrary = false, onOpenChat }: { showLibr
       </>}
     </main>
     {evidenceBrief && <div className="gc-overlay" onMouseDown={e => { if (e.target === e.currentTarget) setEvidenceId(null); }}><aside className="gc-evidence-drawer" role="dialog" aria-modal="true" aria-label="Sources"><div className="gc-panel-heading"><div><h2>Sources</h2></div><button autoFocus aria-label="Close sources" onClick={() => setEvidenceId(null)}>×</button></div><p className="gc-panel-question">{evidenceBrief.question}</p>{isFactualBody(evidenceBrief.body) && <div className="gc-limits">{evidenceBrief.body.caveats.map((text, i) => <p key={i}>{text}</p>)}</div>}<SourceList sources={sourcesByBrief[evidenceBrief.id]} selectedRef={selectedSourceRef} /></aside></div>}
-    {selectedBrief && isFactualBody(selectedBrief.body) && <div className="gc-overlay gc-brief-overlay" onMouseDown={e => { if (e.target === e.currentTarget) setBriefId(null); }}><section className="gc-brief-document" role="dialog" aria-modal="true" aria-label="Saved factual brief"><div className="gc-panel-heading"><span className="gc-eyebrow">NEW YORK GIANTS · BRIEF</span><button autoFocus aria-label="Close brief" onClick={() => setBriefId(null)}>×</button></div><h1>{briefTitle(selectedBrief)}</h1><div className="gc-brief-meta">{date(selectedBrief.created_at)} · {bookmarkedBriefIds.has(selectedBrief.id) ? 'Saved' : 'Preview'}</div><FactualAnswer body={selectedBrief.body} briefId={selectedBrief.id} onEvidence={ref => { setBriefId(null); openEvidence(selectedBrief.id, ref); }} /><h2 className="gc-source-heading">Sources</h2><SourceList sources={sourcesByBrief[selectedBrief.id]} /><div className="gc-brief-actions"><button disabled={!sourcesByBrief[selectedBrief.id]} onClick={() => { downloadBrief(selectedBrief, sourcesByBrief[selectedBrief.id] ?? []); setSavedFeedback('Markdown brief downloaded with source links.'); }}>Download Markdown</button><button onClick={() => { openConversation(selectedBrief.session_id); }}>Continue conversation</button></div>{savedFeedback && <p role="status">{savedFeedback}</p>}</section></div>}
+    {selectedBrief && isFactualBody(selectedBrief.body) && <div className="gc-overlay gc-brief-overlay" onMouseDown={e => { if (e.target === e.currentTarget) setBriefId(null); }}><section className="gc-brief-document" role="dialog" aria-modal="true" aria-label="Saved factual brief"><div className="gc-panel-heading"><span className="gc-eyebrow">NEW YORK GIANTS · BRIEF</span><button autoFocus aria-label="Close brief" onClick={() => setBriefId(null)}>×</button></div><h1>{briefTitle(selectedBrief)}</h1><div className="gc-brief-meta">{date(selectedBrief.created_at)} · {bookmarkedBriefIds.has(selectedBrief.id) ? 'Saved' : 'Preview'}</div><FactualAnswer body={selectedBrief.body} briefId={selectedBrief.id} onEvidence={ref => { setBriefId(null); openEvidence(selectedBrief.id, ref); }} /><h2 className="gc-source-heading">Sources</h2><SourceList sources={sourcesByBrief[selectedBrief.id]} /><div className="gc-brief-actions"><button disabled={!sourcesByBrief[selectedBrief.id]} onClick={() => { downloadBrief(selectedBrief, sourcesByBrief[selectedBrief.id] ?? []); setSavedFeedback('Download requested.'); }}>Download Markdown</button><button disabled={!sourcesByBrief[selectedBrief.id]} onClick={async () => { try { await navigator.clipboard.writeText(briefMarkdown(selectedBrief, sourcesByBrief[selectedBrief.id] ?? [])); setSavedFeedback('Markdown copied with source links.'); } catch { setSavedFeedback('Could not copy Markdown. Try Download Markdown.'); } }}>Copy Markdown</button><button onClick={() => { openConversation(selectedBrief.session_id); }}>Continue conversation</button></div>{savedFeedback && <p role="status">{savedFeedback}</p>}</section></div>}
     <Toaster />
   </div>;
 }
@@ -200,8 +202,8 @@ function briefTitle(brief: Brief): string {
   const result = isFactualBody(brief.body) ? brief.body.seller_move_analysis?.result : null;
   return result ? `${result.player.player_name} · ${result.proposal.pick_year} round ${result.proposal.pick_round} trade scenario` : brief.question;
 }
-function downloadBrief(brief: Brief, sources: BriefSource[]) {
-  if (!isFactualBody(brief.body)) return;
+function briefMarkdown(brief: Brief, sources: BriefSource[]): string {
+  if (!isFactualBody(brief.body)) return '';
   const body = factualAnswerPresentation(brief.body);
   const cell = (value: unknown) => String(value ?? 'Not recorded').replaceAll('|', '\\|').replaceAll('\n', ' ');
   const narrative=body.answer_paragraphs?.length?body.answer_paragraphs.map(p=>p.text+(p.source_refs.length?' '+p.source_refs.map(ref=>'['+ref+']').join(' '):'')).join('\n\n'):body.answer;
@@ -242,7 +244,12 @@ function downloadBrief(brief: Brief, sources: BriefSource[]) {
     if (Array.isArray(data?.rows)) for (const row of data.rows as Array<{ k: unknown; v: unknown }>) lines.push(`- ${cell(row.k)}: ${cell(row.v)}`);
     lines.push('');
   }
-  const url = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/markdown;charset=utf-8' }));
+  return lines.join('\n');
+}
+function downloadBrief(brief: Brief, sources: BriefSource[]) {
+  const markdown = briefMarkdown(brief, sources);
+  if (!markdown) return;
+  const url = URL.createObjectURL(new Blob([markdown], { type: 'text/markdown;charset=utf-8' }));
   const a = document.createElement('a'); a.href = url; a.download = `Giants-brief-${brief.id.slice(0, 8)}.md`; a.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
