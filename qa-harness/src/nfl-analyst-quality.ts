@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import { nflCommunicationIssues } from '../../server/src/nfl_conversation/communication.js';
 import path from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {execFileSync} from 'node:child_process';
@@ -110,10 +111,12 @@ if(phase==='report'){
  const candidate=scores.filter(s=>s.id.includes('-candidate-'));const materialErrors=candidate.flatMap(s=>s.material_errors.map((error:string)=>({id:s.id,error})));
  const runs=await Promise.all(files.filter(f=>f.startsWith('e2e-')&&f.includes('-candidate-')&&f.endsWith('.json')).map(read));
  const latencies=runs.map(r=>r.elapsed_ms).sort((a,b)=>a-b);
+ const communicationIssues=runs.flatMap(r=>nflCommunicationIssues(r.question??'',r.result?.body?.answer??'').map(sentence=>({id:r.id,sentence})));
  const captures=await Promise.all(files.filter(f=>f.startsWith('capture-')&&f.endsWith('.json')).map(read));
  const ordinary=[...captures.filter(r=>NFL_QUALITY_CASES.some(c=>!c.complex&&r.id==='capture-'+c.id)),...runs.filter(r=>/^e2e-scope-candidate-[12]-[23]$|^e2e-saved-candidate-[12]-2$/.test(r.id))].map(r=>r.elapsed_ms).sort((a,b)=>a-b);
  const median=(values:number[])=>values.length?(values[Math.floor((values.length-1)/2)]+values[Math.floor(values.length/2)])/2:null;
  const summary={sample:'Bounded historical prompt replays and actual tool pipelines; not universal reliability',judges:judgments.length,judge_errors:judgments.filter(j=>j.error),writing_scores:byVariant,candidate_scores:averages(candidate),pair_count:pairs.length,pairwise_preference:prefScore(pairs),writing_preference:prefScore(pairs.filter(p=>p.judge.startsWith('judge-writing'))),e2e_preference:prefScore(pairs.filter(p=>p.judge.startsWith('judge-e2e'))),complete_fraction:candidate.filter(s=>s.complete_or_useful_input).length/Math.max(1,candidate.length),material_errors:materialErrors,ordinary_sample_count:ordinary.length,ordinary_median_ms:median(ordinary),e2e_candidate_median_ms:median(latencies),e2e_candidate_max_ms:Math.max(0,...latencies),direct_claim_review:await exists('direct-claim-review.json')?await read('direct-claim-review.json'):null,
+ communication_issues:communicationIssues,
  expected_counts:{writing:96,e2e:48,judgments:48},
  actual_counts:{writing:files.filter(f=>f.startsWith('writing-')&&f.endsWith('.json')).length,e2e:files.filter(f=>f.startsWith('e2e-')&&f.endsWith('.json')).length,judgments:judgments.filter(j=>!j.error).length},
  judge_models:[...new Set(judgments.filter(j=>!j.error).map(j=>j.model))],
@@ -126,6 +129,7 @@ if(phase==='report'){
  historical_writing_quality:['relevance','depth','decision_usefulness'].every(k=>byVariant.candidate[k]>=Math.max(byVariant.original[k],byVariant.september8[k])),
  completion:summary.complete_fraction>=0.9&&summary.e2e_complete_fraction>=0.9,
  no_material_errors:materialErrors.length===0,
+ no_unrequested_metacommentary:communicationIssues.length===0,
  direct_review:summary.direct_claim_review?.passed===true,
  bounded_deadline:summary.e2e_candidate_max_ms<=181000};
  await save('gates.json',{...gates,accepted:Object.values(gates).every(Boolean)});

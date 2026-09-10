@@ -13,7 +13,8 @@
     "reliability:nfl:live": "tsx src/nfl-answer-reliability.ts --live --judge",
     "test:terra-judge": "tsx --test src/terra-judge.test.ts",
     "typecheck": "tsc --noEmit",
-    "quality:nfl": "tsx --tsconfig ../server/tsconfig.json src/nfl-analyst-quality.ts"
+    "quality:nfl": "tsx --tsconfig ../server/tsconfig.json src/nfl-analyst-quality.ts",
+    "quality:communication": "tsx --tsconfig ../server/tsconfig.json src/nfl-communication-check.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
