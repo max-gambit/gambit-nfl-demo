@@ -89,6 +89,7 @@ REASON
 - Dated public cap observations with conflicting bases do not establish that NYG is currently over the cap or must clear room. Keep any cost-pressure inference conditional on reconciling the ledger.
 - Explain contract term separately from guaranteed liability, current-team cap separately from incoming cost, and cap recognition separately from cash. A budget alone cannot establish actual incoming price. Use executed contract comparisons and funding calculations for numerical scenarios; never supply new financial inputs the user did not provide.
 - A low current-team cap charge cannot justify a contained-cost acquisition or less future Giants commitment. Snapshot end years may include voids; only dossier active years establish active term. State a conditional investigation premise, not a price conclusion.
+- A single season of production supports a volume/workload comparison, not an improving trend, consistency claim or specific football role. Explain a conditional role hypothesis and the evaluation needed to test it.
 - Compare like metrics, periods and cohorts. Production is not a scouting grade. A player can lead in receptions while another leads in yards; specify the metric. Attribute scouting evaluations and distinguish user-supplied grades from verified team assessments.
 - Availability reports support staff questions, not medical conclusions. Coaching outcomes support review hypotheses; film/charting is required for coverage, assignment or causal claims. Limited practice is not full participation, and one observed game cannot establish a workload trend.
 
@@ -480,7 +481,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
     const generationStart=Date.now();
     const mustFinish=evidence.size>0&&(finalFailures>0||Date.now()-started>deadlineMs-30_000);
     if(mustFinish&&!finalFailures)messages.push({role:'user',content:'Finish from the available evidence now. Identify any material unfinished input; do not start another research round.'});
-    try { response = await call({ model: BRIEF_MODEL, max_tokens: 4500, output_config:{effort:'low'}, system: NFL_ANALYST_SYSTEM, tools: evidence.size?exposedTools:exposedTools.filter(tool=>tool.name!=='finish_analysis'),
+    try { response = await call({ model: BRIEF_MODEL, max_tokens: 4500, output_config:{effort:'medium'}, system: NFL_ANALYST_SYSTEM, tools: evidence.size?exposedTools:exposedTools.filter(tool=>tool.name!=='finish_analysis'),
       tool_choice: mustFinish?{type:'tool',name:'finish_analysis',disable_parallel_tool_use:true}:{type:'auto'}, messages,
     }, { timeout: Math.max(1, deadlineMs - (Date.now() - started)), maxRetries: 0 });
     } catch (error) { return partial(error instanceof Error && /timeout|timed out|abort/i.test(error.message) ? 'Response deadline reached.' : 'The analysis provider is unavailable.'); }
@@ -635,7 +636,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
                 const {facts,fact_fields,answer_statements,...reviewEvidence}=forModel(item);
                 return reviewEvidence;
               }),
-              tool_coverage: { examples: nflExampleCoverage, tools: nflAnalystTools.filter(t => t.name !== 'finish_analysis').map(t => ({name: t.name, description: t.description?.split('. ').slice(0,2).join('. ')})) },
+              tool_coverage: { examples: nflExampleCoverage, contract_dossiers:getNflContractDossierCoverage(), tools: nflAnalystTools.filter(t => t.name !== 'finish_analysis').map(t => ({name: t.name, description: t.description?.split('. ').slice(0,2).join('. ')})) },
             }, { callModel:options.callModel, timeoutMs: Math.min(90_000, Math.max(1, deadlineMs - (Date.now() - started))) });
           } catch(error) { stageMs.review+=Date.now()-reviewStart; options.onTrace?.({stage:'review_error',error:String(error)}); return partial('The factual interpretation review could not finish.'); }
           stageMs.review+=Date.now()-reviewStart;
