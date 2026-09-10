@@ -8,9 +8,46 @@ import type Anthropic from '@anthropic-ai/sdk';
 import {buildNflAiAnswer} from '../../src/nfl_facts/ai_answer.js';
 import {loadNflDemoSeed} from '../../src/nfl_data/seed.js';
 import {categoricalGroundingIssues} from '../../src/nfl_conversation/semantic_grounding.js';
+import {factualAnswerPresentation} from '@shared/nflAnswerDepth';
+import {nflAcquisitionSummary} from '@shared/nflAcquisitionPresentation';
+import {nflAnswerVisuals} from '@shared/nflAnswerVisuals';
 
 const year=(year:number,base_salary:number,guaranteed_salary:number):NflIllustrativeContractYear=>({year,kind:'active',base_salary,guaranteed_salary,other_cash:0,guaranteed_other_cash:0,incentives_cap_charge:0,incentives_cash:0,salary_paid_by_prior_team:0,other_cash_paid_by_prior_team:0});
 const fixture=():NflContractScenarioArgs=>({schema_version:1,season:2026,team_id:'NYG',timing:'post_june_1',protected_player_ids:['Brian Burns','Andrew Thomas'],budget:{type:'cap',amount:5_000_000,reserve:1_000_000},moves:[{player_id:'Jakobi Meyers',action:'acquire',illustrative_terms:{basis:'user_supplied_illustrative',label:'Rehearsal illustration',user_input:'Complete prior validated illustrative terms',terms_complete:true,signing_bonus:2_000_000,years:[year(2026,2_000_000,2_000_000),year(2027,4_500_000,0)],prior_team_obligations:[],guarantee_note:'Supplied outstanding guarantees'}},{player_id:'Paulson Adebo',action:'restructure',conversion_amount:6_000_000}]});
+
+test('zero funding gap keeps the paid acquisition prominent in saved prose and cap/cash charts',async()=>{
+  const answer=await buildCapStrategy(fixture()), body=answer.body;
+  body.answer='Acquire him without funding. Minimum funding needed is $0.';
+  body.answer_paragraphs=[{text:body.answer,source_refs:[1]}];
+  body.tables[0].title='Minimum funding decision';body.tables[0].rows[0][0]='Hold / no acquisition';body.tables[0].rows[1][0]='Acquire without funding';
+  const original=structuredClone(body), view=factualAnswerPresentation(body);
+  assert.match(view.answer,/Jakobi Meyers would use \$3,000,000 of cap space and \$4,000,000 in cash in 2026/);
+  assert.match(view.answer,/No salary conversion is needed/);assert.doesNotMatch(view.answer,/Minimum funding needed is \$0|without funding/);
+  assert.deepEqual(view.tables[0].rows.map(row=>row.slice(1)),body.tables[0].rows.map(row=>row.slice(1)));
+  assert.equal(view.tables[0].rows[0][0],'Do not acquire · no added cost');assert.equal(view.tables[0].rows[1][0],'Acquire · use existing cap room');
+  assert.deepEqual(body,original);assert.deepEqual(factualAnswerPresentation(view),view);
+  const refs=new Set(answer.sources.map(source=>source.ref_index));assert.ok(view.answer_paragraphs![0].source_refs.every(ref=>refs.has(ref)));
+  const visual=nflAnswerVisuals(view.tables)[0];assert.equal(visual.kind,'bars');if(visual.kind!=='bars')return;
+  assert.equal(visual.title,'Cap and cash comparison');assert.deepEqual(visual.points[0].values,[3_000_000,5_500_000,4_000_000,4_500_000]);
+  assert.equal(visual.points[1].label,'Do not acquire · no added cost');
+});
+
+test('salary conversion changes the plan but never replaces the incoming player cost with the net cap change',async()=>{
+  const input=fixture();input.budget!.amount=3_000_000;
+  const {body}=await buildCapStrategy(input);body.answer='Use the minimum salary conversion to cover the cap shortfall.';
+  const summary=nflAcquisitionSummary(body)!;assert.deepEqual(summary.years,[{year:2026,cap:3_000_000,cash:4_000_000},{year:2027,cap:5_500_000,cash:4_500_000}]);
+  const view=factualAnswerPresentation(body);assert.match(view.answer,/\$3,000,000 of cap space and \$4,000,000 in cash/);
+  assert.ok(view.tables[0].rows.some(row=>row[1]==='$2,000,000'));assert.doesNotMatch(view.answer,/No salary conversion is needed/);
+});
+
+test('an opening that already explains cap and cash is not repeated, and blocked costs stay unknown',async()=>{
+  const {body}=await buildCapStrategy(fixture());body.answer='On the illustrative terms, Meyers uses $3 million of cap and $4 million in cash in 2026. No restructure is needed.';
+  assert.equal(factualAnswerPresentation(body).answer,body.answer);
+  body.answer='A $3 million cap budget would cover the cap charge. Cash required is $4 million.';
+  assert.match(factualAnswerPresentation(body).answer,/Jakobi Meyers would use \$3,000,000 of cap space/);
+  const result=body.contract_scenario!.result as {moves:Array<{status:string}>};result.moves[0].status='blocked';body.answer='The incoming terms are unresolved.';
+  assert.equal(nflAcquisitionSummary(body),null);assert.equal(factualAnswerPresentation(body).answer,body.answer);
+});
 
 test('funding discovery preserves reserve and prefers no conversion when the acquisition fits',()=>{
   const input=fixture(),before=structuredClone(input), s=calculateCapStrategy(input);

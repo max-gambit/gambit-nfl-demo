@@ -58,7 +58,7 @@ export function nflAnswerVisuals(tables: DataAnalysisTable[]): NflAnswerVisual[]
     const eligible = columns.flatMap((name, i) => {
       // Dates, rank, contract endpoints and grades with an unknown scale are never chart metrics.
       const numericMetric = player >= 0 && /^(?:20\d{2}\s+)?(?:receiving yards|rec yards|yards\s*\/\s*game|receptions|games|starts|(?:offensive\s+)?snaps)$/i.test(name);
-      const financialMetric = grouped && /^(?:(?:Hold|Scenario)\s+(?:cap|cash)|(?:Current|Next-year)\s+(?:cap|cash)\s+change(?: vs hold)?(?: \(\+ used\))?)$/i.test(name);
+      const financialMetric = grouped && /^(?:(?:Hold|Scenario)\s+(?:cap|cash)|(?:Current|Next-year)\s+(?:annual\s+)?(?:cap|cash)\s+change(?: vs hold)?(?: \(\+ used\))?)$/i.test(name);
       return (numericMetric || financialMetric) && table.rows.some(row => chartNumber(row[i]) != null) ? [i] : [];
     });
     // Prefer a per-game view for college samples of different lengths when it was already calculated.
@@ -71,8 +71,16 @@ export function nflAnswerVisuals(tables: DataAnalysisTable[]): NflAnswerVisual[]
       internal: team >= 0 && /\bNYG\b/.test(String(row[team])),
       values: metrics.map(i => chartNumber(row[i])), labels: metrics.map(i => cellLabel(row[i])),
     }));
+    // Lead acquisition comparisons with the paid alternatives; the zero-cost
+    // no-acquisition baseline remains visible after them.
+    if (alternative >= 0 && table.title === 'Acquisition cost and budget fit') points.sort((a, b) => Number(a.label.startsWith('Do not acquire')) - Number(b.label.startsWith('Do not acquire')));
     const financialTitle = metrics.some(i => /cash/i.test(columns[i])) ? metrics.some(i => /cap/i.test(columns[i])) ? 'Cap and cash comparison' : 'Cash comparison' : 'Cap comparison';
-    visuals.push({ ...base, kind: 'bars', grouped, title: grouped ? financialTitle : /yard|reception/i.test(columns[metrics[0]]) ? 'Receiving production' : 'Recorded workload', metrics: metrics.map(i => columns[i]), points });
+    const metricLabel = (name: string) => name
+      .replace(/^Current cap change vs hold \(\+ used\)$/, 'This-year cap added')
+      .replace(/^Next-year cap change vs hold \(\+ used\)$/, 'Next-year cap added')
+      .replace(/^Current annual cash change$/, 'This-year cash paid')
+      .replace(/^Next-year annual cash change$/, 'Next-year cash paid');
+    visuals.push({ ...base, kind: 'bars', grouped, title: grouped ? financialTitle : /yard|reception/i.test(columns[metrics[0]]) ? 'Receiving production' : 'Recorded workload', metrics: metrics.map(i => metricLabel(columns[i])), points });
   });
   return visuals;
 }

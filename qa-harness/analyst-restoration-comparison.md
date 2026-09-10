@@ -1,5 +1,11 @@
 # Giants analyst restoration: comparison record
 
+## September 9: acquisition cost versus additional cap room
+
+Max found “minimum funding needed is $0” misleading and asked to avoid more meta language. The answer now names the incoming cap charge and cash payment in its opening, then says whether a salary conversion is needed. Saved strategy answers gain this clarification from their own executed acquisition record without changing stored prose, terms or figures. It distinguishes the incoming player cost from the net cap effect of a funding move, and does not repeat an opening that already explains both costs.
+
+The existing chart includes cash alongside cap, leads with paid acquisition alternatives, and uses “Acquire · use existing cap room” / “Do not acquire · no added cost.” No additional explanation panel was added. [Fresh verified Meyers answer](http://localhost:5175/?conversation=1503e1c4-8a78-4e58-9fdb-2711752655d4): 31.6 seconds at Astra/High/Fast, complete with existing validation. It states the illustrative $3m cap/$4m cash cost for 2026 and retains $5.5m cap/$4.5m cash for 2027. Its numerical decision cells exactly match the earlier result; the screenshot's original saved body is unchanged in the database. Browser inspection and reload passed for the fresh answer, and the earlier saved answer displays the clarification. All displayed source references resolve. Forty focused tests, server typecheck and build passed. Local evidence: `test-results/analyst-restoration/acquisition-clarity-verification.json` and `acquisition-clarity-fresh.json`.
+
 ## September 9: High reasoning latency test
 
 Max reported the multi-minute wait and selected “Keep Astra, test High reasoning for faster answers.” The candidate now uses **Astra / High / Fast** for generation and semantic review. Only the reasoning setting changed; prompts, tools, source checks, calculation checks, repair handling and charts are unchanged. Historical max-reasoning metadata remains readable.
