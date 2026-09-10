@@ -1,6 +1,7 @@
 import type { StateCreator } from 'zustand';
 import type { Artifact, Brief, BriefOption, BriefSource, ChatTurn } from '@shared/types';
 import { supabase } from '../api/client';
+import { loadBriefSources } from '../api/briefSources';
 
 export interface BriefsSlice {
   briefs: Brief[];
@@ -166,7 +167,7 @@ export const createBriefsSlice: StateCreator<BriefsSlice, [], [], BriefsSlice> =
     });
 
     const [sourcesRes, optionsRes] = await Promise.all([
-      supabase.from('brief_sources').select('*').eq('brief_id', briefId).order('ref_index'),
+      loadBriefSources(supabase, briefId),
       supabase.from('brief_options').select('*').eq('brief_id', briefId).order('ref_index'),
     ]);
 

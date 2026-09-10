@@ -497,7 +497,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
     if(mustFinish&&!finalFailures)messages.push({role:'user',content:'Finish from the available evidence now. Identify any material unfinished input; do not start another research round.'});
     try { response = await call({ model: ANALYST_MODEL, max_tokens: 4500, output_config:{effort:ANALYST_EFFORT}, system: NFL_ANALYST_SYSTEM, tools: evidence.size?exposedTools:exposedTools.filter(tool=>tool.name!=='finish_analysis'),
       tool_choice: mustFinish?{type:'tool',name:'finish_analysis',disable_parallel_tool_use:true}:{type:'auto'}, messages,
-    }, { timeout: Math.max(1, deadlineMs - (Date.now() - started)), maxRetries: 0 });
+    }, { timeout: Math.max(1, deadlineMs - (Date.now() - started)) });
     } catch (error) {
       stageMs[finalFailures?'repair':'generation']+=Date.now()-generationStart;
       providerErrorCode=error instanceof AnalystProviderError?error.code:'request_failed';

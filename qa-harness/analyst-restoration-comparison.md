@@ -1,5 +1,19 @@
 # Giants analyst restoration: comparison record
 
+## September 10: provider recovery and complete source retrieval
+
+The reported Nabers extension question and its first retry stopped before any tool executed. Their saved provider durations were 75 ms and 69 ms, with `request_failed`; the underlying original exception was not retained, so the exact network cause is unproven.
+
+The analyst and semantic reviewer now allow at most two retries for transient connection failures and HTTP 408/409/429/server errors. The same request and model settings are retained under one total timeout. Server backoff is honored. Authentication, quota, invalid requests, TLS errors, cancellation and partially consumed successful streams do not silently retry. Connection failures now retain a safe diagnostic code. This follows the [documented OpenAI retry categories](https://developers.openai.com/api/reference/typescript#retries), with the stricter existing total deadline preserved.
+
+Browser acceptance used the exact original question in a separate conversation, with one deliberately injected pre-send `ECONNRESET` in an isolated QA process. The log records the injected failure, automatic retry and subsequent real model/tool rounds. The answer completed in 111.3 seconds, passed grounding and saved 18 activity entries. This is one recovery demonstration, not a reliability or latency average. [Saved recovery conversation](http://localhost:5175/?conversation=22b8b397-84dd-4d31-8afa-e516a1fd72bb); brief `01cf1ac4-8466-408d-8ab2-213d8e84b1ca`.
+
+This broad answer also exposed the browser's one-page source read: it loaded only 1,000 of 2,729 persisted sources. Source reads now paginate and discard incomplete page sets on failure. All 55 paragraph/table reference occurrences resolve. Citation 2521 was opened and visually inspected after reload; the selected source appears first in the drawer. The original four conversation records, including Max's later successful retry and roster follow-up, were read back unchanged.
+
+The normal launcher was restarted on ports 5175/8792 with no fault injection. In the saved test conversation, “Keep it brief: what must we verify before quoting an extension price for Nabers?” completed in 55.0 seconds, passed grounding and resolved every displayed reference among its 25 sources. Its brief is `cdfc7c3a-9572-499f-8d7a-fad45641b153`.
+
+Validation: 49 focused tests, server typecheck and production build passed. The regression tests demonstrate the pre-fix recovery failures, bounded retries, cancellation during the real backoff timer, nonretryable cases and source-page completeness/failure behavior. Local evidence is under `test-results/analyst-restoration/provider-recovery-*`; the fault injector is ignored QA-only material and is absent from the normal launcher. Exact signed receiver-comparison economics remain uncaptured; this change does not supply an extension price or refresh the underlying football data.
+
 ## September 10: contract follow-up routing and failure recovery
 
 The question “What contract and payroll details must we verify before executing Adebo’s conversion?” incorrectly triggered a 2016–2025 historical market prefetch because the old detector matched “contract” and “before.” The provider request then failed before executing a tool. The fallback promoted that prefetch into the answer and changed the active objective from contract to history. The original provider error code was not retained, so its exact cause is unknown; the visible routing and fallback faults are reproduced independently.

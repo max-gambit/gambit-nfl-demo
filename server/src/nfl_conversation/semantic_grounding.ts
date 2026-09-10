@@ -109,7 +109,7 @@ export async function reviewNflAnalystSemantics(input: {
       type: 'object', properties: { claim_checks:{type:'array',minItems:1,maxItems:12,items:{type:'object',properties:{claim:{type:'string'},status:{type:'string',enum:['supported','conditional','unsupported']},reason:{type:'string'}},required:['claim','status','reason'],additionalProperties:false}}, issues: { type: 'array', maxItems: 5, items: { type: 'string' } },pass:{type:'boolean'} }, required: ['claim_checks','issues','pass'], additionalProperties: false,
     }).schema as Anthropic.Tool.InputSchema }], tool_choice: { type: 'tool', name: 'review_answer' },
     messages: [{ role: 'user', content: JSON.stringify(input) }],
-  }, { timeout: options.timeoutMs ?? 60_000, maxRetries: 0 });
+  }, { timeout: options.timeoutMs ?? 60_000 });
   options.onTrace?.({stage:'review_response',model:response.model,model_config:analystModelMetadata(response),usage:response.usage});
   const calls = response.content.filter((b): b is Anthropic.ToolUseBlock => b.type === 'tool_use' && b.name === 'review_answer');
   const result = calls.length === 1 ? calls[0].input as { pass?: unknown; issues?: unknown; claim_checks?: Array<{claim:string;status:string;reason:string}> } : undefined;

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type Anthropic from '@anthropic-ai/sdk';
-import { ANALYST_MODEL, analystModelMetadata, analystResponseRequest, createAnalystClient } from '../../src/nfl_conversation/model.js';
+import { ANALYST_MODEL, AnalystProviderError, analystModelMetadata, analystResponseRequest, createAnalystClient } from '../../src/nfl_conversation/model.js';
 
 const params = (): Anthropic.MessageCreateParamsNonStreaming => ({
   model: ANALYST_MODEL, max_tokens: 4500, system: 'Use the provided evidence.',
@@ -125,4 +125,105 @@ test('an interrupted or failed stream never becomes a completed response or sile
     await assert.rejects(call(params(), { onReasoning: () => {} }), /stream (ended|failed)/);
     assert.equal(attempts, 1);
   }
+});
+
+test('transient connection failures recover with the same request and one shared deadline', async () => {
+  const requests: RequestInit[] = [];
+  const delays: number[] = [];
+  const call = createAnalystClient({ getApiKey: () => 'unit-test', sleep: async ms => { delays.push(ms); }, fetch: (async (_url, init) => {
+    requests.push(init!);
+    if (requests.length < 3) throw new TypeError('fetch failed', { cause: { code: 'ECONNRESET' } });
+    return apiResponse([{ type: 'function_call', call_id: 'call_recovered', name: 'lookup', arguments: '{"player":"A"}' }]);
+  }) as typeof fetch });
+  const result = await call(params());
+  assert.equal(result.stop_reason, 'tool_use');
+  assert.equal(requests.length, 3);
+  assert.equal(new Set(requests.map(r => r.body)).size, 1);
+  assert.equal(new Set(requests.map(r => r.signal)).size, 1);
+  assert.equal(delays.length, 2);
+  assert.ok(delays[0] >= 500 && delays[1] > delays[0]);
+  assert.equal(analystModelMetadata(result)?.transport_retries, 2);
+});
+
+test('persistent connection failures stop after two retries and retain a safe error code', async () => {
+  let attempts = 0;
+  const call = createAnalystClient({ getApiKey: () => 'unit-test', sleep: async () => {}, fetch: (async () => {
+    attempts++;
+    throw new TypeError('fetch failed; private request detail', { cause: { code: 'EAI_AGAIN', message: 'private hostname' } });
+  }) as typeof fetch });
+  await assert.rejects(call(params(), { maxRetries: 99 }), error => error instanceof AnalystProviderError && error.code === 'network_EAI_AGAIN' && !/private/.test(error.message));
+  assert.equal(attempts, 3);
+});
+
+test('retryable HTTP failures honor server backoff before recovering', async () => {
+  for (const status of [408, 409, 429, 500, 503]) {
+    let attempts = 0;
+    const delays: number[] = [];
+    const call = createAnalystClient({ getApiKey: () => 'unit-test', sleep: async ms => { delays.push(ms); }, fetch: (async () => {
+      if (++attempts === 1) return new Response('{"error":{"code":"temporary_failure"}}', { status, headers: { 'retry-after': '2' } });
+      return apiResponse([]);
+    }) as typeof fetch });
+    await call(params());
+    assert.equal(attempts, 2);
+    assert.deepEqual(delays, [2000]);
+  }
+});
+
+test('authentication, quota, malformed requests and TLS failures are not retried', async () => {
+  for (const failure of [
+    () => new Response('{"error":{"code":"invalid_api_key"}}', { status: 401 }),
+    () => new Response('{"error":{"code":"bad_request"}}', { status: 400 }),
+    () => new Response('{"error":{"code":"insufficient_quota"}}', { status: 429 }),
+    () => { throw new TypeError('fetch failed', { cause: { code: 'CERT_HAS_EXPIRED' } }); },
+  ]) {
+    let attempts = 0;
+    const call = createAnalystClient({ getApiKey: () => 'unit-test', sleep: async () => {}, fetch: (async () => { attempts++; return failure(); }) as typeof fetch });
+    await assert.rejects(call(params()));
+    assert.equal(attempts, 1);
+  }
+});
+
+test('explicitly disabled retries and server no-retry hints stop after one attempt', async () => {
+  for (const disabled of [true, false]) {
+    let attempts = 0;
+    const call = createAnalystClient({ getApiKey: () => 'unit-test', sleep: async () => {}, fetch: (async () => {
+      attempts++;
+      return new Response('{}', { status: 503, headers: disabled ? {} : { 'x-should-retry': 'false' } });
+    }) as typeof fetch });
+    await assert.rejects(call(params(), disabled ? { maxRetries: 0 } : {}));
+    assert.equal(attempts, 1);
+  }
+});
+
+test('cancellation during backoff prevents another request', async () => {
+  let attempts = 0;
+  const controller = new AbortController();
+  const call = createAnalystClient({ getApiKey: () => 'unit-test', sleep: async (_ms, signal) => {
+    controller.abort(new Error('cancel during backoff'));
+    signal.throwIfAborted();
+  }, fetch: (async () => { attempts++; throw new TypeError('fetch failed'); }) as typeof fetch });
+  await assert.rejects(call(params(), { signal: controller.signal }), /cancel during backoff/);
+  assert.equal(attempts, 1);
+});
+
+test('backoff never extends the request deadline', async () => {
+  let attempts = 0;
+  const call = createAnalystClient({ getApiKey: () => 'unit-test', sleep: async () => { assert.fail('no time remains for retry'); }, fetch: (async () => {
+    attempts++;
+    return new Response('{}', { status: 503, headers: { 'retry-after': '60' } });
+  }) as typeof fetch });
+  await assert.rejects(call(params(), { timeout: 1000 }));
+  assert.equal(attempts, 1);
+});
+
+test('the real backoff timer is aborted without sending another request', async () => {
+  let attempts = 0;
+  const controller = new AbortController();
+  const call = createAnalystClient({ getApiKey: () => 'unit-test', fetch: (async () => {
+    attempts++;
+    setTimeout(() => controller.abort(), 10);
+    throw new TypeError('fetch failed');
+  }) as typeof fetch });
+  await assert.rejects(call(params(), { signal: controller.signal }), { name: 'AbortError' });
+  assert.equal(attempts, 1);
 });

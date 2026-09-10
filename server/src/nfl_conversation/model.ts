@@ -2,6 +2,7 @@ import type Anthropic from '@anthropic-ai/sdk';
 import dotenv from 'dotenv';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { setTimeout as delay } from 'node:timers/promises';
 import { readSse } from '@shared/sse';
 
 export const ANALYST_MODEL = 'gpt-6-astra';
@@ -20,11 +21,32 @@ export interface AnalystModelMetadata {
   response_id: string;
   reasoning_tokens: number;
   cached_input_tokens: number;
+  transport_retries: number;
 }
 
 type Json = Record<string, any>;
 export class AnalystProviderError extends Error {
-  constructor(public readonly code: string, message: string) { super(message); }
+  constructor(public readonly code: string, message: string, public readonly retryable = false, public readonly retryAfterMs?: number) { super(message); }
+}
+
+const TRANSIENT_NETWORK_CODES = new Set(['ECONNRESET', 'ECONNREFUSED', 'EPIPE', 'ETIMEDOUT', 'EAI_AGAIN', 'ENOTFOUND', 'ENETUNREACH', 'EHOSTUNREACH', 'UND_ERR_CONNECT_TIMEOUT', 'UND_ERR_SOCKET']);
+
+function networkError(error: unknown): unknown {
+  if (!(error instanceof TypeError) || !/fetch failed/i.test(error.message)) return error;
+  const code = (error.cause as { code?: unknown } | undefined)?.code;
+  // Keep diagnostics useful without logging credentials, request bodies or URLs.
+  const safeCode = typeof code === 'string' && /^[A-Z][A-Z0-9_]{1,60}$/.test(code) ? code : undefined;
+  return new AnalystProviderError(safeCode ? 'network_' + safeCode : 'network_error',
+    'The OpenAI analyst connection failed' + (safeCode ? ' (' + safeCode + ')' : '') + '.',
+    code === undefined || (safeCode !== undefined && TRANSIENT_NETWORK_CODES.has(safeCode)));
+}
+
+function retryAfterMs(headers: Headers): number | undefined {
+  const milliseconds = headers.get('retry-after-ms');
+  const value = headers.get('retry-after');
+  const wait = milliseconds !== null ? Number(milliseconds) : value === null ? NaN
+    : Number.isFinite(Number(value)) ? Number(value) * 1000 : Date.parse(value) - Date.now();
+  return Number.isFinite(wait) && wait >= 0 ? wait : undefined;
 }
 
 // The application keeps its existing tool protocol. These weak maps preserve
@@ -106,21 +128,45 @@ async function readAnalystStream(response: Response, onReasoning: NonNullable<An
   throw new AnalystProviderError('stream_interrupted', 'The OpenAI analyst stream ended before the response completed.');
 }
 
-export function createAnalystClient(deps: { fetch?: typeof fetch; getApiKey?: () => string | undefined } = {}) {
+export function createAnalystClient(deps: { fetch?: typeof fetch; getApiKey?: () => string | undefined; sleep?: (ms: number, signal: AbortSignal) => Promise<void> } = {}) {
   return async function createMessage(params: Anthropic.MessageCreateParamsNonStreaming, options?: AnalystRequestOptions): Promise<Anthropic.Message> {
     const key = (deps.getApiKey ?? apiKey)();
     if (!key) throw new AnalystProviderError('missing_api_key', 'The Giants analyst needs OPENAI_API_KEY configured in server/.env.local.');
-    const timeout = AbortSignal.timeout(Math.max(1, options?.timeout ?? 180000));
+    const timeoutMs = Math.max(1, options?.timeout ?? 180000);
+    const deadline = Date.now() + timeoutMs;
+    const timeout = AbortSignal.timeout(timeoutMs);
     const signal = options?.signal ? AbortSignal.any([timeout, options.signal]) : timeout;
-    const response = await (deps.fetch ?? fetch)('https://api.openai.com/v1/responses', {
-      method: 'POST', headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...analystResponseRequest(params), ...(options?.onReasoning ? { stream: true, reasoning: { effort: ANALYST_EFFORT, summary: 'auto' } } : {}) }), signal,
-    });
-    if (!response.ok) {
-      const detail = await response.json().catch(() => ({})) as Json;
-      const code = typeof detail.error?.code === 'string' ? detail.error.code : 'http_' + response.status;
-      throw new AnalystProviderError(code, 'The OpenAI analyst request failed (HTTP ' + response.status + '; ' + code + ').');
+    const body = JSON.stringify({ ...analystResponseRequest(params), ...(options?.onReasoning ? { stream: true, reasoning: { effort: ANALYST_EFFORT, summary: 'auto' } } : {}) });
+    const maxRetries = Math.max(0, Math.min(2, Math.floor(options?.maxRetries ?? 2)));
+    let retries = 0;
+    let response: Response;
+    while (true) {
+      signal.throwIfAborted();
+      try {
+        response = await (deps.fetch ?? fetch)('https://api.openai.com/v1/responses', {
+          method: 'POST', headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' }, body, signal,
+        });
+        if (!response.ok) {
+          const detail = await response.json().catch(() => ({})) as Json;
+          const code = typeof detail.error?.code === 'string' ? detail.error.code : 'http_' + response.status;
+          const retryable = response.headers.get('x-should-retry') !== 'false' && code !== 'insufficient_quota'
+            && ([408, 409, 429].includes(response.status) || response.status >= 500);
+          throw new AnalystProviderError(code, 'The OpenAI analyst request failed (HTTP ' + response.status + '; ' + code + ').', retryable, retryAfterMs(response.headers));
+        }
+        break;
+      } catch (caught) {
+        signal.throwIfAborted();
+        const error = networkError(caught);
+        if (!(error instanceof AnalystProviderError) || !error.retryable || retries >= maxRetries) throw error;
+        const wait = error.retryAfterMs ?? 500 * 2 ** retries;
+        if (wait >= deadline - Date.now()) throw error;
+        retries++;
+        console.warn('[nfl analyst] provider_retry', retries, error.code);
+        await (deps.sleep ?? ((ms, activeSignal) => delay(ms, undefined, { signal: activeSignal })))(wait, signal);
+      }
     }
+    // Once a successful response stream begins, preserve the existing failure
+    // boundary: do not replay emitted summaries or execute partial tool calls.
     const result = options?.onReasoning ? await readAnalystStream(response, options.onReasoning) : await response.json() as Json;
     if (!Array.isArray(result.output) || typeof result.id !== 'string' || typeof result.model !== 'string') throw new AnalystProviderError('invalid_response', 'The OpenAI analyst returned an invalid response.');
     if (result.status !== 'completed' && result.status !== 'incomplete') throw new AnalystProviderError('response_' + result.status, 'The OpenAI analyst did not complete the response.');
@@ -147,7 +193,7 @@ export function createAnalystClient(deps: { fetch?: typeof fetch; getApiKey?: ()
       usage: { input_tokens: result.usage?.input_tokens ?? 0, output_tokens: result.usage?.output_tokens ?? 0 },
     } as Anthropic.Message;
     responseItems.set(content, result.output);
-    responseMetadata.set(message, { provider: 'openai', requested_model: ANALYST_MODEL, model: result.model, reasoning_effort: ANALYST_EFFORT, requested_service_tier: ANALYST_SERVICE_TIER, service_tier: typeof result.service_tier === 'string' ? result.service_tier : null, response_id: result.id, reasoning_tokens: result.usage?.output_tokens_details?.reasoning_tokens ?? 0, cached_input_tokens: result.usage?.input_tokens_details?.cached_tokens ?? 0 });
+    responseMetadata.set(message, { provider: 'openai', requested_model: ANALYST_MODEL, model: result.model, reasoning_effort: ANALYST_EFFORT, requested_service_tier: ANALYST_SERVICE_TIER, service_tier: typeof result.service_tier === 'string' ? result.service_tier : null, response_id: result.id, reasoning_tokens: result.usage?.output_tokens_details?.reasoning_tokens ?? 0, cached_input_tokens: result.usage?.input_tokens_details?.cached_tokens ?? 0, transport_retries: retries });
     return message;
   };
 }

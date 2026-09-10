@@ -202,7 +202,8 @@ function safeUrl(value: unknown): string | null {
 function SourceList({ sources, selectedRef }: { sources?: BriefSource[]; selectedRef?: number | null }) {
   if (!sources) return <p className="gc-empty-note" role="status">Loading the source record…</p>;
   if (!sources.length) return <p className="gc-empty-note">No source cards are attached to this answer.</p>;
-  return <div className="gc-source-list">{sources.map(source => {
+  const orderedSources = selectedRef == null ? sources : [...sources].sort((a, b) => Number(b.ref_index === selectedRef) - Number(a.ref_index === selectedRef));
+  return <div className="gc-source-list">{orderedSources.map(source => {
     const data = source.data && typeof source.data === 'object' ? source.data as Record<string, unknown> : {};
     const url = safeUrl(data.source_url);
     const rows = Array.isArray(data.rows) ? data.rows as Array<{ k?: unknown; v?: unknown }> : [];
