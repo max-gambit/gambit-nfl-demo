@@ -1,8 +1,18 @@
 # Giants analyst restoration: comparison record
 
-The implementation is available to try at [the verified Astra conversation](http://localhost:5175/?conversation=8e6a899f-5e72-4a50-bdee-1107a9bae08e). It restores sourced quantitative explanations, expands candidate selection beyond a fixed shortlist, preserves saved contracts and scenario state, and repairs unsupported claims without deleting whole sentences. The current code is `fe3c5e1` on `codex/giants-analyst-restoration-20260909`.
+The implementation is available to try at [the shorter visual answer](http://localhost:5175/?conversation=14ec3596-07f5-4edf-8366-64d2147d91c4). It restores sourced quantitative explanations, expands candidate selection beyond a fixed shortlist, preserves saved contracts and scenario state, and repairs unsupported claims without deleting whole sentences. The initial Astra/browser implementation was `fe3c5e1`; subsequent visual refinements are on `codex/giants-analyst-restoration-20260909`.
 
 The restoration is not yet promoted over the presentation build. The complete earlier fixed-setting comparison showed a substantial writing improvement, but incomplete live answers and unsupported recommendation premises failed acceptance. Those failures were retained and corrected; the replacement Astra comparison remains unfinished. Max asked to wrap up after the implementation and main browser workflow were verified, so the remaining 96-answer writing and 48-turn end-to-end repeat is not being started at this handoff.
+
+## September 9: shorter answers and visual comparisons
+
+After Max approved the improved answer quality, he requested slightly less prose and more graphics. The writer now targets 60–140 words for simple questions and 200–350 for substantial comparisons, preserving the recommendation, decisive tradeoff, alternatives and material conditions. A chart appears after the opening paragraph when selected evidence supports one. The complete figures remain expandable, and the source button opens the original evidence drawer.
+
+Available visuals include player production/workload bars with a metric selector; cap/cash comparisons across alternatives or years; dated practice-participation grids; and converted/failed play comparisons. They read the selected tool tables directly. Missing values stay unknown, year and guarantee fields are not treated as performance metrics, signed financial values retain their basis, and unsupported tables remain tables. Existing saved answers gain these visuals without changing their persisted prose or figures.
+
+The same receiver question produced **269 words versus the earlier 358** in one live replay (24.9% shorter), at Astra/max/Fast in 213.6 seconds. This is one observed comparison, not a measured average. The saved brief `82ab913c-d40d-41ac-b124-c800437a9bf6` was read back as complete, and its chart and exact 269-word answer survived save/reload. Browser checks also covered changing starts to snaps, opening chart sources, expanding the full table and the saved three-alternative cap view. Practice/coaching and a 390px layout were visually checked using the captured acceptance tables. Fourteen focused tests, the server typecheck and application build passed. These presentation checks do not complete the comparative acceptance work below.
+
+Local evidence: `test-results/analyst-restoration/visual-answer-readback.json`; the captured chart preview is `visual-review.html` in that directory. The updated runtime uses the existing candidate ports 8792/5175.
 
 ## Complete fixed-setting comparison
 

@@ -3,6 +3,8 @@ import type { Brief, BriefSource, DataAnalysisBriefBody } from '@shared/types';
 import { isFactualBody } from '@shared/nflFacts';
 import { factualAnswerPresentation, marketAnnualRows } from '@shared/nflAnswerDepth';
 import { HistoricalPackageEvidence, MarketAnswerEvidence, ScenarioChangeEvidence } from './NygAnswerEvidence';
+import { nflAnswerVisuals } from '@shared/nflAnswerVisuals';
+import { NygAnswerVisuals } from './NygAnswerVisuals';
 import { nflTransactionMarketCohortEvidence, nflTransactionTradePackageLines } from '@shared/nflTransactionMarket';
 import { createBrief, createBriefWithSession, getBrief } from '../api/briefs';
 import { useBookmarks, useBriefs, useSessions, useUi } from '../store';
@@ -160,17 +162,22 @@ function FactualAnswer({ body: savedBody, previous = null, briefId, onEvidence }
   const body = factualAnswerPresentation(savedBody);
   const result = body.seller_move_analysis?.result;
   const primaryMarket = body.market_analysis && !body.seller_move_analysis && body.answer_layout !== 'trade_packages';
+  const visuals = nflAnswerVisuals(body.tables);
+  const visualTableIndices = new Set(visuals.map(visual => visual.tableIndex));
+  const paragraphs = body.answer_paragraphs?.length ? body.answer_paragraphs : [{ text: body.answer, source_refs: body.answer_source_refs ?? [] }];
   const cite = (refs: number[]) => refs.length ? <button className="gc-cite" onClick={() => onEvidence(refs[0])}>[{refs.slice(0, 4).join(', ')}{refs.length > 4 ? '…' : ''}]</button> : null;
   return <div className="gc-factual-answer" onFocus={() => setActiveBrief(briefId)} onMouseDown={() => setActiveBrief(briefId)}>
-    {body.answer_paragraphs?.length ? body.answer_paragraphs.map((paragraph,index)=><p className="gc-answer-lead" key={index}>{paragraph.text} {cite(paragraph.source_refs)}</p>) : <p className="gc-answer-lead">{body.answer} {cite(body.answer_source_refs??[])}</p>}
+    <p className="gc-answer-lead">{paragraphs[0].text} {cite(paragraphs[0].source_refs)}</p>
+    {visuals.length > 0 && <NygAnswerVisuals visuals={visuals} onEvidence={onEvidence} />}
+    {paragraphs.slice(1).map((paragraph,index)=><p className="gc-answer-lead" key={index}>{paragraph.text} {cite(paragraph.source_refs)}</p>)}
     {body.conversation_state && <details className="gc-calculation-details"><summary>Scenario and assumptions</summary><div className="gc-details-body"><p><strong>Objective:</strong> {body.conversation_state.active.objective.replaceAll('_',' ')} · {body.conversation_state.active.candidate_scope} candidates</p><p><strong>Horizon:</strong> {body.conversation_state.active.horizon || 'Not specified'}</p>{body.conversation_state.active.budget && <p><strong>Budget:</strong> {body.conversation_state.active.budget.type} {money(body.conversation_state.active.budget.amount)} · reserve {money(body.conversation_state.active.budget.reserve)}</p>}{[...body.conversation_state.active.protected_player_names.map(p=>'Keep '+p), ...body.conversation_state.active.assumptions, ...body.conversation_state.active.supplied_terms, ...body.conversation_state.active.unresolved_inputs].map((text,i)=><p key={i}>{text}</p>)}</div></details>}
     {result && <div className="gc-fact-strip"><div><small>{result.cap.current_year} CAP SPACE CREATED</small><strong>{money(result.cap.current_year_cap_space_created_dollars)}</strong></div><div><small>{result.cap.current_year} DEAD MONEY</small><strong>{money(result.cap.current_year_dead_money_dollars)}</strong></div><div><small>PROPOSED RETURN</small><strong>{result.proposal.pick_year} · Round {result.proposal.pick_round}</strong></div></div>}
     {result && previous?.seller_move_analysis?.result && <ScenarioChangeEvidence current={result} previous={previous.seller_move_analysis.result} />}
     {primaryMarket && <div className="gc-fact-strip"><div><small>PLAYER MOVEMENTS</small><strong>{body.market_analysis!.coverage.event_count}</strong></div><div><small>TRADES</small><strong>{body.market_analysis!.coverage.distinct_trade_count ?? 'Not recorded'}</strong></div><div><small>PERIOD</small><strong>{body.market_analysis!.query.start_year}–{body.market_analysis!.query.end_year}</strong></div></div>}
     {body.key_findings.map((finding, i) => <div className="gc-finding" key={i}><strong>{finding.label}</strong><p>{finding.body} {cite(finding.source_refs)}</p></div>)}
-    {body.tables.map((table, i) => <div className={`gc-fact-table${table.title.includes('packages') ? ' gc-package-table' : ''}`} key={i}>
+    {body.tables.map((table, i) => { const figures = <div className={`gc-fact-table${table.title.includes('packages') ? ' gc-package-table' : ''}`}>
       <h3>{table.title} {cite(table.source_refs)}</h3><div><table><thead><tr>{table.columns.map((column, j) => <th key={j}>{column}</th>)}</tr></thead><tbody>{table.rows.map((row, j) => <tr key={j}>{row.map((cell, k) => <td key={k}>{String(cell ?? 'Not recorded')}</td>)}</tr>)}</tbody></table></div>
-    </div>)}
+    </div>; return visualTableIndices.has(i) ? <details className="gc-chart-figures" key={i}><summary>Full figures · {table.title}</summary>{figures}</details> : <div key={i}>{figures}</div>; })}
     {Boolean(body.supporting_details?.length) && <details className="gc-calculation-details"><summary>Comparison details</summary><div className="gc-details-body">{body.supporting_details!.map((detail,i)=><div className="gc-finding" key={i}><strong>{detail.label}</strong><p>{detail.body} {cite(detail.source_refs)}</p></div>)}</div></details>}
     {body.contract_scenario?.tables && <details className="gc-calculation-details"><summary>All contract years and obligations</summary><div className="gc-details-body">{body.contract_scenario.tables.map((table,i)=><div className="gc-fact-table" key={i}><h3>{table.title} {cite(table.source_refs)}</h3><div><table><thead><tr>{table.columns.map((c,j)=><th key={j}>{c}</th>)}</tr></thead><tbody>{table.rows.map((row,j)=><tr key={j}>{row.map((cell,k)=><td key={k}>{String(cell??'Unknown')}</td>)}</tr>)}</tbody></table></div></div>)}</div></details>}
     {body.historical_selection && body.market_analysis && <HistoricalPackageEvidence analysis={body.market_analysis} selection={body.historical_selection} sources={sourcesByBrief[briefId] ?? []} onEvidence={onEvidence} />}

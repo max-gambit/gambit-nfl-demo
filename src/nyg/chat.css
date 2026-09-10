@@ -54,6 +54,70 @@
 .gc-answer-mark { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
 .gc-answer-mark small { font-size: 12px; font-weight: 600; letter-spacing: 0; color: #4c5868; }
 .gc-answer-lead { font-size: 14px; line-height: 1.65; margin: 0 0 16px; color: #26364c; white-space: pre-line; }
+.gc-answer-visuals { display: grid; gap: 16px; margin: 20px 0 24px; }
+.gc-answer-visual { border: 1px solid #dce3ed; border-radius: 8px; padding: 20px; background: linear-gradient(135deg, #f8faff, #fff 65%); overflow: hidden; }
+.gc-answer-visual > header { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; margin-bottom: 18px; }
+.gc-answer-visual h3 { margin: 0 0 5px; color: #152d50; font: 650 16px/1.35 var(--gc-font); }
+.gc-answer-visual header p { margin: 0; color: #65738a; font-size: 11px; line-height: 1.5; }
+.gc-chart-source { flex-shrink: 0; border: 0; background: transparent; color: #48617d; padding: 3px 0; font-size: 11px; }
+.gc-chart-source span { margin-left: 4px; }
+.gc-chart-controls { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 16px; }
+.gc-chart-controls label { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #65738a; }
+.gc-chart-controls select { padding: 5px 8px; border: 1px solid #d5dfea; border-radius: 4px; color: #203854; background: #fff; font-size: 12px; max-width: 100%; }
+.gc-chart-key,.gc-chart-legend { display: flex; align-items: center; gap: 7px; color: #55667b; font-size: 11px; }
+.gc-chart-key { flex-shrink: 0; }
+.gc-chart-key i,.gc-chart-legend i { display: inline-block; width: 9px; height: 9px; flex-shrink: 0; border-radius: 2px; background: #90a9c7; }
+.gc-chart-key i.internal { background: #173e78; }
+.gc-chart-legend { flex-wrap: wrap; gap: 10px 20px; margin: 12px 0 18px; }
+.gc-chart-legend > span { display: flex; align-items: center; gap: 6px; }
+.gc-chart-axis { display: flex; justify-content: space-between; margin: 0 90px 8px 164px; color: #8792a1; font-size: 10px; font-variant-numeric: tabular-nums; }
+.gc-comparison-row { display: grid; grid-template-columns: 152px minmax(0, 1fr); gap: 12px; align-items: center; padding: 8px 0; }
+.gc-chart-player strong { display: block; color: #263c58; font-size: 12px; font-weight: 600; line-height: 1.35; }
+.gc-chart-player small { display: block; font-size: 10px; color: #7a8696; margin-top: 3px; }
+.gc-chart-series { display: grid; gap: 5px; }
+.gc-chart-value-row { display: grid; grid-template-columns: minmax(0, 1fr) 80px; align-items: center; gap: 10px; }
+.gc-chart-value-row > strong { color: #263c58; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; overflow-wrap: anywhere; }
+.gc-chart-value-row > .gc-chart-unknown { color: #8290a1; font-size: 10px; font-weight: 400; }
+.gc-horizontal-track { height: 16px; position: relative; background: #edf1f6; border-radius: 3px; }
+.gc-horizontal-track > span { position: absolute; top: 0; height: 100%; border-radius: 3px; background: #90a9c7; }
+.gc-horizontal-track > .internal { background: #173e78; }
+.gc-zero-line { position: absolute; height: 100%; width: 1px; background: #b3bfd0; z-index: 1; }
+.gc-answer-visual .series-0 { background: #173e78; }
+.gc-answer-visual .series-1 { background: #7598af; }
+.gc-answer-visual .series-2 { background: #62978e; }
+.gc-answer-visual .series-3 { background: #b3a07c; }
+.gc-comparison-bars.grouped .gc-comparison-row { padding: 12px 0; border-bottom: 1px solid #e8edf3; }
+.gc-comparison-bars.grouped .gc-comparison-row:last-child { border: 0; }
+.gc-comparison-bars.grouped .gc-horizontal-track { height: 13px; }
+.gc-chart-figures { margin: 12px 0 20px; border-bottom: 1px solid var(--gc-line); padding-bottom: 12px; }
+.gc-chart-figures > summary { color: #586c85; cursor: pointer; font-size: 12px; line-height: 1.5; }
+.gc-chart-foot { margin: 12px 0 0; color: #718096; font-size: 11px; }
+.gc-practice-matrix { display: grid; gap: 8px; align-items: center; overflow-x: auto; padding: 3px 0; }
+.gc-matrix-row { display: contents; }
+.gc-matrix-heading { color: #6c7b8e; text-align: center; font-size: 10px; font-weight: 500; }
+.gc-matrix-row > strong { color: #263c58; font-size: 12px; line-height: 1.4; padding: 8px 0; }
+.gc-practice-cell { border-radius: 5px; text-align: center; font-size: 11px; font-weight: 650; padding: 10px 4px; }
+.gc-practice-cell.fp,.gc-answer-visual .practice-fp { background: #d7ebe5; color: #326254; }
+.gc-practice-cell.lp,.gc-answer-visual .practice-lp { background: #f6e8c8; color: #896326; }
+.gc-practice-cell.dnp,.gc-answer-visual .practice-dnp { background: #edd8dd; color: #8a4154; }
+.gc-practice-cell.unknown { background: #edf1f6; color: #7a8696; }
+.gc-game-designation { color: #607086; font-size: 11px; text-align: center; }
+.gc-down-bars { display: grid; gap: 16px; }
+.gc-down-label { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 12px; margin-bottom: 7px; }
+.gc-down-label strong { color: #263c58; font-weight: 600; }
+.gc-down-label span { color: #718096; font-size: 11px; }
+.gc-down-track { display: flex; height: 22px; overflow: hidden; background: #edf1f6; border-radius: 4px; }
+.gc-down-track > span:first-child { background: #173e78; }
+.gc-down-track > span:last-child { background: #7598af; }
+@media(max-width:760px) {
+  .gc-answer-visual { padding: 14px; }
+  .gc-chart-controls { align-items: flex-start; flex-direction: column; }
+  .gc-chart-axis { margin-left: 0; }
+  .gc-comparison-row { grid-template-columns: 1fr; gap: 6px; }
+  .gc-chart-player { display: flex; align-items: baseline; gap: 8px; }
+  .gc-chart-player small { margin: 0; }
+  .gc-down-label { align-items: flex-start; flex-direction: column; gap: 3px; }
+}
 .gc-fact-strip { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); padding: 14px 0; border-top: 1px solid var(--gc-line); border-bottom: 1px solid var(--gc-line); margin-bottom: 16px; }
 .gc-fact-strip > div { padding: 0 17px; border-left: 1px solid var(--gc-line); }
 .gc-fact-strip > div:first-child { padding-left: 0; border: 0; }
