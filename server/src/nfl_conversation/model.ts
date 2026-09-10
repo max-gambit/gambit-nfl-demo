@@ -87,7 +87,7 @@ function apiKey(): string | undefined {
   return process.env.OPENAI_API_KEY?.trim();
 }
 
-export interface ReasoningSummaryEvent { id: string; delta?: string; text?: string }
+export interface ReasoningSummaryEvent { id: string; delta?: string; text?: string; done?: boolean }
 export type AnalystRequestOptions = Anthropic.RequestOptions & { onReasoning?: (event: ReasoningSummaryEvent) => void };
 
 async function readAnalystStream(response: Response, onReasoning: NonNullable<AnalystRequestOptions['onReasoning']>): Promise<Json> {
@@ -97,7 +97,7 @@ async function readAnalystStream(response: Response, onReasoning: NonNullable<An
     if (event.type === 'response.reasoning_summary_text.delta' && typeof event.delta === 'string') {
       onReasoning({ id: `${event.item_id}:${event.summary_index}`, delta: event.delta });
     } else if (event.type === 'response.reasoning_summary_text.done' && typeof event.text === 'string') {
-      onReasoning({ id: `${event.item_id}:${event.summary_index}`, text: event.text });
+      onReasoning({ id: `${event.item_id}:${event.summary_index}`, text: event.text, done: true });
     } else if (event.type === 'response.completed' || event.type === 'response.incomplete') return event.response;
     else if (event.type === 'response.failed' || event.type === 'error') {
       throw new AnalystProviderError('stream_failed', 'The OpenAI analyst stream failed.');

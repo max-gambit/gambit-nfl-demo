@@ -437,7 +437,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
   const model = options.callModel ?? createAnalystMessage;
   const call: typeof createAnalystMessage = (params, requestOptions) => model(params, {
     ...requestOptions,
-    ...(options.onActivity ? { onReasoning: event => options.onActivity?.({ ...event, kind: 'reasoning' }) } : {}),
+    ...(options.onActivity ? { onReasoning: event => options.onActivity?.({ id: event.id, delta: event.delta, text: event.text, kind: 'reasoning', status: event.done ? 'done' : 'running' }) } : {}),
   });
   // Code validates exact cells and categorical facts. A separate bounded
   // evidence review checks the premises and completeness of AI interpretation.

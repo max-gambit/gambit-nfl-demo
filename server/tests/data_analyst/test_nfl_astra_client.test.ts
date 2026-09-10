@@ -106,11 +106,13 @@ test('reasoning summaries arrive before completion and only public summary event
   assert.deepEqual(events, [{ id: 'rs_one:0', delta: 'Comparing the contracts.' }]);
   assert.equal(request.stream, true);
   assert.deepEqual(request.reasoning, { effort: 'high', summary: 'auto' });
+  emit({ type: 'response.reasoning_summary_text.done', item_id: 'rs_one', summary_index: 0, text: 'Comparing the contracts.' });
   emit({ type: 'response.completed', response: { id: 'resp_stream', model: ANALYST_MODEL, status: 'completed', output: [
     { id: 'rs_one', type: 'reasoning', encrypted_content: 'opaque-stream-state', summary: [] },
     { type: 'function_call', call_id: 'call_stream', name: 'lookup', arguments: '{"player":"A"}' },
   ] } });
   const result = await pending;
+  assert.deepEqual(events.at(-1), { id: 'rs_one:0', text: 'Comparing the contracts.', done: true });
   assert.equal(result.stop_reason, 'tool_use');
   assert.equal(result.content[0].type, 'tool_use');
   assert.equal(JSON.stringify(events).includes('opaque-stream-state'), false);
