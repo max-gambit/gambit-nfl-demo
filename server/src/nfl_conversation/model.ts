@@ -2,6 +2,7 @@ import type Anthropic from '@anthropic-ai/sdk';
 import dotenv from 'dotenv';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { readSse } from '@shared/sse';
 
 export const ANALYST_MODEL = 'gpt-6-astra';
 export const ANALYST_EFFORT = 'high';
@@ -86,22 +87,41 @@ function apiKey(): string | undefined {
   return process.env.OPENAI_API_KEY?.trim();
 }
 
+export interface ReasoningSummaryEvent { id: string; delta?: string; text?: string }
+export type AnalystRequestOptions = Anthropic.RequestOptions & { onReasoning?: (event: ReasoningSummaryEvent) => void };
+
+async function readAnalystStream(response: Response, onReasoning: NonNullable<AnalystRequestOptions['onReasoning']>): Promise<Json> {
+  for await (const frame of readSse(response)) {
+    if (frame.data === '[DONE]') break;
+    const event = JSON.parse(frame.data) as Json;
+    if (event.type === 'response.reasoning_summary_text.delta' && typeof event.delta === 'string') {
+      onReasoning({ id: `${event.item_id}:${event.summary_index}`, delta: event.delta });
+    } else if (event.type === 'response.reasoning_summary_text.done' && typeof event.text === 'string') {
+      onReasoning({ id: `${event.item_id}:${event.summary_index}`, text: event.text });
+    } else if (event.type === 'response.completed' || event.type === 'response.incomplete') return event.response;
+    else if (event.type === 'response.failed' || event.type === 'error') {
+      throw new AnalystProviderError('stream_failed', 'The OpenAI analyst stream failed.');
+    }
+  }
+  throw new AnalystProviderError('stream_interrupted', 'The OpenAI analyst stream ended before the response completed.');
+}
+
 export function createAnalystClient(deps: { fetch?: typeof fetch; getApiKey?: () => string | undefined } = {}) {
-  return async function createMessage(params: Anthropic.MessageCreateParamsNonStreaming, options?: Anthropic.RequestOptions): Promise<Anthropic.Message> {
+  return async function createMessage(params: Anthropic.MessageCreateParamsNonStreaming, options?: AnalystRequestOptions): Promise<Anthropic.Message> {
     const key = (deps.getApiKey ?? apiKey)();
     if (!key) throw new AnalystProviderError('missing_api_key', 'The Giants analyst needs OPENAI_API_KEY configured in server/.env.local.');
     const timeout = AbortSignal.timeout(Math.max(1, options?.timeout ?? 180000));
     const signal = options?.signal ? AbortSignal.any([timeout, options.signal]) : timeout;
     const response = await (deps.fetch ?? fetch)('https://api.openai.com/v1/responses', {
       method: 'POST', headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
-      body: JSON.stringify(analystResponseRequest(params)), signal,
+      body: JSON.stringify({ ...analystResponseRequest(params), ...(options?.onReasoning ? { stream: true, reasoning: { effort: ANALYST_EFFORT, summary: 'auto' } } : {}) }), signal,
     });
     if (!response.ok) {
       const detail = await response.json().catch(() => ({})) as Json;
       const code = typeof detail.error?.code === 'string' ? detail.error.code : 'http_' + response.status;
       throw new AnalystProviderError(code, 'The OpenAI analyst request failed (HTTP ' + response.status + '; ' + code + ').');
     }
-    const result = await response.json() as Json;
+    const result = options?.onReasoning ? await readAnalystStream(response, options.onReasoning) : await response.json() as Json;
     if (!Array.isArray(result.output) || typeof result.id !== 'string' || typeof result.model !== 'string') throw new AnalystProviderError('invalid_response', 'The OpenAI analyst returned an invalid response.');
     if (result.status !== 'completed' && result.status !== 'incomplete') throw new AnalystProviderError('response_' + result.status, 'The OpenAI analyst did not complete the response.');
     const content: Anthropic.ContentBlock[] = [];

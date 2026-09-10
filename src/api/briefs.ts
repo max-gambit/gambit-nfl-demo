@@ -8,8 +8,24 @@ import type {
 import { postJson, SERVER_URL, supabase, NotImplementedError } from './client';
 import { createSession, deleteSession } from './sessions';
 import { stripBriefModePrefix } from '@shared/briefMode';
+import type { AnalysisActivityEvent } from '@shared/nflAnalysisActivity';
+import { readSse } from '@shared/sse';
 
-export async function createBrief(req: CreateBriefRequest): Promise<Brief> {
+export async function createBrief(req: CreateBriefRequest, onActivity?: (event: AnalysisActivityEvent) => void): Promise<Brief> {
+  if (onActivity) {
+    const response = await fetch(`${SERVER_URL}/briefs`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' }, body: JSON.stringify(req),
+    });
+    if (!response.ok) throw new Error('The answer could not be started.');
+    if (!response.headers.get('Content-Type')?.includes('text/event-stream')) throw new Error('The live connection is unavailable. Refresh the conversation to check for a saved answer.');
+    for await (const frame of readSse(response)) {
+      const data = JSON.parse(frame.data);
+      if (frame.event === 'activity') onActivity(data as AnalysisActivityEvent);
+      if (frame.event === 'complete' && data.brief?.id) return data.brief as Brief;
+      if (frame.event === 'failure') throw new Error(data.detail ?? data.error ?? 'The answer could not finish.');
+    }
+    throw new Error('The live connection ended. Refresh this conversation to check for a saved answer before retrying.');
+  }
   const res = await postJson<CreateBriefResponse>('/briefs', req);
   return res.brief;
 }
@@ -91,16 +107,21 @@ export async function createBriefWithSession(
   question: string,
   mode?: BriefMode,
   template?: BriefTemplateSelection,
+  live?: { onActivity: (event: AnalysisActivityEvent) => void; onSession: (session: Session) => void },
 ): Promise<{ session: Session; brief: Brief }> {
   const parsed = stripBriefModePrefix(question);
   const trimmed = parsed.question.trim();
   const briefMode = mode ?? parsed.mode ?? undefined;
   const label = deriveSessionLabel(trimmed);
   const session = await createSession(label, { workspaceKey: 'nyg-demo' });
+  live?.onSession(session);
   try {
-    const brief = await createBrief({ session_id: session.id, question: trimmed, mode: briefMode, template });
+    const brief = await createBrief({ session_id: session.id, question: trimmed, mode: briefMode, template }, live?.onActivity);
     return { session, brief };
   } catch (error) {
+    // Streaming may disconnect after generation or persistence has begun.
+    // Retain its session so a completed answer can be recovered on reload.
+    if (live) throw error;
     try {
       await deleteSession(session.id);
     } catch (rollbackError) {

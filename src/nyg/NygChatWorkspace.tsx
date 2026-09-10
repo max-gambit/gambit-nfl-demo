@@ -5,6 +5,8 @@ import { factualAnswerPresentation, marketAnnualRows } from '@shared/nflAnswerDe
 import { HistoricalPackageEvidence, MarketAnswerEvidence, ScenarioChangeEvidence } from './NygAnswerEvidence';
 import { nflAnswerVisuals } from '@shared/nflAnswerVisuals';
 import { NygAnswerVisuals } from './NygAnswerVisuals';
+import { NygAnalysisActivity } from './NygAnalysisActivity';
+import { updateAnalysisActivity, type AnalysisActivity, type AnalysisActivityEvent } from '@shared/nflAnalysisActivity';
 import { nflTransactionMarketCohortEvidence, nflTransactionTradePackageLines } from '@shared/nflTransactionMarket';
 import { createBrief, createBriefWithSession, getBrief } from '../api/briefs';
 import { useBookmarks, useBriefs, useSessions, useUi } from '../store';
@@ -31,6 +33,7 @@ export function NygChatWorkspace({ showLibrary = false, onOpenChat }: { showLibr
   const [reportOpen, setReportOpen] = useState(false);
   const [report, setReport] = useState({player:'',author:'',date:'',observation:''});
   const [pending, setPending] = useState<string | null>(null);
+  const [activity, setActivity] = useState<AnalysisActivity[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [railOpen, setRailOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -94,12 +97,13 @@ export function NygChatWorkspace({ showLibrary = false, onOpenChat }: { showLibr
   async function submit(question: string) {
     const text = question.trim();
     if (!text || inFlight.current) return;
-    inFlight.current = true; setPending(text); setDraft(''); setError(null);
+    inFlight.current = true; setPending(text); setActivity([]); setDraft(''); setError(null);
     const sessionAtSubmit = activeSessionId;
+    const onActivity = (event: AnalysisActivityEvent) => setActivity(items => updateAnalysisActivity(items, event));
     try {
       let answer: Brief;
-      if (sessionAtSubmit) answer = await createBrief({ session_id: sessionAtSubmit, question: text, mode: 'data_analyst', template: { template_id: 'data_table' } });
-      else { const created = await createBriefWithSession(text, 'data_analyst', { template_id: 'data_table' }); insertSession(created.session); answer = created.brief; }
+      if (sessionAtSubmit) answer = await createBrief({ session_id: sessionAtSubmit, question: text, mode: 'data_analyst', template: { template_id: 'data_table' } }, onActivity);
+      else { const created = await createBriefWithSession(text, 'data_analyst', { template_id: 'data_table' }, { onActivity, onSession: insertSession }); answer = created.brief; }
       insertBrief(answer); setActiveBrief(answer.id); void loadBriefData(answer.id);
       // Poll in addition to realtime; a lost socket must not strand the answer.
       if (answer.status === 'generating') {
@@ -143,7 +147,7 @@ export function NygChatWorkspace({ showLibrary = false, onOpenChat }: { showLibr
                 </>}
               </div>
             </article>)}
-            {pending && !turns.some(t => t.question === pending && t.id === turns.at(-1)?.id) && <article className="gc-turn"><div className="gc-user"><span className="gc-eyebrow">YOU</span><p>{pending}</p></div><PendingAnswer /></article>}
+            {pending && <article className="gc-turn"><div className="gc-user"><span className="gc-eyebrow">YOU</span><p>{pending}</p></div><PendingAnswer /><NygAnalysisActivity items={activity} live /></article>}
           </div>}
           <div ref={bottomRef} />
         </div>
@@ -167,6 +171,7 @@ function FactualAnswer({ body: savedBody, previous = null, briefId, onEvidence }
   const paragraphs = body.answer_paragraphs?.length ? body.answer_paragraphs : [{ text: body.answer, source_refs: body.answer_source_refs ?? [] }];
   const cite = (refs: number[]) => refs.length ? <button className="gc-cite" onClick={() => onEvidence(refs[0])}>[{refs.slice(0, 4).join(', ')}{refs.length > 4 ? '…' : ''}]</button> : null;
   return <div className="gc-factual-answer" onFocus={() => setActiveBrief(briefId)} onMouseDown={() => setActiveBrief(briefId)}>
+    <NygAnalysisActivity items={body.analysis_activity ?? []} />
     <p className="gc-answer-lead">{paragraphs[0].text} {cite(paragraphs[0].source_refs)}</p>
     {visuals.length > 0 && <NygAnswerVisuals visuals={visuals} onEvidence={onEvidence} />}
     {paragraphs.slice(1).map((paragraph,index)=><p className="gc-answer-lead" key={index}>{paragraph.text} {cite(paragraph.source_refs)}</p>)}

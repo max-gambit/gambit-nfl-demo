@@ -5,7 +5,9 @@ import { buildNflFactualAnswer, unsupportedAnswer } from '../nfl_facts/answer.js
 import { buildNflAiAnswer } from '../nfl_facts/ai_answer.js';
 import { isHistoricalRecordQuestion } from '../nfl_transactions/historical_selection.js';
 import { randomBytes } from 'node:crypto';
-import { Hono } from 'hono';
+import { Hono, type Context } from 'hono';
+import { streamSSE } from 'hono/streaming';
+import { updateAnalysisActivity, type AnalysisActivity, type AnalysisActivityEvent } from '@shared/nflAnalysisActivity';
 import Anthropic from '@anthropic-ai/sdk';
 import { BRIEF_MODEL, createClaudeMessage } from '../claude/client.js';
 import { BRIEF_SYSTEM } from '../claude/prompts.js';
@@ -185,7 +187,38 @@ export function nflAnalysisContextForSession(
  *
  * The client polls (or subscribes via Realtime) until status flips.
  */
-briefRoutes.post('/', async (c) => {
+briefRoutes.post('/', (c) => {
+  if (!c.req.header('Accept')?.includes('text/event-stream')) return createNflBrief(c);
+  return streamSSE(c, async stream => {
+    // A disconnected viewer must not cancel persistence or cause a second run.
+    let connected = true;
+    stream.onAbort(() => { connected = false; });
+    let writes = Promise.resolve();
+    const send = (event: string, data: unknown) => {
+      if (!connected) return;
+      writes = writes.then(async () => { if (connected) await stream.writeSSE({ event, data: JSON.stringify(data) }); }).catch(() => { connected = false; });
+    };
+    const heartbeat = setInterval(() => send('ping', {}), 15000);
+    try {
+      send('connected', {});
+      const response = await createNflBrief(c, activity => send('activity', activity));
+      const result = await response.json();
+      send(response.ok ? 'complete' : 'failure', result);
+    } catch {
+      send('failure', { detail: 'The answer could not finish. Your question is preserved.' });
+    } finally {
+      clearInterval(heartbeat);
+      await writes;
+    }
+  });
+});
+
+async function createNflBrief(c: Context, onActivity?: (event: AnalysisActivityEvent) => void) {
+  let activity: AnalysisActivity[] = [];
+  const publish = onActivity ? (event: AnalysisActivityEvent) => {
+    activity = updateAnalysisActivity(activity, event);
+    onActivity(event);
+  } : undefined;
   let body: CreateBriefRequest;
   try {
     body = await c.req.json();
@@ -356,11 +389,13 @@ briefRoutes.post('/', async (c) => {
   // investigation and prose; the server still owns table cells and arithmetic.
   try {
     const analysis = await buildNflAiAnswer(question, {
+      onActivity: publish,
       sessionId: session_id,
       history: [...contextBriefs].reverse().filter(row => row.status === 'ready').map(row => ({ question: row.question, body: row.body?.kind === 'data_analysis' ? row.body : null })),
       initialEvidence: preparedMarketBody ? { body: preparedMarketBody, sources: preparedSources } : undefined,
     });
     preparedMarketBody = analysis.body;
+    if (activity.length) preparedMarketBody.analysis_activity = activity;
     preparedSources = analysis.sources;
     preparedProgress = analysis.body.ai_analysis?.outcome==='needs_input' ? readyBriefProgress('Contract input needed','The saved-contract lookup completed; the answer identifies the missing terms.') : analysis.body.ai_analysis?.outcome==='complete' ? readyBriefProgress('Analysis ready','The answer and supporting sources are ready.') : readyBriefProgress('Analysis incomplete','The checked evidence and saved question are available; written analysis did not complete.');
   } catch (error) {
@@ -413,7 +448,7 @@ briefRoutes.post('/', async (c) => {
   // The AI answer and its exact source records are persisted together.
   const response: CreateBriefResponse = { brief };
   return c.json(response, 201);
-});
+}
 
 briefRoutes.get('/:id/progress-stream', async (c) => {
   const id = c.req.param('id');

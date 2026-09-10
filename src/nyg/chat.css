@@ -318,3 +318,12 @@
 .gc-report-input button { border: 1px solid var(--gc-line); padding: 7px 12px; background: #f5f7f9; border-radius: 4px; }
 .gc-source-card blockquote { white-space: pre-wrap; font-size: 12px; line-height: 1.65; margin: 12px 0; border-left: 2px solid #bdc9d8; padding-left: 12px; }
 .gc-visible-calculations summary { cursor: pointer; font-size: 13px; font-weight: 650; }
+.gc-analysis-activity { margin: 8px 0 16px; color: #5b6472; font-size: 13px; }
+.gc-analysis-toggle { display: flex; align-items: center; gap: 14px; max-width: 100%; border: 0; padding: 5px 0; background: transparent; color: inherit; text-align: left; cursor: pointer; }
+.gc-analysis-toggle > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gc-analysis-toggle small { flex: none; color: #174986; }
+.gc-analysis-feed { max-height: 280px; overflow-y: auto; margin-top: 6px; border-left: 2px solid #dce2e9; padding: 0 12px; overscroll-behavior: contain; overflow-wrap: anywhere; }
+.gc-analysis-entry p { margin: 7px 0; white-space: pre-wrap; line-height: 1.55; }
+.gc-analysis-reasoning { color: #485363; }
+.gc-analysis-tool, .gc-analysis-status { font-size: 12px; color: #64748b; }
+.gc-analysis-note { font-size: 11px; color: #7a8492; margin: 5px 0 10px; }

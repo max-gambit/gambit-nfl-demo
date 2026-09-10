@@ -82,3 +82,45 @@ test('the parent abort reaches the provider request', async () => {
   const call = createAnalystClient({ getApiKey: () => 'unit-test', fetch: (async (_url, init) => { init?.signal?.throwIfAborted(); return apiResponse([]); }) as typeof fetch });
   await assert.rejects(call(params(), { signal: controller.signal }), /test cancellation/);
 });
+
+test('reasoning summaries arrive before completion and only public summary events reach the UI', async () => {
+  let controller!: ReadableStreamDefaultController<Uint8Array>;
+  const encode = new TextEncoder();
+  let request: any;
+  const call = createAnalystClient({ getApiKey: () => 'unit-test', fetch: (async (_url, init) => {
+    request = JSON.parse(String(init?.body));
+    return new Response(new ReadableStream({ start(c) { controller = c; } }), { headers: { 'Content-Type': 'text/event-stream' } });
+  }) as typeof fetch });
+  const events: unknown[] = [];
+  let sawSummary!: () => void;
+  const summaryArrived = new Promise<void>(resolve => { sawSummary = resolve; });
+  let finished = false;
+  const pending = call(params(), { onReasoning: event => { events.push(event); sawSummary(); } }).then(result => { finished = true; return result; });
+  await Promise.resolve();
+  const emit = (event: unknown) => controller.enqueue(encode.encode(`data: ${JSON.stringify(event)}\n\n`));
+  emit({ type: 'response.reasoning_text.delta', delta: 'never expose this' });
+  emit({ type: 'response.output_text.delta', delta: 'unfinished answer' });
+  emit({ type: 'response.reasoning_summary_text.delta', item_id: 'rs_one', summary_index: 0, delta: 'Comparing the contracts.' });
+  await summaryArrived;
+  assert.equal(finished, false);
+  assert.deepEqual(events, [{ id: 'rs_one:0', delta: 'Comparing the contracts.' }]);
+  assert.equal(request.stream, true);
+  assert.deepEqual(request.reasoning, { effort: 'high', summary: 'auto' });
+  emit({ type: 'response.completed', response: { id: 'resp_stream', model: ANALYST_MODEL, status: 'completed', output: [
+    { id: 'rs_one', type: 'reasoning', encrypted_content: 'opaque-stream-state', summary: [] },
+    { type: 'function_call', call_id: 'call_stream', name: 'lookup', arguments: '{"player":"A"}' },
+  ] } });
+  const result = await pending;
+  assert.equal(result.stop_reason, 'tool_use');
+  assert.equal(result.content[0].type, 'tool_use');
+  assert.equal(JSON.stringify(events).includes('opaque-stream-state'), false);
+});
+
+test('an interrupted or failed stream never becomes a completed response or silently retries', async () => {
+  for (const payload of ['', 'data: {"type":"response.failed"}\n\n']) {
+    let attempts = 0;
+    const call = createAnalystClient({ getApiKey: () => 'unit-test', fetch: (async () => { attempts++; return new Response(payload); }) as typeof fetch });
+    await assert.rejects(call(params(), { onReasoning: () => {} }), /stream (ended|failed)/);
+    assert.equal(attempts, 1);
+  }
+});

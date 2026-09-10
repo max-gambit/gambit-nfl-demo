@@ -200,6 +200,7 @@ export interface NflHistoricalSelection {
 
 export interface DataAnalysisBriefBody {
   kind: 'data_analysis';
+  analysis_activity?: import('./nflAnalysisActivity').AnalysisActivity[];
   /** Distinguishes preserved factual answers from AI synthesis of retrieved evidence. */
   language_policy?: 'facts_only_v1' | 'grounded_ai_v1';
   ai_analysis?: { model: string; model_config?: { provider: 'openai'; requested_model: string; model: string; reasoning_effort: 'high' | 'max'; requested_service_tier: 'fast'; service_tier: string | null; response_id: string; reasoning_tokens: number; cached_input_tokens: number }; elapsed_ms: number; tool_names: string[]; assumptions: string[]; evidence_validated?: boolean; grounding_checked?: boolean; withheld_numeric_sentences?: number; outcome?: 'complete' | 'evidence_only' | 'unavailable' | 'needs_input'; pipeline_version?: 'analyst_v1' | 'analyst_v2'; stage_ms?: { retrieval: number; generation: number; review: number; repair: number }; repair_count?: number; validation_outcome?: 'passed' | 'incomplete' | 'needs_input'; evidence_hash?: string };

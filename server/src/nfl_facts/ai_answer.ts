@@ -1,4 +1,5 @@
 import { jsonSchemaOutputFormat } from '@anthropic-ai/sdk/helpers/json-schema';
+import { analysisToolLabel, type AnalysisActivityEvent } from '@shared/nflAnalysisActivity';
 import { cleanNflAnalystProse } from '@shared/nflReceiverPresentation';
 import { searchNflAuthority } from '../nfl_authority/index.js';
 import { describeNflIllustrativeTerms, getNflContractDossier, getNflContractDossierCoverage, NFL_CONTRACT_SCENARIO_TOOL_SCHEMA, nflContractComparisonTool, type NflContractScenarioArgs, type NflContractScenarioResult } from '../nfl_contracts/index.js';
@@ -28,6 +29,7 @@ import { deterministicMarketSourceRows, deterministicMarketEventSourceRows } fro
 
 export interface AnalystTurn { question: string; body: DataAnalysisBriefBody | null }
 export interface AnalystOptions {
+  onActivity?: (event: AnalysisActivityEvent) => void;
   pipeline?: 'legacy' | 'candidate';
   onEvidence?: (evidence: unknown[]) => void;
   onTrace?: (event: Record<string, unknown>) => void;
@@ -430,7 +432,11 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
     const properties=Object.fromEntries(Object.entries(tool.input_schema.properties??{}).filter(([key])=>['answer_paragraphs','tables','followups','evidence_id','continuation_query_id'].includes(key)));
     return {...tool,strict:false,input_examples:[{answer_paragraphs:[{text:'The supported recommendation and its evidence.',source_refs:[1]}],tables:[],followups:[],evidence_id:'lookup_1',continuation_query_id:'lookup_1'}],input_schema:jsonSchemaOutputFormat({type:'object',properties,required:['answer_paragraphs','tables','followups','evidence_id','continuation_query_id'],additionalProperties:false} as any).schema as Anthropic.Tool.InputSchema};
   });
-  const call = options.callModel ?? createAnalystMessage;
+  const model = options.callModel ?? createAnalystMessage;
+  const call: typeof createAnalystMessage = (params, requestOptions) => model(params, {
+    ...requestOptions,
+    ...(options.onActivity ? { onReasoning: event => options.onActivity?.({ ...event, kind: 'reasoning' }) } : {}),
+  });
   // Code validates exact cells and categorical facts. A separate bounded
   // evidence review checks the premises and completeness of AI interpretation.
   // Tests can replace that review explicitly; production never defaults to pass.
@@ -506,12 +512,14 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
     const results: Anthropic.ToolResultBlockParam[] = [];
     const batchStart=Date.now();
     const readKeys=new Map<string,string>();
+    for (const tool of calls) options.onActivity?.({ id: tool.id, kind: 'tool', text: analysisToolLabel(tool.name, tool.input), status: 'running' });
     // Reads use an immutable turn context. State-changing/dependent tools remain ordered below.
     for(const tool of calls){const run=independentRead(tool);if(!run||finalFailures)continue;const key=tool.name+JSON.stringify(canonical(tool.input));readKeys.set(tool.id,key);if(!readCache.has(key))readCache.set(key,Promise.resolve().then(run).then(answer=>({answer}),error=>({error})));}
 
     let finishFailedThisRound=false;
     for (const tool of calls) {
       toolNames.push(tool.name);
+      let activityFailed = false;
       try {
         if(finalFailures&&tool.name!=='finish_analysis')throw new Error('Repair the identified claim using the evidence already retrieved, then resubmit finish_analysis.');
         if(readKeys.has(tool.id)){const key=readKeys.get(tool.id)!;const result=await readCache.get(key)!;if(result.error)throw result.error;let item=registeredReads.get(key);if(!item){item=register(result.answer!,false,true);registeredReads.set(key,item);}results.push({type:'tool_result',tool_use_id:tool.id,content:JSON.stringify(forModel(item))});continue;}
@@ -634,6 +642,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
           const categoricalIssues = categoricalGroundingIssues(authored, [...evidence.values()]);
           let issues: string[];
           const reviewStart=Date.now();
+          options.onActivity?.({ id: `review-${round}`, kind: 'status', text: 'Checking claims against the sources' });
           options.onEvidence?.([...evidence.values()].map(forModel));
           try {
             issues = options.reviewDraft ? await options.reviewDraft(draft, [...evidence.values()].map(forModel)) : await reviewNflAnalystSemantics({
@@ -645,7 +654,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
                 return reviewEvidence;
               }),
               tool_coverage: { examples: nflExampleCoverage, contract_dossiers:getNflContractDossierCoverage(), tools: nflAnalystTools.filter(t => t.name !== 'finish_analysis').map(t => ({name: t.name, description: t.description?.split('. ').slice(0,2).join('. ')})) },
-            }, { callModel:options.callModel, onTrace:options.onTrace, timeoutMs: Math.min(120_000, Math.max(1, deadlineMs - (Date.now() - started))) });
+            }, { callModel:call, onTrace:options.onTrace, timeoutMs: Math.min(120_000, Math.max(1, deadlineMs - (Date.now() - started))) });
           } catch(error) { stageMs.review+=Date.now()-reviewStart; options.onTrace?.({stage:'review_error',error:String(error)}); return partial('The factual interpretation review could not finish.'); }
           stageMs.review+=Date.now()-reviewStart;
           options.onTrace?.({stage:'review',issues,elapsed_ms:Date.now()-reviewStart});
@@ -740,10 +749,13 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
         if(executed.body.contract_scenario)adoptExecutedState(executed);
         results.push({ type: 'tool_result', tool_use_id: tool.id, content: JSON.stringify(forModel(executed)) });
       } catch (error) {
+        activityFailed = true;
         console.info('[nfl analyst] validation',tool.name,error instanceof Error?error.message:'lookup failed');
         options.onTrace?.({stage:'validation',tool:tool.name,error:error instanceof Error?error.message:'Lookup unavailable'});
         if (tool.name === 'finish_analysis'&&!finishFailedThisRound){finishFailedThisRound=true;if(++finalFailures>1)return partial('The written answer failed evidence validation.');}
         results.push({ type: 'tool_result', tool_use_id: tool.id, is_error: true, content: error instanceof Error ? error.message : 'Lookup unavailable.' });
+      } finally {
+        options.onActivity?.({ id: tool.id, kind: 'tool', status: activityFailed ? 'failed' : 'done' });
       }
     }
     if(!calls.some(t=>t.name==='finish_analysis'))stageMs.retrieval+=Date.now()-batchStart;
