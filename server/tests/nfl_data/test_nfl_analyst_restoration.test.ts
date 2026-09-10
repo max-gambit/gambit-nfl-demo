@@ -103,3 +103,35 @@ test('worded adjacent quantities, parenthesized lists and year ranges retain the
   assert.ok(periodFacts.some(f=>f.value===7.5&&f.unit==='percent'&&f.period==='2015–2017'));
   assert.ok(validateSourcedParagraphs([{text:'The share of league movements rose from 7.5% in 2015–2017 to 11.05% in 2023–2025.',source_refs:[1]}],periodFacts,new Set([1])));
 });
+
+
+test('receiver enrichment resolves the real same-name WR and linebacker collision',async()=>{
+  const data=await seed;
+  const receiver=data.roster_entries.find(row=>row.player_name==='Justin Jefferson'&&row.position==='WR')!;
+  assert.equal(receiver.team_id,'MIN');
+  const metric=data.player_metrics.find(row=>row.player_id===receiver.player_id&&row.team_id==='MIN')!;
+  const cap=data.cap_rows.find(row=>row.player_id===receiver.player_id&&row.team_id==='MIN')!;
+  const result=await buildNflReceiverComparison({player_names:['Justin Jefferson'],candidate_scope:'external'},data,'Compare receiver Justin Jefferson.');
+  assert.equal(result.body.tables[0].rows[0][1],'MIN · external');
+  assert.equal(result.body.tables[0].rows[0][5],metric.receiving_yards_2025);
+  assert.equal(result.body.tables[0].rows[0][7],'$'+cap.cap_number_2026!.toLocaleString('en-US'));
+  assert.match(result.sources[0].title!,/recorded receiving usage/);
+  const scoped=await buildNflReceiverComparison({player_names:['Justin Jefferson','Malik Nabers'],candidate_scope:'external'},data,'Compare external receivers.');
+  assert.equal(scoped.body.population?.matched_count,1);
+  assert.equal(scoped.body.population?.displayed_count,1);
+});
+
+test('parenthetical, following-player and ordered-list claims bind to the right player',()=>{
+  const second={...evidence,id:'lookup_2',sources:evidence.sources.map(s=>({...s,ref_index:2,title:'Sutton record'})),body:{...evidence.body,tables:[{...evidence.body.tables[0],rows:[['Courtland Sutton',1017,74,'$13,975,000']],source_refs:[2]}]}};
+  const catalog=collectEvidenceFacts([evidence,second]);
+  const check=(text:string)=>validateSourcedParagraphs([{text,source_refs:[1,2]}],catalog,new Set([1,2]));
+  assert.ok(check('Meyers (835 receiving yards) versus Sutton (1,017 receiving yards).'));
+  assert.ok(check('Meyers and Sutton recorded 835 and 1,017 receiving yards, respectively.'));
+  assert.ok(check('Receiving yards in 2025: 835 for Meyers and 1,017 for Sutton.'));
+  assert.ok(check('Meyers has a $6.21M current-team cap and is an option whose high-snap role would need checking.'));
+  for(const text of ['Meyers (1,017 receiving yards) versus Sutton (835 receiving yards).','Receiving yards in 2025: 1,017 for Meyers and 835 for Sutton.','Meyers and Sutton recorded 1,017 and 835 receiving yards, respectively.'])assert.throws(()=>check(text),/Unsupported quantity/);
+  assert.equal(numericMentions('The 2026-2027 years, 2027-28 horizon and No. 1 or WR1 labels are context.').length,0);
+  assert.equal(numericMentions('sub-$5M cap')[0].value,5e6);
+  assert.equal(numericMentions('negative -$5M cap')[0].value,-5e6);
+  assert.equal(numericMentions('16-17 starts')[0].after.trim(),'starts');
+});

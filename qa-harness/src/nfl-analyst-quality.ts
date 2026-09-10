@@ -29,7 +29,7 @@ const hash=(v:unknown)=>createHash('sha256').update(JSON.stringify(v)).digest('h
 const save=async(name:string,value:unknown)=>fs.writeFile(path.join(out,name),JSON.stringify(value,null,2)+'\n');
 const read=async(name:string)=>JSON.parse(await fs.readFile(path.join(out,name),'utf8'));
 const exists=async(name:string)=>fs.access(path.join(out,name)).then(()=>true,()=>false);
-if(['writing','e2e','judge'].includes(phase)){
+if(['writing','e2e'].includes(phase)){
  const manifest=await read('manifest.json');
  if(hash(runtimeHashes)!==hash(manifest.runtimeHashes))throw new Error('Runtime changed since evidence freeze. Start a versioned comparison directory.');
  for(const file of manifest.files){const digest=createHash('sha256').update(await fs.readFile(path.join(root,file.path))).digest('hex');if(digest!==file.sha256)throw new Error('Public evidence changed since freeze: '+file.path);}
@@ -39,7 +39,7 @@ async function pool<T>(jobs:(()=>Promise<T>)[]){let index=0;const results:T[]=[]
 async function runTurn(id:string,question:string,pipeline:string,history:unknown[]=[]){
  const events:unknown[]=[];let evidence:unknown[]=[];const started=Date.now();
  const callModel=async(params:any,options:any)=>{events.push({request:params});try{const result=await client.createClaudeMessage(params,options);events.push({response:result});return result;}catch(error){events.push({provider_error:String(error)});throw error;}};
- try{const result=await api.buildNflAiAnswer(question,{pipeline,deadlineMs:120000,history,callModel,sessionId:'00000000-0000-4000-8000-000000000003',readSavedContract:async(request:any,context:any)=>savedContracts.selectSavedNflContract(savedRows,request,context),loadTradeSnapshot:async()=>(await trades.loadReviewedNflTransactionSnapshot()).snapshot,onEvidence:(e:unknown[])=>{evidence=e;},onTrace:(e:unknown)=>events.push(e)});const record={id,question,pipeline,history,runtime_hash:hash(runtimeHashes),result,evidence,events,elapsed_ms:Date.now()-started,evidence_hash:hash(evidence)};await save(id+'.json',record);console.log(id,result.body.ai_analysis?.outcome,record.elapsed_ms);return record;}
+ try{const result=await api.buildNflAiAnswer(question,{pipeline,deadlineMs:180000,history,callModel,sessionId:'00000000-0000-4000-8000-000000000003',readSavedContract:async(request:any,context:any)=>savedContracts.selectSavedNflContract(savedRows,request,context),loadTradeSnapshot:async()=>(await trades.loadReviewedNflTransactionSnapshot()).snapshot,onEvidence:(e:unknown[])=>{evidence=e;},onTrace:(e:unknown)=>events.push(e)});const record={id,question,pipeline,history,runtime_hash:hash(runtimeHashes),result,evidence,events,elapsed_ms:Date.now()-started,evidence_hash:hash(evidence)};await save(id+'.json',record);console.log(id,result.body.ai_analysis?.outcome,record.elapsed_ms);return record;}
  catch(error){const record={id,question,pipeline,history,runtime_hash:hash(runtimeHashes),error:String(error),evidence,events,elapsed_ms:Date.now()-started};await save(id+'.json',record);console.log(id,'ERROR',String(error));return record;}
 }
 if(phase==='probe'){const selected=process.argv.includes('--case')?arg('--case','receiver_flexibility').split(','):['receiver_flexibility'];await pool(NFL_QUALITY_CASES.filter(c=>selected.includes(c.id)).map(c=>()=>runTurn('probe-'+c.id+'-'+Date.now(),c.question,'candidate')));}
@@ -47,7 +47,7 @@ if(phase==='freeze'){
  const paths=execFileSync('git',['ls-files','data'],{cwd:root,encoding:'utf8'}).trim().split('\n').filter(p=>p.includes('/nfl'));
  const files=await Promise.all(paths.map(async p=>{const contents=await fs.readFile(path.join(root,p));const frozen=path.join(out,'frozen-data',p);await fs.mkdir(path.dirname(frozen),{recursive:true});await fs.writeFile(frozen,contents);return {path:p,sha256:createHash('sha256').update(contents).digest('hex')};}));
  if(!files.length)throw new Error('No frozen public evidence files found.');
- await save('manifest.json',{created_at:new Date().toISOString(),saved_contract_fixture_hash:hash(savedRows),candidate_revision:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),baseline_revision:'e16ec81',historical_revisions:['32722f3','7c740fc'],model:client.BRIEF_MODEL,effort:'low',concurrency:2,deadline_ms:120000,latency_policy:'Quality is the release priority; elapsed time is reported as a tradeoff per user direction.',runtimeHashes,files,question_bank:NFL_QUALITY_CASES,sequences:NFL_QUALITY_SEQUENCES});
+ await save('manifest.json',{created_at:new Date().toISOString(),saved_contract_fixture_hash:hash(savedRows),candidate_revision:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),baseline_revision:'e16ec81',historical_revisions:['32722f3','7c740fc'],model:client.BRIEF_MODEL,effort:'low',concurrency:2,deadline_ms:180000,latency_policy:'Quality is the release priority; elapsed time is reported as a tradeoff per user direction.',runtimeHashes,files,question_bank:NFL_QUALITY_CASES,sequences:NFL_QUALITY_SEQUENCES});
  await pool(NFL_QUALITY_CASES.map(c=>async()=>{if(await exists('evidence-'+c.id+'.json'))return;const r=await runTurn('capture-'+c.id,c.question,'candidate');await save('evidence-'+c.id+'.json',{question:c.question,heldOut:c.heldOut,evidence:r.evidence,evidence_hash:hash(r.evidence)});}));
 }
 if(phase==='e2e')await pool(NFL_QUALITY_SEQUENCES.flatMap(sequence=>['legacy','candidate'].flatMap(pipeline=>[1,2].map(trial=>async()=>{const history:unknown[]=[];for(const [i,q] of sequence.questions.entries()){const id=`e2e-${sequence.id}-${pipeline}-${trial}-${i+1}`;const r=await exists(id+'.json')?await read(id+'.json'):await runTurn(id,q,pipeline,history);history.push({question:q,body:r.result?.body??null});}}))));
@@ -74,10 +74,14 @@ function comparableWriterText(raw:string):string {
  }catch{return raw;}
 }
 if(phase==='judge'){
- await save('judge-context.json',{runtime_hash:hash(runtimeHashes),harness_sha256:createHash('sha256').update(await fs.readFile(fileURLToPath(import.meta.url))).digest('hex'),format_policy:'Normalize historical JSON wrappers, preserving all authored fields; evaluate meaning rather than serialization.',answer_label_policy:'Deterministic shuffled labels; pipeline names omitted.'});
+ const frozenManifest=await read('manifest.json');
+ const answerRuntimeHash=hash(frozenManifest.runtimeHashes);
+ if(hash((await read('writer-context.json')).runtimeHashes)!==answerRuntimeHash)throw new Error('Writer context does not match the frozen runtime.');
+ await save('judge-context.json',{answer_runtime_hash:answerRuntimeHash,harness_sha256:createHash('sha256').update(await fs.readFile(fileURLToPath(import.meta.url))).digest('hex'),format_policy:'Normalize historical JSON wrappers, preserving all authored fields; evaluate meaning rather than serialization.',answer_label_policy:'Deterministic shuffled labels; pipeline names omitted.'});
  const {judgeNflAnswerQuality}=await import('./terra-judge.js');
  async function judge(id:string,question:string,records:any[],evidence:unknown,context:unknown){
   if(await exists(id+'.json'))return;
+  if(records.some(r=>r.runtime_hash&&r.runtime_hash!==answerRuntimeHash))throw new Error('An answer was generated by a different runtime.');
   const ordered=records.slice().sort((a,b)=>hash(id+a.id).localeCompare(hash(id+b.id)));
   const labels=Object.fromEntries(ordered.map((r,i)=>[String.fromCharCode(65+i),r.id]));
   const answers=ordered.map((r,i)=>{
@@ -94,7 +98,7 @@ if(phase==='judge'){
  await pool(jobs);
 }
 if(phase==='report'){
- const files=await fs.readdir(out);const judgments=await Promise.all(files.filter(f=>f.startsWith('judge-')&&f.endsWith('.json')).map(read));
+ const files=await fs.readdir(out);const judgments=await Promise.all(files.filter(f=>/^judge-(?:writing|e2e)-.*\.json$/.test(f)).map(read));
  const scores:any[]=[];const prefs:any[]=[];
  for(const j of judgments){if(j.error)continue;for(const a of j.verdict.answers)scores.push({...a,id:j.labels[a.label],judge:j.id});for(const p of j.verdict.preferences)prefs.push({...p,a:j.labels[p.a],b:j.labels[p.b],winner:p.winner==='tie'?'tie':j.labels[p.winner],judge:j.id});}
  const averages=(rows:any[])=>Object.fromEntries(['relevance','depth','alternatives','uncertainty','decision_usefulness','followup_usefulness'].map(k=>[k,rows.reduce((s,r)=>s+r[k],0)/Math.max(1,rows.length)]));
@@ -121,7 +125,7 @@ if(phase==='report'){
  completion:summary.complete_fraction>=0.9&&summary.e2e_complete_fraction>=0.9,
  no_material_errors:materialErrors.length===0,
  direct_review:summary.direct_claim_review?.passed===true,
- bounded_deadline:summary.e2e_candidate_max_ms<=121000};
+ bounded_deadline:summary.e2e_candidate_max_ms<=181000};
  await save('gates.json',{...gates,accepted:Object.values(gates).every(Boolean)});
  await save('summary.json',summary);console.log(JSON.stringify(summary,null,2));
  const report=['# Giants analyst restoration comparison','',JSON.stringify(summary,null,2),'','## Anonymous judgments and source records',...judgments.map(j=>`- [${j.id}](${j.id}.json)`)].join('\n');await fs.writeFile(path.join(out,'comparison.md'),report);

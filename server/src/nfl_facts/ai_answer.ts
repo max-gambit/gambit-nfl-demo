@@ -81,6 +81,7 @@ INVESTIGATE
 - For an open-ended receiver acquisition question, your first lookup must search_player_records with team_ids:[], position_groups:['WR'], exclude_nyg:true. Do not start by naming familiar prepared receivers. Compare the resulting candidates, including missing enrichment honestly.
 - Decide what evidence the question needs. Use independent lookups together, reuse successful evidence, and finish once the material questions are supported. Read the Giants cap observations for cap-sensitive decisions and sourced rules for transaction mechanics. A table limit is a displayed sample, not the size of the researched population.
 - Keep explicit filters, exclusions, budgets, reserve and protections. A vague preference is not a numeric cutoff. Change the scope when the objective changes. Use set_scenario before a dependent calculation, and restore an earlier scenario explicitly when requested. Saved illustrative terms are distinct from actual reported contracts and current budget constraints.
+- Retrieve fresh evidence for each turn, including short follow-ups. Prior answer text and tables provide context, but prior source refs and lookup IDs are not current evidence. Only initial_evidence and this turn's tool results may be cited. When comparing a prior package or scenario with a new one, retrieve both.
 - Use historical/snapshot dates as supplied. An old model recommendation is not evidence. Missing data limits the affected claim; continue useful supported work. Ask a focused question only for an input needed to complete the decision.
 
 REASON
@@ -346,7 +347,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
     else next.active.protected_player_names=explicitPlayerProtections(question,[],next.active.protected_player_names).names;
     conversationState=next;
   };
-  const deadlineMs = options.deadlineMs ?? 120_000;
+  const deadlineMs = options.deadlineMs ?? 180_000;
   const evidence = new Map<string, Evidence>();
   const sources: FactualAnswer['sources'] = [];
   const toolNames: string[] = [];
@@ -477,9 +478,9 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
     if (Date.now() - started > deadlineMs) return partial('Response deadline reached.');
     let response: Anthropic.Message;
     const generationStart=Date.now();
-    const mustFinish=finalFailures>0||Date.now()-started>deadlineMs-30_000;
+    const mustFinish=evidence.size>0&&(finalFailures>0||Date.now()-started>deadlineMs-30_000);
     if(mustFinish&&!finalFailures)messages.push({role:'user',content:'Finish from the available evidence now. Identify any material unfinished input; do not start another research round.'});
-    try { response = await call({ model: BRIEF_MODEL, max_tokens: 4500, output_config:{effort:'low'}, system: NFL_ANALYST_SYSTEM, tools: exposedTools,
+    try { response = await call({ model: BRIEF_MODEL, max_tokens: 4500, output_config:{effort:'low'}, system: NFL_ANALYST_SYSTEM, tools: evidence.size?exposedTools:exposedTools.filter(tool=>tool.name!=='finish_analysis'),
       tool_choice: mustFinish?{type:'tool',name:'finish_analysis',disable_parallel_tool_use:true}:{type:'auto'}, messages,
     }, { timeout: Math.max(1, deadlineMs - (Date.now() - started)), maxRetries: 0 });
     } catch (error) { return partial(error instanceof Error && /timeout|timed out|abort/i.test(error.message) ? 'Response deadline reached.' : 'The analysis provider is unavailable.'); }
@@ -507,7 +508,7 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
         if(readKeys.has(tool.id)){const key=readKeys.get(tool.id)!;const result=await readCache.get(key)!;if(result.error)throw result.error;let item=registeredReads.get(key);if(!item){item=register(result.answer!,false,true);registeredReads.set(key,item);}results.push({type:'tool_result',tool_use_id:tool.id,content:JSON.stringify(forModel(item))});continue;}
         if (tool.name === 'finish_analysis') {
           if (calls.length !== 1) throw new Error('Submit finish_analysis on its own after reading the tool results.');
-          if (!evidence.size) throw new Error('Retrieve relevant evidence before submitting.');
+          if (!evidence.size) throw new Error('No current-turn evidence exists. Retrieve the relevant evidence with a read tool before finishing; previous lookup IDs are not reusable.');
           const args = object(tool.input);
           for(const key of ['key_findings','tables','caveats','assumptions','followups']) if(args[key]==null)args[key]=[];
           if (args.scenario) applyScenario(args.scenario);
@@ -627,9 +628,15 @@ export async function buildNflAiAnswerV2(question: string, options: AnalystOptio
           options.onEvidence?.([...evidence.values()].map(forModel));
           try {
             issues = options.reviewDraft ? await options.reviewDraft(draft, [...evidence.values()].map(forModel)) : await reviewNflAnalystSemantics({
-              question, user_context: history.slice(-8).map(turn => turn.question), authored, selected_answer: answer, selected_tables: tables, evidence: [...evidence.values()].map(forModel),
+              question, user_context: history.slice(-8).map(turn => turn.question), authored, selected_answer: answer, selected_tables: tables, evidence: [...evidence.values()].map(item=>{
+                // Exact quantities have already been bound by code. Preserve the
+                // source tables, calculations and caveats without repeating every
+                // cell again as a fact catalog and an answer-statement catalog.
+                const {facts,fact_fields,answer_statements,...reviewEvidence}=forModel(item);
+                return reviewEvidence;
+              }),
               tool_coverage: { examples: nflExampleCoverage, tools: nflAnalystTools.filter(t => t.name !== 'finish_analysis').map(t => ({name: t.name, description: t.description?.split('. ').slice(0,2).join('. ')})) },
-            }, { callModel:options.callModel, timeoutMs: Math.min(30_000, Math.max(1, deadlineMs - (Date.now() - started))) });
+            }, { callModel:options.callModel, timeoutMs: Math.min(90_000, Math.max(1, deadlineMs - (Date.now() - started))) });
           } catch(error) { stageMs.review+=Date.now()-reviewStart; options.onTrace?.({stage:'review_error',error:String(error)}); return partial('The factual interpretation review could not finish.'); }
           stageMs.review+=Date.now()-reviewStart;
           options.onTrace?.({stage:'review',issues,elapsed_ms:Date.now()-reviewStart});

@@ -117,3 +117,26 @@ test('a concrete unsupported claim check is not hidden by a nominal pass verdict
   const issues=await reviewNflAnalystSemantics(input,{callModel:async()=>message('review_answer',{claim_checks:[{claim:'cheaper acquisition',status:'unsupported',reason:'Only current-team cap was retrieved.'}],pass:true,issues:[]})});
   assert.match(issues.join(' '),/Only current-team cap/);
 });
+
+
+test('complete seven-claim review is accepted without dropping any unsupported claim',async()=>{
+  const input={question:'Compare options.',authored:prose('The recommendation is conditional.'),selected_answer:'The recommendation is conditional.',selected_tables:[],evidence:[],tool_coverage:{}};
+  const checks=Array.from({length:7},(_,i)=>({claim:'Claim '+i,status:'supported',reason:'Recorded source'}));
+  assert.deepEqual(await reviewNflAnalystSemantics(input,{callModel:async()=>message('review_answer',{claim_checks:checks,pass:true,issues:[]})}),[]);
+  checks[6]={claim:'It is cheaper to acquire.',status:'unsupported',reason:'Only current-team cap is recorded.'};
+  assert.match((await reviewNflAnalystSemantics(input,{callModel:async()=>message('review_answer',{claim_checks:checks,pass:true,issues:[]})})).join(' '),/Only current-team cap/);
+});
+
+test('a follow-up must retrieve current-turn evidence before finish is exposed',async()=>{
+  let count=0;
+  const result=await buildNflAiAnswer('Explain active term separately from guaranteed liability.',{
+    loadData:async()=>({seed:await loadNflDemoSeed(),source_mode:'supabase_current_views',fallback_reason:null}),reviewDraft:async()=>[],
+    history:[{question:'Inspect Meyers.',body:{kind:'data_analysis',answer:'An old answer is not evidence.',key_findings:[],tables:[],calculations:[],caveats:[],followups:[]}}],
+    callModel:async params=>{
+      if(!count++){assert.equal(params.tools?.some(t=>t.name==='finish_analysis'),false);return message('read_contract_dossiers',{player_names:['Jakobi Meyers']});}
+      assert.ok(params.tools?.some(t=>t.name==='finish_analysis'));
+      return message('finish_analysis',{answer:'Active term and guaranteed liability are separate questions. The dossier supports the recorded term; inspect the actual guarantees before inferring future liability.',evidence_id:'lookup_1',continuation_query_id:'lookup_1'});
+    },
+  });
+  assert.equal(result.body.ai_analysis?.outcome,'complete');
+});

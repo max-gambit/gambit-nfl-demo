@@ -23,6 +23,7 @@ const amountPattern = /(?:[-−+]\s*)?\$?\s*\d[\d,]*(?:\.\d+)?\s*(?:billion|mill
 
 export function numericMentions(text: string): Array<{ raw: string; value: number; unit: EvidenceFact['unit']; index: number; precision: number; after: string; comparison?: 'gt'|'gte'|'lt'|'lte' }> {
   const dateSpans=[...text.matchAll(/\b20\d{2}-\d{2}-\d{2}\b|\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\.?[ -]+\d{1,2}(?:[–-]\d{1,2})?(?:,?\s+20\d{2})?/gi)].map(m=>[m.index!,m.index!+m[0].length]);
+  for(const match of text.matchAll(/(?<![$\d])\b20\d{2}[–-](?:20)?\d{2}\b|\b(?:No\.\s*|WR|QB|TE|RB|OT|IOL|EDGE)[1-9]\b/gi))dateSpans.push([match.index!,match.index!+match[0].length]);
   for(const match of text.matchAll(/\bon\s+\d{1,2}\/\d{1,2}(?:\s*(?:and|,)\s*\d{1,2}\/\d{1,2})*/gi))dateSpans.push([match.index!,match.index!+match[0].length]);
   for(const match of text.matchAll(/\b(?:on\s+)?the\s+(?:[1-9]|[12]\d|3[01])(?:st|nd|rd|th)(?:\s*(?:and|,)\s*(?:the\s+)?(?:[1-9]|[12]\d|3[01])(?:st|nd|rd|th))*/gi))dateSpans.push([match.index!,match.index!+match[0].length]);
   const spelled=/\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)(?:[- ](one|two|three|four|five|six|seven|eight|nine))?\s+(billion|million|thousand|dollars|percent|yards|receptions|games|snaps|years)\b/gi;
@@ -33,7 +34,7 @@ export function numericMentions(text: string): Array<{ raw: string; value: numbe
     const digitText=raw.match(/\d[\d,]*(?:\.\d+)?/)?.[0];
     const digits=digitText??String(words[match[1]?.toLowerCase()] + (match[2]?words[match[2].toLowerCase()]:0));
     const scale=/billion|b\b/i.test(raw)?1e9:/million|m\b/i.test(raw)?1e6:/thousand|k\b/i.test(raw)?1e3:1;
-    const value=Number(digits.replaceAll(',',''))*scale*(/^[-−]/.test(raw)?-1:1);
+    const value=Number(digits.replaceAll(',',''))*scale*(/^[-−]/.test(raw)&&!/[a-z0-9]$/i.test(text.slice(0,index))?-1:1);
     if(!Number.isFinite(value))return [];
     const following=text.slice(match.index!+match[0].length);
     const unit:EvidenceFact['unit']=/\$|dollars/i.test(raw)||/^\s*dollars\b/i.test(following)?'USD':/%|percent/i.test(raw)||/^\s*percent\b/i.test(following)?'percent':'number';
@@ -41,7 +42,13 @@ export function numericMentions(text: string): Array<{ raw: string; value: numbe
     const comparison=/^[-–]?plus\b|^\+/.test(following)?'gte' as const:/\b(?:cleared|exceeded|above|more than|over)\s*$/i.test(prefix)?'gt' as const:/\bat least\s*$/i.test(prefix)?'gte' as const:/\b(?:under|below|less than)\s*$/i.test(prefix)?'lt' as const:/\bat most\s*$/i.test(prefix)?'lte' as const:undefined;
     return [{raw,value,unit,index,comparison,after:following.split(/\d/)[0].slice(0,35),precision:scale/10**(digits.split('.')[1]?.length??0)}];
   }).sort((a,b)=>a.index-b.index);
-  return mentions.map((mention,i)=>({...mention,after:text.slice(mention.index+mention.raw.length,mentions[i+1]?.index).slice(0,35)}));
+  return mentions.map((mention,i)=>{
+    const next=mentions[i+1];
+    const between=next?text.slice(mention.index+mention.raw.length,next.index+Number(/^[-−]/.test(next.raw))).trim():'';
+    // A range's endpoints share the unit following its second endpoint.
+    const after=next&&/^(?:[–-]|to)$/.test(between)?text.slice(next.index+next.raw.length,mentions[i+2]?.index):text.slice(mention.index+mention.raw.length,next?.index);
+    return {...mention,after:after.slice(0,35)};
+  });
 }
 
 function scalar(value: unknown): number | undefined {
@@ -130,13 +137,13 @@ function matches(mention: ReturnType<typeof numericMentions>[number], fact: Evid
 }
 
 function metricCompatible(mention: ReturnType<typeof numericMentions>[number], fact: EvidenceFact): boolean {
-  const nearby = mention.after.toLowerCase();
-  const metric = fact.metric.toLowerCase();
-  const domains = [['receiving yards','yards'],['receptions','reception'],['touchdowns','touchdown'],['offensive snaps','offensive snap'],['snaps','snap'],['games','game']];
-  for (const [plural, singular] of domains) {
-    if (new RegExp(`\\b(?:${plural}|${singular}s?)\\b`).test(nearby) && !new RegExp(plural === 'touchdowns' ? 'touchdown|\\btd\\b' : singular === 'reception' ? 'reception|\\brec\\b' : singular).test(metric)) return false;
-  }
-  return true;
+  const spelledUnit=mention.raw.match(/\b(yards|receptions|games|snaps)\s*$/i)?.[1];
+  const direct=spelledUnit??mention.after.trimStart().match(/^(?:[-–]\s*)?(?:(?:receiving|offensive|defensive)\s+)?(yards?|receptions?|catches|touchdowns?|TD|snaps?|games?|starts?)\b/i)?.[1];
+  if(!direct)return true;
+  const metric=fact.metric.toLowerCase();
+  const unit=direct.toLowerCase();
+  const pattern=/reception|catches/.test(unit)?/reception|\brec\b/:/touchdown|^td$/.test(unit)?/touchdown|\btd\b/:unit.startsWith('yard')?/yards?/:unit.startsWith('snap')?/snaps?/:unit.startsWith('game')?/games?/:/starts?/;
+  return pattern.test(metric);
 }
 
 /** Preserve prose verbatim. Invalid claims become actionable repair errors. */
@@ -167,13 +174,14 @@ export function validateSourcedParagraphs(paragraphs: SourcedParagraph[], facts:
         const prefix=sentence.slice(0,mention.index);
         const clause=prefix.split(/;|—|,(?!\d)|\b(?:while|versus|but|then|ahead of)\b/i).at(-1)??prefix;
         const clauseStart=prefix.length-clause.length;
-        const actors=occurrences.filter(o=>{
-          if(o.index<clauseStart||o.index>mention.index)return false;
-          const tail=sentence.slice(o.index,mention.index);
-          return /^[a-z ]+\s*$/i.test(tail) || /(?:['’]s)?\s+(?:recorded|produced|has|had|played|carries|carried|posted|took|costs|received|receives|logged|finished)\b/i.test(tail) || /['’]s\s*$/.test(tail);
-        });
+        const actors=occurrences.filter(o=>o.index>=clauseStart&&o.index<mention.index);
         const nearest=actors.sort((a,b)=>b.index-a.index)[0];
-        const mentionedSubjects=mention.comparison&&/\beach\b/i.test(prefix)?[...new Set(occurrences.filter(o=>o.index<mention.index).map(o=>o.subject))]:nearest?[nearest.subject]:[];
+        const nextAmount=numericMentions(sentence).find(m=>m.index>mention.index)?.index??sentence.length;
+        const namedAfter=occurrences.find(o=>o.index>mention.index&&o.index<nextAmount&&/^\s*(?:(?:receiving )?yards?|receptions?|catches|games?|snaps?|starts?)?\s*(?:for|by)\s*$/i.test(sentence.slice(mention.index+mention.raw.length,o.index)));
+        const allAmounts=numericMentions(sentence).filter(m=>!/^20\d{2}$/.test(m.raw));
+        const orderedSubjects=[...new Set(occurrences.filter(o=>o.index<(allAmounts[0]?.index??0)).sort((a,b)=>a.index-b.index).map(o=>o.subject))];
+        const ordinal=/\brespectively\b/i.test(sentence)&&orderedSubjects.length===allAmounts.length?orderedSubjects[allAmounts.findIndex(m=>m.index===mention.index)]:undefined;
+        const mentionedSubjects=mention.comparison&&/\beach\b/i.test(prefix)?[...new Set(occurrences.filter(o=>o.index<mention.index).map(o=>o.subject))]:namedAfter?[namedAfter.subject]:ordinal?[ordinal]:nearest?[nearest.subject]:[];
         const matchFact = (f:EvidenceFact) => {
           if (f.statement) return normalize(f.statement).includes(normalize(sentence)) || normalize(sentence).includes(normalize(f.statement));
           // Period labels are part of the bound record even when not a value cell.
